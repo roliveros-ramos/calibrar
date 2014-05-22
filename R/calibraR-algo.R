@@ -79,7 +79,7 @@
 # Calculate Fitness -------------------------------------------------------
 
 
-.calculateFitness = function(opt, fn, ...) {
+.calculateFitness = function(opt, fn) {
   
   fn = match.fun(fn)
   pop = opt$pop
@@ -96,7 +96,7 @@
       
       work.dir = .setWorkDir(run, i)    # set the 'individual' current directory
       
-      Fitness = fn(pop[, i+1], ...) 
+      Fitness = fn(pop[, i+1]) 
       Fitness = c(i+1, Fitness)
       Fitness
       
@@ -112,7 +112,7 @@
       
       work.dir = .setWorkDir(run, i)    # set the 'individual' current directory
 
-      Fitness = fn(pop[,i+1], ...)
+      Fitness = fn(pop[,i+1])
       FITNESS	=	rbind(FITNESS, Fitness)
       
     }

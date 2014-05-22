@@ -3,16 +3,29 @@ optimEA = function (par, fn, gr = NULL, ..., method = "default",
                     lower = -Inf, upper = Inf, active=NULL, 
                     control = list(), hessian = FALSE, restart=NULL) {
   
-  fn   = match.fun(fn)
+  npar = length(par)
+
+  active = .checkActive(active=active, npar=npar)
+  bounds = .checkBounds(lower=lower, upper=upper, npar=npar)
+  guess  = .checkOpt(par=par, lower=bounds$lower, upper=bounds$upper)
+  
+  isActive = which(active)
+  
+  par    = guess[isActive]
+  lower  = bounds$lower[isActive]
+  upper  = bounds$upper[isActive]
+  
   npar = length(par)
   
-  bounds = .checkBounds(lower=lower, upper=upper, npar=npar)
+  # closure for function evaluation
+  fn   = match.fun(fn)
+  fn1  = function(par) {
+    parx = guess
+    parx[isActive] = par
+    fn(parx, ...)
+  }
   
-  lower  = bounds$lower
-  upper  = bounds$upper
-  par    = .checkOpt(par=par, lower=lower, upper=upper)
-  
-  control = .checkControl(control=control, method=method, par=par, fn=fn, ...)
+  control = .checkControl(control=control, method=method, par=par, fn=fn1, active=active)
   
   # opt = get restart, a method for a file (character) or a restart class
   
@@ -32,7 +45,7 @@ optimEA = function (par, fn, gr = NULL, ..., method = "default",
     
     # evaluate the function in the population: evaluate fn, aggregate fitness
     
-    opt$fitness = .calculateFitness(opt, fn=fn, ...)
+    opt$fitness = .calculateFitness(opt, fn=fn1)
     
     # select best 'individuals'
     
@@ -49,7 +62,7 @@ optimEA = function (par, fn, gr = NULL, ..., method = "default",
     
   }
   
-  value = control$aggFn(fn(opt$MU), control$weights)
+  value = control$aggFn(fn1(opt$MU), control$weights)
   names(opt$MU) = names(par)
   opt$counts = c('function'=opt$gen*control$popsize, generations=opt$gen)
   

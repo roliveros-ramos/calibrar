@@ -1,4 +1,15 @@
 
+.checkActive = function(active, npar) {
+
+  if(is.null(active)) return(rep(TRUE, npar))
+  if(all(!active)) stop("No parameter is active, at least one parameter must be optimized.")
+  if(!is.logical(active)) stop("'active' must be a boolean vector.")
+  if(length(active)!=npar) stop("Length of 'active' parameters must match parameter number.")
+  active[is.na(active)] = FALSE
+  return(active)
+  
+}
+
 .checkBounds =  function(lower, upper, npar) {
   
   nl = length(lower)
@@ -63,7 +74,7 @@
   
 }
 
-.checkControl = function(control, method, par, fn, ...) {
+.checkControl = function(control, method, par, fn, active) {
   
   fn = match.fun(fn)
   
@@ -95,11 +106,12 @@
   }
   
   # check for user-provided variances (sigma)
-  if(!is.null(con$sigma) & length(con$sigma)!=length(par)) 
+  if(!is.null(con$sigma) & length(con$sigma)!=length(active)) 
     stop("Vector of variances (sigma) must match parameter length.")
+  if(!is.null(con$sigma)) con$sigma = con$sigma[which(active)]
   
   # check number of variables
-  if(is.null(con$nvar)) con$nvar = length(fn(par, ...))
+  if(is.null(con$nvar)) con$nvar = length(fn(par))
   
   # update maximum number of function evaluations and generations
   if(!is.null(con$maxit) & !is.null(con$maxgen)) 

@@ -23,3 +23,4 @@ optimEA(par0, fn=StyblinskiTang, lower=-5, upper=5)
 # Make it work with multiple phases. 
 # 
 
+optimEA(rep(NA,5), fn=Rosenbrock)
