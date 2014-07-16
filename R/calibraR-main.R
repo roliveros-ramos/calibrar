@@ -1,5 +1,10 @@
+# TO_DO: replicates for fn
+# multiple phases
+# check par: length(par)==1 provide the number of parameters, guess=rep(NA, par)?
+# add npar? Check compatibility or use it to set the calibration, guess=rep(NA, npar)
 
-optimEA = function (par, fn, gr = NULL, ..., method = "default", 
+
+optimES = function (par, fn, gr = NULL, ..., method = "default", 
                     lower = -Inf, upper = Inf, active=NULL, 
                     control = list(), hessian = FALSE, restart=NULL) {
   
@@ -26,6 +31,13 @@ optimEA = function (par, fn, gr = NULL, ..., method = "default",
   }
   
   control = .checkControl(control=control, method=method, par=par, fn=fn1, active=active)
+  
+  if(control$REPORT>0) {
+    trace = list()
+    trace$control = control
+    trace$value = numeric(control$maxgen)
+  } else trace=NULL
+
   
   # opt = get restart, a method for a file (character) or a restart class
   
@@ -59,6 +71,7 @@ optimEA = function (par, fn, gr = NULL, ..., method = "default",
     # save status of the population (for restart)
     
     # save detailed outputs
+    if(control$REPORT>0) trace$value[opt$gen] = control$aggFn(fn1(opt$MU), control$weights)
     
   }
   
@@ -66,9 +79,37 @@ optimEA = function (par, fn, gr = NULL, ..., method = "default",
   names(opt$MU) = names(par)
   opt$counts = c('function'=opt$gen*control$popsize, generations=opt$gen)
   
-  output = list(par=opt$MU, value=value, counts=opt$counts)
+  output = list(par=opt$MU, value=value, counts=opt$counts, 
+                trace=trace)
   
   return(output)
+  
+}
+
+
+calibrate = function(par, fn, ..., aggFn = NULL, method = "default",
+                     replicates=1, lower = -Inf, upper = Inf, phases=NULL, 
+                     gr = NULL, control = list(), hessian = FALSE, 
+                     restart=NULL) {
+  
+  npar = length(par)
+  
+  phases     = .checkPhases(active=active, npar=npar)
+  bounds     = .checkBounds(lower=lower, upper=upper, npar=npar)
+  guess      = .checkOpt(par=par, lower=bounds$lower, upper=bounds$upper)
+
+  par    = guess
+  lower  = bounds$lower
+  upper  = bounds$upper
+  nphases = max(phases, na.rm=TRUE)
+
+  replicates = .checkReplicates(replicates, nphases) 
+  
+  for(phase in seq_len(nphases)) {
+      
+    # call optimEA
+    
+  }
   
 }
 

@@ -29,6 +29,7 @@ Rosenbrock = function(x, aggregate=TRUE) {
   if(isTRUE(aggregate)) return(sum(out)) else return(out) 
 }
 
+
 Beale = function(x) {
   # f(3, 0.5) = 0
   # x,y \in [-4.5, 4.5]
@@ -190,21 +191,3 @@ StyblinskiTang = function(x, aggregate=TRUE) {
   out = (x^4 - 16*x^2 + 5*x)/2
   if(isTRUE(aggregate)) return(sum(out)) else return(out) 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

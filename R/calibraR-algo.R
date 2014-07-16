@@ -11,9 +11,15 @@
   sigma = control$sigma
   if(is.null(control$sigma)) sigma = rep(NA, length(x))
   out = x^2/12
-  out[!is.finite(out)] = 2500
+  out[!is.finite(out)] = 1
   sigma[is.na(sigma)] = out[is.na(sigma)]
   return(sigma)
+}
+
+.calculateRange = function(lower, upper) {
+  out = upper - lower
+  out[!is.finite(out)] = 1
+  return(out)
 }
 
 .newOpt = function(par, lower, upper, control) {
@@ -24,7 +30,7 @@
   opt$nvar      = control$nvar
   opt$seed      = control$popsize
   opt$selection = control$selection 
-  opt$range     = upper - lower
+  opt$range     = .calculateRange(lower, upper)
   opt$MU        = as.numeric(par)
   opt$SIGMA	    = .calculateSigma(opt$range, control)
   opt$lower     = lower

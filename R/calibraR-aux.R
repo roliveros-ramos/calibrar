@@ -1,12 +1,49 @@
+.pasteList = function(x) {
+  if(length(x)<=1) return(x)
+  out = paste(paste(x[-length(x)], sep="", collapse=", "), "and", x[length(x)])
+  return(out)
+  
+}
 
 .checkActive = function(active, npar) {
-
+  
   if(is.null(active)) return(rep(TRUE, npar))
-  if(all(!active)) stop("No parameter is active, at least one parameter must be optimized.")
-  if(!is.logical(active)) stop("'active' must be a boolean vector.")
-  if(length(active)!=npar) stop("Length of 'active' parameters must match parameter number.")
-  active[is.na(active)] = FALSE
+  active = as.logical(active)
+   if(all(!active)) stop("No parameter is active, at least one parameter must be optimized.")
+  if(length(active)!=npar) stop("Length of 'phases' argument must match number of parameters.")
   return(active)
+  
+}
+
+.checkPhases = function(phases, npar) {
+
+  if(is.null(phases)) return(rep(1L, npar))
+  phases = as.integer(phases)
+  active = phases>0 & !is.na(phases)
+  if(all(!active)) stop("No parameter is active, at least one parameter must be optimized.")
+  if(length(active)!=npar) stop("Length of 'phases' argument must match number of parameters.")
+  phases[phases<=0] = NA
+  if(min(phases, na.rm=TRUE)!=1L) stop("No parameters has been specified for phase 1.")
+  allPhases = seq(from=1, to=max(phases, na.rm=TRUE))
+  ind = allPhases %in% phases
+  missingPhases = .pasteList(allPhases[!ind])
+  if(!all(ind)) stop(paste("No parameters for phases", missingPhases, "have been indicated."))
+  
+  return(phases)
+  
+}
+
+.checkReplicates = function(replicates, nphases) {
+
+  if(any(is.na(replicates))) stop("NAs are not allowed as 'replicates' number.")
+  if(is.null(replicates)) return(rep(1, nphases))
+  if(length(replicates)==1) return(rep(replicates, nphases)) 
+  if(length(replicates)!=nphases) stop("Length of 'replicates' argument must match number of phases.")
+  replicates = as.integer(replicates)
+  
+  if(any(replicates<=0)) stop("All 'replicates' must be positive integers.")
+  
+  return(replicates)
   
 }
 
@@ -79,7 +116,7 @@
   fn = match.fun(fn)
   
   con = list(trace = 0, fnscale = 1, parscale = rep.int(1, length(par)), maxit = NULL, maxgen=NULL,
-             abstol = -Inf, reltol = sqrt(.Machine$double.eps), REPORT = 5, ncores=parallel::detectCores(), 
+             abstol = -Inf, reltol = sqrt(.Machine$double.eps), REPORT = 0, ncores=parallel::detectCores(), 
              alpha=0.05, age.max=1, selection=0.5, step=0.5, nvar=NULL, weights=1, sigma=NULL,
              method=method, aggFn=.weighted.sum, parallel=FALSE, run=NULL, useCV=TRUE,
              convergence=1e-6)
