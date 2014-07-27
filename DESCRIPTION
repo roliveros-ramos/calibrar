@@ -1,10 +1,10 @@
-Package: calibraR
+Package: calibrar
 Type: Package
-Title: Calibration of Individual Based Models using Evolutionary Algorithms
+Title: Calibration of Ecological using Evolutionary Algorithms
 Version: 0.1
 Date: 2014-04-13
 Author: Ricardo Oliveros-Ramos
 Maintainer: Ricardo Oliveros-Ramos <ricardo.oliveros@gmail.com>
-Description: Calibration of Individual Based Models using Evolutionary Algorithms
+Description: Calibration of Ecological using Evolutionary Algorithms
 License: GLP-2
 ByteCompile: TRUE
