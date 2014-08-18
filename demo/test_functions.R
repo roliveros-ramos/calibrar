@@ -27,3 +27,12 @@ testx = function(x) Rosenbrock(x) + Sphere(x)
 testx2 = function(x) c(Rosenbrock(x), Sphere(x))
 
 optimES(rep(NA,5), fn=Rosenbrock)
+
+
+calibrate(par=rep(NA, 5), fn=Sphere)
+calibrate(par=rep(NA, 5), fn=Sphere, replicates=3)
+calibrate(par=rep(0.5, 5), fn=Sphere, replicates=3, lower=-5, upper=5)
+x = calibrate(par=rep(0.5, 5), fn=Sphere, replicates=3, lower=-5, upper=5, phases=c(1,1,1,2,3))
+calibrate(par=rep(0.5, 5), fn=Sphere, replicates=c(1,1,4), lower=-5, upper=5,
+          phases=c(1,1,1,2,3))
+

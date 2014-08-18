@@ -94,7 +94,9 @@ calibrate = function(par, fn, ..., aggFn = NULL, method = "default",
   
   npar = length(par)
   
-  phases     = .checkPhases(active=active, npar=npar)
+  fn = match.fun(fn)
+  
+  phases     = .checkPhases(phases=phases, npar=npar)
   bounds     = .checkBounds(lower=lower, upper=upper, npar=npar)
   guess      = .checkOpt(par=par, lower=bounds$lower, upper=bounds$upper)
 
@@ -105,13 +107,31 @@ calibrate = function(par, fn, ..., aggFn = NULL, method = "default",
 
   replicates = .checkReplicates(replicates, nphases) 
   
+  output = list()
+  
   for(phase in seq_len(nphases)) {
       
     # call optimEA
+    active = (phases <= phase) # NAs are corrected in optimES 
+    temp = optimES(par=par, fn=fn, gr = NULL, ..., method = method, 
+                   lower = lower, upper = upper, active=active, 
+                   control = control, hessian = hessian, restart=restart)
+   
+    output$phases[[phase]] = temp # trim?
+    par[which(active)] = temp$par
+    control = .updateControl(control=control, opt=temp, method=method)  # update CVs? 
     
   }
   
+  output = c(temp, output)
+  class(output) = c("calibrar", class(output))
+  
+  return(output)
+  
 }
+
+
+
 
 
 

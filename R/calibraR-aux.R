@@ -193,3 +193,8 @@
 }
 
 
+.updateControl = function(control, opt, method) {
+  # update sigma...
+  return(control)
+}
+
