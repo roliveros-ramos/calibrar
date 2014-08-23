@@ -115,7 +115,7 @@
   
   fn = match.fun(fn)
   
-  con = list(trace = 0, fnscale = 1, parscale = rep.int(1, length(par)), maxit = NULL, maxgen=NULL,
+  con = list(trace = 0, fnscale = 1, parscale = rep.int(1L, length(par)), maxit = NULL, maxgen=NULL,
              abstol = -Inf, reltol = sqrt(.Machine$double.eps), REPORT = 0, ncores=parallel::detectCores(), 
              alpha=0.05, age.max=1, selection=0.5, step=0.5, nvar=NULL, weights=1, sigma=NULL,
              method=method, aggFn=.weighted.sum, parallel=FALSE, run=NULL, useCV=TRUE,

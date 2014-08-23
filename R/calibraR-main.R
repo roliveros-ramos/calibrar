@@ -1,8 +1,6 @@
 # TO_DO: replicates for fn
-# multiple phases
 # check par: length(par)==1 provide the number of parameters, guess=rep(NA, par)?
 # add npar? Check compatibility or use it to set the calibration, guess=rep(NA, npar)
-
 
 optimES = function (par, fn, gr = NULL, ..., method = "default", 
                     lower = -Inf, upper = Inf, active=NULL, 
@@ -88,10 +86,9 @@ optimES = function (par, fn, gr = NULL, ..., method = "default",
 
 
 calibrate = function(par, fn, ..., aggFn = NULL, method = "default",
-                     replicates=1, lower = -Inf, upper = Inf, phases=NULL, 
+                     phases = NULL, replicates=1, lower = -Inf, upper = Inf,  
                      gr = NULL, control = list(), hessian = FALSE, 
-                     restart=NULL) {
-  
+                     restart = NULL) 
   npar = length(par)
   
   fn = match.fun(fn)
@@ -100,9 +97,9 @@ calibrate = function(par, fn, ..., aggFn = NULL, method = "default",
   bounds     = .checkBounds(lower=lower, upper=upper, npar=npar)
   guess      = .checkOpt(par=par, lower=bounds$lower, upper=bounds$upper)
 
-  par    = guess
-  lower  = bounds$lower
-  upper  = bounds$upper
+  par     = guess
+  lower   = bounds$lower
+  upper   = bounds$upper
   nphases = max(phases, na.rm=TRUE)
 
   replicates = .checkReplicates(replicates, nphases) 

@@ -223,7 +223,7 @@
 }
 
 
-.updatePopulation = function(opt, pop) {
+.updatePopulation = function(opt) {
   
   opt = within(opt, {
     
