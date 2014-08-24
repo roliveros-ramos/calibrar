@@ -1,6 +1,18 @@
 # TO_DO: replicates for fn
 # check par: length(par)==1 provide the number of parameters, guess=rep(NA, par)?
 # add npar? Check compatibility or use it to set the calibration, guess=rep(NA, npar)
+# Restart
+# Should function be taken from restart or arguments?
+# Should we take control from new control or restart?
+# Now: to reproduce actual functioning, think on mutating objects.
+
+# save restart in run dir if not null.
+# use default restart.file if not defined, build over model? parse function name?
+# this has to be inherited from calibrar() to include phase and model
+# define saveRestart?
+# messages by REPORT
+
+# model-specific packages can be designed over calibrar.
 
 optimES = function (par, fn, gr = NULL, ..., method = "default", 
                     lower = -Inf, upper = Inf, active=NULL, 
@@ -30,7 +42,7 @@ optimES = function (par, fn, gr = NULL, ..., method = "default",
   
   control = .checkControl(control=control, method=method, par=par, fn=fn1, active=active)
   
-  if(control$REPORT>0) {
+  if(control$REPORT>0 & control$trace>0) {
     trace = list()
     trace$control = control
     trace$value = numeric(control$maxgen)
@@ -69,7 +81,14 @@ optimES = function (par, fn, gr = NULL, ..., method = "default",
     # save status of the population (for restart)
     
     # save detailed outputs
-    if(control$REPORT>0) trace$value[opt$gen] = control$aggFn(fn1(opt$MU), control$weights)
+    if(control$REPORT>0 & control$trace>0) {
+      
+      if(opt$gen%%control$REPORT==0) {
+        trace$value[opt$gen] = control$aggFn(fn1(opt$MU), control$weights)
+        .messageBbyGen(opt, trace)
+      }
+      
+    }
     
   }
   

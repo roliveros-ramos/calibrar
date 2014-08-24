@@ -5,6 +5,10 @@
   
 }
 
+.messageBbyGen = function(opt, trace) {
+  cat("--- Generation", opt$gen, "-----")
+}
+
 .checkActive = function(active, npar) {
   
   if(is.null(active)) return(rep(TRUE, npar))
@@ -116,7 +120,7 @@
   fn = match.fun(fn)
   
   con = list(trace = 0, fnscale = 1, parscale = rep.int(1L, length(par)), maxit = NULL, maxgen=NULL,
-             abstol = -Inf, reltol = sqrt(.Machine$double.eps), REPORT = 0, ncores=parallel::detectCores(), 
+             abstol = -Inf, reltol = sqrt(.Machine$double.eps), REPORT = 10L, ncores=parallel::detectCores(), 
              alpha=0.05, age.max=1, selection=0.5, step=0.5, nvar=NULL, weights=1, sigma=NULL,
              method=method, aggFn=.weighted.sum, parallel=FALSE, run=NULL, useCV=TRUE,
              convergence=1e-6)
@@ -184,12 +188,14 @@
 }
 
 .getRestart = function(restart) {
-  
-  return(restart)
+  if(!file.exists(restart)) stop("Restart file does not exist.")
+  load(restart)
+  return(opt)
 }
 
-.createRestartFile = function() {
-  # MU, SIGMA, sigmasmall, gen, phase
+.createRestartFile = function(opt, control) {
+  save(opt, file = control$restart.file)
+  return(invisible())
 }
 
 
