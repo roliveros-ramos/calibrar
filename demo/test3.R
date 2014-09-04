@@ -33,11 +33,14 @@ calibrarDemo = function(path=NULL, model=NULL, seed=830613, ...) {
   # observed abundances
   n = matrix(rpois(length(mu), lambda=mu), nrow=T, ncol=L)  
   
-  data.folder = file.path(path, "data")
+  main.folder   = file.path(path, "PoissonDemo")
+  data.folder   = file.path(main.folder, "data")
+  master.folder = file.path(main.folder, "master")
   
   if(!file.exists(data.folder)) dir.create(data.folder, recursive=TRUE)
+  if(!file.exists(master.folder)) dir.create(master.folder, recursive=TRUE)
   
-  write.csv(env, file.path(data.folder, "environment.csv"))
+  write.csv(env, file.path(master.folder, "environment.csv"))
   
 
   for(i in seq_len(L)) {
@@ -48,11 +51,21 @@ calibrarDemo = function(path=NULL, model=NULL, seed=830613, ...) {
     write.csv(dat, file.path(data.folder, site.file))
   }
   
+
+  parInfo = data.frame(guess = unlist(par_real))
+  parInfo$guess = c(0.2, 0.1, rep(0, T-1), sd, log(n[1,]))
+  parInfo$min = c(0, 0, rep(-10, T-1), 0.01, rep(0, L))
+  parInfo$max = c(1, 0.5, rep(10, T-1), 1, log(1.5*n[1,]))
+  parInfo$phase = c(1, 1, rep(2, T-1), NA, rep(3, L))
+  
+  write.csv(parInfo, file.path(main.folder, "parInfo.csv"))
+
+  # write calibrationInfo.csv
+  
   return(par_real)
 }
 
-path = "private"
-.generatePoissonMixedModel(path=path)
+# mode new functions
 
 .PoissonMixedModel = function(par, forcing) {
   # par is a list with 'alpha', 'beta' 'gamma' and 'mu_ini'.
@@ -61,7 +74,7 @@ path = "private"
   alpha  = par$alpha
   beta   = par$beta
   gamma  = if(!is.null((par$gamma))) par$gamma else rep(0, T-1)
-  mu_ini = par$mu_ini
+  mu_ini = exp(par$mu_ini)
   
   mu = matrix(nrow=T, ncol=L)
   
