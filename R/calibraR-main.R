@@ -107,7 +107,8 @@ optimES = function (par, fn, gr = NULL, ..., method = "default",
 calibrate = function(par, fn, ..., aggFn = NULL, method = "default",
                      phases = NULL, replicates=1, lower = -Inf, upper = Inf,  
                      gr = NULL, control = list(), hessian = FALSE, 
-                     restart = NULL) 
+                     restart = NULL) {
+  
   npar = length(par)
   
   fn = match.fun(fn)
@@ -147,7 +148,10 @@ calibrate = function(par, fn, ..., aggFn = NULL, method = "default",
 }
 
 
+# getObservedData
 
+
+# createObjectiveFunction
 
 
 

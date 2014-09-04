@@ -5,6 +5,11 @@
 # method for summary and print
 # f() print the minimum
 
+summary.calibrar.function = function(x) {
+  "hola"
+}
+
+
 Ackley = function(x) {
   # f(0,0) = 0
   # x,y \in [-5,5]

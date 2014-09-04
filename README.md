@@ -1,4 +1,4 @@
 calibraR
 ========
 
-Calibration of Individual Based Models using Evolutionary Algorithms
+Calibration of Ecological models using Evolutionary Algorithms
