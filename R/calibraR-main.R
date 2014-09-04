@@ -154,4 +154,21 @@ calibrate = function(par, fn, ..., aggFn = NULL, method = "default",
 # createObjectiveFunction
 
 
+# calibrar Demo
+
+calibrarDemo = function(path=NULL, model=NULL, seed=830613, ...) {
+  
+  if(is.null(path)) path = getwd()
+  if(is.null(model)) {
+    model = "default"
+    warning("Using default demo 'PoissonMixedModel'")
+  }
+  
+  output = switch(model, 
+                  Poisson = .generatePoissonMixedModel(path=path, seed=seed, ...),
+                  .generatePoissonMixedModel(path=path, seed=seed, ...)  
+  )
+  return(output)                
+  
+}
 
