@@ -1,14 +1,17 @@
 
 
-.generatePoissonMixedModel = function(path, alpha=0.1, beta=0.05, sd=0.4, T=100, L=12, N0=100, sd_env=0.1, seed=771104, 
+.generatePoissonMixedModel = function(path, alpha=0.4, beta=0.4, T=10, L=6, N0=100, sd_env=0.3, 
                                       ...) {
-  
-  set.seed(seed)
   
   nsites = ceiling(log10(L+1))
   
+  sd = alpha
+  
   env  = matrix(rnorm(T*L, mean=0, sd=sd_env), nrow=T, ncol=L)
-  env  = round(apply(env, 2, cumsum),3)
+  env  = env/diff(range(env))
+#   env  = apply(env, 2, filter, filter=rep(1,3)/3)
+#   env  = env/sqrt(seq_len(T))
+  env  = round(env, 4)
   
   colnames(env) = paste0("L", sprintf(paste0("%0", nsites, "d"), seq_len(L)))
   rownames(env) = seq_len(T)
@@ -17,7 +20,7 @@
   gamma  = rnorm(T-1, mean=0, sd=sd)
   mu_ini = log(rpois(n=L, lambda=runif(L, min=N0/4, max=N0))) #initial means
   
-  par_real = list(alpha=alpha, beta=beta, gamma=gamma, 
+  par_real = list(alpha=alpha, beta=beta, gamma=gamma,  
                   sd=sd, mu_ini=mu_ini)
   
   mu = .PoissonMixedModel(par=par_real, forcing=env)
@@ -46,9 +49,9 @@
   # parInfo.csv
   
   parInfo = data.frame(guess = unlist(par_real))
-  parInfo$guess = c(0.2, 0.1, rep(0, T-1), sd, round(log(n[1,]),1))
-  parInfo$min = c(0, 0, rep(-10, T-1), 0.01, rep(0, L))
-  parInfo$max = c(1, 0.5, rep(10, T-1), 1, round(rep(max(log(1.5*n[1,])),L),1))
+  parInfo$guess = c(0.2, 0.1, rep(0, T-1), alpha/3, round(log(n[1,]),3))
+  parInfo$lower = c(0, -0.5, rep(-1.5, T-1), 0, rep(0, L))
+  parInfo$upper = c(1, 0.5, rep(1.5, T-1), 1, round(rep(max(log(1.5*n[1,])),L),1))
   parInfo$phase = c(1, 1, rep(2, T-1), NA, rep(3, L))
   
   write.csv(parInfo, file.path(main.folder, "parInfo.csv"))
@@ -56,26 +59,42 @@
   # calibrationInfo.csv
   
   calibrationInfo = list()
-  calibrationInfo$variable = colnames(env)
-  calibrationInfo$type = "lpois"
+  calibrationInfo$variable  = paste0("site_", sprintf(paste0("%0", nsites, "d"), seq_len(L)))
+  calibrationInfo$type      = "pois"
   calibrationInfo$calibrate = TRUE
-  calibrationInfo$weights = 1
-  calibrationInfo$useData = TRUE
+  calibrationInfo$weights   = 1
+  calibrationInfo$useData   = TRUE
   
   calibrationInfo = as.data.frame(calibrationInfo)
+  
+  calibrationInfo2 = list()
+  calibrationInfo2$variable = "gammas"
+  calibrationInfo2$type     = "normp"
+  calibrationInfo2$calibrate = TRUE
+  calibrationInfo2$weights   = 1/(2*sd^2)
+  calibrationInfo2$useData   = FALSE
+  
+  calibrationInfo2 = as.data.frame(calibrationInfo2)
+  calibrationInfo = rbind(calibrationInfo, calibrationInfo2)
   
   write.csv(calibrationInfo, file.path(main.folder, "calibrationInfo.csv"),
             row.names=FALSE)
   
-  return(par_real)
+  constants = list(T=T, L=L)
+  
+  output = list(path=main.folder, par=par_real, constants)
+  
+  return(output)
+  
 }
 
 # mode new functions
 
 .PoissonMixedModel = function(par, forcing) {
-  # par is a list with 'alpha', 'beta' 'gamma' and 'mu_ini'.
+  # par is a list with 'alpha', 'beta' 'gamma', 'sd' and 'mu_ini'.
   T = nrow(forcing)
   L = ncol(forcing)
+  forcing = as.matrix(forcing)
   alpha  = par$alpha
   beta   = par$beta
   gamma  = if(!is.null((par$gamma))) par$gamma else rep(0, T-1)
@@ -91,3 +110,4 @@
   }
   return(mu)
 }
+

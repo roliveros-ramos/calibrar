@@ -1,3 +1,35 @@
+.messageByGen = function(opt, trace) {
+  cat(sprintf("Generation %d - Value: %f\n", opt$gen, trace$value[opt$gen]))
+#   print(trace$par[opt$gen, ])
+}
+
+
+.printSeq = function(n, preffix=NULL, suffix=NULL, sep="") {
+  nx  = ceiling(log10(n))
+  fmt = paste0(sprintf(paste0("%0", nx, "d"), seq_len(n)))
+  out = paste(preffix, fmt, suffix, sep=sep)
+  return(out)
+}
+
+.read.csv3 = function(path,  ...) {
+  
+  x = tryCatch(read.csv(file=path, row.names=1, ...),
+               error = function(e) .errorReadingCsv(e, path))
+  if(is.null(x)) stop()
+  x = as.matrix(x)
+  mode(x)="numeric"
+  
+  return(x)
+}
+
+.errorReadingCsv = function(e, path) {
+  on.exit(stop())
+  message(e, ".")
+  message("Error reading file ", sQuote(path), ".", sep="")
+  return(invisible())
+}
+
+
 .pasteList = function(x) {
   if(length(x)<=1) return(x)
   out = paste(paste(x[-length(x)], sep="", collapse=", "), "and", x[length(x)])
@@ -115,6 +147,12 @@
   
 }
 
+# if (con$trace < 0) 
+#   warning("read the documentation for 'trace' more carefully")
+# else if (method == "SANN" && con$trace && as.integer(con$REPORT) == 
+#            0) 
+#   stop("'trace != 0' needs 'REPORT >= 1'")
+
 .checkControl = function(control, method, par, fn, active) {
   
   fn = match.fun(fn)
@@ -158,7 +196,7 @@
   if(!is.null(con$maxit) & !is.null(con$maxgen)) 
     warning("'maxit' and 'maxgen' provided, ignoring 'maxit'.")
   if(!is.null(con$maxit) & is.null(con$maxgen)) con$maxgen = floor(con$maxit/con$popsize)
-  if(is.null(con$maxit) & is.null(con$maxgen)) con$maxgen = 1000L
+  if(is.null(con$maxit) & is.null(con$maxgen)) con$maxgen = 2000L
   
   con$maxit = con$popsize*con$maxgen
   

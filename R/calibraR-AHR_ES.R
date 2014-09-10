@@ -1,7 +1,8 @@
 
 .continueEvolution = function(opt, control) {
   out = (opt$gen <= (control$maxgen - 1)) & (opt$step >= control$convergence)
-#   out = (opt$gen <= control$maxit) 
+#   out = (opt$gen <= control$maxit)
+# reltol * (abs(val) + reltol)
   return(out)
 }
 
@@ -170,12 +171,12 @@
   n       =	ncol(x)
   if(n==1) return(matrix(1, nrow=nrow(x), ncol=1))
   
-  cv.min  = apply(x, 2, min, na.rm=TRUE)
-  cv.max  = apply(x, 2, max, na.rm=TRUE)
+  cv.min  = 0.9*(apply(x, 2, min, na.rm=TRUE) + 1e-20)
+  cv.max  = 1.1*(apply(x, 2, max, na.rm=TRUE) + 1e-20)
   out     = t(x)
   out     = ((cv.max - out)/(cv.max-cv.min))^b
   out     = t(out/rowSums(out))
-  out	  = t(apply(out, 1, .norma))
+  out	    = t(apply(out, 1, .norma))
   return(out)
   
 }

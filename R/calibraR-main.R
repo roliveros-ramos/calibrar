@@ -14,17 +14,22 @@
 
 # model-specific packages can be designed over calibrar.
 
+
+
 optimES = function (par, fn, gr = NULL, ..., method = "default", 
                     lower = -Inf, upper = Inf, active=NULL, 
                     control = list(), hessian = FALSE, restart=NULL) {
   
   npar = length(par)
 
+  if(is.null(names(par))) names(par) = .printSeq(npar, preffix="par")
+  
   active = .checkActive(active=active, npar=npar)
   bounds = .checkBounds(lower=lower, upper=upper, npar=npar)
   guess  = .checkOpt(par=par, lower=bounds$lower, upper=bounds$upper)
   
   isActive = which(active)
+  activeFlag = isTRUE(all(active))
   
   par    = guess[isActive]
   lower  = bounds$lower[isActive]
@@ -34,18 +39,24 @@ optimES = function (par, fn, gr = NULL, ..., method = "default",
   
   # closure for function evaluation
   fn   = match.fun(fn)
+  
+  control = .checkControl(control=control, method=method, par=par, fn=fn, active=active)
+  
   fn1  = function(par) {
     parx = guess
     parx[isActive] = par
-    fn(parx, ...)
+    fn(parx, ...)/control$fnscale
   }
   
-  control = .checkControl(control=control, method=method, par=par, fn=fn1, active=active)
   
   if(control$REPORT>0 & control$trace>0) {
     trace = list()
     trace$control = control
-    trace$value = numeric(control$maxgen)
+    trace$value = rep(NA, control$maxgen)
+    trace$step = rep(NA, control$maxgen)
+    trace$par = matrix(NA, nrow=control$maxgen, ncol=length(isActive))
+    trace$sd = matrix(NA, nrow=control$maxgen, ncol=length(isActive))
+    trace$opt = vector("list", control$maxgen)
   } else trace=NULL
 
   
@@ -85,19 +96,26 @@ optimES = function (par, fn, gr = NULL, ..., method = "default",
       
       if(opt$gen%%control$REPORT==0) {
         trace$value[opt$gen] = control$aggFn(fn1(opt$MU), control$weights)
-        .messageBbyGen(opt, trace)
+        trace$step[opt$gen] = opt$step
+        trace$par[opt$gen, ] = opt$MU
+        trace$sd[opt$gen, ] = opt$SIGMA
+        trace$opt[[opt$gen]] = opt
+        .messageByGen(opt, trace)
       }
       
     }
     
   }
   
-  value = control$aggFn(fn1(opt$MU), control$weights)
+  value = control$aggFn(x=fn1(opt$MU), w=control$weights)
   names(opt$MU) = names(par)
   opt$counts = c('function'=opt$gen*control$popsize, generations=opt$gen)
-  
+
   output = list(par=opt$MU, value=value, counts=opt$counts, 
-                trace=trace)
+                trace=trace, partial=fn1(opt$MU), 
+                active=list(par=isActive, flag=activeFlag))
+  
+  class(output) = c("optimES.result", class(output))
   
   return(output)
   
@@ -137,11 +155,29 @@ calibrate = function(par, fn, ..., aggFn = NULL, method = "default",
     output$phases[[phase]] = temp # trim?
     par[which(active)] = temp$par
     control = .updateControl(control=control, opt=temp, method=method)  # update CVs? 
-    
+
+    cat(sprintf("Phase %d finished (%d of %d parameters active).\n",
+                phase, sum(active, na.rm=TRUE), npar))
+    print(temp$par)
   }
   
-  output = c(temp, output)
-  class(output) = c("calibrar", class(output))
+  isActive = !is.na(phases) & (phases>=1)
+  paropt = guess
+  paropt[isActive] = temp$par
+  
+  if(is.null(names(paropt))) names(paropt) = .printSeq(npar, preffix="par")
+  
+  newNames = rep("*", npar)
+  newNames[isActive] = ""
+  
+  
+  
+  final = list(par=paropt, value=temp$value, counts=temp$counts, 
+               trace=NULL, partial=temp$partial,
+               active=isActive)
+  
+  output = c(final, output)
+  class(output) = c("calibrar.result", class(output))
   
   return(output)
   
@@ -151,12 +187,112 @@ calibrate = function(par, fn, ..., aggFn = NULL, method = "default",
 # getObservedData
 
 
+getObservedData = function(info, path, data.folder="data", ...) {
+  
+  observed  = list()
+  variables = info$variable
+  
+  useData       = as.logical(info$useData)
+  
+  cat("Creating observed data list for calibration...","\n")
+  
+  for(var in 1:nrow(info)) {
+    
+    cat(paste0("Variable: ", variables[var], "\n"))
+    var.path        = file.path(path, data.folder, paste0(variables[var],".csv"))
+    datos           = if(useData[var]) .read.csv3(var.path, ...) else NA
+    observed[[var]] = datos
+    
+  }
+  
+  names(observed) = variables
+  
+  return(observed)
+  
+}
+
+# get Calibration Info
+
+getCalibrationInfo = function(path, file="calibrationInfo.csv", 
+                              stringsAsFactors=FALSE, ...) {
+  
+  caliPath = file.path(path, file)
+  calibrationInfo = read.csv(caliPath, stringsAsFactors=FALSE, ...)
+  
+  fullNames = c("variable", "type", "calibrate", "weights", "useData")  
+  doesNotMatch = !(names(calibrationInfo) %in% fullNames)
+  dnm = names(calibrationInfo)[doesNotMatch]
+  
+  isMissing = !(fullNames %in% names(calibrationInfo))
+  im = fullNames[isMissing]
+  
+  sdnm = if(length(dnm)>1) " columns do " else " column does "
+  sim  = if(length(im)>1) " variables are " else " variable is "
+  msg1 = paste0("Error in ", caliPath, " file (", paste(sapply(dnm, sQuote), collapse=", "), 
+                sdnm, "not match).")
+  msg2 = paste0("Error in ", caliPath, " file (", paste(sapply(im, sQuote), collapse=", "), 
+                sim, "missing).")
+  
+  if(any(doesNotMatch)) stop(msg1)
+  if(any(isMissing)) stop(msg2)
+  
+  # cating correct data types
+  calibrationInfo$variable  = as.character(calibrationInfo$variable)
+  calibrationInfo$type      = as.character(calibrationInfo$type)
+  calibrationInfo$calibrate = as.logical(calibrationInfo$calibrate)
+  calibrationInfo$weights   = as.numeric(calibrationInfo$weights)
+  calibrationInfo$useData   = as.logical(calibrationInfo$useData)
+  
+  return(calibrationInfo)
+}
+
 # createObjectiveFunction
 
+createObjectiveFunction = function(runModel, info, observed, aggFn=.weighted.sum, 
+                                   aggregate=FALSE, ...) {
+
+  fn   = match.fun(runModel)
+  aggFn = match.fun(aggFn)
+  
+  force(observed)
+  force(info)
+  force(aggregate)
+  
+  # check for names in observed and simulated
+  
+  fn1  = function(par) {
+    aggFn = match.fun(aggFn)
+    simulated = fn(par, ...)
+    # apply fitness to all outputs
+    output = .calculateObjetiveValue(obs=observed, sim=simulated, info=info)
+    if(isTRUE(aggregate)) output = aggFn(x=output, w=info$weights)
+    return(output)
+  }
+  
+  return(fn1) 
+  
+}
+
+.calculateObjetiveValue = function(obs, sim, info) {
+  fit = NULL
+  for(j in seq_len(nrow(info))) {
+    if(!info$calibrate[j]) next
+    var = info$variable[j]
+    fit = c(fit, .fitness(obs=obs[[var]], sim=sim[[var]], FUN=info$type[j]))
+  }
+  names(fit) = info$variable[which(info$calibrate)]
+  return(fit)
+}
+
+.fitness = function(obs, sim, FUN, ...) {
+  FUN = match.fun(FUN)
+  output = FUN(obs=obs, sim=sim, ...)
+  return(output)
+}
 
 # calibrar Demo
 
-calibrarDemo = function(path=NULL, model=NULL, seed=830613, ...) {
+calibrarDemo = function(path=NULL, model=NULL,  ...) {
   
   if(is.null(path)) path = getwd()
   if(is.null(model)) {
