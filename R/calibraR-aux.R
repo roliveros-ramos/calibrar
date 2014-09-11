@@ -1,5 +1,7 @@
 .messageByGen = function(opt, trace) {
-  cat(sprintf("Generation %d - Value: %f\n", opt$gen, trace$value[opt$gen]))
+  nx  = ceiling(log10(opt$control$maxgen))
+  cat(sprintf(paste0("Generation %", nx, "d - Value: %.10g\n"), 
+              opt$gen, trace$value[opt$gen]))
 #   print(trace$par[opt$gen, ])
 }
 

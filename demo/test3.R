@@ -7,7 +7,7 @@ set.seed(12345) # updated to T=20 and L=40 for comparative purposes.
 path = "private" # path where to create the demo files
 
 # create the demostration files
-# demo = calibrarDemo(path=path, model="PoissonMixedModel", L=4, T=20) 
+demo = calibrarDemo(path=path, model="PoissonMixedModel", L=4, T=20) 
 
 # set.seed(12345) # updated to T=20 and L=40 for comparative purposes.
 # Parameter's information
@@ -68,7 +68,8 @@ cat("Starting calibration...\n")
 
 calib = calibrate(par=parInfo$guess, fn=obj, lower=parInfo$lower, 
                   upper=parInfo$upper, phases=parInfo$phase,
-                  control=list(weights=calibrationInfo$weights, REPORT=1, trace=1))
+                  control=list(weights=calibrationInfo$weights,
+                               REPORT=1, trace=5))
 
 # calib2 = optimES(par=parInfo$guess, fn=obj, lower=parInfo$lower, 
 #                   upper=parInfo$upper, control=list(weights=calibrationInfo$weights))

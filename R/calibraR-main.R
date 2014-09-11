@@ -15,7 +15,6 @@
 # model-specific packages can be designed over calibrar.
 
 
-
 optimES = function (par, fn, gr = NULL, ..., method = "default", 
                     lower = -Inf, upper = Inf, active=NULL, 
                     control = list(), hessian = FALSE, restart=NULL) {
@@ -48,16 +47,24 @@ optimES = function (par, fn, gr = NULL, ..., method = "default",
     fn(parx, ...)/control$fnscale
   }
   
+  trace = "elmo"
   
   if(control$REPORT>0 & control$trace>0) {
+    
     trace = list()
     trace$control = control
-    trace$value = rep(NA, control$maxgen)
-    trace$step = rep(NA, control$maxgen)
     trace$par = matrix(NA, nrow=control$maxgen, ncol=length(isActive))
-    trace$sd = matrix(NA, nrow=control$maxgen, ncol=length(isActive))
-    trace$opt = vector("list", control$maxgen)
-  } else trace=NULL
+    trace$value = rep(NA, control$maxgen)
+    trace$best  = rep(NA, control$maxgen)
+    
+    if(control$trace>1) {
+      trace$sd = matrix(NA, nrow=control$maxgen, ncol=length(isActive))   
+      trace$step = rep(NA, control$maxgen)     
+    }
+
+    if(control$trace>2) trace$opt = vector("list", control$maxgen)
+    
+  } 
 
   
   # opt = get restart, a method for a file (character) or a restart class
@@ -93,24 +100,30 @@ optimES = function (par, fn, gr = NULL, ..., method = "default",
     
     # save detailed outputs
     if(control$REPORT>0 & control$trace>0) {
-      
+        
+        trace$par[opt$gen, ] = opt$MU
+        trace$best[opt$gen]  = opt$selected$best$fit.global
+        
+        if(control$trace>1) {
+          trace$sd[opt$gen, ]  = opt$SIGMA
+          trace$step[opt$gen]  = opt$step       
+        }
+
       if(opt$gen%%control$REPORT==0) {
         trace$value[opt$gen] = control$aggFn(fn1(opt$MU), control$weights)
-        trace$step[opt$gen] = opt$step
-        trace$par[opt$gen, ] = opt$MU
-        trace$sd[opt$gen, ] = opt$SIGMA
-        trace$opt[[opt$gen]] = opt
-        .messageByGen(opt, trace)
+        if(control$trace>2) trace$opt[[opt$gen]] = opt
       }
       
     }
     
-  }
+    .messageByGen(opt, trace)
+    
+  } # end generations loop
   
   value = control$aggFn(x=fn1(opt$MU), w=control$weights)
   names(opt$MU) = names(par)
   opt$counts = c('function'=opt$gen*control$popsize, generations=opt$gen)
-
+  
   output = list(par=opt$MU, value=value, counts=opt$counts, 
                 trace=trace, partial=fn1(opt$MU), 
                 active=list(par=isActive, flag=activeFlag))
@@ -170,11 +183,8 @@ calibrate = function(par, fn, ..., aggFn = NULL, method = "default",
   newNames = rep("*", npar)
   newNames[isActive] = ""
   
-  
-  
   final = list(par=paropt, value=temp$value, counts=temp$counts, 
-               trace=NULL, partial=temp$partial,
-               active=isActive)
+               partial=temp$partial, active=isActive)
   
   output = c(final, output)
   class(output) = c("calibrar.result", class(output))
