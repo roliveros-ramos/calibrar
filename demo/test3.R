@@ -69,22 +69,33 @@ cat("Starting calibration...\n")
 calib = calibrate(par=parInfo$guess, fn=obj, lower=parInfo$lower, 
                   upper=parInfo$upper, phases=parInfo$phase,
                   control=list(weights=calibrationInfo$weights,
-                               REPORT=1, trace=5))
+                               REPORT=10, trace=5))
 
-# calib2 = optimES(par=parInfo$guess, fn=obj, lower=parInfo$lower, 
-#                   upper=parInfo$upper, control=list(weights=calibrationInfo$weights))
-# 
-# calib3 = optimx(par=parInfo$guess, fn=obj2, lower=parInfo$lower, 
-#                  upper=parInfo$upper, method="L-BFGS-B")
-# 
-# calib4 = cma_es(par=parInfo$guess, fn=obj2, lower=parInfo$lower, 
-#                 upper=parInfo$upper)
-# 
-# calib5 = optim(par=parInfo$guess, fn=obj2)
-# 
-# calib6 = optim(par=parInfo$guess, fn=obj2, method="SANN")
+cat("Running optimization algorithms\n")
+cat("\t", date(), "\n")
 
-print(calib)
+cat("Running optim CG\n")
+opt = optim(par=parInfo$guess, fn=obj2)
+
+cat("Running optimx BFGS\n")
+optx = optimx(par=parInfo$guess, fn=obj2, lower=parInfo$lower, 
+              upper=parInfo$upper, method="L-BFGS-B")
+
+cat("Running cmaes CMA-ES\n")
+cma = cma_es(par=parInfo$guess, fn=obj2, lower=parInfo$lower, upper=parInfo$upper)
+
+cat("Running optim SANN\n")
+sann = optim(par=parInfo$guess, fn=obj2, method="SANN")
+
+final = rbind(real=unlist(demo$par),
+              'AHR-ES'=calib$par,
+              SANN=sann$par,
+              'CMA-ES'=cma$par,
+              optx[,seq_along(parInfo$guess)],
+              CG=opt$par
+)
+
+print(final)
 
 
 

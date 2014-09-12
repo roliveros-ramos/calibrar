@@ -116,7 +116,8 @@ optimES = function (par, fn, gr = NULL, ..., method = "default",
       
     }
     
-    .messageByGen(opt, trace)
+   if(control$verbose & opt$gen%%control$REPORT==0) 
+     .messageByGen(opt, trace)
     
   } # end generations loop
   
@@ -124,8 +125,18 @@ optimES = function (par, fn, gr = NULL, ..., method = "default",
   names(opt$MU) = names(par)
   opt$counts = c('function'=opt$gen*control$popsize, generations=opt$gen)
   
-  output = list(par=opt$MU, value=value, counts=opt$counts, 
-                trace=trace, partial=fn1(opt$MU), 
+  paropt = guess
+  paropt[isActive] = opt$MU
+  
+  if(is.null(names(paropt))) names(paropt) = .printSeq(npar, preffix="par")
+  
+  newNames = rep("*", npar)
+  newNames[isActive] = ""
+  
+  names(paropt) = paste0(names(paropt), newNames)
+  
+  output = list(par=paropt, value=value, counts=opt$counts, 
+                trace=trace, partial=fn1(opt$MU), MU=opt$MU, 
                 active=list(par=isActive, flag=activeFlag))
   
   class(output) = c("optimES.result", class(output))
@@ -166,22 +177,26 @@ calibrate = function(par, fn, ..., aggFn = NULL, method = "default",
                    control = control, hessian = hessian, restart=restart)
    
     output$phases[[phase]] = temp # trim?
-    par[which(active)] = temp$par
+    par[which(active)] = temp$MU
     control = .updateControl(control=control, opt=temp, method=method)  # update CVs? 
 
-    cat(sprintf("Phase %d finished (%d of %d parameters active).\n",
+    cat(sprintf("\nPhase %d finished (%d of %d parameters active)\n",
                 phase, sum(active, na.rm=TRUE), npar))
-    print(temp$par)
+    cat(sprintf("Function value: %g \n", temp$value))
+    print(temp$MU)
+    cat("\n")
   }
   
   isActive = !is.na(phases) & (phases>=1)
   paropt = guess
-  paropt[isActive] = temp$par
+  paropt[isActive] = temp$MU
   
   if(is.null(names(paropt))) names(paropt) = .printSeq(npar, preffix="par")
   
   newNames = rep("*", npar)
   newNames[isActive] = ""
+  
+  names(paropt) = paste0(names(paropt), newNames)
   
   final = list(par=paropt, value=temp$value, counts=temp$counts, 
                partial=temp$partial, active=isActive)

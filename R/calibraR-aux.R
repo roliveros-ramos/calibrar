@@ -163,7 +163,7 @@
              abstol = -Inf, reltol = sqrt(.Machine$double.eps), REPORT = 10L, ncores=parallel::detectCores(), 
              alpha=0.05, age.max=1, selection=0.5, step=0.5, nvar=NULL, weights=1, sigma=NULL,
              method=method, aggFn=.weighted.sum, parallel=FALSE, run=NULL, useCV=TRUE,
-             convergence=1e-6)
+             convergence=1e-6, stochastic=FALSE, verbose=FALSE)
   
   popOpt = floor(0.5*(4 + floor(3*log(length(par))))/con$selection)
   con$popsize = popOpt

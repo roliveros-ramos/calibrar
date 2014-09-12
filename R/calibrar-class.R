@@ -3,9 +3,10 @@
 
 print.calibrar.result = function(x, ...) {
   
-  cat("Function value:", calib$value, "\n")
+  cat("Function value:", x$value, "\n")
   cat("Parameters:\n")
   print(x=x$par, ...)
+  cat("* not calibrated parameters")
    
 }
 
@@ -27,7 +28,7 @@ summary.calibrar.result = function(x, ...) {
 
 print.summary.calibrar.result = function(x, ...) {
   cat(sprintf("Calibration in %d phases.\n", x$nphases))
-  cat("Function value:", calib$value, "\n")
+  cat("Function value:", x$value, "\n")
   cat("Parameters:\n")
   print(x=x$par, ...)
   cat(sprintf("\n\t%d of %d parameters have been calibrated.\n\n", 
@@ -40,12 +41,15 @@ print.summary.calibrar.result = function(x, ...) {
 
 # Methods for optimES.result class ----------------------------------------
 
-print.optimES.result = function(x, ...) {
+print.optimES.result = function(x, short=FALSE, ...) {
   
-  cat("\nFunction value:", calib$value, "\n")
-  cat("Parameters:\n")
-  print(x=x$par, ...)
-  if(!isTRUE(x$active$flag)) cat("* Only active parameters are shown.\n")
+  cat("\nFunction value:", x$value, "\n")
+  if(!isTRUE(short)) {
+    cat(sprintf("Parameters (%d of %d parameters active).\n",
+                length(x$active$par), npar))
+    print(x=x$par, ...)    
+    if(!isTRUE(x$active$flag)) cat("* Only active parameters are shown.\n")
+  }
   
 }
 
