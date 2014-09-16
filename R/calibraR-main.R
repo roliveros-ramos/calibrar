@@ -326,8 +326,8 @@ calibrarDemo = function(path=NULL, model=NULL,  ...) {
   }
   
   output = switch(model, 
-                  Poisson = .generatePoissonMixedModel(path=path, seed=seed, ...),
-                  .generatePoissonMixedModel(path=path, seed=seed, ...)  
+                  Poisson = .generatePoissonMixedModel(path=path, ...),
+                  .generatePoissonMixedModel(path=path, ...)  
   )
   return(output)                
   

@@ -10,20 +10,20 @@ print.calibrar.result = function(x, ...) {
    
 }
 
-coef.calibrar.result = function(x, ...) {
-  return(x$par)
+coef.calibrar.result = function(object, ...) {
+  return(object$par)
 }
 
 plot.calibrar.result = function(x, ...) {
   return(invisible(NULL))
 }
 
-summary.calibrar.result = function(x, ...) {
-  x$nphases = length(x$phases)
-  x$nactive = sum(x$active)
-  x$npar = length(x$par)
-  class(x) = "summary.calibrar.result"
-  return(x)
+summary.calibrar.result = function(object, ...) {
+  object$nphases = length(object$phases)
+  object$nactive = sum(object$active)
+  object$npar = length(object$par)
+  class(object) = "summary.calibrar.result"
+  return(object)
 }
 
 print.summary.calibrar.result = function(x, ...) {
@@ -46,28 +46,28 @@ print.optimES.result = function(x, short=FALSE, ...) {
   cat("\nFunction value:", x$value, "\n")
   if(!isTRUE(short)) {
     cat(sprintf("Parameters (%d of %d parameters active).\n",
-                length(x$active$par), npar))
+                length(x$active$par), length(x$paropt)))
     print(x=x$par, ...)    
     if(!isTRUE(x$active$flag)) cat("* Only active parameters are shown.\n")
   }
   
 }
 
-coef.optimES.result = function(x, ...) {
-  return(x$par)
+coef.optimES.result = function(object, ...) {
+  return(object$par)
 }
 
 plot.optimES.result = function(x, ...) {
   return(invisible(NULL))
 }
 
-summary.optimES.result = function(x, ...) {
-  class(x) = "summary.optimES.result"
-  return(x)
+summary.optimES.result = function(object, ...) {
+  class(object) = "summary.optimES.result"
+  return(object)
 }
 
 print.summary.optimES.result = function(x, ...) {
-  cat("\nFunction value:", calib$value, "\n")
+  cat("\nFunction value:", x$value, "\n")
   cat("Parameters:\n")
   print(x=x$par, ...)
   if(!isTRUE(x$active$flag)) cat("* Only active parameters are shown.")

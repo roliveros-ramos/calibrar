@@ -64,7 +64,7 @@ rtnorm2 = function(n, mean = 0, sd = 1, lower = -Inf, upper = Inf, lq=0.025) {
   if(length(lower)!=length(upper)) stop("upper and lower must have the same length.")
   if(length(mean)!=length(upper)) stop("mean/sd and lower/upper must have the same length.")
   
-  output = matrix(rtnorm(n*length(mean), mean=mean, sd=sd, lower=lower, upper=upper), 
+  output = matrix(.rtnormx(n*length(mean), mean=mean, sd=sd, lower=lower, upper=upper), 
                   nrow=length(mean))
   return(output)
 }
@@ -98,7 +98,7 @@ rtnorm2 = function(n, mean = 0, sd = 1, lower = -Inf, upper = Inf, lq=0.025) {
 }
 
 # borrowed from msm package, not optimized function, to be updated
-rtnorm = function (n, mean = 0, sd = 1, lower = -Inf, upper = Inf) {
+.rtnormx = function (n, mean = 0, sd = 1, lower = -Inf, upper = Inf) {
   
   if (length(n) > 1) n <- length(n)
   mean <- rep(mean, length = n)
