@@ -1,0 +1,10 @@
+note <- sprintf("R package version %s", 0.1)
+
+bibentry(bibtype = "Article",
+         title = "calibrar: an R package for the calibration of ecological models",
+         journal = "Submitted",
+         author = c(person("Ricardo", "Oliveros--Ramos"),
+                    person("Yunne--Jai", "Shin")),
+         year = 2014,
+         note = note,
+         url = "htpps://roliveros-ramos.github.com/calibraR")
