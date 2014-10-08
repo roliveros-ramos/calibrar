@@ -1,31 +1,28 @@
-\name{SphereN}
-\alias{SphereN}
+\name{getObservedData}
+\alias{getObservedData}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-Sphere function with random noise
 %%  ~~function to do ... ~~
 }
 \description{
-This function calculates the Euclidian distance from a point to the origin after a random displacement of it position.
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
 }
 \usage{
-SphereN(x, sd = 0.1, aggregate = TRUE)
+getObservedData(info, path, data.folder = "data", ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{x}{
-%%     ~~Describe \code{x} here~~
-The coordinates of the point
+  \item{info}{
+%%     ~~Describe \code{info} here~~
 }
-  \item{sd}{
-%%     ~~Describe \code{sd} here~~
-The standard deviation of the noise to be added to the position of \code{x},
-a normal distribution with mean zero is used.
+  \item{path}{
+%%     ~~Describe \code{path} here~~
 }
-  \item{aggregate}{
-%%     ~~Describe \code{aggregate} here~~
-If \code{aggregate} is \code{TRUE} the distance is returned, otherwise the size of the projection of the distance among each axis.
+  \item{data.folder}{
+%%     ~~Describe \code{data.folder} here~~
+}
+  \item{\dots}{
+%%     ~~Describe \code{\dots} here~~
 }
 }
 \details{
@@ -36,7 +33,6 @@ If \code{aggregate} is \code{TRUE} the distance is returned, otherwise the size 
 %%  If it is a LIST, use
 %%  \item{comp1 }{Description of 'comp1'}
 %%  \item{comp2 }{Description of 'comp2'}
-The distance from the point \code{x} to the origin after a random displacement.
 %% ...
 }
 \references{
@@ -44,7 +40,6 @@ The distance from the point \code{x} to the origin after a random displacement.
 }
 \author{
 %%  ~~who you are~~
-Ricardo Oliveros--Ramos
 }
 \note{
 %%  ~~further notes~~
@@ -61,16 +56,26 @@ Ricardo Oliveros--Ramos
 ##--	or do  help(data=index)  for the standard data sets.
 
 ## The function is currently defined as
-function (x, sd = 0.1, aggregate = TRUE) 
+function (info, path, data.folder = "data", ...) 
 {
-    x = x + rnorm(length(x), sd = sd)
-    out = x^2
-    if (isTRUE(aggregate)) 
-        return(sum(out))
-    else return(out)
+    observed = list()
+    variables = info$variable
+    useData = as.logical(info$useData)
+    cat("Creating observed data list for calibration...", "\n")
+    for (var in 1:nrow(info)) {
+        cat(paste0("Variable: ", variables[var], "\n"))
+        var.path = file.path(path, data.folder, paste0(variables[var], 
+            ".csv"))
+        datos = if (useData[var]) 
+            .read.csv3(var.path, ...)
+        else NA
+        observed[[var]] = datos
+    }
+    names(observed) = variables
+    return(observed)
   }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
-\keyword{stochastic}
-\keyword{random}% __ONLY ONE__ keyword per line
+\keyword{ ~kwd1 }
+\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
