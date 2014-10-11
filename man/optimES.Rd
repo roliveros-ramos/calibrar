@@ -4,8 +4,7 @@
 \title{Optimization using Evolutionary Strategies}
 \usage{
 optimES(par, fn, gr = NULL, ..., lower = -Inf, upper = Inf,
-  active = NULL, control = list(), hessian = FALSE, method = "default",
-  restart = NULL)
+  active = NULL, control = list(), hessian = FALSE, method = "default")
 }
 \arguments{
 \item{par}{A numeric vector. The length of the par argument defines the
@@ -36,17 +35,17 @@ Currently not implemented.}
 \item{method}{The optimization method to be used. Currently, the only implemented
 is the 'default' method, corresponding to the AHR-ES (Oliveros & Shin, 2014).}
 
+\item{\dots}{Additional parametrs to be passed to \code{fn}.}
+
 \item{restart}{If restart is an object of class \code{optimES.restart}, it continue the
 optimization using the information from that object.}
-
-\item{\dots}{Additional parametrs to be passed to \code{fn}.}
 }
 \description{
 This function performs the optimization of a function using
 evolutionary strategies, by default the AHR-ES (Oliveros & Shin, 2014).
 }
 \examples{
-calibrate(par=rep(1, 5), fn=SphereN)
+optimES(par=rep(1, 5), fn=SphereN)
 }
 \author{
 Ricardo Oliveros-Ramos

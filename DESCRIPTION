@@ -7,5 +7,7 @@ Author: Ricardo Oliveros-Ramos
 Maintainer: Ricardo Oliveros-Ramos <ricardo.oliveros@gmail.com>
 Description: Calibration of Ecological using Evolutionary Algorithms
 License: GPL-2
-Depends: foreach, parallel
+Depends:
+    foreach,
+    parallel
 ByteCompile: TRUE

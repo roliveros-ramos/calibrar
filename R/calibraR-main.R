@@ -54,12 +54,11 @@ NULL
 #' optimization using the information from that object.
 #' @author Ricardo Oliveros-Ramos
 #' @examples
-#' calibrate(par=rep(1, 5), fn=SphereN)
+#' optimES(par=rep(1, 5), fn=SphereN)
 #' @export
 optimES = function (par, fn, gr = NULL, ..., lower = -Inf, upper = Inf, active=NULL, 
                     control = list(), hessian = FALSE, method = "default") {
   
-  restart = .restartCalibration(control)
   
   npar = length(par)
 
@@ -89,7 +88,7 @@ optimES = function (par, fn, gr = NULL, ..., lower = -Inf, upper = Inf, active=N
     fn(parx, ...)/control$fnscale
   }
   
-
+  restart = .restartCalibration(control)
   if(isTRUE(restart)) {
     
     res = .getRestart(control=control)
@@ -180,7 +179,7 @@ optimES = function (par, fn, gr = NULL, ..., lower = -Inf, upper = Inf, active=N
   
   if(is.null(names(paropt))) names(paropt) = .printSeq(npar, preffix="par")
   
-  newNames = rep("*", npar)
+  newNames = rep("*", length(paropt))
   newNames[isActive] = ""
   
   names(paropt) = paste0(names(paropt), newNames)
@@ -231,11 +230,18 @@ optimES = function (par, fn, gr = NULL, ..., lower = -Inf, upper = Inf, active=N
 #' calibration using the information from that object.
 #' @author Ricardo Oliveros-Ramos
 #' @examples
-#' calibrate(par=rep(1, 5), fn=SphereN)
+#' calibrate(par=rep(NA, 5), fn=SphereN)
+#' calibrate(par=rep(NA, 5), fn=SphereN, replicates=3)
+#' calibrate(par=rep(0.5, 5), fn=SphereN, replicates=3, lower=-5, upper=5)
+#' calibrate(par=rep(0.5, 5), fn=SphereN, replicates=3, lower=-5, upper=5, phases=c(1,1,1,2,3))
+#' calibrate(par=rep(0.5, 5), fn=SphereN, replicates=c(1,1,4), lower=-5, upper=5, phases=c(1,1,1,2,3))
+
 #' @export
 calibrate = function(par, fn, ..., aggFn = NULL, phases = NULL, replicates=1, 
                      lower = -Inf, upper = Inf,  gr = NULL, control = list(), 
-                     hessian = FALSE, method = "default", restart = NULL) {
+                     hessian = FALSE, method = "default") {
+  
+  restart = .restartCalibration(control, type="results")
   
   npar = length(par)
   
@@ -252,18 +258,22 @@ calibrate = function(par, fn, ..., aggFn = NULL, phases = NULL, replicates=1,
 
   replicates = .checkReplicates(replicates, nphases) 
   
-  output   = list()
-  iniPhase = 1 
+  output = if(isTRUE(restart)) .getResults(control=control) else list(phase=1)
   
-  for(phase in seq(from=iniPhase, to=nphases)) {
+  for(phase in seq(from=output$phase, to=nphases)) {
       
+    if(output$phase > nphases) break
+    
     active = (phases <= phase) # NAs are corrected in optimES 
-    # call optimEA
+    # call optimES
     temp = optimES(par=par, fn=fn, gr = NULL, ..., method = method, 
                    lower = lower, upper = upper, active=active, 
-                   control = control, hessian = hessian, restart=restart)
+                   control = control, hessian = hessian)
    
     output$phases[[phase]] = temp # trim?
+    output$phase = phase + 1
+    .createOutputFile(output, control) 
+      
     par[which(active)] = temp$MU
     control = .updateControl(control=control, opt=temp, method=method)  # update CVs? 
 
@@ -276,7 +286,7 @@ calibrate = function(par, fn, ..., aggFn = NULL, phases = NULL, replicates=1,
   
   isActive = !is.na(phases) & (phases>=1)
   paropt = guess
-  paropt[isActive] = temp$MU
+  paropt[isActive] = output$phases[[nphases]]$MU
   
   if(is.null(names(paropt))) names(paropt) = .printSeq(npar, preffix="par")
   
@@ -285,11 +295,13 @@ calibrate = function(par, fn, ..., aggFn = NULL, phases = NULL, replicates=1,
   
   names(paropt) = paste0(names(paropt), newNames)
   
-  final = list(par=paropt, value=temp$value, counts=temp$counts, 
-               partial=temp$partial, active=isActive)
+  final = list(par=paropt, value=output$phases[[nphases]]$value, 
+               counts=output$phases[[nphases]]$counts, 
+               partial=output$phases[[nphases]]$partial, 
+               active=isActive)
   
   output = c(final, output)
-  class(output) = c("calibrar.result", class(output))
+  .createOutputFile(output, control) 
   
   return(output)
   

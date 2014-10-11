@@ -46,9 +46,9 @@ print.optimES.result = function(x, short=FALSE, ...) {
   cat("\nFunction value:", x$value, "\n")
   if(!isTRUE(short)) {
     cat(sprintf("Parameters (%d of %d parameters active).\n",
-                length(x$active$par), length(x$paropt)))
+                length(x$active$par), length(x$par)))
     print(x=x$par, ...)    
-    if(!isTRUE(x$active$flag)) cat("* Only active parameters are shown.\n")
+    if(!isTRUE(x$active$flag)) cat("* Parameters not calibrated.\n")
   }
   
 }

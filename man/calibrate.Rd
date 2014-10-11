@@ -5,7 +5,7 @@
 \usage{
 calibrate(par, fn, ..., aggFn = NULL, phases = NULL, replicates = 1,
   lower = -Inf, upper = Inf, gr = NULL, control = list(),
-  hessian = FALSE, method = "default", restart = NULL)
+  hessian = FALSE, method = "default")
 }
 \arguments{
 \item{par}{A numeric vector. The length of the par argument defines the
@@ -44,10 +44,10 @@ Currently not implemented.}
 \item{method}{The optimization method to be used. Currently, the only implemented
 is the 'default' method, corresponding to the AHR-ES (Oliveros & Shin, 2014).}
 
+\item{\dots}{Additional parametrs to be passed to \code{fn}.}
+
 \item{restart}{If restart is an object of class \code{calibrar.restart}, it continue the
 calibration using the information from that object.}
-
-\item{\dots}{Additional parametrs to be passed to \code{fn}.}
 }
 \description{
 This function performs the optimization of a function, possibly
