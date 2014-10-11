@@ -55,7 +55,11 @@ in sequential phases of increasing complexity, and it is designed for the
 calibration of a model, by minimizing the error function \code{fn} associated to it.
 }
 \examples{
-calibrate(par=rep(1, 5), fn=SphereN)
+calibrate(par=rep(NA, 5), fn=SphereN)
+calibrate(par=rep(NA, 5), fn=SphereN, replicates=3)
+calibrate(par=rep(0.5, 5), fn=SphereN, replicates=3, lower=-5, upper=5)
+calibrate(par=rep(0.5, 5), fn=SphereN, replicates=3, lower=-5, upper=5, phases=c(1,1,1,2,3))
+calibrate(par=rep(0.5, 5), fn=SphereN, replicates=c(1,1,4), lower=-5, upper=5, phases=c(1,1,1,2,3))
 }
 \author{
 Ricardo Oliveros-Ramos
