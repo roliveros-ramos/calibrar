@@ -1,7 +1,8 @@
 
-# Methods for calibrar.result class ---------------------------------------
+# Methods for calibrar.results class ---------------------------------------
 
-print.calibrar.result = function(x, ...) {
+#' @export
+print.calibrar.results = function(x, ...) {
   
   cat("Function value:", x$value, "\n")
   cat("Parameters:\n")
@@ -10,23 +11,27 @@ print.calibrar.result = function(x, ...) {
    
 }
 
-coef.calibrar.result = function(object, ...) {
+#' @export
+coef.calibrar.results = function(object, ...) {
   return(object$par)
 }
 
-plot.calibrar.result = function(x, ...) {
+#' @export
+plot.calibrar.results = function(x, ...) {
   return(invisible(NULL))
 }
 
-summary.calibrar.result = function(object, ...) {
+#' @export
+summary.calibrar.results = function(object, ...) {
   object$nphases = length(object$phases)
   object$nactive = sum(object$active)
   object$npar = length(object$par)
-  class(object) = "summary.calibrar.result"
+  class(object) = "summary.calibrar.results"
   return(object)
 }
 
-print.summary.calibrar.result = function(x, ...) {
+#' @export
+print.summary.calibrar.results = function(x, ...) {
   cat(sprintf("Calibration in %d phases.\n", x$nphases))
   cat("Function value:", x$value, "\n")
   cat("Parameters:\n")
@@ -41,6 +46,7 @@ print.summary.calibrar.result = function(x, ...) {
 
 # Methods for optimES.result class ----------------------------------------
 
+#' @export
 print.optimES.result = function(x, short=FALSE, ...) {
   
   cat("\nFunction value:", x$value, "\n")
@@ -53,19 +59,23 @@ print.optimES.result = function(x, short=FALSE, ...) {
   
 }
 
+#' @export
 coef.optimES.result = function(object, ...) {
   return(object$par)
 }
 
+#' @export
 plot.optimES.result = function(x, ...) {
   return(invisible(NULL))
 }
 
+#' @export
 summary.optimES.result = function(object, ...) {
   class(object) = "summary.optimES.result"
   return(object)
 }
 
+#' @export 
 print.summary.optimES.result = function(x, ...) {
   cat("\nFunction value:", x$value, "\n")
   cat("Parameters:\n")

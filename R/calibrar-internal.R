@@ -1,4 +1,6 @@
-
+.setNewCalibration = function() {
+  return(invisible())
+}
 .calculateObjetiveValue = function(obs, sim, info) {
   fit = NULL
   for(j in seq_len(nrow(info))) {
@@ -178,7 +180,7 @@
   fn = match.fun(fn)
   
   con = list(trace = 0, fnscale = 1, parscale = rep.int(1L, length(par)), maxit = NULL, maxgen=NULL,
-             abstol = -Inf, reltol = sqrt(.Machine$double.eps), REPORT = 10L, ncores=parallel::detectCores(), 
+             abstol = -Inf, reltol = sqrt(.Machine$double.eps), REPORT = 10L, nCores=parallel::detectCores(), 
              alpha=0.05, age.max=1, selection=0.5, step=0.5, nvar=NULL, weights=1, sigma=NULL,
              method=method, aggFn=.weighted.sum, parallel=FALSE, run=NULL, master=NULL, useCV=TRUE,
              convergence=1e-6, stochastic=FALSE, verbose=FALSE, restart.file=NULL)
@@ -198,8 +200,8 @@
   if(con$popsize < popOpt) warning("'popsize' is too small, using default value.")
   con$popsize = max(con$popsize, popOpt)
   if(isTRUE(con$parallel)) {
-    popOptP = ceiling(con$popsize/con$ncores)*con$ncores
-    if(con$popsize != popOptP) message(paste("Optimizing 'popsize' to work with", con$ncore, "cores."))
+    popOptP = ceiling(con$popsize/con$nCores)*con$nCores
+    if(con$popsize != popOptP) message(paste("Optimizing 'popsize' to work with", con$nCores, "cores."))
     con$popsize = popOptP
     con$selection = round(con$selection*popOpt/popOptP, 1)
   }

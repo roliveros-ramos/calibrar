@@ -301,6 +301,7 @@ calibrate = function(par, fn, ..., aggFn = NULL, phases = NULL, replicates=1,
                active=isActive)
   
   output = c(final, output)
+  class(output) = c("calibrar.results")
   .createOutputFile(output, control) 
   
   return(output)

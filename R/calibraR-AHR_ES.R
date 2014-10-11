@@ -109,7 +109,7 @@
       
     }
     
-    FITNESS = FITNESS[sort(FITNESS[,1],index.return=TRUE)$ix,][,-1]
+    FITNESS = FITNESS[sort(FITNESS[,1], index.return=TRUE)$ix,][,-1, drop=FALSE]
     
   } else {
     
