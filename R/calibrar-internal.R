@@ -1,8 +1,26 @@
+
+.calculateObjetiveValue = function(obs, sim, info) {
+  fit = NULL
+  for(j in seq_len(nrow(info))) {
+    if(!info$calibrate[j]) next
+    var = info$variable[j]
+    fit = c(fit, .fitness(obs=obs[[var]], sim=sim[[var]], FUN=info$type[j]))
+  }
+  names(fit) = info$variable[which(info$calibrate)]
+  return(fit)
+}
+
+.fitness = function(obs, sim, FUN, ...) {
+  FUN = match.fun(FUN)
+  output = FUN(obs=obs, sim=sim, ...)
+  return(output)
+}
+
 .messageByGen = function(opt, trace) {
   nx  = ceiling(log10(opt$control$maxgen))
   cat(sprintf(paste0("Generation %", nx, "d - Value: %.10g\n"), 
               opt$gen, trace$value[opt$gen]))
-#   print(trace$par[opt$gen, ])
+  #   print(trace$par[opt$gen, ])
 }
 
 
@@ -47,14 +65,14 @@
   
   if(is.null(active)) return(rep(TRUE, npar))
   active = as.logical(active)
-   if(all(!active)) stop("No parameter is active, at least one parameter must be optimized.")
+  if(all(!active)) stop("No parameter is active, at least one parameter must be optimized.")
   if(length(active)!=npar) stop("Length of 'phases' argument must match number of parameters.")
   return(active)
   
 }
 
 .checkPhases = function(phases, npar) {
-
+  
   if(is.null(phases)) return(rep(1L, npar))
   phases = as.integer(phases)
   active = phases>0 & !is.na(phases)
@@ -72,7 +90,7 @@
 }
 
 .checkReplicates = function(replicates, nphases) {
-
+  
   if(any(is.na(replicates))) stop("NAs are not allowed as 'replicates' number.")
   if(is.null(replicates)) return(rep(1, nphases))
   if(length(replicates)==1) return(rep(replicates, nphases)) 
@@ -89,7 +107,7 @@
   
   nl = length(lower)
   nu = length(upper)
-
+  
   if(nl==1) {
     if(npar!=1 & lower!=-Inf) 
       warning("Only one lower bound has been provided, used for all parameters.")
@@ -126,7 +144,7 @@
 }
 
 .checkOpt = function(par, lower, upper) {
-
+  
   if(any(par < lower, na.rm=TRUE)) 
     stop("Initial guess for parameters must be greater than lower threshold.")
   
@@ -215,7 +233,7 @@
     warning("Unknown control parameters: ", paste0(paste(unknown, collapse = ", ")),".")
   
   return(con)
-
+  
 }
 
 .setWorkDir = function(run, i) {
@@ -243,4 +261,3 @@
   # update sigma...
   return(control)
 }
-

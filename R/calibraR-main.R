@@ -4,16 +4,16 @@
 #' 
 #' Calibration of Ecological Models using Evolutionary Algorithms
 #' 
-#' \tabular{ll}{ Package: \tab calibraR\cr Type: \tab Package\cr Version: \tab
+#' \tabular{ll}{ Package: \tab calibrar\cr Type: \tab Package\cr Version: \tab
 #' 0.1\cr Date: \tab 2014-09-14\cr License: \tab GPL-2\cr } calibrate()
 #' optimES()
 #' 
-#' @name calibraR-package
-#' @aliases calibraR-package calibraR
+#' @name calibrar-package
+#' @aliases calibrar-package calibrar
 #' @docType package
 #' @author Ricardo Oliveros-Ramos Maintainer: Ricardo Oliveros-Ramos
 #' <ricardo.oliveros@@gmail.com>
-#' @references calibrar: an R package for the calibration of ecological models
+#' @references calibrar: an R package for the calibration of ecological models (Oliveros-Ramos and Shin 2014)
 #' @keywords calibration
 #' @examples
 #' 
@@ -27,7 +27,7 @@ NULL
 
 # optimES -----------------------------------------------------------------
 
-#' @title Optimization using evolutionary strategies
+#' @title Optimization using Evolutionary Strategies
 #' @description This function performs the optimization of a function using 
 #' evolutionary strategies, by default the AHR-ES (Oliveros & Shin, 2014). 
 #' @param par A numeric vector. The length of the par argument defines the 
@@ -198,7 +198,7 @@ optimES = function (par, fn, gr = NULL, ..., lower = -Inf, upper = Inf, active=N
 #' @param \dots Additional parametrs to be passed to \code{fn}.
 #' @param aggFn A function to aggregate \code{fn} to a scalar value if the
 #' returned value is a vector. Some optimization algorithm can explote the
-#' additional information provided by a vectorial output from \code{fn}
+#' additional information provided by a vectorial output from \code{fn}.
 #' @param phases An optional vector of the same length as \code{par}, 
 #' indicating the phase at which each parameter becomes active. If omitted, 
 #' default value is 1 for all parameters, performing a single optimization.
@@ -303,6 +303,7 @@ calibrate = function(par, fn, ..., aggFn = NULL, phases = NULL, replicates=1,
 #' in combination with the \code{\link{createObjectiveFunction}}.
 #' @author Ricardo Oliveros-Ramos
 #' @seealso \code{\link{createObjectiveFunction}}, \code{\link{getCalibrationInfo}}.
+#' @export
 getObservedData = function(info, path, data.folder="data", ...) {
   
   observed  = list()
@@ -327,6 +328,8 @@ getObservedData = function(info, path, data.folder="data", ...) {
   
 }
 
+# getCalibrationInfo ------------------------------------------------------
+
 #' Get information for a calibration using the \code{calibrar} package.
 #' 
 #' A wrapper for \code{read.csv} checking column names and data types 
@@ -341,7 +344,7 @@ getObservedData = function(info, path, data.folder="data", ...) {
 #' and \code{\link{getObservedData}}.
 #' @author Ricardo Oliveros-Ramos
 #' @seealso \code{\link{createObjectiveFunction}}, \code{\link{getObservedData}}.
-#' 
+#' @export
 getCalibrationInfo = function(path, file="calibrationInfo.csv", 
                               stringsAsFactors=FALSE, ...) {
   
@@ -375,23 +378,31 @@ getCalibrationInfo = function(path, file="calibrationInfo.csv",
   return(calibrationInfo)
 }
 
+# createObjectiveFunction -------------------------------------------------
+
 #' Create and objective function to be used with optimization routines
 #' 
 #' Create a new function, to be used as the objective function in the 
 #' calibration, given a function to run the model within R, observed data 
 #' and information about the comparison with data.
 #' 
-#' @param runModel %% ~~Describe \code{runModel} here~~
-#' @param info %% ~~Describe \code{info} here~~
-#' @param observed %% ~~Describe \code{observed} here~~
-#' @param aggFn %% ~~Describe \code{aggFn} here~~
-#' @param aggregate %% ~~Describe \code{aggregate} here~~
-#' @param \dots %% ~~Describe \code{\dots} here~~
+#' @param runModel Function to run the model and produce a list of outputs.
+#' @param info A data.frame with the information about the calibration, 
+#' normally created with the \code{\link{getCalibrationInfo}} function. 
+#' See details.
+#' @param observed A list of the observed variables created with the 
+#' function \code{\link{getObservedData}}
+#' @param aggFn A function to aggregate \code{fn} to a scalar value if the
+#' returned value is a vector. Some optimization algorithm can explote the
+#' additional information provided by a vectorial output from \code{fn}
+#' @param aggregate boolean, if TRUE, a scalar value is returned using the 
+#' \code{aggFn}.
+#' @param \dots More arguments passed to the \code{runModel} function.
 #' @return A function, integrating the simulation of the model and the 
 #' comparison with observed data. 
 #' @author Ricardo Oliveros-Ramos
 #' @seealso \code{\link{getObservedData}}, \code{\link{getCalibrationInfo}}.
-#' 
+#' @export
 createObjectiveFunction = function(runModel, info, observed, aggFn=.weighted.sum, 
                                    aggregate=FALSE, ...) {
 
@@ -416,78 +427,3 @@ createObjectiveFunction = function(runModel, info, observed, aggFn=.weighted.sum
   return(fn1) 
   
 }
-
-.calculateObjetiveValue = function(obs, sim, info) {
-  fit = NULL
-  for(j in seq_len(nrow(info))) {
-    if(!info$calibrate[j]) next
-    var = info$variable[j]
-    fit = c(fit, .fitness(obs=obs[[var]], sim=sim[[var]], FUN=info$type[j]))
-  }
-  names(fit) = info$variable[which(info$calibrate)]
-  return(fit)
-}
-
-.fitness = function(obs, sim, FUN, ...) {
-  FUN = match.fun(FUN)
-  output = FUN(obs=obs, sim=sim, ...)
-  return(output)
-}
-
-# calibrar Demo
-
-
-
-#' %% ~~function to do ... ~~
-#' 
-#' %% ~~ A concise (1-5 lines) description of what the function does. ~~
-#' 
-#' %% ~~ If necessary, more details than the description above ~~
-#' 
-#' @param path %% ~~Describe \code{path} here~~
-#' @param model %% ~~Describe \code{model} here~~
-#' @param \dots %% ~~Describe \code{\dots} here~~
-#' @return %% ~Describe the value returned %% If it is a LIST, use %%
-#' \item{comp1 }{Description of 'comp1'} %% \item{comp2 }{Description of
-#' 'comp2'} %% ...
-#' @note %% ~~further notes~~
-#' @author %% ~~who you are~~
-#' @seealso %% ~~objects to See Also as \code{\link{help}}, ~~~
-#' @references %% ~put references to the literature/web site here ~
-#' @keywords ~kwd1 ~kwd2
-#' @examples
-#' 
-#' ##---- Should be DIRECTLY executable !! ----
-#' ##-- ==>  Define data, use random,
-#' ##--	or do  help(data=index)  for the standard data sets.
-#' 
-#' ## The function is currently defined as
-#' function (path = NULL, model = NULL, ...) 
-#' {
-#'     if (is.null(path)) 
-#'         path = getwd()
-#'     if (is.null(model)) {
-#'         model = "default"
-#'         warning("Using default demo 'PoissonMixedModel'")
-#'     }
-#'     output = switch(model, Poisson = .generatePoissonMixedModel(path = path, 
-#'         ...), .generatePoissonMixedModel(path = path, ...))
-#'     return(output)
-#'   }
-#' 
-calibrarDemo = function(path=NULL, model=NULL,  ...) {
-  
-  if(is.null(path)) path = getwd()
-  if(is.null(model)) {
-    model = "default"
-    warning("Using default demo 'PoissonMixedModel'")
-  }
-  
-  output = switch(model, 
-                  Poisson = .generatePoissonMixedModel(path=path, ...),
-                  .generatePoissonMixedModel(path=path, ...)  
-  )
-  return(output)                
-  
-}
-
