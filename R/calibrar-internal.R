@@ -180,8 +180,8 @@
   con = list(trace = 0, fnscale = 1, parscale = rep.int(1L, length(par)), maxit = NULL, maxgen=NULL,
              abstol = -Inf, reltol = sqrt(.Machine$double.eps), REPORT = 10L, ncores=parallel::detectCores(), 
              alpha=0.05, age.max=1, selection=0.5, step=0.5, nvar=NULL, weights=1, sigma=NULL,
-             method=method, aggFn=.weighted.sum, parallel=FALSE, run=NULL, useCV=TRUE,
-             convergence=1e-6, stochastic=FALSE, verbose=FALSE)
+             method=method, aggFn=.weighted.sum, parallel=FALSE, run=NULL, master=NULL, useCV=TRUE,
+             convergence=1e-6, stochastic=FALSE, verbose=FALSE, restart.file=NULL)
   
   popOpt = floor(0.5*(4 + floor(3*log(length(par))))/con$selection)
   con$popsize = popOpt
@@ -244,18 +244,6 @@
   return(work.dir)
   
 }
-
-.getRestart = function(restart) {
-  if(!file.exists(restart)) stop("Restart file does not exist.")
-  load(restart)
-  return(opt)
-}
-
-.createRestartFile = function(opt, control) {
-  save(opt, file = control$restart.file)
-  return(invisible())
-}
-
 
 .updateControl = function(control, opt, method) {
   # update sigma...

@@ -57,8 +57,9 @@ NULL
 #' calibrate(par=rep(1, 5), fn=SphereN)
 #' @export
 optimES = function (par, fn, gr = NULL, ..., lower = -Inf, upper = Inf, active=NULL, 
-                    control = list(), hessian = FALSE, method = "default", 
-                    restart=NULL) {
+                    control = list(), hessian = FALSE, method = "default") {
+  
+  restart = .restartCalibration(control)
   
   npar = length(par)
 
@@ -88,31 +89,38 @@ optimES = function (par, fn, gr = NULL, ..., lower = -Inf, upper = Inf, active=N
     fn(parx, ...)/control$fnscale
   }
   
-  trace = "elmo"
-  
-  if(control$REPORT>0 & control$trace>0) {
-    
-    trace = list()
-    trace$control = control
-    trace$par = matrix(NA, nrow=control$maxgen, ncol=length(isActive))
-    trace$value = rep(NA, control$maxgen)
-    trace$best  = rep(NA, control$maxgen)
-    
-    if(control$trace>1) {
-      trace$sd = matrix(NA, nrow=control$maxgen, ncol=length(isActive))   
-      trace$step = rep(NA, control$maxgen)     
-    }
 
-    if(control$trace>2) trace$opt = vector("list", control$maxgen)
+  if(isTRUE(restart)) {
+    
+    res = .getRestart(control=control)
+    opt   = res$opt
+    trace = res$trace
+    
+  } else {
+    
+    opt = .newOpt(par=par, lower=lower, upper=upper, control=control)
+    
+    trace = NULL
+    
+    if(control$REPORT>0 & control$trace>0) {
+      
+      trace = list()
+      trace$control = control
+      trace$par = matrix(NA, nrow=control$maxgen, ncol=length(isActive))
+      trace$value = rep(NA, control$maxgen)
+      trace$best  = rep(NA, control$maxgen)
+      
+      if(control$trace>1) {
+        trace$sd = matrix(NA, nrow=control$maxgen, ncol=length(isActive))   
+        trace$step = rep(NA, control$maxgen)     
+      }
+      
+      if(control$trace>2) trace$opt = vector("list", control$maxgen)
+      
+    } 
     
   } 
-
-  
-  # opt = get restart, a method for a file (character) or a restart class
-  
-  opt = if(!is.null(restart)) # TO_DO
-    .getRestart(restart=restart) else 
-      .newOpt(par=par, lower=lower, upper=upper, control=control) # here par=NA?
+      
   
   while(isTRUE(.continueEvolution(opt, control))) {
     
@@ -137,8 +145,6 @@ optimES = function (par, fn, gr = NULL, ..., lower = -Inf, upper = Inf, active=N
     opt = .calculateOptimalWeights(opt)
     opt = .updatePopulation(opt)
     
-    # save status of the population (for restart)
-    
     # save detailed outputs
     if(control$REPORT>0 & control$trace>0) {
         
@@ -156,6 +162,9 @@ optimES = function (par, fn, gr = NULL, ..., lower = -Inf, upper = Inf, active=N
       }
       
     }
+    
+    # save restart
+    .createRestartFile(opt=opt, trace=trace, control=control)
     
    if(control$verbose & opt$gen%%control$REPORT==0) 
      .messageByGen(opt, trace)
@@ -243,12 +252,13 @@ calibrate = function(par, fn, ..., aggFn = NULL, phases = NULL, replicates=1,
 
   replicates = .checkReplicates(replicates, nphases) 
   
-  output = list()
+  output   = list()
+  iniPhase = 1 
   
-  for(phase in seq_len(nphases)) {
+  for(phase in seq(from=iniPhase, to=nphases)) {
       
-    # call optimEA
     active = (phases <= phase) # NAs are corrected in optimES 
+    # call optimEA
     temp = optimES(par=par, fn=fn, gr = NULL, ..., method = method, 
                    lower = lower, upper = upper, active=active, 
                    control = control, hessian = hessian, restart=restart)
