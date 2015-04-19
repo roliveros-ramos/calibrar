@@ -50,8 +50,6 @@ NULL
 #' Currently not implemented. 
 #' @param method The optimization method to be used. Currently, the only implemented
 #' is the 'default' method, corresponding to the AHR-ES (Oliveros & Shin, 2014).
-#' @param restart If restart is an object of class \code{optimES.restart}, it continue the
-#' optimization using the information from that object.
 #' @author Ricardo Oliveros-Ramos
 #' @examples
 #' optimES(par=rep(1, 5), fn=SphereN)
@@ -226,8 +224,6 @@ optimES = function (par, fn, gr = NULL, ..., lower = -Inf, upper = Inf, active=N
 #' Currently not implemented. 
 #' @param method The optimization method to be used. Currently, the only implemented
 #' is the 'default' method, corresponding to the AHR-ES (Oliveros & Shin, 2014).
-#' @param restart If restart is an object of class \code{calibrar.restart}, it continue the
-#' calibration using the information from that object.
 #' @author Ricardo Oliveros-Ramos
 #' @examples
 #' calibrate(par=rep(NA, 5), fn=SphereN)
