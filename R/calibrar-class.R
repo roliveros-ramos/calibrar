@@ -4,10 +4,11 @@
 #' @export
 print.calibrar.results = function(x, ...) {
   
+  cat("Calibration finished.\n")
   cat("Function value:", x$value, "\n")
   cat("Parameters:\n")
   print(x=x$par, ...)
-  cat("* not calibrated parameters")
+  if(!all(x$active)) cat("* Parameters not calibrated.\n")
    
 }
 

@@ -49,7 +49,7 @@
   # parInfo.csv
   
   parInfo = data.frame(guess = unlist(par_real))
-  parInfo$guess = c(0.2, 0.1, rep(0, T-1), alpha/3, round(log(n[1,]),3))
+  parInfo$guess = c(0.2, 0.1, rep(0, T-1), round(alpha/3,4), round(log(n[1,]),3))
   parInfo$lower = c(0, -0.5, rep(-1.5, T-1), 0, rep(0, L))
   parInfo$upper = c(1, 0.5, rep(1.5, T-1), 1, round(rep(max(log(1.5*n[1,])),L),1))
   parInfo$phase = c(1, 1, rep(2, T-1), NA, rep(3, L))

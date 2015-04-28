@@ -23,7 +23,7 @@
 
 .createRestartFile = function(opt, trace, control) {
   if(is.null(control$restart.file)) return(invisible())
-  if(opt$gen%%control$REPORT!=0) return(invisible())
+  if((opt$gen%%control$REPORT)!=0) return(invisible())
   res.file = paste0(control$restart.file, ".restart")
   class(opt) = c("optimES.restart", class(opt))
   force(trace)

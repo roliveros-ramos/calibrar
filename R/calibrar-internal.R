@@ -106,20 +106,32 @@
 }
 
 .checkBounds =  function(lower, upper, npar) {
+
+  lf = uf = FALSE
+  
+  if(is.null(lower)) {
+    lower = -Inf
+    lf = TRUE
+  }
+  
+  if(is.null(upper)) {
+    upper = Inf
+    uf = TRUE
+  }
   
   nl = length(lower)
   nu = length(upper)
   
   if(nl==1) {
     if(npar!=1 & lower!=-Inf) 
-      warning("Only one lower bound has been provided, used for all parameters.")
+      if(!lf) warning("Only one lower bound has been provided, used for all parameters.")
     lower = rep(lower, npar)
     nl = npar
   }
   
   if(nu==1) {
     if(npar!=1 & upper!=Inf) 
-      warning("Only one upper bound has been provided, used for all parameters.")    
+      if(!uf) warning("Only one upper bound has been provided, used for all parameters.")    
     upper = rep(upper, npar)
     nu = npar
   }

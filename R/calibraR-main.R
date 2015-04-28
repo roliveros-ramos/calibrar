@@ -1,8 +1,8 @@
 # calibrar package: Calibration of Ecological models using Evoluti --------
 
-#' Calibration of Ecological Models using Evolutionary Algorithms
+#' Sequential Parameter Estimation for the Calibration of Ecological Models
 #' 
-#' Calibration of Ecological Models using Evolutionary Algorithms
+#' Sequential Parameter Estimation for the Calibration of Ecological Models
 #' 
 #' \tabular{ll}{ Package: \tab calibrar\cr Type: \tab Package\cr Version: \tab
 #' 0.1\cr Date: \tab 2014-09-14\cr License: \tab GPL-2\cr } calibrate()
@@ -25,17 +25,132 @@
 #' 
 NULL
 
-# optimES -----------------------------------------------------------------
+# calibrate ---------------------------------------------------------------
 
-#' @title Optimization using Evolutionary Strategies
-#' @description This function performs the optimization of a function using 
-#' evolutionary strategies, by default the AHR-ES (Oliveros & Shin, 2014). 
+#' @title Sequential parameter estimation for the calibration of models
+#' @description This function performs the optimization of a function, possibly 
+#' in sequential phases of increasing complexity, and it is designed for the 
+#' calibration of a model, by minimizing the error function \code{fn} associated to it.  
 #' @param par A numeric vector. The length of the par argument defines the 
 #' number of parameters to be estimated (i.e. the dimension of the problem).
 #' @param fn The function to be minimized.
 #' @param gr the gradient of \code{fn}. Ignored, added for portability with
 #' other optimization functions.
-#' @param \dots Additional parametrs to be passed to \code{fn}.
+#' @param \dots Additional parameters to be passed to \code{fn}.
+#' @param method The optimization method to be used. Currently, the only implemented
+#' is the 'default' method, corresponding to the AHR-ES (Oliveros & Shin, 2014).
+#' @param lower Lower threshold value(s) for parameters. One value or a vector 
+#' of the same length as par. If one value is provided, it is used for all 
+#' parameters. \code{NA} means \code{-Inf}. By default \code{-Inf} is used (unconstrained).
+#' @param upper Upper threshold value(s) for parameters. One value or a vector 
+#' of the same length as par. If one value is provided, it is used for all 
+#' parameters. \code{NA} means \code{Inf}. By default \code{Inf} is used (unconstrained). 
+#' @param control Parameter for the control of the algorithm itself, see details.
+#' @param hessian Logical. Should a numerically differentiated Hessian matrix be returned?
+#' Currently not implemented. 
+#' @param phases An optional vector of the same length as \code{par}, 
+#' indicating the phase at which each parameter becomes active. If omitted, 
+#' default value is 1 for all parameters, performing a single optimization.
+#' @param replicates The number of replicates for the evaluation of \code{fn}.
+#' The default value is 1. A value greater than 1 is only useful for stochastic
+#' functions.
+#' @details In the control list, \code{aggFn} is a function to aggregate \code{fn} to 
+#' a scalar value if the returned value is a vector. Some optimization algorithm can 
+#' exploite the additional information provided by a vectorial output from \code{fn}.
+#' @author Ricardo Oliveros-Ramos
+#' @examples
+#' calibrate(par=rep(NA, 5), fn=SphereN)
+#' calibrate(par=rep(NA, 5), fn=SphereN, replicates=3)
+#' calibrate(par=rep(0.5, 5), fn=SphereN, replicates=3, lower=-5, upper=5)
+#' calibrate(par=rep(0.5, 5), fn=SphereN, replicates=3, lower=-5, upper=5, phases=c(1,1,1,2,3))
+#' calibrate(par=rep(0.5, 5), fn=SphereN, replicates=c(1,1,4), lower=-5, upper=5, phases=c(1,1,1,2,3))
+
+#' @export
+calibrate = function(par, fn, gr = NULL, ..., method = "default",
+                     lower = NULL, upper = NULL, control = list(), 
+                     hessian = FALSE, phases = NULL, replicates=1) {
+
+  # check for a restart file
+  restart = .restartCalibration(control, type="results")
+  
+  npar = length(par)
+  
+  # checking conformance of all arguments
+  if(is.null(names(par))) names(par) = .printSeq(npar, preffix="par")
+  
+  fn = match.fun(fn)
+  
+  phases     = .checkPhases(phases=phases, npar=npar)
+  bounds     = .checkBounds(lower=lower, upper=upper, npar=npar)
+  guess      = .checkOpt(par=par, lower=bounds$lower, upper=bounds$upper)
+  
+  par     = guess
+  lower   = bounds$lower
+  upper   = bounds$upper
+  nphases = max(phases, na.rm=TRUE)
+  
+  replicates = .checkReplicates(replicates, nphases) 
+  
+  output = if(isTRUE(restart)) .getResults(control=control) else list(phase=1)
+  
+  # start the sequential parameter estimation
+  for(phase in seq(from=output$phase, to=nphases)) {
+    
+    if(output$phase > nphases) break
+    
+    active = (phases <= phase) # NAs are corrected in .calibrar 
+    # call optimizers handler .calibrar
+    temp = .calibrar(par=par, fn=fn, gr = NULL, ..., method = method, 
+                   lower = lower, upper = upper, control = control, 
+                   hessian = hessian, active=active)
+    
+    output$phases[[phase]] = temp # trim?
+    output$phase = phase + 1
+    
+    .createOutputFile(output, control) 
+    
+    par = temp$par #update parameter guess
+    control = .updateControl(control=control, opt=temp, method=method)  # update CVs? 
+    
+    cat(sprintf("\nPhase %d finished (%d of %d parameters active)\n",
+                phase, sum(active, na.rm=TRUE), npar))
+    cat(sprintf("Function value: %g \n", temp$value))
+    print(par[which(active)])
+    cat("\n")
+  }
+  
+   isActive = (phases>0) & !is.na(phases)
+   paropt = output$phases[[nphases]]$par # save parameters of last phase
+  
+  newNames = rep("*", npar)
+  newNames[isActive] = ""
+  
+  names(paropt) = paste0(names(paropt), newNames)
+  
+  final = list(par=paropt, value=output$phases[[nphases]]$value, 
+               counts=output$phases[[nphases]]$counts, 
+               partial=output$phases[[nphases]]$partial, 
+               active=isActive)
+  
+  output = c(final, output)
+  class(output) = c("calibrar.results")
+  .createOutputFile(output, control) 
+  
+  return(output)
+  
+}
+
+# optimES -----------------------------------------------------------------
+
+#' @title Optimization using Evolutionary Strategies
+#' @description This function performs the optimization of a function using 
+#' evolutionary strategies, by default the AHR-ES (Oliveros & Shin, 2015). 
+#' @param par A numeric vector. The length of the par argument defines the 
+#' number of parameters to be estimated (i.e. the dimension of the problem).
+#' @param fn The function to be minimized.
+#' @param gr the gradient of \code{fn}. Ignored, added for portability with
+#' other optimization functions.
+#' @param \dots Additional parameters to be passed to \code{fn}.
 #' @param lower Lower threshold value(s) for parameters. One value or a vector 
 #' of the same length as par. If one value is provided, it is used for all 
 #' parameters. \code{NA} means \code{-Inf}. By default \code{-Inf} is used (unconstrained).
@@ -49,7 +164,7 @@ NULL
 #' @param hessian Logical. Should a numerically differentiated Hessian matrix be returned?
 #' Currently not implemented. 
 #' @param method The optimization method to be used. Currently, the only implemented
-#' is the 'default' method, corresponding to the AHR-ES (Oliveros & Shin, 2014).
+#' is the 'default' method, corresponding to the AHR-ES (Oliveros & Shin, 2015).
 #' @author Ricardo Oliveros-Ramos
 #' @examples
 #' optimES(par=rep(1, 5), fn=SphereN)
@@ -86,219 +201,16 @@ optimES = function (par, fn, gr = NULL, ..., lower = -Inf, upper = Inf, active=N
     fn(parx, ...)/control$fnscale
   }
   
-  restart = .restartCalibration(control)
-  if(isTRUE(restart)) {
-    
-    res = .getRestart(control=control)
-    opt   = res$opt
-    trace = res$trace
-    
-  } else {
-    
-    opt = .newOpt(par=par, lower=lower, upper=upper, control=control)
-    
-    trace = NULL
-    
-    if(control$REPORT>0 & control$trace>0) {
-      
-      trace = list()
-      trace$control = control
-      trace$par = matrix(NA, nrow=control$maxgen, ncol=length(isActive))
-      trace$value = rep(NA, control$maxgen)
-      trace$best  = rep(NA, control$maxgen)
-      
-      if(control$trace>1) {
-        trace$sd = matrix(NA, nrow=control$maxgen, ncol=length(isActive))   
-        trace$step = rep(NA, control$maxgen)     
-      }
-      
-      if(control$trace>2) trace$opt = vector("list", control$maxgen)
-      
-    } 
-    
-  } 
-      
-  
-  while(isTRUE(.continueEvolution(opt, control))) {
-    
-    opt$gen  = opt$gen + 1
-    opt$ages = opt$ages + 1
-    
-    # create a new population
-    
-    if(all(opt$SIGMA==0)) break
-    opt$pop = .createPopulation(opt)
-    
-    # evaluate the function in the population: evaluate fn, aggregate fitness
-    
-    opt$fitness = .calculateFitness(opt, fn=fn1)
-    
-    # select best 'individuals'
-    
-    opt$selected = .selection(opt)
-        
-    # create the new parents: MU and SD
-    
-    opt = .calculateOptimalWeights(opt)
-    opt = .updatePopulation(opt)
-    
-    # save detailed outputs
-    if(control$REPORT>0 & control$trace>0) {
-        
-        trace$par[opt$gen, ] = opt$MU
-        trace$best[opt$gen]  = opt$selected$best$fit.global
-        
-        if(control$trace>1) {
-          trace$sd[opt$gen, ]  = opt$SIGMA
-          trace$step[opt$gen]  = opt$step       
-        }
-
-      if(opt$gen%%control$REPORT==0) {
-        trace$value[opt$gen] = control$aggFn(fn1(opt$MU), control$weights)
-        if(control$trace>2) trace$opt[[opt$gen]] = opt
-      }
-      
-    }
-    
-    # save restart
-    .createRestartFile(opt=opt, trace=trace, control=control)
-    
-   if(control$verbose & opt$gen%%control$REPORT==0) 
-     .messageByGen(opt, trace)
-    
-  } # end generations loop
-  
-  value = control$aggFn(x=fn1(opt$MU), w=control$weights)
-  names(opt$MU) = names(par)
-  opt$counts = c('function'=opt$gen*control$popsize, generations=opt$gen)
+  output = .optimES(par=par, fn=fn1, lower=lower, upper=upper, control=control)
   
   paropt = guess
-  paropt[isActive] = opt$MU
+  paropt[isActive] = output$ppar 
   
   if(is.null(names(paropt))) names(paropt) = .printSeq(npar, preffix="par")
   
-  newNames = rep("*", length(paropt))
-  newNames[isActive] = ""
-  
-  names(paropt) = paste0(names(paropt), newNames)
-  
-  output = list(par=paropt, value=value, counts=opt$counts, 
-                trace=trace, partial=fn1(opt$MU), MU=opt$MU, 
-                active=list(par=isActive, flag=activeFlag))
+  output = list(par=paropt, output, active=list(par=isActive, flag=activeFlag))
   
   class(output) = c("optimES.result", class(output))
-  
-  return(output)
-  
-}
-
-# calibrate ---------------------------------------------------------------
-
-#' @title Sequential calibration of models
-#' @description This function performs the optimization of a function, possibly 
-#' in sequential phases of increasing complexity, and it is designed for the 
-#' calibration of a model, by minimizing the error function \code{fn} associated to it.  
-#' @param par A numeric vector. The length of the par argument defines the 
-#' number of parameters to be estimated (i.e. the dimension of the problem).
-#' @param fn The function to be minimized.
-#' @param \dots Additional parametrs to be passed to \code{fn}.
-#' @param aggFn A function to aggregate \code{fn} to a scalar value if the
-#' returned value is a vector. Some optimization algorithm can explote the
-#' additional information provided by a vectorial output from \code{fn}.
-#' @param phases An optional vector of the same length as \code{par}, 
-#' indicating the phase at which each parameter becomes active. If omitted, 
-#' default value is 1 for all parameters, performing a single optimization.
-#' @param replicates The number of replicates for the evaluation of \code{fn}.
-#' The default value is 1. A value greater than 1 is only useful for stochastic
-#' functions.
-#' @param lower Lower threshold value(s) for parameters. One value or a vector 
-#' of the same length as par. If one value is provided, it is used for all 
-#' parameters. \code{NA} means \code{-Inf}. By default \code{-Inf} is used (unconstrained).
-#' @param upper Upper threshold value(s) for parameters. One value or a vector 
-#' of the same length as par. If one value is provided, it is used for all 
-#' parameters. \code{NA} means \code{Inf}. By default \code{Inf} is used (unconstrained). 
-#' @param gr the gradient of \code{fn}. Ignored, added for portability with
-#' other optimization functions.
-#' @param control Parameter for the control of the algorithm itself, see details.
-#' @param hessian Logical. Should a numerically differentiated Hessian matrix be returned?
-#' Currently not implemented. 
-#' @param method The optimization method to be used. Currently, the only implemented
-#' is the 'default' method, corresponding to the AHR-ES (Oliveros & Shin, 2014).
-#' @author Ricardo Oliveros-Ramos
-#' @examples
-#' calibrate(par=rep(NA, 5), fn=SphereN)
-#' calibrate(par=rep(NA, 5), fn=SphereN, replicates=3)
-#' calibrate(par=rep(0.5, 5), fn=SphereN, replicates=3, lower=-5, upper=5)
-#' calibrate(par=rep(0.5, 5), fn=SphereN, replicates=3, lower=-5, upper=5, phases=c(1,1,1,2,3))
-#' calibrate(par=rep(0.5, 5), fn=SphereN, replicates=c(1,1,4), lower=-5, upper=5, phases=c(1,1,1,2,3))
-
-#' @export
-calibrate = function(par, fn, ..., aggFn = NULL, phases = NULL, replicates=1, 
-                     lower = -Inf, upper = Inf,  gr = NULL, control = list(), 
-                     hessian = FALSE, method = "default") {
-  
-  restart = .restartCalibration(control, type="results")
-  
-  npar = length(par)
-  
-  fn = match.fun(fn)
-  
-  phases     = .checkPhases(phases=phases, npar=npar)
-  bounds     = .checkBounds(lower=lower, upper=upper, npar=npar)
-  guess      = .checkOpt(par=par, lower=bounds$lower, upper=bounds$upper)
-
-  par     = guess
-  lower   = bounds$lower
-  upper   = bounds$upper
-  nphases = max(phases, na.rm=TRUE)
-
-  replicates = .checkReplicates(replicates, nphases) 
-  
-  output = if(isTRUE(restart)) .getResults(control=control) else list(phase=1)
-  
-  for(phase in seq(from=output$phase, to=nphases)) {
-      
-    if(output$phase > nphases) break
-    
-    active = (phases <= phase) # NAs are corrected in optimES 
-    # call optimES
-    temp = optimES(par=par, fn=fn, gr = NULL, ..., method = method, 
-                   lower = lower, upper = upper, active=active, 
-                   control = control, hessian = hessian)
-   
-    output$phases[[phase]] = temp # trim?
-    output$phase = phase + 1
-    .createOutputFile(output, control) 
-      
-    par[which(active)] = temp$MU
-    control = .updateControl(control=control, opt=temp, method=method)  # update CVs? 
-
-    cat(sprintf("\nPhase %d finished (%d of %d parameters active)\n",
-                phase, sum(active, na.rm=TRUE), npar))
-    cat(sprintf("Function value: %g \n", temp$value))
-    print(temp$MU)
-    cat("\n")
-  }
-  
-  isActive = !is.na(phases) & (phases>=1)
-  paropt = guess
-  paropt[isActive] = output$phases[[nphases]]$MU
-  
-  if(is.null(names(paropt))) names(paropt) = .printSeq(npar, preffix="par")
-  
-  newNames = rep("*", npar)
-  newNames[isActive] = ""
-  
-  names(paropt) = paste0(names(paropt), newNames)
-  
-  final = list(par=paropt, value=output$phases[[nphases]]$value, 
-               counts=output$phases[[nphases]]$counts, 
-               partial=output$phases[[nphases]]$partial, 
-               active=isActive)
-  
-  output = c(final, output)
-  class(output) = c("calibrar.results")
-  .createOutputFile(output, control) 
   
   return(output)
   
