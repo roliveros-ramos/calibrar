@@ -27,7 +27,25 @@
     fn(parx, ...)/control$fnscale
   }
 
-  output = .optimES(par=par, fn=fn1, lower=lower, upper=upper, control=control)
+  
+  imethod = "default"
+  optimMethods  = c("Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN",
+                    "Brent")
+  optimxMethods = c("nlm", "nlminb", "spg", "ucminf", "newuoa", "bobyqa", 
+                    "nmkb", "hjkb", "Rcgmin", "Rvmmin")
+    
+  if(method %in% optimMethods) imethod = "optim"
+  if(method %in% optimxMethods) imethod = "optimx"
+    
+    
+  output = 
+    switch(imethod, 
+           default = .optimES(par=par, fn=fn1, lower=lower, upper=upper, control=control),
+           optim   = .optim(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, 
+                            hessian=hessian, method=method),
+           optimx  = .optimx(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, 
+                             hessian=hessian, method=method)
+           )
 
   # reshaping full parameters
   paropt = guess
@@ -37,13 +55,49 @@
   # final outputs
   output = list(par=paropt, output, active=list(par=isActive, flag=activeFlag))
   
-  class(output) = c("optimES.result", class(output)) # change
+  class(output) = c("optimES.result", class(output)) # change name
   
   return(output)
   
 }
 
 
+# wrapper for optim -------------------------------------------------------
+
+.optim = function(par, fn, gr, lower, upper, control, hessian, method) {
+  
+  if(!(method %in% c("L-BFGS-B", "Brent"))) {
+    lower = -Inf
+    upper = Inf
+  }
+  
+  output = suppressWarnings(optim(par=par, fn=fn, gr=gr, method=method, lower=lower, 
+              upper=upper, control=control, hessian=hessian))
+  
+  names(output)[names(output)=="par"] = "ppar"
+  
+  return(output)
+  
+}
+
+
+# wrapper for optimx ------------------------------------------------------
+
+.optimx = function(par, fn, gr, lower, upper, control, hessian, method) {
+  
+  parNames = names(par)
+  
+  out = suppressWarnings(optimx(par=par, fn=fn, gr=gr, method=method, lower=lower, 
+                               upper=upper, control=control, hessian=hessian))
+  
+  par = as.numeric(out[, parNames])
+  value = out$value
+  counts = as.numeric(out[, c("fevals", "gevals")])
+  output = list(ppar=par, value=value, counts=counts, convergence=out$convcode)
+  
+  return(output)
+  
+}
 # optimES internal --------------------------------------------------------
 
 .optimES = function(par, fn, lower, upper, control, hessian=FALSE) {
@@ -137,8 +191,12 @@
   opt$counts = c('function'=opt$gen*control$popsize, generations=opt$gen)
   
   output = list(ppar=opt$MU, value=value, counts=opt$counts, 
-                trace=trace, partial=partial)
+                trace=trace, partial=partial, convergence=1)
   
   return(output)
   
 }
+
+
+
+
