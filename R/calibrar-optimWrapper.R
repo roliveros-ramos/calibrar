@@ -36,15 +36,16 @@
     
   if(method %in% optimMethods) imethod = "optim"
   if(method %in% optimxMethods) imethod = "optimx"
-    
+  if(method == "cmaes") imethod = "cmaes"  
     
   output = 
     switch(imethod, 
            default = .optimES(par=par, fn=fn1, lower=lower, upper=upper, control=control),
-           optim   = .optim(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, 
+           optim   = .optim(par=par, fn=fn1, gr=gr, lower=lower, upper=upper, control=control, 
                             hessian=hessian, method=method),
-           optimx  = .optimx(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, 
-                             hessian=hessian, method=method)
+           optimx  = .optimx(par=par, fn=fn1, gr=gr, lower=lower, upper=upper, control=control, 
+                             hessian=hessian, method=method),
+           cmaes   = .cmaes(par=par, fn=fn1, lower=lower, upper=upper, control=control)
            )
 
   # reshaping full parameters
@@ -98,6 +99,20 @@
   return(output)
   
 }
+
+
+# wrapper for cma_es ------------------------------------------------------
+
+.cmaes = function(par, fn, lower, upper, control) {
+  
+  output = suppressWarnings(cma_es(par=par, fn=fn, lower=lower, upper=upper, control=control))
+  
+  names(output)[names(output)=="par"] = "ppar"
+  
+  return(output)
+  
+}
+
 # optimES internal --------------------------------------------------------
 
 .optimES = function(par, fn, lower, upper, control, hessian=FALSE) {
