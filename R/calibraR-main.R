@@ -193,7 +193,7 @@ optimES = function (par, fn, gr = NULL, ..., lower = -Inf, upper = Inf, active=N
   # closure for function evaluation
   fn   = match.fun(fn)
   
-  control = .checkControl(control=control, method=method, par=par, fn=fn, active=active)
+  control = .checkControl(control=control, method=method, par=par, fn=fn, active=active, ...)
   
   fn1  = function(par) {
     parx = guess
@@ -201,7 +201,7 @@ optimES = function (par, fn, gr = NULL, ..., lower = -Inf, upper = Inf, active=N
     fn(parx, ...)/control$fnscale
   }
   
-  output = .optimES(par=par, fn=fn1, lower=lower, upper=upper, control=control)
+  output = .optimES(par=par, fn=fn1, lower=lower, upper=upper, control=control, isActive = isActive)
   
   paropt = guess
   paropt[isActive] = output$ppar 

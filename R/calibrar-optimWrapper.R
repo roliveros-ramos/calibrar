@@ -40,7 +40,7 @@
     
   output = 
     switch(imethod, 
-           default = .optimES(par=par, fn=fn1, lower=lower, upper=upper, control=control),
+           default = .optimES(par=par, fn=fn1, lower=lower, upper=upper, control=control, isActive=isActive),
            optim   = .optim(par=par, fn=fn1, gr=gr, lower=lower, upper=upper, control=control, 
                             hessian=hessian, method=method),
            optimx  = .optimx(par=par, fn=fn1, gr=gr, lower=lower, upper=upper, control=control, 
@@ -115,7 +115,7 @@
 
 # optimES internal --------------------------------------------------------
 
-.optimES = function(par, fn, lower, upper, control, hessian=FALSE) {
+.optimES = function(par, fn, lower, upper, control, isActive, hessian=FALSE) {
   
   # get restart for the current phase
   restart = .restartCalibration(control) # flag: TRUE or FALSE
@@ -186,7 +186,7 @@
       }
       
       if(opt$gen%%control$REPORT==0) {
-        trace$value[opt$gen] = control$aggFn(fn1(opt$MU), control$weights)
+        trace$value[opt$gen] = control$aggFn(fn(opt$MU), control$weights)
         if(control$trace>2) trace$opt[[opt$gen]] = opt
       }
       

@@ -187,7 +187,7 @@
 #            0) 
 #   stop("'trace != 0' needs 'REPORT >= 1'")
 
-.checkControl = function(control, method, par, fn, active) {
+.checkControl = function(control, method, par, fn, active, ...) {
   
   fn = match.fun(fn)
   
@@ -224,7 +224,7 @@
   if(!is.null(con$sigma)) con$sigma = con$sigma[which(active)]
   
   # check number of variables
-  if(is.null(con$nvar)) con$nvar = length(fn(par))
+  if(is.null(con$nvar)) con$nvar = length(fn(par, ...))
   
   # update maximum number of function evaluations and generations
   if(!is.null(con$maxit) & !is.null(con$maxgen)) 
