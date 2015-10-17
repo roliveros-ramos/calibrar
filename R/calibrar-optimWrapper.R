@@ -19,7 +19,7 @@
   
   # closure for function evaluation
   fn   = match.fun(fn)
-  control = .checkControl(control=control, method=method, par=par, fn=fn, active=active)
+  control = .checkControl(control=control, method=method, par=guess, fn=fn, active=active, ...)
   
   fn1  = function(par) {
     parx = guess

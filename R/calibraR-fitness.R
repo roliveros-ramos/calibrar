@@ -14,7 +14,7 @@ norm2 = function(obs, sim, ...) {
 }
 
 lnorm2 = function(obs, sim, tiny=1e-2, ...) {
-  if(all(!is.finite(x))) return(Inf)
+  if(all(!is.finite(sim))) return(Inf)
   obs = log(obs + tiny)
   sim = log(sim + tiny)
   nlogLike = sum((obs-sim)^2, na.rm=TRUE)
