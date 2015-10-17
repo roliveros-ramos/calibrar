@@ -181,12 +181,6 @@
   
 }
 
-# if (con$trace < 0) 
-#   warning("read the documentation for 'trace' more carefully")
-# else if (method == "SANN" && con$trace && as.integer(con$REPORT) == 
-#            0) 
-#   stop("'trace != 0' needs 'REPORT >= 1'")
-
 .checkControl = function(control, method, par, fn, active, ...) {
   
   fn = match.fun(fn)
@@ -256,6 +250,29 @@
     warning("Unknown control parameters: ", paste0(paste(unknown, collapse = ", ")),".")
   
   return(con)
+  
+}
+
+.checkConvergence = function(control, nphases) {
+  
+  maxgen      = control$maxgen
+  maxiter     = control$maxiter
+  convergence = control$convergence
+  
+  if(length(maxgen)==1) maxgen = rep(maxgen, nphases)
+  if(length(maxiter)==1) maxiter = rep(maxiter, nphases)
+  if(length(convergence)==1) convergence = rep(convergence, nphases)
+  
+  if(!is.null(maxgen) & length(maxgen)!=nphases) 
+    stop("'maxgen' length must match number of calibration phases.")
+  
+  if(!is.null(maxiter) & length(maxiter)!=nphases) 
+    stop("'maxiter' length must match number of calibration phases.")
+  
+  if(!is.null(convergence) & length(convergence)!=nphases) 
+    stop("'convergence' length must match number of calibration phases.")
+  
+  return(list(maxgen=maxgen, maxiter=maxiter, convergence=convergence))
   
 }
 

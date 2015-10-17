@@ -93,11 +93,17 @@ calibrate = function(par, fn, gr = NULL, ..., method = "default",
   
   output = if(isTRUE(restart)) .getResults(control=control) else list(phase=1)
   
+  conv = .checkConvergence(control, nphases)
+  
   # start the sequential parameter estimation
   for(phase in seq(from=output$phase, to=nphases)) {
     
     if(output$phase > nphases) break
-    
+  
+    control$maxgen      = conv$maxgen[phase]
+    control$maxiter     = conv$maxiter[phase]
+    control$convergence = conv$convergence[phase]
+
     active = (phases <= phase) # NAs are corrected in .calibrar 
     # call optimizers handler .calibrar
     temp = .calibrar(par=par, fn=fn, gr = NULL, ..., method = method, 
