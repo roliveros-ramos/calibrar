@@ -222,9 +222,18 @@
   if(!is.null(con$sigma) & length(con$sigma)!=length(active)) 
     stop("Vector of variances (sigma) must match parameter length.")
   if(!is.null(con$sigma)) con$sigma = con$sigma[which(active)]
-  
+
+  if(inherits(fn, "objFn")) {
+    con$nvar = attr(fn, "nvar")
+    con$weights = attr(fn, "weights")
+    names(con$weights) = attr(fn, "variables")
+    if(con$verbose) {
+      print(con$weights) 
+    }
+  }
   # check number of variables
-  if(is.null(con$nvar)) con$nvar = length(fn(par, ...))
+  if(is.null(con$nvar)) length(fn(par, ...))
+
   
   # update maximum number of function evaluations and generations
   if(!is.null(con$maxit) & !is.null(con$maxgen)) 

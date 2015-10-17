@@ -344,17 +344,23 @@ createObjectiveFunction = function(runModel, info, observed, aggFn=.weighted.sum
   force(info)
   force(aggregate)
   
+  weights = info$weights[info$calibrate]
+
   # check for names in observed and simulated
-  
   fn1  = function(par) {
     aggFn = match.fun(aggFn)
     simulated = fn(par, ...)
     # apply fitness to all outputs
     output = .calculateObjetiveValue(obs=observed, sim=simulated, info=info)
-    if(isTRUE(aggregate)) output = aggFn(x=output, w=info$weights)
+    if(isTRUE(aggregate)) output = aggFn(x=output, w=weights)
     return(output)
   }
   
+  class(fn1) = c(class(fn1), "objFn")
+  
+  attr(fn1, "nvar") = sum(info$calibrate)
+  attr(fn1, "weights") = weights
+  attr(fn1, "variables") = info$variables[info$calibrate]
   return(fn1) 
   
 }
