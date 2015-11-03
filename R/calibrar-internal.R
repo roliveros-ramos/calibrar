@@ -226,7 +226,7 @@
     }
   }
   # check number of variables
-  if(is.null(con$nvar)) length(fn(par, ...))
+  if(is.null(con$nvar)) con$nvar = length(fn(par, ...))
 
   
   # update maximum number of function evaluations and generations
