@@ -54,7 +54,7 @@
   if(is.null(names(paropt))) names(paropt) = .printSeq(npar, preffix="par")
   
   # final outputs
-  output = list(par=paropt, output, active=list(par=isActive, flag=activeFlag))
+  output = c(list(par=paropt), output, list(active=list(par=isActive, flag=activeFlag)))
   
   class(output) = c("optimES.result", class(output)) # change name
   
