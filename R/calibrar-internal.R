@@ -76,6 +76,7 @@
 .checkPhases = function(phases, npar) {
   
   if(is.null(phases)) return(rep(1L, npar))
+
   phases = as.integer(phases)
   active = phases>0 & !is.na(phases)
   if(all(!active)) stop("No parameter is active, at least one parameter must be optimized.")
@@ -181,7 +182,7 @@
   
 }
 
-.checkControl = function(control, method, par, fn, active, ...) {
+.checkControl = function(control, method, par, fn, active, skeleton, ...) {
   
   fn = match.fun(fn)
   
@@ -226,7 +227,7 @@
     }
   }
   # check number of variables
-  if(is.null(con$nvar)) con$nvar = length(fn(par, ...))
+  if(is.null(con$nvar)) con$nvar = length(fn(relist(par, skeleton), ...))
 
   
   # update maximum number of function evaluations and generations

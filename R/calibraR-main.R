@@ -73,6 +73,12 @@ calibrate = function(par, fn, gr = NULL, ..., method = "default",
   # check for a restart file
   restart = .restartCalibration(control, type="results")
   
+  skeleton = as.relistable(par)
+  par    = unlist(par)
+  lower  = unlist(lower)
+  upper  = unlist(upper)
+  phases = unlist(phases)
+  
   npar = length(par)
   
   # checking conformance of all arguments
@@ -108,7 +114,7 @@ calibrate = function(par, fn, gr = NULL, ..., method = "default",
     # call optimizers handler .calibrar
     temp = .calibrar(par=par, fn=fn, gr = NULL, ..., method = method, 
                    lower = lower, upper = upper, control = control, 
-                   hessian = hessian, active=active)
+                   hessian = hessian, active=active, skeleton=skeleton)
     
     output$phases[[phase]] = temp # trim?
     output$phase = phase + 1
@@ -128,10 +134,12 @@ calibrate = function(par, fn, gr = NULL, ..., method = "default",
    isActive = (phases>0) & !is.na(phases)
    paropt = output$phases[[nphases]]$par # save parameters of last phase
   
-  newNames = rep("*", npar)
-  newNames[isActive] = ""
-  
-  names(paropt) = paste0(names(paropt), newNames)
+#   newNames = rep("*", npar)
+#   newNames[isActive] = ""
+#   
+#   names(paropt) = paste0(names(paropt), newNames)
+
+  paropt = relist(paropt, skeleton)
   
   final = list(par=paropt, value=output$phases[[nphases]]$value, 
                counts=output$phases[[nphases]]$counts, 

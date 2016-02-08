@@ -1,6 +1,8 @@
 .calibrar = function (par, fn, gr = NULL, ..., lower = -Inf, upper = Inf, active=NULL, 
-                    control = list(), hessian = FALSE, method = "default") {
+                    control = list(), hessian = FALSE, method = "default", skeleton=NULL) {
   
+  skeleton = skeleton
+  if(is.null(skeleton)) skeleton = as.relistable(par)
   
   npar = length(par)
  
@@ -19,11 +21,12 @@
   
   # closure for function evaluation
   fn   = match.fun(fn)
-  control = .checkControl(control=control, method=method, par=guess, fn=fn, active=active, ...)
+  control = .checkControl(control=control, method=method, par=guess, fn=fn, active=active, skeleton=skeleton, ...)
   
   fn1  = function(par) {
     parx = guess
     parx[isActive] = par
+    parx = relist(flesh = parx, skeleton = skeleton)
     fn(parx, ...)/control$fnscale
   }
 
