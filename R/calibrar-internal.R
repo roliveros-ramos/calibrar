@@ -227,7 +227,8 @@
     }
   }
   # check number of variables
-  if(is.null(con$nvar)) con$nvar = length(fn(relist(par, skeleton), ...))
+  xpar = if(missing(skeleton)) par else relist(par, skeleton)
+  if(is.null(con$nvar)) con$nvar = length(fn(xpar, ...))
 
   
   # update maximum number of function evaluations and generations
@@ -243,7 +244,7 @@
   if(length(con$weights)!=con$nvar) stop("Vector of weights should match the length of the output of fn.")
   if(any(con$weights<0)) stop("Weights should be positive numbers.")
   if(any(is.na(con$weights))) stop("Weights cannot be NA.")
-  
+  if(method=="cmaes") con$weights = NULL 
   # aggregation function for global fitness
   con$aggFn = match.fun(con$aggFn)
   

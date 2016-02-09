@@ -9,8 +9,6 @@
   
   env  = matrix(rnorm(T*L, mean=0, sd=sd_env), nrow=T, ncol=L)
   env  = env/diff(range(env))
-#   env  = apply(env, 2, filter, filter=rep(1,3)/3)
-#   env  = env/sqrt(seq_len(T))
   env  = round(env, 4)
   
   colnames(env) = paste0("L", sprintf(paste0("%0", nsites, "d"), seq_len(L)))
@@ -20,13 +18,12 @@
   gamma  = rnorm(T-1, mean=0, sd=sd)
   mu_ini = log(rpois(n=L, lambda=runif(L, min=N0/4, max=N0))) #initial means
   
-  par_real = list(alpha=alpha, beta=beta, gamma=gamma,  
-                  sd=sd, mu_ini=mu_ini)
+  par_real = list(alpha=alpha, beta=beta, gamma=gamma, sd=sd, mu_ini=mu_ini)
   
   mu = .PoissonMixedModel(par=par_real, forcing=env)
-  
+
   # observed abundances
-  n = matrix(rpois(length(mu), lambda=mu), nrow=T, ncol=L)  
+  n = matrix(rpois(length(mu), lambda=as.matrix(as.data.frame(mu))), nrow=T, ncol=L)  
   
   main.folder   = file.path(path, "PoissonDemo")
   data.folder   = file.path(main.folder, "data")
@@ -36,7 +33,6 @@
   if(!file.exists(master.folder)) dir.create(master.folder, recursive=TRUE)
   
   write.csv(env, file.path(master.folder, "environment.csv"))
-  
   
   for(i in seq_len(L)) {
     isite = sprintf(paste0("%0", nsites, "d"), i)
@@ -48,13 +44,11 @@
   
   # parInfo.csv
   
-  parInfo = data.frame(guess = unlist(par_real))
-  parInfo$guess = c(0.2, 0.1, rep(0, T-1), round(alpha/3,4), round(log(n[1,]),3))
-  parInfo$lower = c(0, -0.5, rep(-1.5, T-1), 0, rep(0, L))
-  parInfo$upper = c(1, 0.5, rep(1.5, T-1), 1, round(rep(max(log(1.5*n[1,])),L),1))
-  parInfo$phase = c(1, 1, rep(2, T-1), NA, rep(3, L))
-  
-  write.csv(parInfo, file.path(main.folder, "parInfo.csv"))
+  parInfo = list()
+  parInfo$guess = relist(c(0.2, 0.1, rep(0, T-1), par_real$sd, round(log(n[1,]),3)), par_real)
+  parInfo$lower = relist(c(0, -0.5, rep(-1.5, T-1), 0, round(rep(min(log(0.5*n[1,])),L),1)), par_real)
+  parInfo$upper = relist(c(1, 0.5, rep(1.5, T-1), 1, round(rep(max(log(1.5*n[1,])),L),1)), par_real)
+  parInfo$phase = relist(c(1, 1, rep(3, T-1), NA, rep(2, L)), par_real)
   
   # calibrationInfo.csv
   
@@ -82,7 +76,7 @@
   
   constants = list(T=T, L=L)
   
-  output = list(path=main.folder, par=par_real, constants)
+  output = c(list(path=main.folder, par=par_real), constants, parInfo)
   
   return(output)
   
@@ -98,6 +92,7 @@
   alpha  = par$alpha
   beta   = par$beta
   gamma  = if(!is.null((par$gamma))) par$gamma else rep(0, T-1)
+  gamma  = gamma - mean(gamma)
   mu_ini = exp(par$mu_ini)
   
   mu = matrix(nrow=T, ncol=L)
@@ -108,6 +103,11 @@
     log_mu_new = log(mu[t,]) + alpha + beta*forcing[t,] + gamma[t]
     mu[t+1, ] = exp(log_mu_new)
   }
-  return(mu)
+  
+  output = as.list(as.data.frame(mu)) # return a list with the results
+  # names of the outputs matching observed data names
+  names(output) = paste0("site_", sprintf(paste0("%0", ceiling(log10(L+1)), "d"), seq_len(L)))
+  
+  return(output)
 }
 
