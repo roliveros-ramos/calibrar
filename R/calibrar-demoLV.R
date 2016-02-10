@@ -5,7 +5,6 @@
 .generatePredatorPreyModel = function(path, r=0.5, l=0.2, alpha=0.1, gamma=0.1, K=100, T=100, 
                                       N0=10, P0=1, ...) {
 
-  require(deSolve) # check on hadley
   # 'real' parameters
   par_real = list(r=r, l=l, K=K, alpha=alpha, gamma=gamma, initial=list(N=N0, P=P0))
   
@@ -57,6 +56,8 @@
 
 
 .PredatorPreyModel = function(par, T) {
+  if(!require(deSolve)) 
+    stop("You need to install the 'deSolve' package.")# check on hadley
   # par is a list with 'alpha', 'beta' 'gamma', 'sd' and 'mu_ini'.
   LV = function(t, y, parms, ...) {
     r = parms$r
