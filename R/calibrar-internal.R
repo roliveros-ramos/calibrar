@@ -186,13 +186,13 @@
   
   fn = match.fun(fn)
   
-  con = list(trace = 0, fnscale = 1, parscale = rep.int(1L, length(par)), maxit = NULL, maxgen=NULL,
+  con = list(trace = 0, fnscale = 1, parscale = rep.int(1L, length(which(active))), maxit = NULL, maxgen=NULL,
              abstol = -Inf, reltol = sqrt(.Machine$double.eps), REPORT = 10L, nCores=parallel::detectCores(), 
              alpha=0.05, age.max=1, selection=0.5, step=0.5, nvar=NULL, weights=1, sigma=NULL,
              method=method, aggFn=.weighted.sum, parallel=FALSE, run=NULL, master=NULL, useCV=TRUE,
              convergence=1e-6, stochastic=FALSE, verbose=FALSE, restart.file=NULL)
   
-  popOpt = floor(0.5*(4 + floor(3*log(length(par))))/con$selection)
+  popOpt = floor(0.5*(4 + floor(3*log(length(which(active)))))/con$selection)
   con$popsize = popOpt
   
   controlDef  = names(con)       # default options
@@ -238,12 +238,14 @@
   if(is.null(con$maxit) & is.null(con$maxgen)) con$maxgen = 2000L
   
   con$maxit = con$popsize*con$maxgen
-  
-  # update and check weights
-  if(length(con$weights)==1) con$weights = rep(con$weights, con$nvar)
-  if(length(con$weights)!=con$nvar) stop("Vector of weights should match the length of the output of fn.")
-  if(any(con$weights<0)) stop("Weights should be positive numbers.")
-  if(any(is.na(con$weights))) stop("Weights cannot be NA.")
+
+  if(method=="default") {
+    # update and check weights
+    if(length(con$weights)==1) con$weights = rep(con$weights, con$nvar)
+    if(length(con$weights)!=con$nvar) stop("Vector of weights should match the length of the output of fn.")
+    if(any(con$weights<0)) stop("Weights should be positive numbers.")
+    if(any(is.na(con$weights))) stop("Weights cannot be NA.")    
+  }
   if(method=="cmaes") con$weights = NULL 
   # aggregation function for global fitness
   con$aggFn = match.fun(con$aggFn)

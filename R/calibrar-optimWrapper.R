@@ -108,7 +108,13 @@
 
 .cmaes = function(par, fn, lower, upper, control) {
   
+  npar = length(unlist(par))
   output = suppressWarnings(cma_es(par=par, fn=fn, lower=lower, upper=upper, control=control))
+  
+  if(is.null(output$par)) {
+    output$par = relist(rep(NA, npar), skeleton=par)
+    if(!is.finite(output$value)) warning("Infinite value reached for fn.")
+  }
   
   names(output)[names(output)=="par"] = "ppar"
   
