@@ -16,16 +16,12 @@
   
   main.folder   = file.path(path, "PredatorPreyDemo")
   data.folder   = file.path(main.folder, "data")
-  master.folder = file.path(main.folder, "master")
   
   if(!file.exists(data.folder)) dir.create(data.folder, recursive=TRUE)
-  if(!file.exists(master.folder)) dir.create(master.folder, recursive=TRUE)
-  
-  write.csv(times, file.path(master.folder, "time.csv"))
-  
+    
   for(i in c("prey", "predator")) {
     ifile = paste0(i, ".csv")
-    dat = matrix(pop[[i]], ncol=1)
+    dat = matrix(n[[i]], ncol=1)
     colnames(dat) = i
     write.csv(dat, file.path(data.folder, ifile))
   }
@@ -33,16 +29,16 @@
   # parInfo.csv
   
   parInfo = list()
-  parInfo$guess = list(r=0.1, l=0.1, K=1.1*max(n$prey), alpha=0.05, gamma=0.1, initial=list(N=n$prey[1], P=n$prey[2]))
-  parInfo$lower = list(r=0, l=0, K=0, alpha=0, gamma=0, initial=list(N=0.5*n$prey[1], P=0.5*n$prey[2]))
-  parInfo$upper = list(r=2, l=2, K=1.5*max(n$prey), alpha=1, gamma=1, initial=list(N=1.5*n$prey[1], P=1.5*n$prey[2]))
-  parInfo$phase = list(r=1, l=1, K=1, alpha=1, gamma=1, initial=list(N=2, P=2))
+  parInfo$guess = list(r=0.1, l=0.1, K=1.1*max(n$prey), alpha=0.05, gamma=0.1, initial=list(N=n$prey[1], P=n$predator[1]))
+  parInfo$lower = list(r=0, l=0, K=0.25*max(n$prey), alpha=0, gamma=0, initial=list(N=0.5*n$prey[1], P=0.5*n$predator[1]))
+  parInfo$upper = list(r=2, l=2, K=5*max(n$prey), alpha=1, gamma=1, initial=list(N=1.5*n$prey[1], P=1.5*n$predator[1]))
+  parInfo$phase = list(r=1, l=1, K=1, alpha=1, gamma=1, initial=list(N=NA, P=NA))
   
   # calibrationInfo.csv
   
   calibrationInfo = list()
   calibrationInfo$variable  = c("prey", "predator")
-  calibrationInfo$type      = "lnorm"
+  calibrationInfo$type      = "lnorm2"
   calibrationInfo$calibrate = TRUE
   calibrationInfo$weights   = 1
   calibrationInfo$useData   = TRUE
