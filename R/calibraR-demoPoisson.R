@@ -1,22 +1,28 @@
 
 
-.generatePoissonMixedModel = function(path, alpha=0.4, beta=0.4, T=10, L=6, N0=100, sd_env=0.3, 
+.generatePoissonMixedModel = function(path, alpha=0.4, beta=-0.4, T=10, L=6, N0=100, sd_env=0.3, 
                                       ...) {
   
   nsites = ceiling(log10(L+1))
   
-  sd = alpha
+  sd = alpha/5
+  
+#   env  = matrix(rnorm(T*L, mean=0, sd=sd_env), nrow=T, ncol=L)
+#   env  = env/diff(range(env))
+#   env  = round(env, 4) + 1
   
   env  = matrix(rnorm(T*L, mean=0, sd=sd_env), nrow=T, ncol=L)
-  env  = env/diff(range(env))
-  env  = round(env, 4)
+  env  = apply(env, 2, cumsum)
+  env  = sweep(env, 2, STATS = colMeans(env), FUN = "-")
+  env  = env/diff(range(env))/2
+  env  = round(env, 4) + 1
   
   colnames(env) = paste0("L", sprintf(paste0("%0", nsites, "d"), seq_len(L)))
   rownames(env) = seq_len(T)
   
   # 'real' parameters
   gamma  = rnorm(T-1, mean=0, sd=sd)
-  mu_ini = log(rpois(n=L, lambda=runif(L, min=N0/4, max=N0))) #initial means
+  mu_ini = log(rpois(n=L, lambda=runif(L, min=N0/5, max=2*N0))) #initial means
   
   par_real = list(alpha=alpha, beta=beta, gamma=gamma, sd=sd, mu_ini=mu_ini)
   

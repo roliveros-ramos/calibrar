@@ -74,6 +74,8 @@
   sol = ode(y=y0, times=times, func=LV, parms=par, method="ode45")
   out = as.list(as.data.frame(sol[,-1]))
   names(out) = c("prey", "predator")
+  out$prey[is.na(out$prey)] = 0
+  out$predator[is.na(out$predator)] = 0
   return(out)
 }
 
