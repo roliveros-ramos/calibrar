@@ -93,6 +93,17 @@ calibrarDemo = function(path=NULL, model=NULL,  ...) {
                   PredatorPrey      = .generatePredatorPreyModel(path=path, ...),
                   .generatePoissonMixedModel(path=path, ...)  
   )
+  output$value = NA
+  output$time = NA
+  output$counts = c('function'=NA, gradient=NA)
+  class(output) = c("calibrar.demo", "calibrar.results", class(output))
   return(output)                
   
 }
+
+#' @export
+#' @method print calibrar.demo
+print.calibrar.demo = function(x, ...) {
+  print.default(x, ...)
+}
+
