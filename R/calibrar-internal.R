@@ -182,6 +182,8 @@
   
 }
 
+.optPopSize = function(n, selection) floor(0.5*(4 + floor(3*log(n)))/selection)
+
 .checkControl = function(control, method, par, fn, active, skeleton, ...) {
   
   fn = match.fun(fn)
@@ -192,7 +194,8 @@
              method=method, aggFn=.weighted.sum, parallel=FALSE, run=NULL, master=NULL, useCV=TRUE,
              convergence=1e-6, stochastic=FALSE, verbose=FALSE, restart.file=NULL)
   
-  popOpt = floor(0.5*(4 + floor(3*log(length(which(active)))))/con$selection)
+  
+  popOpt = .optPopSize(n=length(which(active)), selection=con$selection)
   con$popsize = popOpt
   
   controlDef  = names(con)       # default options
