@@ -18,6 +18,21 @@ coef.calibrar.results = function(object, ...) {
 }
 
 #' @export
+predict.calibrar.results = function(object, ...) {
+
+  obj = object$fn
+  
+  if(is.null(attr(obj, which="fn"))) {
+    warning("Predict is only available for functions created with 'createObjectiveFunction'.")
+    return(invisible())
+  }
+  
+  fn = match.fun(attr(obj, which="fn"))  
+  out = fn(object$par)
+  return(out)
+}
+
+#' @export
 plot.calibrar.results = function(x, ...) {
   return(invisible(NULL))
 }

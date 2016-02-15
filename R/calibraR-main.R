@@ -141,7 +141,7 @@ calibrate = function(par, fn, gr = NULL, ..., method = "default",
   final = list(par=paropt, value=output$phases[[nphases]]$value, 
                counts=output$phases[[nphases]]$counts, 
                partial=output$phases[[nphases]]$partial, 
-               active=isActive)
+               active=isActive, fn=fn)
   
   output = c(final, output)
   class(output) = c("calibrar.results")
@@ -367,10 +367,16 @@ createObjectiveFunction = function(runModel, info, observed, aggFn=.weighted.sum
   }
   
   class(fn1) = c(class(fn1), "objFn")
+
+  fnx = function(par) {
+    simulated = fn(par, ...)
+    return(simulated)
+  }
   
   attr(fn1, "nvar") = sum(info$calibrate)
   attr(fn1, "weights") = weights
   attr(fn1, "variables") = info$variables[info$calibrate]
+  attr(fn1, "fn") = fnx
   return(fn1) 
   
 }
