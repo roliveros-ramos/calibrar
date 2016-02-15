@@ -9,6 +9,8 @@
   if(!exists("opt")) stop("Restart file ", res.file, " is not appropiate.")
   if(!exists("trace")) stop("Restart file ", res.file, " is not appropiate.")
   if(!any(class(opt)=="optimES.restart")) stop("Restart file ", res.file, " is not appropiate.")
+  opt   = get("opt")
+  trace = get("trace")
   return(list(opt=opt, trace=trace))
 }
 

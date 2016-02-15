@@ -56,7 +56,7 @@
 
 
 .PredatorPreyModel = function(par, T) {
-  if(!require(deSolve)) 
+  if(!requireNamespace("deSolve", quietly = TRUE)) 
     stop("You need to install the 'deSolve' package.")# check on hadley
   # par is a list with 'alpha', 'beta' 'gamma', 'sd' and 'mu_ini'.
   LV = function(t, y, parms, ...) {
@@ -71,7 +71,7 @@
   }
   times = seq(0, T)
   y0 = c(par$initial$N, par$initial$P)
-  sol = ode(y=y0, times=times, func=LV, parms=par, method="ode45")
+  sol = deSolve::ode(y=y0, times=times, func=LV, parms=par, method="ode45")
   out = as.list(as.data.frame(sol[,-1]))
   names(out) = c("prey", "predator")
   out$prey[is.na(out$prey)] = 0

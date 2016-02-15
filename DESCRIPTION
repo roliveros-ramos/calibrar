@@ -1,11 +1,27 @@
 Package: calibrar
-Type: Package
-Title: Calibration of Ecological using Evolutionary Algorithms
-Version: 0.1
-Date: 2014-04-13
-Author: Ricardo Oliveros-Ramos
-Maintainer: Ricardo Oliveros-Ramos <ricardo.oliveros@gmail.com>
-Description: Calibration of Ecological using Evolutionary Algorithms
+Version: 0.2.0.9000
+Authors@R: c(
+    person("Ricardo", "Oliveros-Ramos", email="ricardo.oliveros@gmail.com", role=c("aut", "cre")))
+Title: Automated Calibration for Complex (Ecological) Models
+Description: Automated Calibration for complex (ecological) models in R. 
+  The calibrar package allows the calibration of complex models, 
+  including stochastic ones. It is a generic tool that can be used for 
+  any type of model, especially those with non-differentiable objective functions. 
+  It supports multiple phase calibrations and constrained optimization. 
+  It implements maximum likelihood estimation methods and automated construction 
+  of the objective function from simulated model outputs. 
+  See http://roliveros-ramos.github.io/calibrar for more details.
+Depends: 
+  R (>= 3.1)
+Imports:
+  cmaes,
+  optimx, 
+  foreach,
+  parallel 
+Suggests: 
+  deSolve
 License: GPL-2
-Depends: foreach, parallel, optimx, cmaes
+URL: http://roliveros-ramos.github.io/calibrar
+BugReports: https://github.com/roliveros-ramos/calibraR/issues
 ByteCompile: TRUE
+
