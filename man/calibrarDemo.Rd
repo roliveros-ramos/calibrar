@@ -27,65 +27,35 @@ the calibrar package
 \examples{
 \dontrun{
 require(calibrar)
-path = NULL #' NULL to use the current directory
-
+set.seed(880820)
+path = NULL # NULL to use the current directory
 # create the demonstration files
-demo = calibrarDemo(path=path, model="PoissonMixedModel", L=4, T=20)
-
-# set.seed(12345) #' updated to T=20 and L=40 for comparative purposes.
-# Parameter information
-parInfo = read.csv(file.path(demo$path, "parInfo.csv"), row.names=1)
-
+demo = calibrarDemo(model="PoissonMixedModel", L=5, T=100)
 # get calibration information
 calibrationInfo = getCalibrationInfo(path=demo$path)
-
 # get observed data
 observed = getObservedData(info=calibrationInfo, path=demo$path)
-
 # read forcings for the model
-forcing = read.csv(file.path(demo$path, "master", "environment.csv"),
-                   row.names=1)
-
+forcing = read.csv(file.path(demo$path, "master", "environment.csv"), row.names=1)
 # Defining 'runModel' function
 runModel = function(par, forcing) {
-
-  #' forcing is a matrix with the values of environmental variables
-  T = nrow(forcing) #' get number of time steps
-  L = ncol(forcing) #' get number of sites
-
-  # create parameter list in a format readable by model
-  parList = list()
-  parList$alpha = par[1]
-  parList$beta  = par[2]
-  parList$gamma = par[2 + seq_len(T-1)]
-  parList$sd = par[T+2]
-  parList$mu_ini = par[T + 2 + seq_len(L)]
-
-  # get the model
-  model = calibrar:::.PoissonMixedModel
-  # run the model
-  output = model(par=parList, forcing=forcing)
-  output = as.list(as.data.frame(output)) #' return a list with the results
-  # names of the outputs matching observed data names
-  names(output) = paste0("site_", sprintf(paste0("\%0", ceiling(log10(L+1)), "d"), seq_len(L)))
-
-  output = c(output, list(gammas=parList$gamma))
-  return(output)
-
+output = calibrar:::.PoissonMixedModel(par=par, forcing=forcing)
+# adding gamma parameters for penalties
+output = c(output, list(gammas=par$gamma))
+return(output)
 }
-
-x = runModel(parInfo$guess, forcing)
-print(x)
-names(x)
-
-obj  = createObjectiveFunction(runModel=runModel, info=calibrationInfo, observed=observed, forcing=forcing)
-obj2 = createObjectiveFunction(runModel=runModel, info=calibrationInfo, observed=observed, forcing=forcing, aggregate=TRUE)
-cat("Starting calibration...\\n")
-
-calib = calibrate(par=parInfo$guess, fn=obj, lower=parInfo$lower,
-                  upper=parInfo$upper, phases=parInfo$phase,
-                  control=list(weights=calibrationInfo$weights,
-                               REPORT=10, trace=5))
+# real parameters
+cat("Real parameters used to simulate data\\n")
+print(demo$par)
+# objective functions
+obj  = createObjectiveFunction(runModel=runModel, info=calibrationInfo,
+                               observed=observed, forcing=forcing)
+                               cat("Starting calibration...\\n")
+control = list(weights=calibrationInfo$weights, maxit=3.6e5) # control parameters
+cat("Running optimization algorithms\\n", "\\t", date(), "\\n")
+cat("Running optim AHR-ES\\n")
+ahr = calibrate(par=demo$guess, fn=obj, lower=demo$lower, upper=demo$upper, control=control)
+summary(ahr)
 }
 }
 \author{

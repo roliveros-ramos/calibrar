@@ -91,7 +91,7 @@
   
   parNames = names(par)
   
-  out = suppressWarnings(optimx(par=par, fn=fn, gr=gr, method=method, lower=lower, 
+  out = suppressWarnings(optimx::optimx(par=par, fn=fn, gr=gr, method=method, lower=lower, 
                                upper=upper, control=control, hessian=hessian))
   
   par = as.numeric(out[, parNames])
@@ -109,7 +109,7 @@
 .cmaes = function(par, fn, lower, upper, control) {
   
   npar = length(unlist(par))
-  output = suppressWarnings(cma_es(par=par, fn=fn, lower=lower, upper=upper, control=control))
+  output = suppressWarnings(cmaes::cma_es(par=par, fn=fn, lower=lower, upper=upper, control=control))
   
   if(is.null(output$par)) {
     output$par = relist(rep(NA, npar), skeleton=par)

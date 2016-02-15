@@ -224,39 +224,72 @@
 }
 
 
+# .updatePopulation = function(opt) {
+#   
+#   opt = within(opt, {
+#     
+#     supsG       = selected$supsG
+#     
+#     cs          = (mu.eff+2)/(npar+mu.eff+3)
+#     D           = 1 + 2*max(0, sqrt((mu.eff-1)/(npar+1))-1) + cs
+#     mu.cov      = mu.eff
+#     c.cov       = (1/mu.cov)*(2/((npar+sqrt(2))^2))+(1-1/mu.cov)*min(1,(2*mu.eff-1)/((npar+2)^2+mu.eff))
+#     
+#     MU.new      = rowSums(W * pop[, supsG, drop=FALSE])
+#     
+#     pc          = (1-cc)*pc + sqrt(cc*(2-cc))*sqrt(MU.eff)*(MU.new-MU)/step
+#     ps          = (1-cs)*ps + sqrt(cs*(2-cs))*sqrt(MU.eff)*((MU.new-MU)/sqrt(SIGMA))/step
+#     
+#     SIGMA.sel   = rowSums(W * ((pop[, supsG, drop=FALSE] - MU)/step)^2)
+#     SIGMA.new   = (1-c.cov)*SIGMA + (c.cov/mu.cov)*pc*pc + c.cov*(1-1/mu.cov)*SIGMA.sel
+#     
+#     step        = step*exp(cs*(sqrt(sum(ps*ps, na.rm=TRUE))/chiN-1)/D)
+#   
+#     MU          = MU.new
+#     SIGMA       = SIGMA.new
+#     
+#     SD          = step*sqrt(SIGMA)
+#     
+#     rm(list=c("MU.new", "SIGMA.sel", "SIGMA.new"))
+#     
+#   })
+#   
+#   return(opt)
+# 
+# }
+
 .updatePopulation = function(opt) {
   
-  opt = within(opt, {
+    supsG       = opt$selected$supsG
+    npar        = opt$npar
+    MU          = opt$MU
+    SIGMA       = opt$SIGMA
+    step        = opt$step
     
-    supsG       = selected$supsG
+    opt$cs      = (opt$mu.eff+2)/(npar+opt$mu.eff+3)
+    opt$D       = 1 + 2*max(0, sqrt((opt$mu.eff-1)/(npar+1))-1) + opt$cs
+    opt$mu.cov  = opt$mu.eff
+    opt$c.cov   = (1/opt$mu.cov)*(2/((npar+sqrt(2))^2))+(1-1/opt$mu.cov)*
+      min(1,(2*opt$mu.eff-1)/((npar+2)^2+opt$mu.eff))
     
-    cs          = (mu.eff+2)/(npar+mu.eff+3)
-    D           = 1 + 2*max(0, sqrt((mu.eff-1)/(npar+1))-1) + cs
-    mu.cov      = mu.eff
-    c.cov       = (1/mu.cov)*(2/((npar+sqrt(2))^2))+(1-1/mu.cov)*min(1,(2*mu.eff-1)/((npar+2)^2+mu.eff))
+    MU.new      = rowSums(opt$W * opt$pop[, supsG, drop=FALSE])
     
-    MU.new      = rowSums(W * pop[, supsG, drop=FALSE])
+    opt$pc      = (1-opt$cc)*opt$pc + sqrt(opt$cc*(2-opt$cc))*sqrt(opt$MU.eff)*(MU.new-MU)/step
+    opt$ps      = (1-opt$cs)*opt$ps + sqrt(opt$cs*(2-opt$cs))*sqrt(opt$MU.eff)*((MU.new-MU)/sqrt(SIGMA))/step
     
-    pc          = (1-cc)*pc + sqrt(cc*(2-cc))*sqrt(MU.eff)*(MU.new-MU)/step
-    ps          = (1-cs)*ps + sqrt(cs*(2-cs))*sqrt(MU.eff)*((MU.new-MU)/sqrt(SIGMA))/step
+    SIGMA.sel   = rowSums(opt$W * ((opt$pop[, supsG, drop=FALSE] - MU)/step)^2)
+    SIGMA.new   = (1-opt$c.cov)*SIGMA + (opt$c.cov/opt$mu.cov)*opt$pc*opt$pc + 
+      opt$c.cov*(1-1/opt$mu.cov)*SIGMA.sel
     
-    SIGMA.sel   = rowSums(W * ((pop[, supsG, drop=FALSE] - MU)/step)^2)
-    SIGMA.new   = (1-c.cov)*SIGMA + (c.cov/mu.cov)*pc*pc + c.cov*(1-1/mu.cov)*SIGMA.sel
+    opt$step    = step*exp(opt$cs*(sqrt(sum(opt$ps*opt$ps, na.rm=TRUE))/opt$chiN-1)/opt$D)
     
-    step        = step*exp(cs*(sqrt(sum(ps*ps, na.rm=TRUE))/chiN-1)/D)
-  
-    MU          = MU.new
-    SIGMA       = SIGMA.new
+    opt$MU      = MU.new
+    opt$SIGMA   = SIGMA.new
     
-    SD          = step*sqrt(SIGMA)
+    opt$SD      = opt$step*sqrt(opt$SIGMA)
     
-    rm(list=c("MU.new", "SIGMA.sel", "SIGMA.new"))
-    
-  })
-  
   return(opt)
-
+  
 }
-
 
 
