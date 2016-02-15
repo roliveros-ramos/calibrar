@@ -4,6 +4,7 @@
 
 # Example code in package build process
 *-Ex.R
+.RData
 
 # RStudio files
 .Rproj.user/
@@ -21,3 +22,6 @@ vignettes/*.pdf
 # vim backup
 
 *~
+
+# personal files
+TO_DO.txt
