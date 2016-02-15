@@ -1,12 +1,8 @@
-# calibrar package: Calibration of Ecological models using Evoluti --------
+# calibrar package: Automated Calibration for Complex (Ecological) Models --------
 
-#' Sequential Parameter Estimation for the Calibration of Ecological Models
+#' Automated Calibration for Complex (Ecological) Models
 #' 
-#' Sequential Parameter Estimation for the Calibration of Ecological Models
-#' 
-#' \tabular{ll}{ Package: \tab calibrar\cr Type: \tab Package\cr Version: \tab
-#' 0.1\cr Date: \tab 2014-09-14\cr License: \tab GPL-2\cr } calibrate()
-#' optimES()
+#' Automated Calibration for Complex (Ecological) Models
 #' 
 #' @name calibrar-package
 #' @aliases calibrar-package calibrar
@@ -37,8 +33,9 @@ NULL
 #' @param gr the gradient of \code{fn}. Ignored, added for portability with
 #' other optimization functions.
 #' @param \dots Additional parameters to be passed to \code{fn}.
-#' @param method The optimization method to be used. Currently, the only implemented
-#' is the 'default' method, corresponding to the AHR-ES (Oliveros & Shin, 2014).
+#' @param method The optimization method to be used. The 'default' method
+#' is the AHR-ES (Oliveros & Shin, 2016). All the methods from stats::optim,
+#' optimx::optimx and cmaes::cma_es are available.
 #' @param lower Lower threshold value(s) for parameters. One value or a vector 
 #' of the same length as par. If one value is provided, it is used for all 
 #' parameters. \code{NA} means \code{-Inf}. By default \code{-Inf} is used (unconstrained).
@@ -290,8 +287,7 @@ getObservedData = function(info, path, data.folder="data", ...) {
 #' @author Ricardo Oliveros-Ramos
 #' @seealso \code{\link{createObjectiveFunction}}, \code{\link{getObservedData}}.
 #' @export
-getCalibrationInfo = function(path, file="calibrationInfo.csv", 
-                              stringsAsFactors=FALSE, ...) {
+getCalibrationInfo = function(path, file="calibrationInfo.csv", stringsAsFactors=FALSE, ...) {
   
   caliPath = file.path(path, file)
   calibrationInfo = read.csv(caliPath, stringsAsFactors=FALSE, ...)

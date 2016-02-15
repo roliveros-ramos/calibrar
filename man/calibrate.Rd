@@ -17,8 +17,9 @@ number of parameters to be estimated (i.e. the dimension of the problem).}
 \item{gr}{the gradient of \code{fn}. Ignored, added for portability with
 other optimization functions.}
 
-\item{method}{The optimization method to be used. Currently, the only implemented
-is the 'default' method, corresponding to the AHR-ES (Oliveros & Shin, 2014).}
+\item{method}{The optimization method to be used. The 'default' method
+is the AHR-ES (Oliveros & Shin, 2016). All the methods from stats::optim,
+optimx::optimx and cmaes::cma_es are available.}
 
 \item{lower}{Lower threshold value(s) for parameters. One value or a vector
 of the same length as par. If one value is provided, it is used for all

@@ -4,14 +4,9 @@
 \name{calibrar-package}
 \alias{calibrar}
 \alias{calibrar-package}
-\title{Sequential Parameter Estimation for the Calibration of Ecological Models}
+\title{Automated Calibration for Complex (Ecological) Models}
 \description{
-Sequential Parameter Estimation for the Calibration of Ecological Models
-}
-\details{
-\tabular{ll}{ Package: \tab calibrar\cr Type: \tab Package\cr Version: \tab
-0.1\cr Date: \tab 2014-09-14\cr License: \tab GPL-2\cr } calibrate()
-optimES()
+Automated Calibration for Complex (Ecological) Models
 }
 \examples{
 calibrate(par=rep(NA, 5), fn=SphereN)

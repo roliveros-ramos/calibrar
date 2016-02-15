@@ -42,7 +42,7 @@
 #' # objective functions
 #' obj  = createObjectiveFunction(runModel=runModel, info=calibrationInfo, 
 #'                                observed=observed, forcing=forcing)
-#'                                cat("Starting calibration...\n")
+#' cat("Starting calibration...\n")
 #' control = list(weights=calibrationInfo$weights, maxit=3.6e5) # control parameters
 #' cat("Running optimization algorithms\n", "\t", date(), "\n")
 #' cat("Running optim AHR-ES\n")
