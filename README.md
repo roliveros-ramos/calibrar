@@ -3,7 +3,7 @@
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/calibrar)](http://cran.r-project.org/package=calibrar)
 [![Github Issues](http://githubbadges.herokuapp.com/roliveros-ramos/calibrar/issues.svg?style=flat-square)](https://github.com/roliveros-ramos/calibrar/issues)
 
-**Automated Calibration for complex (ecological) models in R.** 
+**Automated Calibration for complex (ecological) models in R.**  
   The calibrar package allows the calibration of complex models, 
   including stochastic ones. It is a generic tool that can be used for 
   any type of model, especially those with non-differentiable objective functions. 
