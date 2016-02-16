@@ -229,7 +229,7 @@ optimES = function (par, fn, gr = NULL, ..., lower = -Inf, upper = Inf, active=N
 
 # getObservedData ---------------------------------------------------------
 
-#' @title Get observed data for a model calibration 
+#' @title Get observed data for the calibration of a model 
 #' 
 #' @description Create a list with the observed data with the 
 #' information provided by its main argument. 
@@ -272,7 +272,7 @@ getObservedData = function(info, path, data.folder="data", ...) {
 
 # getCalibrationInfo ------------------------------------------------------
 
-#' Get information for a calibration using the \code{calibrar} package.
+#' Get information to run a calibration using the \code{calibrar} package.
 #' 
 #' A wrapper for \code{read.csv} checking column names and data types 
 #' for the table with the calibration information.
@@ -321,7 +321,7 @@ getCalibrationInfo = function(path, file="calibrationInfo.csv", stringsAsFactors
 
 # createObjectiveFunction -------------------------------------------------
 
-#' Create and objective function to be used with optimization routines
+#' Create an objective function to be used with optimization routines
 #' 
 #' Create a new function, to be used as the objective function in the 
 #' calibration, given a function to run the model within R, observed data 

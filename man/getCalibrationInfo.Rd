@@ -2,7 +2,7 @@
 % Please edit documentation in R/calibraR-main.R
 \name{getCalibrationInfo}
 \alias{getCalibrationInfo}
-\title{Get information for a calibration using the \code{calibrar} package.}
+\title{Get information to run a calibration using the \code{calibrar} package.}
 \usage{
 getCalibrationInfo(path, file = "calibrationInfo.csv",
   stringsAsFactors = FALSE, ...)

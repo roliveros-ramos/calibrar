@@ -2,7 +2,7 @@
 % Please edit documentation in R/calibraR-main.R
 \name{getObservedData}
 \alias{getObservedData}
-\title{Get observed data for a model calibration}
+\title{Get observed data for the calibration of a model}
 \usage{
 getObservedData(info, path, data.folder = "data", ...)
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/calibraR-main.R
 \name{createObjectiveFunction}
 \alias{createObjectiveFunction}
-\title{Create and objective function to be used with optimization routines}
+\title{Create an objective function to be used with optimization routines}
 \usage{
 createObjectiveFunction(runModel, info, observed, aggFn = .weighted.sum,
   aggregate = FALSE, ...)
