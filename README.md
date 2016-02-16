@@ -4,7 +4,7 @@
 [![Github Issues](http://githubbadges.herokuapp.com/roliveros-ramos/calibrar/issues.svg?style=flat-square)](https://github.com/roliveros-ramos/calibrar/issues)
 
 **Automated parameter estimation for complex (ecological) models**  
-  The calibrar package allows the parameter estimation or calibration of complex models, 
+  This package allows the parameter estimation or calibration of complex models, 
   including stochastic ones. It is a generic tool that can be used for fitting 
   any type of models, especially those with non-differentiable objective functions. 
   It supports multiple phases and constrained optimization. 

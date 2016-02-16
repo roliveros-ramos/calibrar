@@ -12,13 +12,38 @@
 #' @references calibrar: an R package for the calibration of ecological models (Oliveros-Ramos and Shin 2014)
 #' @keywords calibration
 #' @examples
-#' 
-#' calibrate(par=rep(NA, 5), fn=SphereN)
-#' calibrate(par=rep(NA, 5), fn=SphereN, replicates=3)
-#' calibrate(par=rep(0.5, 5), fn=SphereN, replicates=3, lower=-5, upper=5)
-#' calibrate(par=rep(0.5, 5), fn=SphereN, replicates=3, lower=-5, upper=5, phases=c(1,1,1,2,3))
-#' calibrate(par=rep(0.5, 5), fn=SphereN, replicates=c(1,1,4), lower=-5, upper=5, phases=c(1,1,1,2,3))
-#' 
+#' \dontrun{
+#' require(calibrar)
+#' set.seed(880820)
+#' path = NULL # NULL to use the current directory
+#' # create the demonstration files
+#' demo = calibrarDemo(model="PoissonMixedModel", L=5, T=100) 
+#' # get calibration information
+#' calibrationInfo = getCalibrationInfo(path=demo$path)
+#' # get observed data
+#' observed = getObservedData(info=calibrationInfo, path=demo$path)
+#' # read forcings for the model
+#' forcing = read.csv(file.path(demo$path, "master", "environment.csv"), row.names=1)
+#' # Defining 'runModel' function
+#' runModel = function(par, forcing) {
+#' output = calibrar:::.PoissonMixedModel(par=par, forcing=forcing)
+#' # adding gamma parameters for penalties
+#' output = c(output, list(gammas=par$gamma)) 
+#' return(output)
+#' }
+#' # real parameters
+#' cat("Real parameters used to simulate data\n")
+#' print(demo$par)
+#' # objective functions
+#' obj  = createObjectiveFunction(runModel=runModel, info=calibrationInfo, 
+#'                                observed=observed, forcing=forcing)
+#' cat("Starting calibration...\n")
+#' control = list(weights=calibrationInfo$weights, maxit=3.6e5) # control parameters
+#' cat("Running optimization algorithms\n", "\t", date(), "\n")
+#' cat("Running optim AHR-ES\n")
+#' ahr = calibrate(par=demo$guess, fn=obj, lower=demo$lower, upper=demo$upper, control=control)
+#' summary(ahr)
+#' } 
 NULL
 
 # calibrate ---------------------------------------------------------------
@@ -57,11 +82,12 @@ NULL
 #' @author Ricardo Oliveros-Ramos
 #' @examples
 #' calibrate(par=rep(NA, 5), fn=SphereN)
+#' \dontrun{
 #' calibrate(par=rep(NA, 5), fn=SphereN, replicates=3)
 #' calibrate(par=rep(0.5, 5), fn=SphereN, replicates=3, lower=-5, upper=5)
 #' calibrate(par=rep(0.5, 5), fn=SphereN, replicates=3, lower=-5, upper=5, phases=c(1,1,1,2,3))
 #' calibrate(par=rep(0.5, 5), fn=SphereN, replicates=c(1,1,4), lower=-5, upper=5, phases=c(1,1,1,2,3))
-
+#' }
 #' @export
 calibrate = function(par, fn, gr = NULL, ..., method = "default",
                      lower = NULL, upper = NULL, control = list(), 
