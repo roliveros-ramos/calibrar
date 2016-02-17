@@ -10,7 +10,7 @@ Description: Automated parameter estimation for complex (ecological) models in R
   It supports multiple phases and constrained optimization. 
   It implements maximum likelihood estimation methods and automated construction 
   of the objective function from simulated model outputs. 
-  See http://roliveros-ramos.github.io/calibrar for more details.
+  See <http://roliveros-ramos.github.io/calibrar> for more details.
 Depends: 
   R (>= 2.15)
 Imports:
