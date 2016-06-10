@@ -1,9 +1,7 @@
 # calibrar package: Automated Calibration for Complex (Ecological) Models --------
 
-#' Automated Calibration for Complex (Ecological) Models
-#' 
-#' Automated Calibration for Complex (Ecological) Models
-#' 
+#' @title Automated Calibration for Complex (Ecological) Models
+#' @description Automated Calibration for Complex (Ecological) Models
 #' @name calibrar-package
 #' @aliases calibrar-package calibrar
 #' @docType package

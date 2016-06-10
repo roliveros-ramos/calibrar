@@ -61,8 +61,10 @@ calibrarDemo = function(path=NULL, model=NULL,  ...) {
   output = switch(model, 
                   PoissonMixedModel = .generatePoissonMixedModel(path=path, ...),
                   PredatorPrey      = .generatePredatorPreyModel(path=path, ...),
+                  IBMLotkaVolterra  = .generateIBMLotkaVolterra(path, ...),
                   .generatePoissonMixedModel(path=path, ...)  
-  )
+                 )
+  
   output$value = NA
   output$time = NA
   output$counts = c('function'=NA, gradient=NA)

@@ -1,5 +1,5 @@
 .calibrar = function (par, fn, gr = NULL, ..., lower = -Inf, upper = Inf, active=NULL, 
-                    control = list(), hessian = FALSE, method = "default", skeleton=NULL) {
+                    control = list(), hessian = FALSE, method = NULL, skeleton=NULL) {
   
   skeleton = skeleton
   if(is.null(skeleton)) skeleton = as.relistable(par)
@@ -36,11 +36,18 @@
                     "Brent")
   optimxMethods = c("nlm", "nlminb", "spg", "ucminf", "newuoa", "bobyqa", 
                     "nmkb", "hjkb", "Rcgmin", "Rvmmin")
+  psoMethods    = c("PSO", "PSO2007", "PSO2011", "hybridPSO")
     
   if(method %in% optimMethods) imethod = "optim"
   if(method %in% optimxMethods) imethod = "optimx"
+  if(method %in% psoMethods) imethod = "pso"
   if(method == "cmaes") imethod = "cmaes"  
-    
+  if(method == "lbfgsb3") imethod = "lbfgsb3"  
+  if(method == "genSA") imethod = "genSA"
+  if(method == "soma") imethod = "soma"
+  if(method == "genoud") imethod = "genoud"
+  if(method == "DE") imethod = "DEoptim"
+  
   output = 
     switch(imethod, 
            default = .optimES(par=par, fn=fn1, lower=lower, upper=upper, control=control, isActive=isActive),
@@ -48,7 +55,19 @@
                             hessian=hessian, method=method),
            optimx  = .optimx(par=par, fn=fn1, gr=gr, lower=lower, upper=upper, control=control, 
                              hessian=hessian, method=method),
-           cmaes   = .cmaes(par=par, fn=fn1, lower=lower, upper=upper, control=control)
+           pso     = .pso(par=par, fn=fn1, gr=gr, lower=lower, upper=upper, control=control, 
+                             hessian=hessian),
+           cmaes   = .cmaes(par=par, fn=fn1, lower=lower, upper=upper, control=control),
+           lbfgsb3 = .lbfgsb3(par=par, fn=fn1, gr=gr, lower=lower, upper=upper, control=control, 
+                            hessian=hessian),
+           genSA   = .genSA(par=par, fn=fn1, gr=gr, lower=lower, upper=upper, control=control, 
+                            hessian=hessian),
+           soma    = .soma(par=par, fn=fn1, gr=gr, lower=lower, upper=upper, control=control, 
+                            hessian=hessian),
+           genoud  = .genoud(par=par, fn=fn1, gr=gr, lower=lower, upper=upper, control=control, 
+                            hessian=hessian),
+           DEoptim = .DEoptim(par=par, fn=fn1, gr=gr, lower=lower, upper=upper, control=control, 
+                             hessian=hessian)
            )
 
   # reshaping full parameters
@@ -115,6 +134,112 @@
     output$par = relist(rep(NA, npar), skeleton=par)
     if(!is.finite(output$value)) warning("Infinite value reached for fn.")
   }
+  
+  names(output)[names(output)=="par"] = "ppar"
+  
+  return(output)
+  
+}
+
+# wrapper for lbfgsb3 -----------------------------------------------------
+
+.lbfgsb3 = function(par, fn, gr, lower, upper, control, hessian, method) {
+  
+  if(!(method %in% c("L-BFGS-B", "Brent"))) {
+    lower = -Inf
+    upper = Inf
+  }
+  
+  output = suppressWarnings(optim(par=par, fn=fn, gr=gr, method=method, lower=lower, 
+                                  upper=upper, control=control, hessian=hessian))
+  
+  names(output)[names(output)=="par"] = "ppar"
+  
+  return(output)
+  
+}
+
+# wrapper for genSA -------------------------------------------------------
+
+.genSA = function(par, fn, gr, lower, upper, control, hessian, method) {
+  
+  if(!(method %in% c("L-BFGS-B", "Brent"))) {
+    lower = -Inf
+    upper = Inf
+  }
+  
+  output = suppressWarnings(optim(par=par, fn=fn, gr=gr, method=method, lower=lower, 
+                                  upper=upper, control=control, hessian=hessian))
+  
+  names(output)[names(output)=="par"] = "ppar"
+  
+  return(output)
+  
+}
+# wrapper for DEoptim -----------------------------------------------------
+
+.DE = function(par, fn, gr, lower, upper, control, hessian, method) {
+  
+  if(!(method %in% c("L-BFGS-B", "Brent"))) {
+    lower = -Inf
+    upper = Inf
+  }
+  
+  output = suppressWarnings(optim(par=par, fn=fn, gr=gr, method=method, lower=lower, 
+                                  upper=upper, control=control, hessian=hessian))
+  
+  names(output)[names(output)=="par"] = "ppar"
+  
+  return(output)
+  
+}
+# wrapper for soma --------------------------------------------------------
+
+.soma = function(par, fn, gr, lower, upper, control, hessian, method) {
+  
+  if(!(method %in% c("L-BFGS-B", "Brent"))) {
+    lower = -Inf
+    upper = Inf
+  }
+  
+  output = suppressWarnings(optim(par=par, fn=fn, gr=gr, method=method, lower=lower, 
+                                  upper=upper, control=control, hessian=hessian))
+  
+  names(output)[names(output)=="par"] = "ppar"
+  
+  return(output)
+  
+}
+
+# wrapper for genoud ------------------------------------------------------
+
+.genoud = function(par, fn, gr, lower, upper, control, hessian, method) {
+  
+  if(!(method %in% c("L-BFGS-B", "Brent"))) {
+    lower = -Inf
+    upper = Inf
+  }
+  
+  output = suppressWarnings(optim(par=par, fn=fn, gr=gr, method=method, lower=lower, 
+                                  upper=upper, control=control, hessian=hessian))
+  
+  names(output)[names(output)=="par"] = "ppar"
+  
+  return(output)
+  
+}
+
+# wrapper for pso ---------------------------------------------------------
+
+.pso = function(par, fn, gr, lower, upper, control, hessian, method) {
+  
+  if(!(method %in% c("L-BFGS-B", "Brent"))) {
+    lower = -Inf
+    upper = Inf
+  }
+  
+  output = suppressWarnings(optim(par=par, fn=fn, gr=gr, method=method, lower=lower, 
+                                  upper=upper, control=control, hessian=hessian))
   
   names(output)[names(output)=="par"] = "ppar"
   
