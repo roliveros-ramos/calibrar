@@ -57,7 +57,7 @@
 
 .PredatorPreyModel = function(par, T) {
   if(!requireNamespace("deSolve", quietly = TRUE)) 
-    stop("You need to install the 'deSolve' package.")# check on hadley
+    stop("You need to install the 'deSolve' package.")
   # par is a list with 'alpha', 'beta' 'gamma', 'sd' and 'mu_ini'.
   LV = function(t, y, parms, ...) {
     r = parms$r
