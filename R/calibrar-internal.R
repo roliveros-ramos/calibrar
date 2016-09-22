@@ -25,6 +25,10 @@
   #   print(trace$par[opt$gen, ])
 }
 
+# .messageByGen = function(opt, trace) {
+#   cat("--- Generation", opt$gen, "-----")
+# }
+
 
 .printSeq = function(n, preffix=NULL, suffix=NULL, sep="") {
   nx  = ceiling(log10(n))
@@ -57,10 +61,6 @@
   out = paste(paste(x[-length(x)], sep="", collapse=", "), "and", x[length(x)])
   return(out)
   
-}
-
-.messageBbyGen = function(opt, trace) {
-  cat("--- Generation", opt$gen, "-----")
 }
 
 .checkActive = function(active, npar) {

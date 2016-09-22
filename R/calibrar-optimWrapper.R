@@ -1,5 +1,6 @@
 .calibrar = function (par, fn, gr = NULL, ..., lower = -Inf, upper = Inf, active=NULL, 
-                    control = list(), hessian = FALSE, method = NULL, skeleton=NULL) {
+                    control = list(), hessian = FALSE, method = NULL, skeleton=NULL,
+                    replicates=1) {
   
   skeleton = skeleton
   if(is.null(skeleton)) skeleton = as.relistable(par)
@@ -35,12 +36,14 @@
   optimMethods  = c("Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN",
                     "Brent")
   optimxMethods = c("nlm", "nlminb", "spg", "ucminf", "newuoa", "bobyqa", 
-                    "nmkb", "hjkb", "Rcgmin", "Rvmmin")
+                    "nmkb", "hjkb")
   psoMethods    = c("PSO", "PSO2007", "PSO2011", "hybridPSO")
     
   if(method %in% optimMethods) imethod = "optim"
   if(method %in% optimxMethods) imethod = "optimx"
   if(method %in% psoMethods) imethod = "pso"
+  if(method == "Rcgmin") imethod = "Rcgmin"  
+  if(method == "Rvmmin") imethod = "Rvmmin"  
   if(method == "cmaes") imethod = "cmaes"  
   if(method == "lbfgsb3") imethod = "lbfgsb3"  
   if(method == "genSA") imethod = "genSA"
@@ -50,24 +53,29 @@
   
   output = 
     switch(imethod, 
-           default = .optimES(par=par, fn=fn1, lower=lower, upper=upper, control=control, isActive=isActive),
+           default = .optimES(par=par, fn=fn1, gr=gr, lower=lower, upper=upper, control=control, 
+                              hessian=hessian, method=method, isActive=isActive),
            optim   = .optim(par=par, fn=fn1, gr=gr, lower=lower, upper=upper, control=control, 
                             hessian=hessian, method=method),
            optimx  = .optimx(par=par, fn=fn1, gr=gr, lower=lower, upper=upper, control=control, 
                              hessian=hessian, method=method),
+           Rcgmin  = .Rcgmin(par=par, fn=fn1, gr=gr, lower=lower, upper=upper, control=control, 
+                             hessian=hessian, method=method),
+           Rvmmin  = .Rvmmin(par=par, fn=fn1, gr=gr, lower=lower, upper=upper, control=control, 
+                             hessian=hessian, method=method),
            pso     = .pso(par=par, fn=fn1, gr=gr, lower=lower, upper=upper, control=control, 
-                             hessian=hessian),
+                             hessian=hessian, method=method),
            cmaes   = .cmaes(par=par, fn=fn1, lower=lower, upper=upper, control=control),
            lbfgsb3 = .lbfgsb3(par=par, fn=fn1, gr=gr, lower=lower, upper=upper, control=control, 
-                            hessian=hessian),
+                            hessian=hessian, method=method),
            genSA   = .genSA(par=par, fn=fn1, gr=gr, lower=lower, upper=upper, control=control, 
-                            hessian=hessian),
+                            hessian=hessian, method=method),
            soma    = .soma(par=par, fn=fn1, gr=gr, lower=lower, upper=upper, control=control, 
-                            hessian=hessian),
+                            hessian=hessian, method=method),
            genoud  = .genoud(par=par, fn=fn1, gr=gr, lower=lower, upper=upper, control=control, 
-                            hessian=hessian),
-           DEoptim = .DEoptim(par=par, fn=fn1, gr=gr, lower=lower, upper=upper, control=control, 
-                             hessian=hessian)
+                            hessian=hessian, method=method),
+           DEoptim = .DE(par=par, fn=fn1, gr=gr, lower=lower, upper=upper, control=control, 
+                             hessian=hessian, method=method)
            )
 
   # reshaping full parameters
@@ -89,12 +97,13 @@
 
 .optim = function(par, fn, gr, lower, upper, control, hessian, method) {
   
+  # what to do with methods not accepting bound conditions?
   if(!(method %in% c("L-BFGS-B", "Brent"))) {
     lower = -Inf
     upper = Inf
   }
   
-  output = suppressWarnings(optim(par=par, fn=fn, gr=gr, method=method, lower=lower, 
+  output = suppressWarnings(stats::optim(par=par, fn=fn, gr=gr, method=method, lower=lower, 
               upper=upper, control=control, hessian=hessian))
   
   names(output)[names(output)=="par"] = "ppar"
@@ -109,6 +118,7 @@
 .optimx = function(par, fn, gr, lower, upper, control, hessian, method) {
   
   parNames = names(par)
+  control = NULL # check!
   
   out = suppressWarnings(optimx::optimx(par=par, fn=fn, gr=gr, method=method, lower=lower, 
                                upper=upper, control=control, hessian=hessian))
@@ -122,6 +132,38 @@
   
 }
 
+
+# wrapper for Rcgmin ------------------------------------------------------
+
+.Rcgmin = function(par, fn, gr, lower, upper, control, hessian, method) {
+  
+  parNames = names(par)
+  control = NULL # check!
+  
+  output = suppressWarnings(Rcgmin::Rcgmin(par=par, fn=fn, gr=gr, lower=lower, 
+                                           upper=upper, control=control))
+  
+  names(output)[names(output)=="par"] = "ppar"
+  
+  return(output)
+  
+}
+
+# # wrapper for Rvmmin ----------------------------------------------------
+
+.Rvmmin = function(par, fn, gr, lower, upper, control, hessian, method) {
+  
+  parNames = names(par)
+  control = NULL # check!
+  
+  output = suppressWarnings(Rvmmin::Rvmmin(par=par, fn=fn, gr=gr, lower=lower, 
+                                        upper=upper, control=control))
+  
+  names(output)[names(output)=="par"] = "ppar"
+  
+  return(output)
+  
+}
 
 # wrapper for cma_es ------------------------------------------------------
 
@@ -145,15 +187,19 @@
 
 .lbfgsb3 = function(par, fn, gr, lower, upper, control, hessian, method) {
   
-  if(!(method %in% c("L-BFGS-B", "Brent"))) {
-    lower = -Inf
-    upper = Inf
-  }
+  ctrl = list(maxit = 500, trace = 0, iprint = 0L)
+  control[!(names(control) %in% names(ctrl))] = NULL
   
-  output = suppressWarnings(optim(par=par, fn=fn, gr=gr, method=method, lower=lower, 
-                                  upper=upper, control=control, hessian=hessian))
+  xoutput = suppressWarnings(lbfgsb3::lbfgsb3(prm=par, fn=fn, gr=gr, lower=lower,
+  upper=upper, control=control))
   
-  names(output)[names(output)=="par"] = "ppar"
+  output = list()
+  output$ppar  = xoutput$prm
+  output$value = xoutput$f
+  output$counts = c('function'=xoutput$info$isave[34],
+                    gradient=NA)# check on split!
+  output$convergence = NA
+  output$message = NULL
   
   return(output)
   
@@ -163,15 +209,12 @@
 
 .genSA = function(par, fn, gr, lower, upper, control, hessian, method) {
   
-  if(!(method %in% c("L-BFGS-B", "Brent"))) {
-    lower = -Inf
-    upper = Inf
-  }
-  
-  output = suppressWarnings(optim(par=par, fn=fn, gr=gr, method=method, lower=lower, 
-                                  upper=upper, control=control, hessian=hessian))
+  output = suppressWarnings(GenSA::GenSA(par=par, fn=fn, lower=lower, 
+                                  upper=upper, control=control))
   
   names(output)[names(output)=="par"] = "ppar"
+  output$counts = c('function'=output$counts,
+                    gradient=NA)
   
   return(output)
   
@@ -180,15 +223,21 @@
 
 .DE = function(par, fn, gr, lower, upper, control, hessian, method) {
   
-  if(!(method %in% c("L-BFGS-B", "Brent"))) {
-    lower = -Inf
-    upper = Inf
-  }
+  if(isTRUE(control$parallel)) control$parallelType=2
   
-  output = suppressWarnings(optim(par=par, fn=fn, gr=gr, method=method, lower=lower, 
-                                  upper=upper, control=control, hessian=hessian))
+  ctrl = DEoptim::DEoptim.control()
+  control[!(names(control) %in% names(ctrl))] = NULL
   
-  names(output)[names(output)=="par"] = "ppar"
+  # think how to pass 'par'. Initial pop?
+  xoutput = suppressWarnings(DEoptim::DEoptim(fn=fn, lower=lower, upper=upper, control=control))
+  
+  output = list()
+  output$ppar  = xoutput$optim$bestmem
+  output$value = xoutput$optim$bestval
+  output$counts = c('function'=xoutput$optim$nfeval,
+                    gradient=NA)
+  output$convergence = NA
+  output$message = NULL
   
   return(output)
   
@@ -197,15 +246,17 @@
 
 .soma = function(par, fn, gr, lower, upper, control, hessian, method) {
   
-  if(!(method %in% c("L-BFGS-B", "Brent"))) {
-    lower = -Inf
-    upper = Inf
-  }
+  xoutput = suppressWarnings(soma::soma(costFunction=fn, 
+                                       bounds=list(min=lower, max=upper), 
+                                       options=control))
   
-  output = suppressWarnings(optim(par=par, fn=fn, gr=gr, method=method, lower=lower, 
-                                  upper=upper, control=control, hessian=hessian))
-  
-  names(output)[names(output)=="par"] = "ppar"
+  output = list()
+  output$ppar  = xoutput$population[, xoutput$leader]
+  output$value = xoutput$cost[xoutput$leader]
+  output$counts = c('function'=xoutput$migrations*length(xoutput$cost),
+                    gradient=NA)
+  output$convergence = NA
+  output$message = NULL
   
   return(output)
   
@@ -215,16 +266,11 @@
 
 .genoud = function(par, fn, gr, lower, upper, control, hessian, method) {
   
-  if(!(method %in% c("L-BFGS-B", "Brent"))) {
-    lower = -Inf
-    upper = Inf
-  }
-  
-  output = suppressWarnings(optim(par=par, fn=fn, gr=gr, method=method, lower=lower, 
-                                  upper=upper, control=control, hessian=hessian))
+  output = suppressWarnings(rgenoud::genoud(fn=fn, nvars=length(par), starting.values=par, 
+                                             Domains = cbind(lower, upper)))
   
   names(output)[names(output)=="par"] = "ppar"
-  
+  output$counts = c('function'=xoutput$popsize*xoutput$generations, gradient=NA)
   return(output)
   
 }
@@ -233,13 +279,13 @@
 
 .pso = function(par, fn, gr, lower, upper, control, hessian, method) {
   
-  if(!(method %in% c("L-BFGS-B", "Brent"))) {
-    lower = -Inf
-    upper = Inf
-  }
+  method = if(any(method=="PSO", method=="PSO2007")) "SPSO2007" else "SPSO2011"
+  hybrid = if(method=="hybridPSO") TRUE else FALSE
   
-  output = suppressWarnings(optim(par=par, fn=fn, gr=gr, method=method, lower=lower, 
-                                  upper=upper, control=control, hessian=hessian))
+  control = c(control, type=method, hybrid=hybrid)
+  
+  output = suppressWarnings(pso::psoptim(par=par, fn=fn, gr=gr, lower=lower, 
+                                  upper=upper, control=control))
   
   names(output)[names(output)=="par"] = "ppar"
   
@@ -249,7 +295,7 @@
 
 # optimES internal --------------------------------------------------------
 
-.optimES = function(par, fn, lower, upper, control, isActive, hessian=FALSE) {
+.optimES = function(par, fn, gr, lower, upper, control, method, hessian, isActive) {
   
   # get restart for the current phase
   restart = .restartCalibration(control) # flag: TRUE or FALSE

@@ -67,3 +67,4 @@ The running time cannot be reduced, I've added a \dontrun{} to the examples.
 Thanks for the corrections.
 
 Best regards.
+Ricardo
