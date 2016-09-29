@@ -45,14 +45,15 @@
                        initial=list(N=NA, P=NA))
   
   if(isTRUE(uselog)) {
+   
+    xparInfo = parInfo 
+    parInfo$guess$alpha = -log10(xparInfo$guess$alpha)
+    parInfo$lower$alpha = -log10(xparInfo$upper$alpha)
+    parInfo$upper$alpha = -log10(xparInfo$lower$alpha)
     
-    parInfo$guess$alpha = -log10(parInfo$guess$alpha)
-    parInfo$lower$alpha = -log10(parInfo$upper$alpha)
-    parInfo$upper$alpha = -log10(parInfo$lower$alpha)
-    
-    parInfo$guess$beta = -log10(parInfo$guess$beta)
-    parInfo$lower$beta = -log10(parInfo$upper$beta)
-    parInfo$upper$beta = -log10(parInfo$lower$beta)
+    parInfo$guess$beta = -log10(xparInfo$guess$beta)
+    parInfo$lower$beta = -log10(xparInfo$upper$beta)
+    parInfo$upper$beta = -log10(xparInfo$lower$beta)
     
     par_real$alpha     = -log10(par_real$alpha)
     par_real$beta      = -log10(par_real$beta)

@@ -184,7 +184,7 @@
 
 .optPopSize = function(n, selection) floor(0.5*(4 + floor(3*log(n)))/selection)
 
-.checkControl = function(control, method, par, fn, active, skeleton, ...) {
+.checkControl = function(control, method, par, fn, active, skeleton, replicates=1, ...) {
   
   fn = match.fun(fn)
   
@@ -226,7 +226,7 @@
     con$weights = attr(fn, "weights")
     names(con$weights) = attr(fn, "variables")
     if(con$verbose) {
-      print(con$weights) 
+      print(con$weights) # TO_DO: make nicer output 
     }
   }
   # check number of variables
@@ -237,7 +237,8 @@
   # update maximum number of function evaluations and generations
   if(!is.null(con$maxit) & !is.null(con$maxgen)) 
     warning("'maxit' and 'maxgen' provided, ignoring 'maxit'.")
-  if(!is.null(con$maxit) & is.null(con$maxgen)) con$maxgen = floor(con$maxit/con$popsize)
+  if(!is.null(con$maxit) & is.null(con$maxgen)) 
+    con$maxgen = floor(con$maxit/con$popsize/replicates)
   if(is.null(con$maxit) & is.null(con$maxgen)) con$maxgen = 2000L
   
   con$maxit = con$popsize*con$maxgen
@@ -296,3 +297,11 @@
   # update sigma...
   return(control)
 }
+
+.myRowMean = function(x, na.rm=FALSE) {
+  if(!inherits(x, "array") & !inherits(x, "matrix")) return(NULL)
+  if(length(dim(x))<2) return(x)
+  return(rowMeans(x, na.rm=na.rm))
+}
+
+

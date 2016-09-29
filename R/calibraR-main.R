@@ -136,7 +136,7 @@ calibrate = function(par, fn, gr = NULL, ..., method = "default",
     temp = .calibrar(par=par, fn=fn, gr = NULL, ..., method = method, 
                    lower = lower, upper = upper, control = control, 
                    hessian = hessian, active=active, skeleton=skeleton,
-                   replicates=replicates)
+                   replicates=replicates[phase])
     
     output$phases[[phase]] = temp # trim?
     output$phase = phase + 1

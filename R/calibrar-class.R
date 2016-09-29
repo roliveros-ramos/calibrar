@@ -14,11 +14,12 @@ print.calibrar.results = function(x, ...) {
 
 #' @export
 coef.calibrar.results = function(object, ...) {
-  return(object$par)
+  return(unlist(object$par))
 }
 
 #' @export
-predict.calibrar.results = function(object, ...) {
+predict.calibrar.results = function(object, replicates=1, 
+                                    na.rm=FALSE, ...) {
 
   obj = object$fn
   
@@ -28,7 +29,19 @@ predict.calibrar.results = function(object, ...) {
   }
   
   fn = match.fun(attr(obj, which="fn"))  
-  out = fn(object$par)
+  
+  if(replicates<=1) {
+    out = fn(object$par)
+  } else {
+    xout = list()
+    for(i in seq_len(replicates)) {
+      xout[[i]] = fn(object$par)
+    } 
+    xout$FUN = "cbind"
+    xout = do.call(what=mapply, args=xout)
+    out = lapply(xout, FUN=calibrar:::.myRowMean, na.rm=na.rm)
+    out$replicates = xout
+  }
   return(out)
 }
 
@@ -72,7 +85,7 @@ summary.calibrar.results = function(object, ..., pars=NULL) {
       xpars = unlist(unclass(xpars))[pars]
   }
   
-  out = c(value=x$value, xpars)
+  out = c(value=x$value, x$counts[1], xpars)
   return(out)
 }
 

@@ -5,7 +5,7 @@
   
   nsites = ceiling(log10(L+1))
   
-  sd = alpha/5
+  sd = alpha/2
   
 #   env  = matrix(rnorm(T*L, mean=0, sd=sd_env), nrow=T, ncol=L)
 #   env  = env/diff(range(env))
@@ -52,9 +52,9 @@
   
   parInfo = list()
   parInfo$guess = relist(c(0.2, 0.1, rep(0, T-1), par_real$sd, round(log(n[1,]),3)), par_real)
-  parInfo$lower = relist(c(0, -0.5, rep(-1.5, T-1), 0, round(rep(min(log(0.5*n[1,])),L),1)), par_real)
-  parInfo$upper = relist(c(1, 0.5, rep(1.5, T-1), 1, round(rep(max(log(1.5*n[1,])),L),1)), par_real)
-  parInfo$phase = relist(c(1, 1, rep(2, T-1), NA, rep(3, L)), par_real)
+  parInfo$lower = relist(c(0, -0.5, rep(-5*sd, T-1), 0, round(rep(min(log(0.5*n[1,])),L),1)), par_real)
+  parInfo$upper = relist(c(1, 0.5, rep(5*sd, T-1), 1, round(rep(max(log(1.5*n[1,])),L),1)), par_real)
+  parInfo$phase = relist(c(1, 1, rep(1, T-1), NA, rep(1, L)), par_real)
   
   # calibrationInfo.csv
   
@@ -98,7 +98,7 @@
   alpha  = par$alpha
   beta   = par$beta
   gamma  = if(!is.null((par$gamma))) par$gamma else rep(0, T-1)
-  gamma  = gamma - mean(gamma)
+  # gamma  = gamma - mean(gamma)
   mu_ini = exp(par$mu_ini)
   
   mu = matrix(nrow=T, ncol=L)

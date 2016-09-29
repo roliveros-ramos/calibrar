@@ -20,15 +20,24 @@
   
   npar = length(par)
   
+  force(replicates)
+  
   # closure for function evaluation
   fn   = match.fun(fn)
-  control = .checkControl(control=control, method=method, par=guess, fn=fn, active=active, skeleton=skeleton, ...)
+  control = .checkControl(control=control, method=method, par=guess, fn=fn, 
+                          active=active, skeleton=skeleton, 
+                          replicates=replicates, ...)
   
   fn1  = function(par) {
     parx = guess
     parx[isActive] = par
     parx = relist(flesh = parx, skeleton = skeleton)
-    fn(parx, ...)/control$fnscale
+    output = NULL
+    for(i in seq_len(replicates)) {
+      out = fn(parx, ...)/control$fnscale
+      output = rbind(output, t(as.matrix(out)))
+    }
+    return(as.numeric(colMeans(output)))
   }
 
   
@@ -246,6 +255,8 @@
 
 .soma = function(par, fn, gr, lower, upper, control, hessian, method) {
   
+  control = NULL # check!
+  
   xoutput = suppressWarnings(soma::soma(costFunction=fn, 
                                        bounds=list(min=lower, max=upper), 
                                        options=control))
@@ -266,11 +277,14 @@
 
 .genoud = function(par, fn, gr, lower, upper, control, hessian, method) {
   
+  print.level = if(control$verbose) control$trace else 0
+  
   output = suppressWarnings(rgenoud::genoud(fn=fn, nvars=length(par), starting.values=par, 
-                                             Domains = cbind(lower, upper)))
+                                            Domains = cbind(lower, upper),
+                                            print.level=print.level))
   
   names(output)[names(output)=="par"] = "ppar"
-  output$counts = c('function'=xoutput$popsize*xoutput$generations, gradient=NA)
+  output$counts = c('function'=output$popsize*output$generations, gradient=NA)
   return(output)
   
 }
@@ -279,8 +293,9 @@
 
 .pso = function(par, fn, gr, lower, upper, control, hessian, method) {
   
-  method = if(any(method=="PSO", method=="PSO2007")) "SPSO2007" else "SPSO2011"
   hybrid = if(method=="hybridPSO") TRUE else FALSE
+  method = if(any(method=="PSO", method=="PSO2007", method=="hybridPSO")) 
+    "SPSO2007" else "SPSO2011"
   
   control = c(control, type=method, hybrid=hybrid)
   
