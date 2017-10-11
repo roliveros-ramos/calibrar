@@ -294,6 +294,15 @@
   
 }
 
+.getWorkDir = function(run, i) {
+  
+  if(is.null(run)) return(invisible())
+  workDir = file.path(run, paste0("i", i))
+  return(workDir)
+  
+}
+
+
 .updateControl = function(control, opt, method) {
   # update sigma...
   return(control)

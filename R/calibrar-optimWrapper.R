@@ -324,8 +324,6 @@
     
     opt = .newOpt(par=par, lower=lower, upper=upper, control=control)
     
-    .copyMaster(opt)
-    
     trace = NULL
     
     if(control$REPORT>0 & control$trace>0) {
@@ -412,28 +410,14 @@
 #' Copy the content of the master directory into the 
 #' RUN/i{pop} directories.
 #' @author Nicolas Barrier
-.copyMaster = function(opt)
-{
-  # copy the master files into the RUN directory
-  if(!is.null(opt$control$master)) {
-    file.copy(from=opt$control$master, to=getwd(), recursive=TRUE)
-  }
-  
-  # if the run argument is not NULL
-  if(!is.null(opt$control$run)){
-    
-    # loop over all the population and create the directories
-    for(i in 0:(opt$seed-1)) {
-      new.dir = .getWorkDir(opt$control$run, i)
-      
-      if(!file.exists(new.dir)) dir.create(new.dir)
-      
-      # if master is not NULL, its content is copied recursively
-      if(!is.null(opt$control$master)) {
-        file.copy(from=opt$control$master, to=new.dir, recursive=TRUE)
-      }
-    }
-  }
+.copyMaster = function(opt, i) {
+  if(is.null(opt$control$master)) return(invisible())
+  if(is.null(opt$control$run))
+    stop("You must specify a 'run' directory to copy the contents of the 'master' folder.")
+  newDir = .getWorkDir(opt$control$run, i)
+  if(!file.exists(newDir)) dir.create(newDir)
+  file.copy(from=opt$control$master, to=newDir, recursive=TRUE, overwrite = FALSE)
+  return(invisible(newDir))
 }
 
 

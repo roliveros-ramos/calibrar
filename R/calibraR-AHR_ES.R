@@ -103,6 +103,8 @@
 
       setwd(pathTmp)      
       workDir = .setWorkDir(run, i)    # set the 'individual' current directory
+      .copyMaster(opt, i)
+      
       
       Fitness = fn(pop[, i+1]) 
       Fitness = c(i+1, Fitness)
@@ -120,6 +122,7 @@
       
       setwd(pathTmp)      
       workDir = .setWorkDir(run, i)    # set the 'individual' current directory
+      .copyMaster(opt, i)
       
       Fitness = fn(pop[,i+1])
       FITNESS	=	rbind(FITNESS, Fitness)
