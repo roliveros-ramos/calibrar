@@ -324,6 +324,8 @@
     
     opt = .newOpt(par=par, lower=lower, upper=upper, control=control)
     
+    .copyMaster(opt)
+    
     trace = NULL
     
     if(control$REPORT>0 & control$trace>0) {
@@ -394,7 +396,7 @@
       .messageByGen(opt, trace)
     
   } # end generations loop
-  
+
   partial = fn(opt$MU)
   value = control$aggFn(x=partial, w=control$weights) # check if necessary
   names(opt$MU) = names(par)
@@ -405,6 +407,33 @@
   
   return(output)
   
+}
+
+#' Copy the content of the master directory into the 
+#' RUN/i{pop} directories.
+#' @author Nicolas Barrier
+.copyMaster = function(opt)
+{
+  # copy the master files into the RUN directory
+  if(!is.null(opt$control$master)) {
+    file.copy(from=opt$control$master, to=getwd(), recursive=TRUE)
+  }
+  
+  # if the run argument is not NULL
+  if(!is.null(opt$control$run)){
+    
+    # loop over all the population and create the directories
+    for(i in 0:(opt$seed-1)) {
+      new.dir = .getWorkDir(opt$control$run, i)
+      
+      if(!file.exists(new.dir)) dir.create(new.dir)
+      
+      # if master is not NULL, its content is copied recursively
+      if(!is.null(opt$control$master)) {
+        file.copy(from=opt$control$master, to=new.dir, recursive=TRUE)
+      }
+    }
+  }
 }
 
 
