@@ -287,9 +287,10 @@
 .setWorkDir = function(run, i) {
   
   if(is.null(run)) return(invisible())
-  work.dir = file.path(run, paste0("i", i))
-  setwd(work.dir)
-  return(work.dir)
+  workDir = file.path(run, paste0("i", i))
+  if(!dir.exists(workDir)) dir.create(workDir, recursive=TRUE)
+  setwd(workDir)
+  return(workDir)
   
 }
 
