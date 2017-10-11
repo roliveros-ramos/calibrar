@@ -108,9 +108,6 @@
       Fitness = c(i+1, Fitness)
       Fitness
       
-      # barrier.n: reset the proper working directory
-      setwd(path.tmp)
-      
     }
     
     FITNESS = FITNESS[sort(FITNESS[,1], index.return=TRUE)$ix,][,-1, drop=FALSE]
@@ -126,9 +123,6 @@
       
       Fitness = fn(pop[,i+1])
       FITNESS	=	rbind(FITNESS, Fitness)
-      
-      # barrier.n: reset the proper working directory
-      setwd(path.tmp)
       
     }
     
