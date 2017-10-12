@@ -311,40 +311,36 @@
 # optimES internal --------------------------------------------------------
 
 .optimES = function(par, fn, gr, lower, upper, control, method, hessian, isActive) {
-
-    # get restart for the current phase
-    restart = .restartCalibration(control) # flag: TRUE or FALSE
-    if(isTRUE(restart)) {
-
-        res = .getRestart(control=control)
-        opt   = res$opt
-        trace = res$trace
-
-    } else {
-
-        opt = .newOpt(par=par, lower=lower, upper=upper, control=control)
-
-        .copyMaster(opt)
-
-        trace = NULL
-
-        if(control$REPORT>0 & control$trace>0) {
-
-            trace = list()
-            trace$control = control
-            trace$par = matrix(NA, nrow=control$maxgen, ncol=length(isActive))
-            trace$value = rep(NA, control$maxgen)
-            trace$best  = rep(NA, control$maxgen)
-
-            if(control$trace>1) {
-                trace$sd = matrix(NA, nrow=control$maxgen, ncol=length(isActive))   
-                trace$step = rep(NA, control$maxgen)     
-            }
-
-            if(control$trace>2) trace$opt = vector("list", control$maxgen)
-
-        } 
-
+  
+  # get restart for the current phase
+  restart = .restartCalibration(control) # flag: TRUE or FALSE
+  if(isTRUE(restart)) {
+    
+    res = .getRestart(control=control)
+    opt   = res$opt
+    trace = res$trace
+    
+  } else {
+    
+    opt = .newOpt(par=par, lower=lower, upper=upper, control=control)
+    
+    trace = NULL
+    
+    if(control$REPORT>0 & control$trace>0) {
+      
+      trace = list()
+      trace$control = control
+      trace$par = matrix(NA, nrow=control$maxgen, ncol=length(isActive))
+      trace$value = rep(NA, control$maxgen)
+      trace$best  = rep(NA, control$maxgen)
+      
+      if(control$trace>1) {
+        trace$sd = matrix(NA, nrow=control$maxgen, ncol=length(isActive))   
+        trace$step = rep(NA, control$maxgen)     
+      }
+      
+      if(control$trace>2) trace$opt = vector("list", control$maxgen)
+      
     } 
 
     # start new optimization
@@ -400,7 +396,8 @@
     # barrier.n: if a run directory is defined, then the partial function
     # will be done in a RUN/iFinal directory.
     path.tmp = getwd()
-    if(!is.null(opt$control$run)) .setWorkDir(opt$control$run, "Final")
+    workDir = .setWorkDir(run, "Final") 
+    .copyMaster(opt, "Final")
 
     partial = fn(opt$MU)
     value = control$aggFn(x=partial, w=control$weights) # check if necessary
@@ -419,40 +416,15 @@
 #' Copy the content of the master directory into the 
 #' RUN/i{pop} directories.
 #' @author Nicolas Barrier
-.copyMaster = function(opt)
-{
-    # copy the master files into the RUN directory
-    if(!is.null(opt$control$master)) {
-        file.copy(from=opt$control$master, to=getwd(), recursive=TRUE)
-    }
-
-    # if the run argument is not NULL
-    if(!is.null(opt$control$run)){
-
-        # loop over all the population and create the directories
-        for(i in 0:(opt$seed-1)) {
-            new.dir = .getWorkDir(opt$control$run, i)
-
-            if(!file.exists(new.dir)) dir.create(new.dir)
-
-            # if master is not NULL, its content is copied recursively
-            if(!is.null(opt$control$master)) {
-                file.copy(from=opt$control$master, to=new.dir, recursive=TRUE)
-            }
-        }
-
-        # creates a RUN/iFinal directory for the end of the run.
-        # and eventually copy everything in it.
-        new.dir = .getWorkDir(opt$control$run, "Final")
-        if(!file.exists(new.dir)) dir.create(new.dir)
-        
-        # if master is not NULL, its content is copied recursively
-        if(!is.null(opt$control$master)) {
-            file.copy(from=opt$control$master, to=new.dir, recursive=TRUE)
-        }
-    }
+.copyMaster = function(opt, i) {
+  if(is.null(opt$control$master)) return(invisible())
+  if(is.null(opt$control$run))
+    stop("You must specify a 'run' directory to copy the contents of the 'master' folder.")
+  newDir = .getWorkDir(opt$control$run, i)
+  if(!file.exists(newDir)) dir.create(newDir)
+  file.copy(from=opt$control$master, to=newDir, recursive=TRUE, overwrite = FALSE)
+  return(invisible(newDir))
 }
-
 
 .getWorkDir = function(run, i) {
     if(is.null(run)) return(invisible())

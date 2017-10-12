@@ -11,7 +11,7 @@ summary.calibrar.function = function(object, ...) {
 #' Sphere function with random noise 
 #' 
 #' This function calculates the Euclidian distance from a point to the origin
-#' after a random displacement of it position. 
+#' after a random displacement of its position. 
 #' 
 #' @param x The coordinates of the point
 #' @param sd The standard deviation of the noise

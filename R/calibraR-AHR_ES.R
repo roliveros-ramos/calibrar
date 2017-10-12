@@ -93,22 +93,22 @@
   parallel = opt$control$parallel
   run      = opt$control$run
   
-  path.tmp = getwd()               # get the current path
-  on.exit(setwd(path.tmp))         # back to the original path after execution
+  pathTmp = getwd()               # get the current path
+  on.exit(setwd(pathTmp))         # back to the original path after execution
   
   if(isTRUE(parallel)) {
     # optimize parallel execution, reduce data transfer
     
     FITNESS  =  foreach(i=0:(opt$seed-1), .combine=rbind, .verbose=FALSE, .inorder=FALSE) %dopar% {
+
+      setwd(pathTmp)      
+      workDir = .setWorkDir(run, i)    # set the 'individual' current directory
+      .copyMaster(opt, i)
       
-      work.dir = .setWorkDir(run, i)    # set the 'individual' current directory
       
       Fitness = fn(pop[, i+1]) 
       Fitness = c(i+1, Fitness)
       Fitness
-      
-      # barrier.n: reset the proper working directory
-      setwd(path.tmp)
       
     }
     
@@ -120,13 +120,12 @@
     
     for(i in 0:(opt$seed-1)) {
       
-      work.dir = .setWorkDir(run, i)    # set the 'individual' current directory
-
+      setwd(pathTmp)      
+      workDir = .setWorkDir(run, i)    # set the 'individual' current directory
+      .copyMaster(opt, i)
+      
       Fitness = fn(pop[,i+1])
       FITNESS	=	rbind(FITNESS, Fitness)
-      
-      # barrier.n: reset the proper working directory
-      setwd(path.tmp)
       
     }
     
