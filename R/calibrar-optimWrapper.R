@@ -1,12 +1,12 @@
 .calibrar = function (par, fn, gr = NULL, ..., lower = -Inf, upper = Inf, active=NULL, 
-                    control = list(), hessian = FALSE, method = NULL, skeleton=NULL,
-                    replicates=1) {
+                      control = list(), hessian = FALSE, method = NULL, skeleton=NULL,
+                      replicates=1) {
   
   skeleton = skeleton
   if(is.null(skeleton)) skeleton = as.relistable(par)
   
   npar = length(par)
- 
+  
   # check active parameters
   active = .checkActive(active=active, npar=npar)
   isActive = which(active)
@@ -39,7 +39,7 @@
     }
     return(as.numeric(colMeans(output)))
   }
-
+  
   
   imethod = "default"
   optimMethods  = c("Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN",
@@ -47,7 +47,7 @@
   optimxMethods = c("nlm", "nlminb", "spg", "ucminf", "newuoa", "bobyqa", 
                     "nmkb", "hjkb")
   psoMethods    = c("PSO", "PSO2007", "PSO2011", "hybridPSO")
-    
+  
   if(method %in% optimMethods) imethod = "optim"
   if(method %in% optimxMethods) imethod = "optimx"
   if(method %in% psoMethods) imethod = "pso"
@@ -73,20 +73,20 @@
            Rvmmin  = .Rvmmin(par=par, fn=fn1, gr=gr, lower=lower, upper=upper, control=control, 
                              hessian=hessian, method=method),
            pso     = .pso(par=par, fn=fn1, gr=gr, lower=lower, upper=upper, control=control, 
-                             hessian=hessian, method=method),
+                          hessian=hessian, method=method),
            cmaes   = .cmaes(par=par, fn=fn1, lower=lower, upper=upper, control=control),
            lbfgsb3 = .lbfgsb3(par=par, fn=fn1, gr=gr, lower=lower, upper=upper, control=control, 
-                            hessian=hessian, method=method),
+                              hessian=hessian, method=method),
            genSA   = .genSA(par=par, fn=fn1, gr=gr, lower=lower, upper=upper, control=control, 
                             hessian=hessian, method=method),
            soma    = .soma(par=par, fn=fn1, gr=gr, lower=lower, upper=upper, control=control, 
-                            hessian=hessian, method=method),
+                           hessian=hessian, method=method),
            genoud  = .genoud(par=par, fn=fn1, gr=gr, lower=lower, upper=upper, control=control, 
-                            hessian=hessian, method=method),
+                             hessian=hessian, method=method),
            DEoptim = .DE(par=par, fn=fn1, gr=gr, lower=lower, upper=upper, control=control, 
-                             hessian=hessian, method=method)
-           )
-
+                         hessian=hessian, method=method)
+    )
+  
   # reshaping full parameters
   paropt = guess
   paropt[isActive] = output$ppar 
@@ -113,7 +113,7 @@
   }
   
   output = suppressWarnings(stats::optim(par=par, fn=fn, gr=gr, method=method, lower=lower, 
-              upper=upper, control=control, hessian=hessian))
+                                         upper=upper, control=control, hessian=hessian))
   
   names(output)[names(output)=="par"] = "ppar"
   
@@ -130,7 +130,7 @@
   control = NULL # check!
   
   out = suppressWarnings(optimx::optimx(par=par, fn=fn, gr=gr, method=method, lower=lower, 
-                               upper=upper, control=control, hessian=hessian))
+                                        upper=upper, control=control, hessian=hessian))
   
   par = as.numeric(out[, parNames])
   value = out$value
@@ -166,7 +166,7 @@
   control = NULL # check!
   
   output = suppressWarnings(Rvmmin::Rvmmin(par=par, fn=fn, gr=gr, lower=lower, 
-                                        upper=upper, control=control))
+                                           upper=upper, control=control))
   
   names(output)[names(output)=="par"] = "ppar"
   
@@ -200,7 +200,7 @@
   control[!(names(control) %in% names(ctrl))] = NULL
   
   xoutput = suppressWarnings(lbfgsb3::lbfgsb3(prm=par, fn=fn, gr=gr, lower=lower,
-  upper=upper, control=control))
+                                              upper=upper, control=control))
   
   output = list()
   output$ppar  = xoutput$prm
@@ -219,7 +219,7 @@
 .genSA = function(par, fn, gr, lower, upper, control, hessian, method) {
   
   output = suppressWarnings(GenSA::GenSA(par=par, fn=fn, lower=lower, 
-                                  upper=upper, control=control))
+                                         upper=upper, control=control))
   
   names(output)[names(output)=="par"] = "ppar"
   output$counts = c('function'=output$counts,
@@ -258,8 +258,8 @@
   control = NULL # check!
   
   xoutput = suppressWarnings(soma::soma(costFunction=fn, 
-                                       bounds=list(min=lower, max=upper), 
-                                       options=control))
+                                        bounds=list(min=lower, max=upper), 
+                                        options=control))
   
   output = list()
   output$ppar  = xoutput$population[, xoutput$leader]
@@ -300,7 +300,7 @@
   control = c(control, type=method, hybrid=hybrid)
   
   output = suppressWarnings(pso::psoptim(par=par, fn=fn, gr=gr, lower=lower, 
-                                  upper=upper, control=control))
+                                         upper=upper, control=control))
   
   names(output)[names(output)=="par"] = "ppar"
   
@@ -311,6 +311,9 @@
 # optimES internal --------------------------------------------------------
 
 .optimES = function(par, fn, gr, lower, upper, control, method, hessian, isActive) {
+  
+  pathTmp = getwd()               # get the current path
+  on.exit(setwd(pathTmp))         # back to the original path after execution
   
   # get restart for the current phase
   restart = .restartCalibration(control) # flag: TRUE or FALSE
@@ -341,9 +344,8 @@
       
       if(control$trace>2) trace$opt = vector("list", control$maxgen)
       
-    } 
-    
-  } 
+    }
+  }
   
   # start new optimization
   while(isTRUE(.continueEvolution(opt, control))) {
@@ -394,7 +396,12 @@
       .messageByGen(opt, trace)
     
   } # end generations loop
-
+  
+  # run for final calculation of value
+  setwd(pathTmp)      
+  .copyMaster(opt, 0)
+  workDir = .setWorkDir(opt$control$run, 0)
+  
   partial = fn(opt$MU)
   value = control$aggFn(x=partial, w=control$weights) # check if necessary
   names(opt$MU) = names(par)
@@ -402,6 +409,7 @@
   
   output = list(ppar=opt$MU, value=value, counts=opt$counts, 
                 trace=trace, partial=partial, convergence=1)
+  
   
   return(output)
   
@@ -417,6 +425,8 @@
   return(invisible(newDir))
 }
 
-
-
-
+.getWorkDir = function(run, i) {
+  if(is.null(run)) return(invisible())
+  work.dir = file.path(run, paste0("i", i))
+  return(work.dir)
+}
