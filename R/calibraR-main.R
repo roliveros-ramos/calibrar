@@ -146,11 +146,12 @@ calibrate = function(par, fn, gr = NULL, ..., method = "default",
     par = temp$par #update parameter guess
     control = .updateControl(control=control, opt=temp, method=method)  # update CVs? 
     
-    cat(sprintf("\nPhase %d finished (%d of %d parameters active)\n",
-                phase, sum(active, na.rm=TRUE), npar))
-    cat(sprintf("Function value: %g \n", temp$value))
-    print(par[which(active)])
-    cat("\n")
+    msg = paste(c(sprintf("\nPhase %d finished (%d of %d parameters active)",
+                        phase, sum(active, na.rm=TRUE), npar),
+                sprintf("Function value: %g", temp$value),
+                paste(c("Parameters:",sprintf("%0.3g", par[which(active)])), collapse=" "), 
+                "\n"), collapse="\n")
+    message(msg)
   }
   
    isActive = (phases>0) & !is.na(phases)

@@ -407,15 +407,12 @@
   
 }
 
-#' Copy the content of the master directory into the 
-#' RUN/i{pop} directories.
-#' @author Nicolas Barrier
 .copyMaster = function(opt, i) {
   if(is.null(opt$control$master)) return(invisible())
   if(is.null(opt$control$run))
     stop("You must specify a 'run' directory to copy the contents of the 'master' folder.")
   newDir = .getWorkDir(opt$control$run, i)
-  if(!file.exists(newDir)) dir.create(newDir)
+  if(!file.exists(newDir)) dir.create(newDir, recursive=TRUE)
   file.copy(from=opt$control$master, to=newDir, recursive=TRUE, overwrite = FALSE)
   return(invisible(newDir))
 }

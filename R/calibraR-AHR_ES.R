@@ -102,8 +102,8 @@
     FITNESS  =  foreach(i=0:(opt$seed-1), .combine=rbind, .verbose=FALSE, .inorder=FALSE) %dopar% {
 
       setwd(pathTmp)      
-      workDir = .setWorkDir(run, i)    # set the 'individual' current directory
       .copyMaster(opt, i)
+      workDir = .setWorkDir(run, i)    # set the 'individual' current directory
       
       
       Fitness = fn(pop[, i+1]) 
@@ -121,8 +121,8 @@
     for(i in 0:(opt$seed-1)) {
       
       setwd(pathTmp)      
-      workDir = .setWorkDir(run, i)    # set the 'individual' current directory
       .copyMaster(opt, i)
+      workDir = .setWorkDir(run, i)    # set the 'individual' current directory
       
       Fitness = fn(pop[,i+1])
       FITNESS	=	rbind(FITNESS, Fitness)
