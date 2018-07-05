@@ -333,16 +333,18 @@
       
       trace = list()
       trace$control = control
-      trace$par = matrix(NA, nrow=control$maxgen, ncol=length(isActive))
+      trace$par   = matrix(NA, nrow=control$maxgen, ncol=length(isActive))
       trace$value = rep(NA, control$maxgen)
       trace$best  = rep(NA, control$maxgen)
       
       if(control$trace>1) {
-        trace$sd = matrix(NA, nrow=control$maxgen, ncol=length(isActive))   
+        trace$sd   = matrix(NA, nrow=control$maxgen, ncol=length(isActive))   
         trace$step = rep(NA, control$maxgen)     
       }
       
-      if(control$trace>2) trace$opt = vector("list", control$maxgen)
+      if(control$trace>2) trace$fitness = NULL
+      
+      if(control$trace>3) trace$opt = vector("list", control$maxgen)
       
     }
   }
@@ -382,11 +384,20 @@
         trace$step[opt$gen]  = opt$step       
       }
       
-      if(opt$gen%%control$REPORT==0) {
-        trace$value[opt$gen] = control$aggFn(fn(opt$MU), control$weights)
-        if(control$trace>2) trace$opt[[opt$gen]] = opt
+      if(control$trace>2) {
+        
+        if(is.null(trace$fitness)) 
+          trace$fitness = matrix(NA, nrow=control$maxgen, ncol=ncol(opt$fitness)) 
+        
+        trace$fitness[opt$gen, ] = colMeans(opt$fitness[opt$selected$supsG, , drop=FALSE])
+        
       }
       
+      if(opt$gen%%control$REPORT==0) {
+        trace$value[opt$gen] = control$aggFn(fn(opt$MU), control$weights)
+        if(control$trace>3) trace$opt[[opt$gen]] = opt
+      }
+
     }
     
     # save restart
