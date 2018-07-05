@@ -198,17 +198,16 @@
   opt.sd	= array(NA, dim=c(nrow(pop), ncol(supsL)))
   
   for(i in seq_len(ncol(supsL))) {
-    opt.ind[, i]       = apply(pop[, supsL[, i]], 1, weighted.mean, w=w.rec)
+    opt.ind[, i]   = apply(pop[, supsL[, i]], 1, weighted.mean, w=w.rec)
     opt.var	       = apply(pop[, supsL[, i]]^2, 1, weighted.mean, w=w.rec) - opt.ind[, i]^2
-    opt.var[opt.var<0] = 0
-    opt.sd[, i]        = sqrt(opt.var)
-    
+    opt.var        = pmax(opt.var, 0)
+    opt.sd[, i]    = sqrt(opt.var)
   }
   
   mu.new		= (1-alpha)*opt$mu + alpha*opt.ind
   s.new			= (1-alpha)*(opt$mu^2+opt$sigma^2) + alpha*(opt.ind^2+ opt.sd^2) - mu.new^2
-  s.new[s.new<0]        = 0 # s.new is always positive, this is a correction for rounding errors 
-  sigma.new             = sqrt(s.new)
+  s.new     = pmax(s.new, 0) # s.new is always positive, this is a correction for rounding errors 
+  sigma.new = sqrt(s.new)
   ww.new		= if(isTRUE(opt$useCV)) .w.oi(sigma.new/opt$range) else .w.oi(sigma.new)
   
   ww.rec = array(w.rec[supsL], dim=dim(supsL))
