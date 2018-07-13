@@ -133,7 +133,7 @@ calibrate = function(par, fn, gr = NULL, ..., method = "default",
 
     active = (phases <= phase) # NAs are corrected in .calibrar 
     # call optimizers handler .calibrar
-    temp = .calibrar(par=par, fn=fn, gr = NULL, ..., method = method, 
+    temp = .calibrar(par=par, fn=fn, gr = gr, ..., method = method, 
                    lower = lower, upper = upper, control = control, 
                    hessian = hessian, active=active, skeleton=skeleton,
                    replicates=replicates[phase])
