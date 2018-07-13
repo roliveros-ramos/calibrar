@@ -432,7 +432,9 @@
     stop("You must specify a 'run' directory to copy the contents of the 'master' folder.")
   newDir = .getWorkDir(opt$control$run, i)
   if(!file.exists(newDir)) dir.create(newDir, recursive=TRUE)
-  file.copy(from=opt$control$master, to=newDir, recursive=TRUE, overwrite = FALSE)
+  xfiles = dir(path=opt$control$master)
+  from   = file.path(opt$control$master, xfiles)
+  file.copy(from=from, to=newDir, recursive=TRUE, overwrite = FALSE) # why?
   return(invisible(newDir))
 }
 
