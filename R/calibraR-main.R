@@ -106,6 +106,7 @@ calibrate = function(par, fn, gr = NULL, ..., method = "default",
   if(is.null(names(par))) names(par) = .printSeq(npar, preffix="par")
   
   fn = match.fun(fn)
+  if(!is.null(gr)) gr = match.fun(gr)
   
   phases     = .checkPhases(phases=phases, npar=npar)
   bounds     = .checkBounds(lower=lower, upper=upper, npar=npar)
