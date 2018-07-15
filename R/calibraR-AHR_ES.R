@@ -227,40 +227,6 @@
 }
 
 
-# .updatePopulation = function(opt) {
-#   
-#   opt = within(opt, {
-#     
-#     supsG       = selected$supsG
-#     
-#     cs          = (mu.eff+2)/(npar+mu.eff+3)
-#     D           = 1 + 2*max(0, sqrt((mu.eff-1)/(npar+1))-1) + cs
-#     mu.cov      = mu.eff
-#     c.cov       = (1/mu.cov)*(2/((npar+sqrt(2))^2))+(1-1/mu.cov)*min(1,(2*mu.eff-1)/((npar+2)^2+mu.eff))
-#     
-#     MU.new      = rowSums(W * pop[, supsG, drop=FALSE])
-#     
-#     pc          = (1-cc)*pc + sqrt(cc*(2-cc))*sqrt(MU.eff)*(MU.new-MU)/step
-#     ps          = (1-cs)*ps + sqrt(cs*(2-cs))*sqrt(MU.eff)*((MU.new-MU)/sqrt(SIGMA))/step
-#     
-#     SIGMA.sel   = rowSums(W * ((pop[, supsG, drop=FALSE] - MU)/step)^2)
-#     SIGMA.new   = (1-c.cov)*SIGMA + (c.cov/mu.cov)*pc*pc + c.cov*(1-1/mu.cov)*SIGMA.sel
-#     
-#     step        = step*exp(cs*(sqrt(sum(ps*ps, na.rm=TRUE))/chiN-1)/D)
-#   
-#     MU          = MU.new
-#     SIGMA       = SIGMA.new
-#     
-#     SD          = step*sqrt(SIGMA)
-#     
-#     rm(list=c("MU.new", "SIGMA.sel", "SIGMA.new"))
-#     
-#   })
-#   
-#   return(opt)
-# 
-# }
-
 .updatePopulation = function(opt) {
   
     supsG       = opt$selected$supsG
