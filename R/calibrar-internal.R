@@ -6,6 +6,9 @@
   for(j in seq_len(nrow(info))) {
     if(!info$calibrate[j]) next
     var = info$variable[j]
+    msg = "Variable '%s' not found in %s data."
+    if(!(var %in% names(obs))) stop(sprintf(msg, var, "observed"))
+    if(!(var %in% names(sim))) stop(sprintf(msg, var, "simulated"))
     fit = c(fit, .fitness(obs=obs[[var]], sim=sim[[var]], FUN=info$type[j]))
   }
   names(fit) = info$variable[which(info$calibrate)]
