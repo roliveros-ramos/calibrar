@@ -278,16 +278,15 @@ getObservedData = function(info, path, data.folder="data", ...) {
   observed  = list()
   variables = info$variable
   
-  useData       = as.logical(info$useData)
+  useData = as.logical(info$useData)
   
   cat("Creating observed data list for calibration...","\n")
   
-  for(var in 1:nrow(info)) {
+  for(iVar in seq_len(nrow(info))) {
     
-    cat(paste0("Variable: ", variables[var], "\n"))
-    var.path        = file.path(path, data.folder, paste0(variables[var],".csv"))
-    datos           = if(useData[var]) .read.csv3(var.path, ...) else NA
-    observed[[var]] = datos
+    message(paste0("Variable: ", variables[iVar], "\n"))
+    varPath         = file.path(path, data.folder, paste0(variables[iVar],".csv"))
+    observed[[iVar]] = if(useData[iVar]) .read.csv3(varPath, ...) else NA
     
   }
   
