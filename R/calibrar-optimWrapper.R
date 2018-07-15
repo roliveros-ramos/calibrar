@@ -375,7 +375,9 @@
   
   pathTmp = getwd()               # get the current path
   on.exit(setwd(pathTmp))         # back to the original path after execution
-  
+ 
+  copyMaster(control) # set a copy of master for all individuals
+
   # get restart for the current phase
   restart = .restartCalibration(control) # flag: TRUE or FALSE
   if(isTRUE(restart)) {
@@ -469,12 +471,7 @@
     
   } # end generations loop
   
-  # run for final calculation of value
-  setwd(pathTmp)      
-  .copyMaster(opt, 0)
-  workDir = .setWorkDir(opt$control$run, 0)
-  
-  partial = fn(opt$MU)
+  partial = fn(opt$MU, .i=0)
   value = control$aggFn(x=partial, w=control$weights) # check if necessary
   names(opt$MU) = names(par)
   opt$counts = c('function'=opt$gen*control$popsize, generations=opt$gen)
@@ -487,16 +484,25 @@
   
 }
 
-.copyMaster = function(opt, i) {
-  if(is.null(opt$control$master)) return(invisible())
-  if(is.null(opt$control$run))
+
+# Auxiliar functions to run fn on disk ------------------------------------
+
+copyMaster = function(control, n=NULL) {
+  if(is.null(n)) n = control$popsize
+  for(i in (seq_len(n) - 1)) .copyMaster(control, i)
+  return(invisible())
+}
+
+.copyMaster = function(control, i) {
+  if(is.null(control$master)) return(invisible())
+  if(is.null(control$run))
     stop("You must specify a 'run' directory to copy the contents of the 'master' folder.")
-  newDir = .getWorkDir(opt$control$run, i)
+  newDir = .getWorkDir(control$run, i)
   if(!dir.exists(newDir)) dir.create(newDir, recursive=TRUE)
-  if(isTRUE(opt$control$master)) return(invisible(newDir))
-  if(!dir.exists(opt$control$master)) stop("The 'master' directory does not exist.") 
-  xfiles = dir(path=opt$control$master)
-  from   = file.path(opt$control$master, xfiles)
+  if(isTRUE(control$master)) return(invisible(newDir))
+  if(!dir.exists(control$master)) stop("The 'master' directory does not exist.") 
+  xfiles = dir(path=control$master)
+  from   = file.path(control$master, xfiles)
   file.copy(from=from, to=newDir, recursive=TRUE, overwrite = FALSE) # why?
   return(invisible(newDir))
 }
