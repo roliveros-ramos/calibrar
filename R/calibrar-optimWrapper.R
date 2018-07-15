@@ -24,21 +24,49 @@
   
   # closure for function evaluation
   fn   = match.fun(fn)
+  if(!is.null(gr)) gr = match.fun(gr)
+  
   control = .checkControl(control=control, method=method, par=guess, fn=fn, 
                           active=active, skeleton=skeleton, 
                           replicates=replicates, ...)
-  
-  fn1  = function(par) {
-    parx = guess
-    parx[isActive] = par
-    parx = relist(flesh = parx, skeleton = skeleton)
-    output = NULL
-    for(i in seq_len(replicates)) {
-      out = fn(parx, ...)/control$fnscale
-      output = rbind(output, t(as.matrix(out)))
+ 
+  if(is.null(control$master)) {
+    
+    fn1  = function(par, .i=0) {
+      
+      parx = guess
+      parx[isActive] = par
+      parx = relist(flesh = parx, skeleton = skeleton)
+      output = NULL
+      for(i in seq_len(replicates)) {
+        out = fn(parx, ...)/control$fnscale
+        output = rbind(output, t(as.matrix(out)))
+      }
+      return(as.numeric(colMeans(output)))
+      
     }
-    return(as.numeric(colMeans(output)))
-  }
+    
+  } else {
+
+    fn1  = function(par, .i=0) {
+      
+      cwd = getwd()
+      on.exit(setwd(cwd))
+      .setWorkDir(control$run, i=.i) 
+      
+      parx = guess
+      parx[isActive] = par
+      parx = relist(flesh = parx, skeleton = skeleton)
+      output = NULL
+      for(i in seq_len(replicates)) {
+        out = fn(parx, ...)/control$fnscale
+        output = rbind(output, t(as.matrix(out)))
+      }
+      return(as.numeric(colMeans(output)))
+      
+    }
+    
+  } # end fn1
   
   
   imethod = "default"
@@ -106,6 +134,9 @@
 
 .optim = function(par, fn, gr, lower, upper, control, hessian, method) {
   
+  pathTmp = getwd()               # get the current path
+  on.exit(setwd(pathTmp))         # back to the original path after execution
+  
   # what to do with methods not accepting bound conditions?
   if(!(method %in% c("L-BFGS-B", "Brent"))) {
     lower = -Inf
@@ -125,6 +156,9 @@
 # wrapper for optimx ------------------------------------------------------
 
 .optimx = function(par, fn, gr, lower, upper, control, hessian, method) {
+  
+  pathTmp = getwd()               # get the current path
+  on.exit(setwd(pathTmp))         # back to the original path after execution
   
   parNames = names(par)
   control = NULL # check!
@@ -146,6 +180,9 @@
 
 .Rcgmin = function(par, fn, gr, lower, upper, control, hessian, method) {
   
+  pathTmp = getwd()               # get the current path
+  on.exit(setwd(pathTmp))         # back to the original path after execution
+  
   parNames = names(par)
   control = NULL # check!
   
@@ -162,6 +199,9 @@
 
 .Rvmmin = function(par, fn, gr, lower, upper, control, hessian, method) {
   
+  pathTmp = getwd()               # get the current path
+  on.exit(setwd(pathTmp))         # back to the original path after execution
+  
   parNames = names(par)
   control = NULL # check!
   
@@ -177,6 +217,9 @@
 # wrapper for cma_es ------------------------------------------------------
 
 .cmaes = function(par, fn, lower, upper, control) {
+  
+  pathTmp = getwd()               # get the current path
+  on.exit(setwd(pathTmp))         # back to the original path after execution
   
   npar = length(unlist(par))
   output = suppressWarnings(cmaes::cma_es(par=par, fn=fn, lower=lower, upper=upper, control=control))
@@ -195,6 +238,9 @@
 # wrapper for lbfgsb3 -----------------------------------------------------
 
 .lbfgsb3 = function(par, fn, gr, lower, upper, control, hessian, method) {
+  
+  pathTmp = getwd()               # get the current path
+  on.exit(setwd(pathTmp))         # back to the original path after execution
   
   ctrl = list(maxit = 500, trace = 0, iprint = 0L)
   control[!(names(control) %in% names(ctrl))] = NULL
@@ -218,6 +264,9 @@
 
 .genSA = function(par, fn, gr, lower, upper, control, hessian, method) {
   
+  pathTmp = getwd()               # get the current path
+  on.exit(setwd(pathTmp))         # back to the original path after execution
+  
   output = suppressWarnings(GenSA::GenSA(par=par, fn=fn, lower=lower, 
                                          upper=upper, control=control))
   
@@ -231,6 +280,9 @@
 # wrapper for DEoptim -----------------------------------------------------
 
 .DE = function(par, fn, gr, lower, upper, control, hessian, method) {
+  
+  pathTmp = getwd()               # get the current path
+  on.exit(setwd(pathTmp))         # back to the original path after execution
   
   if(isTRUE(control$parallel)) control$parallelType=2
   
@@ -255,6 +307,9 @@
 
 .soma = function(par, fn, gr, lower, upper, control, hessian, method) {
   
+  pathTmp = getwd()               # get the current path
+  on.exit(setwd(pathTmp))         # back to the original path after execution
+  
   control = NULL # check!
   
   xoutput = suppressWarnings(soma::soma(costFunction=fn, 
@@ -277,6 +332,9 @@
 
 .genoud = function(par, fn, gr, lower, upper, control, hessian, method) {
   
+  pathTmp = getwd()               # get the current path
+  on.exit(setwd(pathTmp))         # back to the original path after execution
+  
   print.level = if(control$verbose) control$trace else 0
   
   output = suppressWarnings(rgenoud::genoud(fn=fn, nvars=length(par), starting.values=par, 
@@ -292,6 +350,9 @@
 # wrapper for pso ---------------------------------------------------------
 
 .pso = function(par, fn, gr, lower, upper, control, hessian, method) {
+  
+  pathTmp = getwd()               # get the current path
+  on.exit(setwd(pathTmp))         # back to the original path after execution
   
   hybrid = if(method=="hybridPSO") TRUE else FALSE
   method = if(any(method=="PSO", method=="PSO2007", method=="hybridPSO")) 
@@ -431,7 +492,9 @@
   if(is.null(opt$control$run))
     stop("You must specify a 'run' directory to copy the contents of the 'master' folder.")
   newDir = .getWorkDir(opt$control$run, i)
-  if(!file.exists(newDir)) dir.create(newDir, recursive=TRUE)
+  if(!dir.exists(newDir)) dir.create(newDir, recursive=TRUE)
+  if(isTRUE(opt$control$master)) return(invisible(newDir))
+  if(!dir.exists(opt$control$master)) stop("The 'master' directory does not exist.") 
   xfiles = dir(path=opt$control$master)
   from   = file.path(opt$control$master, xfiles)
   file.copy(from=from, to=newDir, recursive=TRUE, overwrite = FALSE) # why?

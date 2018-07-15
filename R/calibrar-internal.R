@@ -187,7 +187,8 @@
 .checkControl = function(control, method, par, fn, active, skeleton, replicates=1, ...) {
   
   fn = match.fun(fn)
-  
+
+  # specific options must be taken in .optimES.  
   con = list(trace = 0, fnscale = 1, parscale = rep.int(1L, length(which(active))), maxit = NULL, maxgen=NULL,
              abstol = -Inf, reltol = sqrt(.Machine$double.eps), REPORT = 10L, nCores=parallel::detectCores(), 
              alpha=0.05, age.max=1, selection=0.5, step=0.5, nvar=NULL, weights=1, sigma=NULL,
@@ -206,6 +207,15 @@
   # get unknown options
   unknown = controlUser[!(controlUser %in% controlDef)]
   
+  if(isFALSE(con$master)) con$master = NULL
+  if(!is.null(con$master) & is.null(con$run)) {
+    con$run = tempdir()
+    msg = sprintf("Evaluating 'fn' in %s.", con$run)
+    message(msg)
+  }
+  
+  if(!dir.exists(con$run)) dir.create(con$run, recursive=TRUE)
+  
   # update population size and selection rate
   if(con$popsize < popOpt) warning("'popsize' is too small, using default value.")
   con$popsize = max(con$popsize, popOpt)
@@ -216,11 +226,6 @@
     con$selection = round(con$selection*popOpt/popOptP, 1)
   }
   
-  # check for user-provided variances (sigma)
-  if(!is.null(con$sigma) & length(con$sigma)!=length(active)) 
-    stop("Vector of variances (sigma) must match parameter length.")
-  if(!is.null(con$sigma)) con$sigma = con$sigma[which(active)]
-
   if(inherits(fn, "objFn")) {
     con$nvar = attr(fn, "nvar")
     con$weights = attr(fn, "weights")
@@ -231,7 +236,7 @@
   }
   # check number of variables
   xpar = if(missing(skeleton)) par else relist(par, skeleton)
-  if(is.null(con$nvar)) con$nvar = length(fn(xpar, ...))
+  if(is.null(con$nvar)) con$nvar = length(fn(xpar, ...)) # HERE CHECK
 
   
   # update maximum number of function evaluations and generations
@@ -244,12 +249,20 @@
   con$maxit = con$popsize*con$maxgen
 
   if(method=="default") {
+    
+    # check for user-provided variances (sigma)
+    if(!is.null(con$sigma) & length(con$sigma)!=length(active)) 
+      stop("Vector of variances (sigma) must match parameter length.")
+    if(!is.null(con$sigma)) con$sigma = con$sigma[which(active)]
+    
     # update and check weights
     if(length(con$weights)==1) con$weights = rep(con$weights, con$nvar)
     if(length(con$weights)!=con$nvar) stop("Vector of weights should match the length of the output of fn.")
     if(any(con$weights<0)) stop("Weights should be positive numbers.")
     if(any(is.na(con$weights))) stop("Weights cannot be NA.")    
+    
   }
+  
   if(method=="cmaes") con$weights = NULL 
   # aggregation function for global fitness
   con$aggFn = match.fun(con$aggFn)
