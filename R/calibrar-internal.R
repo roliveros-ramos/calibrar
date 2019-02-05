@@ -217,7 +217,9 @@
     message(msg)
   }
   
-  if(!dir.exists(con$run)) dir.create(con$run, recursive=TRUE)
+  if(!is.null(con$run)) {
+    if(!dir.exists(con$run)) dir.create(con$run, recursive=TRUE)
+  }
   
   # update population size and selection rate
   if(con$popsize < popOpt) warning("'popsize' is too small, using default value.")
