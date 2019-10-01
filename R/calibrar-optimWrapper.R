@@ -457,8 +457,8 @@
       }
       
       if(opt$gen%%control$REPORT==0) {
-        trace$value[opt$gen] = control$aggFn(fn(opt$MU), control$weights)
-        if(control$trace>3) trace$opt[[opt$gen]] = opt
+        if(control$trace>3) trace$value[opt$gen] = control$aggFn(fn(opt$MU), control$weights)
+        if(control$trace>4) trace$opt[[opt$gen]] = opt
       }
 
     }

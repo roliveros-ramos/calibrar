@@ -1,6 +1,7 @@
 # calibrar
 
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/calibrar)](http://cran.r-project.org/package=calibrar)
+[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/2132/badge)](https://bestpractices.coreinfrastructure.org/projects/2132)
 [![Github Issues](http://githubbadges.herokuapp.com/roliveros-ramos/calibrar/issues.svg?style=flat-square)](https://github.com/roliveros-ramos/calibrar/issues)
 [![](http://cranlogs.r-pkg.org/badges/calibrar)](http://cran.rstudio.com/web/packages/calibrar/index.html)
 
