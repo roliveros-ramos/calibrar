@@ -210,7 +210,7 @@
   # get unknown options
   unknown = controlUser[!(controlUser %in% controlDef)]
   
-  if(isFALSE(con$master)) con$master = NULL
+  if(!isTRUE(con$master)) con$master = NULL
   if(!is.null(con$master) & is.null(con$run)) {
     con$run = tempdir()
     msg = sprintf("Evaluating 'fn' in %s.", con$run)
