@@ -210,7 +210,12 @@
   # get unknown options
   unknown = controlUser[!(controlUser %in% controlDef)]
   
-  if(!isTRUE(con$master)) con$master = NULL
+  # check for wrong master argument (not a path nor NULL)
+  if(!is.character(con$master) & !is.null(con$master)) {
+    warning("Control parameter 'master' must be a path or NULL, ignoring user provided value.")
+    con$master = NULL
+  }
+  
   if(!is.null(con$master) & is.null(con$run)) {
     con$run = tempdir()
     msg = sprintf("Evaluating 'fn' in %s.", con$run)
