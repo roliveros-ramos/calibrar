@@ -91,6 +91,17 @@ calibrate = function(par, fn, gr = NULL, ..., method = "default",
                      lower = NULL, upper = NULL, control = list(), 
                      hessian = FALSE, phases = NULL, replicates=1) {
 
+  # check funtion and method
+  multiMethods = "default" # list of methods supporting multi-objective
+  
+  if(inherits(fn, "objFn") & !(method %in% multiMethods)) {
+    agg = attr(fn, "aggregate")
+    if(is.null(agg)) warning("Update your objective function to the last version of the package.")
+    if(!isTRUE(agg)) 
+      stop(sprintf("Method '%s' does not support multi-objective optimization, use aggregate=TRUE in 'createObjectiveFunction'.",
+                   method))
+  }
+  
   # check for a restart file
   restart = .restartCalibration(control, type="results")
   
@@ -402,6 +413,7 @@ createObjectiveFunction = function(runModel, info, observed, aggFn=.weighted.sum
   attr(fn1, "nvar") = sum(info$calibrate)
   attr(fn1, "weights") = weights
   attr(fn1, "variables") = info$variables[info$calibrate]
+  attr(fn1, "aggregate") = aggregate
   attr(fn1, "fn") = fnx
   return(fn1) 
   
