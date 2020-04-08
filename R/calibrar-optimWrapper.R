@@ -163,7 +163,7 @@
   parNames = names(par)
   control = NULL # check!
   
-  out = suppressWarnings(optimx::optimx(par=par, fn=fn, gr=gr, method=method, lower=lower, 
+  out = suppressWarnings(optimr::optimr(par=par, fn=fn, gr=gr, method=method, lower=lower, 
                                         upper=upper, control=control, hessian=hessian))
   
   par = as.numeric(out[, parNames])
