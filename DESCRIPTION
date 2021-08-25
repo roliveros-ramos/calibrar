@@ -26,4 +26,4 @@ License: GPL-2
 URL: http://roliveros-ramos.github.io/calibrar
 BugReports: https://github.com/roliveros-ramos/calibrar/issues
 ByteCompile: TRUE
-RoxygenNote: 6.0.1
+RoxygenNote: 7.1.1

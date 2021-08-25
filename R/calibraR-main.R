@@ -87,7 +87,14 @@ NULL
 #' calibrate(par=rep(0.5, 5), fn=SphereN, replicates=c(1,1,4), lower=-5, upper=5, phases=c(1,1,1,2,3))
 #' }
 #' @export
-calibrate = function(par, fn, gr = NULL, ..., method = "default",
+calibrate = function(par, fn, gr, ..., method, lower, upper, control, 
+                     hessian, phases, replicates) {
+  UseMethod("calibrate")
+}
+
+
+#' @export
+calibrate.default = function(par, fn, gr = NULL, ..., method = "default",
                      lower = NULL, upper = NULL, control = list(), 
                      hessian = FALSE, phases = NULL, replicates=1) {
 
