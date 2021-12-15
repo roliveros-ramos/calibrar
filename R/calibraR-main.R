@@ -152,10 +152,13 @@ calibrate.default = function(par, fn, gr = NULL, ..., method = "default",
 
     active = (phases <= phase) # NAs are corrected in .calibrar 
     # call optimizers handler .calibrar
+    
+    tm1 = Sys.time()
     temp = .calibrar(par=par, fn=fn, gr = gr, ..., method = method, 
                    lower = lower, upper = upper, control = control, 
                    hessian = hessian, active=active, skeleton=skeleton,
                    replicates=replicates[phase])
+    tm2 = Sys.time()
     
     output$phases[[phase]] = temp # trim?
     output$phase = phase + 1
@@ -165,10 +168,10 @@ calibrate.default = function(par, fn, gr = NULL, ..., method = "default",
     par = temp$par #update parameter guess
     control = .updateControl(control=control, opt=temp, method=method)  # update CVs? 
     
-    msg = paste(c(sprintf("\nPhase %d finished (%d of %d parameters active)",
-                        phase, sum(active, na.rm=TRUE), npar),
+    msg = paste(c(sprintf("\nPhase %d finished in %s (%d of %d parameters active)",
+                        phase, format_difftime(tm1, tm2), sum(active, na.rm=TRUE), npar),
                 sprintf("Function value: %g", temp$value),
-                paste(c("Parameters:",sprintf("%0.3g", par[which(active)])), collapse=" "), 
+                paste(c("Parameter values:",sprintf("%0.3g", par[which(active)])), collapse=" "), 
                 "\n"), collapse="\n")
     message(msg)
   }
