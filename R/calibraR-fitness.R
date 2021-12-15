@@ -1,3 +1,22 @@
+
+#' Calcuted error measure between observed and simulated data
+#'
+#' @param obs observed data as expected by FUN.
+#' @param sim simulated data matching 'obs'
+#' @param FUN the error function.
+#' @param ... 
+#'
+#' @return the value of FUN(obs, sim)
+#' @export
+fitness = function(obs, sim, FUN, ...) {
+  FUN = match.fun(FUN)
+  output = FUN(obs=obs, sim=sim, ...)
+  return(output)
+}
+
+
+# Provided ----------------------------------------------------------------
+
 pois = function(obs, sim, ...) {
   nlogLike = -sum(obs*log(sim) - sim, na.rm=TRUE)
   return(nlogLike)
