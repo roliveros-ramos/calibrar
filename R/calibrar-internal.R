@@ -66,6 +66,15 @@
   
 }
 
+format_difftime = function(x, y, ...) {
+  dt = as.numeric(difftime(y, x, units="secs"))
+  h = trunc(dt/3600)
+  m = trunc((dt - h*3600)/60)
+  s = dt - h*3600 - m*60
+  out = sprintf("%dh %dm %0.1fs", h, m, round(s, 1))
+  return(out)
+}
+
 .checkActive = function(active, npar) {
   
   if(is.null(active)) return(rep(TRUE, npar))
