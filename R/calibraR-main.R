@@ -56,8 +56,9 @@ NULL
 #' @param gr the gradient of \code{fn}. Ignored, added for portability with
 #' other optimization functions.
 #' @param \dots Additional parameters to be passed to \code{fn}.
-#' @param method The optimization method to be used. The 'default' method
-#' is the AHR-ES (Oliveros & Shin, 2016). All the methods from stats::optim,
+#' @param method The optimization method to be used. The default method
+#' is the AHR-ES (Adaptative Hierarchical Recombination Evolutionary Strategy, 
+#' Oliveros-Ramos & Shin, 2016). All the methods from stats::optim,
 #' optimx::optimx and cmaes::cma_es are available.
 #' @param lower Lower threshold value(s) for parameters. One value or a vector 
 #' of the same length as par. If one value is provided, it is used for all 
@@ -94,11 +95,13 @@ calibrate = function(par, fn, gr, ..., method, lower, upper, control,
 
 
 #' @export
-calibrate.default = function(par, fn, gr = NULL, ..., method = "default",
+calibrate.default = function(par, fn, gr = NULL, ..., method = "AHR-ES",
                      lower = NULL, upper = NULL, control = list(), 
                      hessian = FALSE, phases = NULL, replicates=1) {
 
-  # check funtion and method
+  if(method=="AHR-ES") method = "default"
+  
+  # check function and method
   multiMethods = "default" # list of methods supporting multi-objective
   
   if(inherits(fn, "objFn") & !(method %in% multiMethods)) {
@@ -185,6 +188,7 @@ calibrate.default = function(par, fn, gr = NULL, ..., method = "default",
 #   names(paropt) = paste0(names(paropt), newNames)
 
   paropt = relist(paropt, skeleton)
+  class(paropt) = setdiff(class(paropt), "relistable")
   
   final = list(par=paropt, value=output$phases[[nphases]]$value, 
                counts=output$phases[[nphases]]$counts, 
@@ -275,71 +279,28 @@ optimES = function (par, fn, gr = NULL, ..., lower = -Inf, upper = Inf, active=N
   
 }
 
-# getObservedData ---------------------------------------------------------
 
-#' @title Get observed data for the calibration of a model 
-#' 
-#' @description Create a list with the observed data with the 
-#' information provided by its main argument. 
-#' 
-#' @param info A data.frame with the information about the calibration, 
-#' normally created with the \code{\link{getCalibrationInfo}} function. 
-#' See details.
-#' @param path Path to the directory to look up for the data.
-#' @param data.folder folder in the path containing the data.
-#' @param \dots Additional arguments to \code{read.csv} function 
-#' to read the data files.
-#' @return A list with the observed data needed for a calibration, to be used 
-#' in combination with the \code{\link{createObjectiveFunction}}.
-#' @author Ricardo Oliveros-Ramos
-#' @seealso \code{\link{createObjectiveFunction}}, \code{\link{getCalibrationInfo}}.
-#' @export
-getObservedData = function(info, path, data.folder="data", ...) {
-  
-  observed  = list()
-  variables = info$variable
-  
-  useData = as.logical(info$useData)
-  
-  cat("Creating observed data list for calibration...","\n")
-  
-  for(iVar in seq_len(nrow(info))) {
-    
-    message(paste0("Variable: ", variables[iVar], "\n"))
-    varPath         = file.path(path, data.folder, paste0(variables[iVar],".csv"))
-    observed[[iVar]] = if(useData[iVar]) .read.csv3(varPath, ...) else NA
-    
-  }
-  
-  names(observed) = variables
-  
-  return(observed)
-  
-}
-
-# getCalibrationInfo ------------------------------------------------------
+# calibration_setup -------------------------------------------------------
 
 #' Get information to run a calibration using the \code{calibrar} package.
 #' 
 #' A wrapper for \code{read.csv} checking column names and data types 
 #' for the table with the calibration information.
 #' 
-#' @param path The path to look for the file.
 #' @param file The file with the calibration information, see details.
-#' @param stringsAsFactors To be passed to \code{read.csv}.
+#' @param control Control arguments for generating the setup. See details.
 #' @param \dots Additional arguments to \code{read.csv} function.
 #' @return A data.frame with the information for the calibration of a 
-#' model, to be used with the \code{\link{createObjectiveFunction}} 
-#' and \code{\link{getObservedData}}.
+#' model, to be used with the \code{\link{calibration_objFn}} 
+#' and \code{\link{calibration_data}}.
 #' @author Ricardo Oliveros-Ramos
-#' @seealso \code{\link{createObjectiveFunction}}, \code{\link{getObservedData}}.
+#' @seealso \code{\link{calibration_objFn}}, \code{\link{calibration_data}}.
 #' @export
-getCalibrationInfo = function(path, file="calibrationInfo.csv", stringsAsFactors=FALSE, ...) {
+calibration_setup = function(file, control=list(), ...) {
   
-  caliPath = file.path(path, file)
-  calibrationInfo = read.csv(caliPath, stringsAsFactors=FALSE, ...)
+  calibrationInfo = read.csv(file, stringsAsFactors=FALSE, ...)
   
-  fullNames = c("variable", "type", "calibrate", "weights", "useData")  
+  fullNames = c("variable", "type", "calibrate", "weight", "use_data", "file", "varid")  
   doesNotMatch = !(names(calibrationInfo) %in% fullNames)
   dnm = names(calibrationInfo)[doesNotMatch]
   
@@ -348,10 +309,9 @@ getCalibrationInfo = function(path, file="calibrationInfo.csv", stringsAsFactors
   
   sdnm = if(length(dnm)>1) " columns do " else " column does "
   sim  = if(length(im)>1) " variables are " else " variable is "
-  msg1 = paste0("Error in ", caliPath, " file (", paste(sapply(dnm, sQuote), collapse=", "), 
-                sdnm, "not match).")
-  msg2 = paste0("Error in ", caliPath, " file (", paste(sapply(im, sQuote), collapse=", "), 
-                sim, "missing).")
+  
+  msg1 = sprintf("Error in %s (%s %s not match).", file, paste(sapply(dnm, sQuote), collapse=", "), sdnm)
+  msg2 = sprintf("Error in %s (%s %s not match).", file, paste(sapply(im, sQuote), collapse=", "), sim)
   
   if(any(doesNotMatch)) stop(msg1)
   if(any(isMissing)) stop(msg2)
@@ -360,13 +320,65 @@ getCalibrationInfo = function(path, file="calibrationInfo.csv", stringsAsFactors
   calibrationInfo$variable  = as.character(calibrationInfo$variable)
   calibrationInfo$type      = as.character(calibrationInfo$type)
   calibrationInfo$calibrate = as.logical(calibrationInfo$calibrate)
-  calibrationInfo$weights   = as.numeric(calibrationInfo$weights)
-  calibrationInfo$useData   = as.logical(calibrationInfo$useData)
+  calibrationInfo$weight    = as.numeric(calibrationInfo$weight)
+  calibrationInfo$use_data  = as.logical(calibrationInfo$use_data)
+  calibrationInfo$file      = as.character(calibrationInfo$file)
+  calibrationInfo$varid     = as.character(calibrationInfo$varid)
+  
+  if(is.null(control$col_skip)) control$col_skip = 2
+    
+  if(is.null(calibrationInfo$col_skip))
+    calibrationInfo$col_skip = control$col_skip
   
   return(calibrationInfo)
 }
 
-# createObjectiveFunction -------------------------------------------------
+# calibration_data --------------------------------------------------------
+
+#' @title Get observed data for the calibration of a model 
+#' 
+#' @description Create a list with the observed data with the 
+#' information provided by its main argument. 
+#' 
+#' @param setup A data.frame with the information about the calibration, 
+#' normally created with the \code{\link{calibration_setup}} function. 
+#' See details.
+#' @param path Path to the directory to look up for the data. Paths in setup are considered relatives to this path.
+#' @param \dots Additional arguments to \code{read.csv} function 
+#' to read the data files.
+#' @return A list with the observed data needed for a calibration, to be used 
+#' in combination with the \code{\link{createObjectiveFunction}}.
+#' @author Ricardo Oliveros-Ramos
+#' @seealso \code{\link{createObjectiveFunction}}, \code{\link{getCalibrationInfo}}.
+#' @export
+calibration_data = function(setup, path=".", verbose=TRUE, ...) {
+  
+  observed  = list()
+  useData = as.logical(setup$use_data)
+  
+  message("Creating observed data list for calibration...","\n")
+  
+  for(iVar in seq_len(nrow(setup))) {
+    
+    if(isTRUE(verbose)) message(sprintf("Variable: %s", setup$variable[iVar]))
+    ifile = file.path(path, setup$file[iVar])
+    varid   = setup$varid[iVar]
+    col_skip = setup$col_skip[iVar]
+    if(useData[iVar]) {
+      observed[[iVar]] = .read.csv4(file=ifile, col_skip=col_skip, varid=varid, ...)
+    } else {
+      observed[[iVar]] = NA
+    }
+      
+  }
+  
+  names(observed) = as.character(setup$variable)
+  
+  return(observed)
+  
+}
+
+# calibration_objFn -------------------------------------------------------
 
 #' Create an objective function to be used with optimization routines
 #' 
@@ -374,41 +386,44 @@ getCalibrationInfo = function(path, file="calibrationInfo.csv", stringsAsFactors
 #' calibration, given a function to run the model within R, observed data 
 #' and information about the comparison with data.
 #' 
-#' @param runModel Function to run the model and produce a list of outputs.
-#' @param info A data.frame with the information about the calibration, 
-#' normally created with the \code{\link{getCalibrationInfo}} function. 
+#' @param model Function to run the model and produce a list of outputs.
+#' @param setup A data.frame with the information about the calibration, 
+#' normally created with the \code{\link{calibration_setup}} function. 
 #' See details.
 #' @param observed A list of the observed variables created with the 
-#' function \code{\link{getObservedData}}
+#' function \code{\link{calibration_data}}
 #' @param aggFn A function to aggregate \code{fn} to a scalar value if the
 #' returned value is a vector. Some optimization algorithm can explote the
 #' additional information provided by a vectorial output from \code{fn}
 #' @param aggregate boolean, if TRUE, a scalar value is returned using the 
 #' \code{aggFn}.
-#' @param \dots More arguments passed to the \code{runModel} function.
+#' @param \dots More arguments passed to the \code{model} function.
 #' @return A function, integrating the simulation of the model and the 
 #' comparison with observed data. 
 #' @author Ricardo Oliveros-Ramos
-#' @seealso \code{\link{getObservedData}}, \code{\link{getCalibrationInfo}}.
+#' @seealso \code{\link{calibration_data}}, \code{\link{calibration_setup}}.
 #' @export
-createObjectiveFunction = function(runModel, info, observed, aggFn=.weighted.sum, 
+calibration_objFn = function(model, setup, observed, aggFn=NULL, 
                                    aggregate=FALSE, ...) {
 
-  fn   = match.fun(runModel)
+  fn   = match.fun(model)
+  
+  if(is.null(aggFn)) aggFn = .weighted.sum
+  
   aggFn = match.fun(aggFn)
   
   force(observed)
-  force(info)
+  force(setup)
   force(aggregate)
   
-  weights = info$weights[info$calibrate]
+  weights = setup$weight[setup$calibrate]
 
   # check for names in observed and simulated
   fn1  = function(par) {
     aggFn = match.fun(aggFn)
     simulated = fn(par, ...)
-    # apply fitness to all outputs
-    output = .calculateObjetiveValue(obs=observed, sim=simulated, info=info)
+    # apply objFn to all outputs
+    output = .calculateObjetiveValue(obs=observed, sim=simulated, info=setup)
     if(isTRUE(aggregate)) output = aggFn(x=output, w=weights)
     return(output)
   }
@@ -420,9 +435,9 @@ createObjectiveFunction = function(runModel, info, observed, aggFn=.weighted.sum
     return(simulated)
   }
   
-  attr(fn1, "nvar") = sum(info$calibrate)
+  attr(fn1, "nvar") = sum(setup$calibrate)
   attr(fn1, "weights") = weights
-  attr(fn1, "variables") = info$variables[info$calibrate]
+  attr(fn1, "variables") = setup$variable[setup$calibrate]
   attr(fn1, "aggregate") = aggregate
   attr(fn1, "fn") = fnx
   return(fn1) 
