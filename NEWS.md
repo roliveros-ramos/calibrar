@@ -6,6 +6,9 @@
 * replicates argument for stochastic functions 
 * added to demos for optimization of stochastic models.
 * several minor bugs fixed
+* getCalibrationInfo, createObjectiveFuction and getObserved data are replaced
+and deprecated.
+* spline_par function to simplify the estimation of smooth time-varying parameters.
 
 # calibrar 0.2
 * par argument for the calibrate function can be a list

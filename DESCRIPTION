@@ -1,5 +1,5 @@
 Package: calibrar
-Version: 0.2.0.9004
+Version: 0.3.0
 Authors@R: c(
     person("Ricardo", "Oliveros-Ramos", email="ricardo.oliveros@gmail.com", role=c("aut", "cre")))
 Title: Automated Parameter Estimation for Complex (Ecological) Models
@@ -23,7 +23,8 @@ Imports:
 Suggests: 
   deSolve
 License: GPL-2
+Encoding: UTF-8
 URL: http://roliveros-ramos.github.io/calibrar
 BugReports: https://github.com/roliveros-ramos/calibrar/issues
 ByteCompile: TRUE
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.1
