@@ -51,6 +51,26 @@
   return(x)
 }
 
+.read.csv4 = function(file, col_skip=NA, varid=NA, ...) {
+  
+  x = tryCatch(read.csv(file=file, row.names=NULL, check.names = FALSE, ...),
+               error = function(e) .errorReadingCsv(e, file))
+  if(is.null(x)) stop(sprintf("File %s not found.", file))
+  if(!is.na(varid)) {
+    if(length(varid)!=1) stop("Only one varid must be provided.")
+    if(!(varid %in% colnames(x))) 
+      stop(sprintf("varid '%s' not found in %s", varid, file))
+    return(as.numeric(x[, varid]))
+  }
+  x = as.matrix(x)
+  if(!is.na(col_skip)) {
+    x = x[, -seq_len(col_skip)]
+  }
+  mode(x)="numeric"
+  return(x)
+}
+
+
 .errorReadingCsv = function(e, path) {
   on.exit(stop())
   message(e, ".")
@@ -256,13 +276,12 @@ format_difftime = function(x, y, ...) {
   # check number of variables
   xpar = if(missing(skeleton)) par else relist(par, skeleton)
   if(is.null(con$nvar)) con$nvar = length(fn(xpar, ...)) # HERE CHECK
-
   
   # update maximum number of function evaluations and generations
   if(!is.null(con$maxit) & !is.null(con$maxgen)) 
     warning("'maxit' and 'maxgen' provided, ignoring 'maxit'.")
   if(!is.null(con$maxit) & is.null(con$maxgen)) 
-    con$maxgen = floor(con$maxit/con$popsize/replicates)
+    con$maxgen = ceiling(con$maxit/con$popsize/replicates)
   if(is.null(con$maxit) & is.null(con$maxgen)) con$maxgen = 2000L
   
   con$maxit = con$popsize*con$maxgen
