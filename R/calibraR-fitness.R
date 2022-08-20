@@ -52,7 +52,7 @@ lnorm3  = function(obs, sim, tiny = 1e-2, ...) {
 }
 
 
-multinom = function(sim, obs, size=20) {
+multinom = function(sim, obs, size=20, tiny=1e-3) {
   A = ncol(sim)
   sim.sum = rowSums(sim, na.rm=TRUE)
   obs.sum = rowSums(obs, na.rm=TRUE)
@@ -64,7 +64,7 @@ multinom = function(sim, obs, size=20) {
   
   sigma2 = ((1-Pobs)*Pobs + 1/A)/size
   
-  error = log(exp(-((Pobs - Psim)^2)/(2*sigma2) + 0.001))
+  error = log(exp(-((Pobs - Psim)^2)/(2*sigma2)) + tiny)
   
   nlogLike = -size*sum(error, na.rm=TRUE)
   return(nlogLike)
