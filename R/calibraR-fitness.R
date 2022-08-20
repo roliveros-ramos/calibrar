@@ -53,11 +53,21 @@ lnorm3  = function(obs, sim, tiny = 1e-2, ...) {
 
 
 multinom = function(sim, obs, size=20, tiny=1e-3) {
-  A = ncol(sim)
-  sim.sum = rowSums(sim, na.rm=TRUE)
+  
+  A = ncol(sim) # number of classes
+  
+  # checking for simulated values with only zeros and replace ones (assumed uniform)
+  sim.allzero = apply(sim, 1, FUN=function(x) all(na.omit(x) == 0) & !all(is.na(x)) )
+  sim[which(sim.allzero), ] = sim[which(sim.allzero), ] + 1
+  
+  sim.sum = rowSums(sim, na.rm=TRUE) # only zero for all NAs.
   obs.sum = rowSums(obs, na.rm=TRUE)
+  
+  # setting to NA for numerical convenience
   sim.sum[sim.sum==0] = NA
-  obs.sum[obs.sum==0] = NA  
+  
+  # removing 'all zeros' from obs, because it means we have no proportion data
+  obs.sum[which(obs.sum==0)] = NA  
   
   Psim     = sim/sim.sum
   Pobs     = obs/obs.sum
