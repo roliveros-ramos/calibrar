@@ -24,26 +24,27 @@ predict.calibrar.results = function(object, replicates=1,
   obj = object$fn
   
   if(is.null(attr(obj, which="fn"))) {
-    warning("Predict is only available for functions created with 'createObjectiveFunction'.")
-    return(invisible())
+    warning("Predict is only available for functions created with 'calibration_objFn'.")
+    return(invisible(NULL))
   }
   
   fn = match.fun(attr(obj, which="fn"))  
   
-  if(replicates<=1) {
+  if(replicates <= 1) {
     out = fn(object$par)
   } else {
     xout = list()
     for(i in seq_len(replicates)) {
       xout[[i]] = fn(object$par)
     } 
-    xout$FUN = "cbind"
+    xout$FUN = ".mycbind"
     xout = do.call(what=mapply, args=xout)
-    out = lapply(xout, FUN=calibrar:::.myRowMean, na.rm=na.rm)
-    out$replicates = xout
+    out = lapply(xout, FUN=.myRowMean, na.rm=na.rm)
+    out$.replicates = xout
   }
   return(out)
 }
+
 
 #' @export
 plot.calibrar.results = function(x, ...) {
