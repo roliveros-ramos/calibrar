@@ -112,8 +112,11 @@ calibrate.default = function(par, fn, gr = NULL, ..., method = "AHR-ES",
                    method))
   }
   
-  # check for a restart file
-  restart = .restartCalibration(control, type="results")
+  fnx = attr(fn, "fn")
+  if(!is.null(fnx)) fnx = match.fun(fnx)
+  
+  # check for a partial results file to restart from a completed phase
+  restart = .restartCalibration(control, type="partial")
   
   skeleton = as.relistable(par)
   par    = unlist(par)
@@ -140,22 +143,35 @@ calibrate.default = function(par, fn, gr = NULL, ..., method = "AHR-ES",
   
   replicates = .checkReplicates(replicates, nphases) 
   
-  output = if(isTRUE(restart)) .getResults(control=control) else list(phase=1)
+  output = if(isTRUE(restart)) .getResults(control=control, type="partial") else list(phase=1)
+ 
+  msg0 = sprintf("\nStarting calibration from phase %d.\n", output$phase)
+  msg1 = sprintf("\nRestarting calibration from phase %d.\n", output$phase)
+
+  
+  if(isTRUE(restart)) message(msg1)
+  if(!isTRUE(restart) & isTRUE(control$verbose)) message(msg0)
   
   conv = .checkConvergence(control, nphases)
   
+  # -------------------------------------------
   # start the sequential parameter estimation
+  # -------------------------------------------
   for(phase in seq(from=output$phase, to=nphases)) {
     
     if(output$phase > nphases) break
-  
+    
     control$maxgen      = conv$maxgen[phase]
     control$maxiter     = conv$maxiter[phase]
     control$convergence = conv$convergence[phase]
 
     active = (phases <= phase) # NAs are corrected in .calibrar 
-    # call optimizers handler .calibrar
     
+    msg2 = sprintf("Calibration phase %d (%d of %d parameters active).\n  Started at %s.\n", 
+                   phase, sum(active, na.rm=TRUE), npar, date())
+    if(isTRUE(control$verbose)) message(msg2)
+    
+    # call optimizers using .calibrar handler
     tm1 = Sys.time()
     temp = .calibrar(par=par, fn=fn, gr = gr, ..., method = method, 
                    lower = lower, upper = upper, control = control, 
@@ -166,10 +182,24 @@ calibrate.default = function(par, fn, gr = NULL, ..., method = "AHR-ES",
     output$phases[[phase]] = temp # trim?
     output$phase = phase + 1
     
-    .createOutputFile(output, control) 
+    .createOutputFile(output, control, type="partial") 
     
     par = temp$par #update parameter guess
     control = .updateControl(control=control, opt=temp, method=method)  # update CVs? 
+    
+    if(!is.null(control$restart) & !is.null(fnx)) {
+      
+      wd = getwd()
+      .setWorkDir(control$run, i=0)
+      xpar = relist(flesh = par, skeleton = skeleton)
+      partial = try(fnx(xpar))
+      setwd(wd)
+      if(!inherits(partial, "try-error")) {
+        ifile = sprintf("%s-phase%d.simulated", control$restart, phase)
+        saveRDS(partial, file=ifile)
+      }
+      
+    }
     
     msg = paste(c(sprintf("\nPhase %d finished in %s (%d of %d parameters active)",
                         phase, format_difftime(tm1, tm2), sum(active, na.rm=TRUE), npar),
@@ -177,16 +207,12 @@ calibrate.default = function(par, fn, gr = NULL, ..., method = "AHR-ES",
                 paste(c("Parameter values:",sprintf("%0.3g", par[which(active)])), collapse=" "), 
                 "\n"), collapse="\n")
     message(msg)
-  }
+    
+  } # end of phases
   
    isActive = (phases>0) & !is.na(phases)
    paropt = output$phases[[nphases]]$par # save parameters of last phase
   
-#   newNames = rep("*", npar)
-#   newNames[isActive] = ""
-#   
-#   names(paropt) = paste0(names(paropt), newNames)
-
   paropt = relist(paropt, skeleton)
   class(paropt) = setdiff(class(paropt), "relistable")
   
@@ -197,7 +223,7 @@ calibrate.default = function(par, fn, gr = NULL, ..., method = "AHR-ES",
   
   output = c(final, output)
   class(output) = c("calibrar.results")
-  .createOutputFile(output, control) 
+  .createOutputFile(output, control, type="results") 
   
   return(output)
   
@@ -300,12 +326,14 @@ calibration_setup = function(file, control=list(), ...) {
   
   calibrationInfo = read.csv(file, stringsAsFactors=FALSE, ...)
   
-  fullNames = c("variable", "type", "calibrate", "weight", "use_data", "file", "varid")  
+  fullNames = c("variable", "type", "calibrate", "weight", "use_data", "file", "varid", "col_skip", "nrows")
+  # mandatory columns
+  minNames = c("variable", "type", "calibrate", "weight", "use_data", "file")
   doesNotMatch = !(names(calibrationInfo) %in% fullNames)
   dnm = names(calibrationInfo)[doesNotMatch]
   
-  isMissing = !(fullNames %in% names(calibrationInfo))
-  im = fullNames[isMissing]
+  isMissing = !(minNames %in% names(calibrationInfo))
+  im = minNames[isMissing]
   
   sdnm = if(length(dnm)>1) " columns do " else " column does "
   sim  = if(length(im)>1) " variables are " else " variable is "
@@ -326,9 +354,17 @@ calibration_setup = function(file, control=list(), ...) {
   calibrationInfo$varid     = as.character(calibrationInfo$varid)
   
   if(is.null(control$col_skip)) control$col_skip = 2
-    
+  if(is.null(control$nrows)) control$nrows = NA
+
+  # optional columns 
+  if(is.null(calibrationInfo$varid))
+    calibrationInfo$varid = NA
+  
   if(is.null(calibrationInfo$col_skip))
     calibrationInfo$col_skip = control$col_skip
+  
+  if(is.null(calibrationInfo$nrows))
+    calibrationInfo$nrows = control$nrows
   
   return(calibrationInfo)
 }
@@ -344,6 +380,7 @@ calibration_setup = function(file, control=list(), ...) {
 #' normally created with the \code{\link{calibration_setup}} function. 
 #' See details.
 #' @param path Path to the directory to look up for the data. Paths in setup are considered relatives to this path.
+#' @param file Optional file to save the created object (as an 'rds' file.)
 #' @param \dots Additional arguments to \code{read.csv} function 
 #' to read the data files.
 #' @return A list with the observed data needed for a calibration, to be used 
@@ -351,7 +388,7 @@ calibration_setup = function(file, control=list(), ...) {
 #' @author Ricardo Oliveros-Ramos
 #' @seealso \code{\link{createObjectiveFunction}}, \code{\link{getCalibrationInfo}}.
 #' @export
-calibration_data = function(setup, path=".", verbose=TRUE, ...) {
+calibration_data = function(setup, path=".", verbose=TRUE, file=NULL, ...) {
   
   observed  = list()
   useData = as.logical(setup$use_data)
@@ -360,19 +397,28 @@ calibration_data = function(setup, path=".", verbose=TRUE, ...) {
   
   for(iVar in seq_len(nrow(setup))) {
     
-    if(isTRUE(verbose)) message(sprintf("Variable: %s", setup$variable[iVar]))
     ifile = file.path(path, setup$file[iVar])
     varid   = setup$varid[iVar]
     col_skip = setup$col_skip[iVar]
+    nrows = setup$nrows[iVar]
     if(useData[iVar]) {
-      observed[[iVar]] = .read.csv4(file=ifile, col_skip=col_skip, varid=varid, ...)
+      observed[[iVar]] = .read_data(file=ifile, col_skip=col_skip, varid=varid, nrows=nrows, ...)
     } else {
       observed[[iVar]] = NA
     }
       
-  }
+  } # end iVar loop
+  
+  msg0 = "Loaded observed data for variable: %s.\n"
+  msg1 = "Loaded observed data for variables: %s.\n"
+  
+  msg = if(sum(useData, na.rm=TRUE)==1) msg0 else msg1 
+  
+  if(isTRUE(verbose)) message(sprintf(msg, paste(sQuote(setup$variable[useData]), collapse=", ")))
   
   names(observed) = as.character(setup$variable)
+  
+  if(!is.null(file)) saveRDS(observed, file=file)
   
   return(observed)
   

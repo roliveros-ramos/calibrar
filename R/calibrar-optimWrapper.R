@@ -29,7 +29,13 @@
   control = .checkControl(control=control, method=method, par=guess, fn=fn, 
                           active=active, skeleton=skeleton, 
                           replicates=replicates, ...)
- 
+
+  # here we modify 'fn' so:
+  # 1. use 'isActive' to mask some parameters ('guess' is reference)
+  # 2. is re-listed according to skeleton
+  # 3. is re-scaled according to control$fnscale
+  # 4. is evaluated 'replicates' times
+  # 5. is evaluated in the 'control$run/.i' folder.
   if(is.null(control$master)) {
     
     fn1  = function(par, .i=0) {
@@ -119,7 +125,7 @@
   paropt = guess
   paropt[isActive] = output$ppar 
   if(is.null(names(paropt))) names(paropt) = .printSeq(npar, preffix="par")
-  
+
   # final outputs
   output = c(list(par=paropt), output, list(active=list(par=isActive, flag=activeFlag)))
   
@@ -386,6 +392,8 @@
     opt   = res$opt
     trace = res$trace
     
+    .messageByGen(opt, trace, restart=TRUE)
+    
   } else {
     
     opt = .newOpt(par=par, lower=lower, upper=upper, control=control)
@@ -414,6 +422,8 @@
   
   # start new optimization
   while(isTRUE(.continueEvolution(opt, control))) {
+    
+    tm1 = Sys.time()
     
     opt$gen  = opt$gen + 1
     opt$ages = opt$ages + 1
@@ -465,9 +475,12 @@
     
     # save restart
     .createRestartFile(opt=opt, trace=trace, control=control)
+    tm2 = Sys.time()
     
-    if(control$verbose & opt$gen%%control$REPORT==0) 
-      .messageByGen(opt, trace)
+    if(control$verbose & opt$gen%%control$REPORT==0) {
+      .messageByGen(opt, trace, level=control$trace, long=format_difftime(tm1, tm2))
+    }
+      
     
   } # end generations loop
   

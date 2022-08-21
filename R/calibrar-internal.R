@@ -21,11 +21,38 @@
   return(output)
 }
 
-.messageByGen = function(opt, trace) {
-  nx  = ceiling(log10(opt$control$maxgen))
-  cat(sprintf(paste0("Generation %", nx, "d - Value: %.10g\n"), 
-              opt$gen, trace$value[opt$gen]))
-  #   print(trace$par[opt$gen, ])
+.messageByGen = function(opt, trace, level=0, restart=FALSE, long=NULL) {
+  
+  nx  = ceiling(log10(opt$control$maxgen + 0.5))
+
+  msg0 = paste0("Generation %", nx, "d finished (%s).\n")
+  msg1 = paste0("Generation %", nx, "d finished (%s)\n   Function value = %.10g\n")
+  msg2 = paste0("Generation %", nx, "d finished (from restart).\n")
+
+  if(is.null(long)) long = date()
+  
+  if(isTRUE(restart)) {
+    out = sprintf(msg2, opt$gen)
+    message(out)
+    return(invisible(NULL))
+  }
+  
+  if(level>3) {
+    out = sprintf(msg1, opt$gen, long, trace$value[opt$gen])
+    message(out)
+    return(invisible(NULL))
+  }
+  
+  if(level>0) {
+    out = sprintf(msg1, opt$gen, long, trace$best[opt$gen])
+    message(out)
+    return(invisible(NULL))
+  }
+  
+  out = sprintf(msg0, opt$gen, long)
+  message(out)
+  
+  return(invisible(NULL))
 }
 
 # .messageByGen = function(opt, trace) {
@@ -51,9 +78,41 @@
   return(x)
 }
 
-.read.csv4 = function(file, col_skip=NA, varid=NA, ...) {
+.read_data  = function(file, col_skip=NA, varid=NA, nrows=-1, ...) {
+
+  type = .guess_type(file)
   
-  x = tryCatch(read.csv(file=file, row.names=NULL, check.names = FALSE, ...),
+  if(type=="text") {
+    out = .read.csv4(file=file, col_skip=col_skip, varid=varid, nrows=nrows, ...)
+    return(out)
+  }
+  
+  if(type=="rds") {
+    out = readRDS(file=file)
+    return(out)
+  }
+  
+  if(type=="nc") {
+    message("netCDF files are not yet supported.")
+  }
+  
+  stop(sprintf("File type not supported (%s)", file))  
+  
+}
+
+.guess_type = function(file) {
+  ext = tail((unlist(strsplit(file, split="\\."))), 1)
+  is_txt = grepl(ext, pattern="csv|txt")
+  is_nc = grepl(ext, pattern="nc")
+  is_rds = grepl(ext, pattern="rds")
+  if(is_txt) return("text")
+  if(is_nc) return("nc")
+  if(is_rds) return("rds")
+}
+
+.read.csv4 = function(file, col_skip=NA, varid=NA, nrows=-1, ...) {
+  if(is.na(nrows)) nrows=-1
+  x = tryCatch(read.csv(file=file, row.names=NULL, check.names = FALSE, nrows=nrows, ...),
                error = function(e) .errorReadingCsv(e, file))
   if(is.null(x)) stop(sprintf("File %s not found.", file))
   if(!is.na(varid)) {
@@ -91,6 +150,14 @@ format_difftime = function(x, y, ...) {
   h = trunc(dt/3600)
   m = trunc((dt - h*3600)/60)
   s = dt - h*3600 - m*60
+  
+  if(h==0) {
+    out = sprintf("%dm %0.1fs", m, round(s, 1))
+    if(m==0) {
+      out = sprintf("%0.2fs", round(s, 2))
+    }
+    return(out)
+  }
   out = sprintf("%dh %dm %0.1fs", h, m, round(s, 1))
   return(out)
 }
@@ -256,13 +323,20 @@ format_difftime = function(x, y, ...) {
   }
   
   # update population size and selection rate
-  if(con$popsize < popOpt) warning("'popsize' is too small, using default value.")
+  if(con$popsize < popOpt) {
+    warning("'popsize' is too small, using default value.")
+    message(sprintf("Population size set to %d (optimal value).", popOpt))
+  }
   con$popsize = max(con$popsize, popOpt)
   if(isTRUE(con$parallel)) {
     popOptP = ceiling(con$popsize/con$nCores)*con$nCores
-    if(con$popsize != popOptP) message(paste("Optimizing 'popsize' to work with", con$nCores, "cores."))
+    if(con$popsize != popOptP) {
+      message(sprintf("Optimizing 'popsize' to work with %d cores...", con$nCores))
+      message(sprintf("   Optimal population size (%d) has been increased to %d.\n", popOpt, popOptP))
+    }
+      
     con$popsize = popOptP
-    con$selection = round(con$selection*popOpt/popOptP, 1)
+    con$selection = con$selection*popOpt/popOptP
   }
   
   if(inherits(fn, "objFn")) {
@@ -270,7 +344,8 @@ format_difftime = function(x, y, ...) {
     con$weights = attr(fn, "weights")
     names(con$weights) = attr(fn, "variables")
     if(con$verbose) {
-      print(con$weights) # TO_DO: make nicer output 
+      
+      #print(con$weights) # TO_DO: make nicer output 
     }
   }
   # check number of variables
@@ -361,8 +436,42 @@ format_difftime = function(x, y, ...) {
 
 .myRowMean = function(x, na.rm=FALSE) {
   if(!inherits(x, "array") & !inherits(x, "matrix")) return(NULL)
-  if(length(dim(x))<2) return(x)
-  return(rowMeans(x, na.rm=na.rm))
+  if(length(dim(x)) <  2) return(x)
+  if(length(dim(x)) == 2) return(rowMeans(x, na.rm=na.rm))
+  if(length(dim(x)) >  2) return(apply(x, MARGIN=seq_along(dim(x)[-1]), FUN=mean, na.rm=na.rm))
 }
 
 
+.mycbind = function(...) {
+  
+  xall = list(...)
+  x = Xall[[1]]
+  
+  if(length(dim(x)) <  2) return(cbind(...))
+  
+  out = array(dim=c(dim(x), length(xall)))
+  
+  if(length(dim(x)) == 2) {
+    for(i in seq_along(xall)) {
+      out[, , i] = xall[[i]]
+    }
+    return(out)
+  }
+  
+  if(length(dim(x)) == 3) {
+    for(i in seq_along(xall)) {
+      out[, , , i] = xall[[i]]
+    }
+    return(out)
+  }
+  
+  if(length(dim(x)) == 4) {
+    for(i in seq_along(xall)) {
+      out[, , , , i] = xall[[i]]
+    }
+    return(out)
+  }
+  
+  stop(sprintf("Dimensions higher than %d are not currently supported.", length(dim(x))-1))
+  
+}
