@@ -1,10 +1,27 @@
 
+#' Numerical computation of the gradient
+#' 
+#' This function calculates the gradient of a function, numerically, including the positibility
+#' of doing it in parallel.
+#'
+#' @param fn The function
+#' @param x The value to compute the gradient at.
+#' @param method The method used. Currently implemented: central, backward, forward and Richardson. See details.
+#' @param control A list of control arguments. Notably, control$parallel=TRUE activates parallel computation.
+#' @param ... Additional arguments to be passed to \code{fn}.
+#'
+#' @return The gradient of \code{fn} at \code{x}.
+#' @export
+#'
+#' @examples gradient(fn=function(x) sum(x^3))
 gradient = function(fn, x, method, control, ...) {
   UseMethod("gradient")
 }
 
 gradient.default = function(fn, x, method, control=list(), ...) {
-  
+
+  # cluster structure must be defined outside
+  # by default, not running in parallel  
   if(is.null(control$parallel)) control$parallel = FALSE
   
   if(isTRUE(control$parallel)) {
@@ -26,7 +43,7 @@ gradient.default = function(fn, x, method, control=list(), ...) {
                 stop("Undefined method."))
     
   }
-    
+   
   return(df)
   
 }
@@ -40,20 +57,20 @@ gradient.default = function(fn, x, method, control=list(), ...) {
   
   n = length(x)
   
-  h = .get_h(x, control, method="simple")*side
-
   if(length(side)==1)   side = rep(side, n)
   if(length(side)!=n)   stop("Argument 'side' should have the same length as x.")
   if(any(is.na(side)))  side[is.na(side)] = 1
   if(any(abs(side)!=1)) stop("Argument 'side' should have values +1 or -1.")
+  
+  h = .get_h(x, control, method="simple")*side
   
   fx = fn(x, ...)
   
   df = rep(NA_real_, n)
   
   for(i in seq_len(n)) {
-    dx = x + h*(i == seq_len(n))
-    df[i] = (fn(dx, ...) - fx)/h[i]
+    dx = h*(i == seq_len(n))
+    df[i] = (fn(x + dx, ...) - fx)/h[i]
   }
   return(df)
 }
@@ -70,9 +87,8 @@ gradient.default = function(fn, x, method, control=list(), ...) {
   df = rep(NA_real_, n)
   
   for(i in seq_len(n)) {
-    dp = x + h*(i == seq_len(n))
-    dm = x - h*(i == seq_len(n))
-    df[i] = (fn(dp, ...) - fn(dm, ...))/(2*h[i])
+    dx = h*(i == seq_len(n))
+    df[i] = (fn(x + dx, ...) - fn(x - dx, ...))/(2*h[i])
   }
   
   return(df)
@@ -82,6 +98,9 @@ gradient.default = function(fn, x, method, control=list(), ...) {
   # richardson method uses 2*r*n function evaluations, n can be parallelized,
   # so computing time is 2*r. The default is r=4, so 8 function evaluations eq,
   # and it's 4 times more costly than central or simple method.
+
+  r = if(is.null(control$r)) 4 else control$r # number of iterations, by default 4.
+  v = if(is.null(control$v)) 2 else control$v # reduction factor of h, by default 2.
   
   n = length(x)
   
@@ -91,6 +110,7 @@ gradient.default = function(fn, x, method, control=list(), ...) {
   
   for(k in seq_len(r)) {
     
+    # gradient as usual
     for(i in seq_len(n)) {
       
       if((k > 1) && (abs(DF[(k - 1), i]) < 1e-20)) {
@@ -99,16 +119,15 @@ gradient.default = function(fn, x, method, control=list(), ...) {
         
       } else {
         
-        dp = x + h*(i == seq_len(n))
-        dm = x - h*(i == seq_len(n))
-        DF[k, i] = (fn(dp, ...) - fn(dm, ...))/(2*h[i])
+        dx = h*(i == seq_len(n))
+        DF[k, i] = (fn(x + dx, ...) - fn(x - dx, ...))/(2*h[i])
         
         if(any(is.na(DF[k, i])))
           stop(sprintf("function returns NA at %g distance from x.", h))
         
       }
     }
-    
+    # reduce h and try again
     h = h/v
     
   }
@@ -125,6 +144,104 @@ gradient.default = function(fn, x, method, control=list(), ...) {
   return(as.numeric(DF))
   
 }
+
+
+# Implementation of methods in parallel -----------------------------------
+
+.grad_simple_parallel = function(fn, x, side=1, control=list(), ...) {
+  # simple method uses n+1 function evaluation, n+1 can be paralleled,
+  # so computer time is 1 functions.
+  
+  n = length(x)
+  
+  if(length(side)==1)   side = rep(side, n)
+  if(length(side)!=n)   stop("Argument 'side' should have the same length as x.")
+  if(any(is.na(side)))  side[is.na(side)] = 1
+  if(any(abs(side)!=1)) stop("Argument 'side' should have values +1 or -1.")
+  
+  h = .get_h(x, control, method="simple")*side
+  
+  DX = rbind(0, diag(h))
+  
+  f = foreach(i=seq(from=1, to=n+1), .combine=c, .verbose=FALSE, .inorder=TRUE) %dopar% {
+    dx  = DX[i, ]
+    fi = fn(x + dx, ...)
+    fi
+  }
+  
+  fx = f[1] # fx = f(i=0)
+  df = (f[-1] - fx)/h
+  
+  return(df)
+}
+
+
+
+.grad_central_parallel = function(fn, x, control=list(), ...) {
+  # central method uses 2*n function evaluation, 2*n can be paralleled,
+  # so computing time is 1 function.
+  
+  n = length(x)
+  
+  h = .get_h(x, control, method="simple")
+
+  DX = rbind(diag(h), diag(-h)) 
+  
+  f = foreach(i=seq(from=1, to=2*n), .combine=c, .verbose=FALSE, .inorder=TRUE) %dopar% {
+    dx  = DX[i, ]
+    fi = fn(x + dx, ...)
+    fi
+  }
+  
+  fp = head(f, n)
+  fm = tail(f, n)
+  df = (fp - fm)/(2*h)
+  
+  return(df)
+}
+
+.grad_richardson_parallel = function(fn, x, control=list(), ...) {
+  # richardson method uses 2*r*n function evaluations, 2*r*n can be paralleled,
+  # so computing time is 1 function. The default is r=4. , so 8 function evaluations eq,
+  # and it's 4 times more costly in resources than central or simple method.
+  
+  r = if(is.null(control$r)) 4 else control$r # number of iterations, by default 4.
+  v = if(is.null(control$v)) 2 else control$v # reduction factor of h, by default 2.
+  
+  n = length(x)
+  
+  h = .get_h(x, control, method="start")
+  
+  H = matrix(NA_real_, nrow=r, ncol=n)
+  for(k in seq_len(r)) H[k, ] = h/(v^(k-1))
+  
+  DX = NULL
+  for(k in seq_len(r)) DX = rbind(DX, diag(H[k, ]), diag(-H[k, ]))
+  
+  f = foreach(i=seq(from=1, to=2*r*n), .combine=c, .verbose=FALSE, .inorder=TRUE) %dopar% {
+    dx  = DX[i, ]
+    fi = fn(x + dx, ...)
+    fi
+  }
+  
+  f = matrix(f, nrow=r, ncol=2*n, byrow = TRUE)
+  fp = f[, 1:n]
+  fm = f[, -(1:n)]
+  DF = (fp - fm)/(2*H)
+  
+  # ponderate all estimates
+  for(m in seq_len(r - 1)) {
+    ind0 = 2:(r + 1 - m)
+    ind1 = 1:(r - m)
+    DF = (DF[ind0, , drop = FALSE]*(4^m) - DF[ind1, , drop = FALSE])/(4^m - 1)
+  }
+  
+  df = as.numeric(DF)
+  
+  return(df)
+  
+}
+
 
 
 # Auxiliar functions ------------------------------------------------------
@@ -168,3 +285,76 @@ gradient.default = function(fn, x, method, control=list(), ...) {
   
 }
 
+
+# Notes for future self ---------------------------------------------------
+
+# args: skeleton, active 
+# # here we have to transform fn so it takes .i and change folder to run if necessary.
+# skeleton = skeleton
+# if(is.null(skeleton)) skeleton = as.relistable(par)
+# 
+# npar = length(par)
+# 
+# # check active parameters
+# active = .checkActive(active=active, npar=npar)
+# isActive = which(active)
+# activeFlag = isTRUE(all(active))
+# 
+# # update to active parameters only
+# guess  = par
+# par    = guess[isActive]
+# 
+# npar = length(par)
+# 
+# force(replicates)
+# 
+# # closure for function evaluation
+# fn   = match.fun(fn)
+# 
+# # here we modify f so:
+# # 1. use 'isActive' to mask some parameters ('guess' is reference)
+# # 2. is re-listed according to skeleton
+# # 3. is re-scaled according to control$fnscale
+# # 4. is evaluated 'replicates' times
+# # 5. is evaluated in the 'control$run/.i' folder.
+# if(is.null(control$master)) {
+#   
+#   fn1  = function(x, .i=0) {
+#     
+#     parx = guess
+#     parx[isActive] = par
+#     parx = relist(flesh = parx, skeleton = skeleton)
+#     output = NULL
+#     for(i in seq_len(replicates)) {
+#       out = fn(parx, ...)/control$fnscale
+#       output = rbind(output, t(as.matrix(out)))
+#     }
+#     return(as.numeric(colMeans(output)))
+#     
+#   }
+#   
+# } else {
+#   
+#   fn1  = function(par, .i=0) {
+#     
+#     cwd = getwd()
+#     on.exit(setwd(cwd))
+#     .setWorkDir(control$run, i=.i) 
+#     
+#     parx = guess
+#     parx[isActive] = par
+#     parx = relist(flesh = parx, skeleton = skeleton)
+#     output = NULL
+#     for(i in seq_len(replicates)) {
+#       out = fn(parx, ...)/control$fnscale
+#       output = rbind(output, t(as.matrix(out)))
+#     }
+#     return(as.numeric(colMeans(output)))
+#     
+#   }
+#   
+# } # end fn1
+# 
+# # here master folder is used for initialization. Maybe it's already initialized (from higher level call),
+# # but it may not.
+# # we return the gradient in the real dimension, setting to zero non-active components
