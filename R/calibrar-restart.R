@@ -14,8 +14,8 @@
   return(list(opt=opt, trace=trace))
 }
 
-.getResults = function(control, ...) {
-  res.file = paste0(control$restart.file, ".results")
+.getResults = function(control, type="results", ...) {
+  res.file = paste0(control$restart.file, ".", type)
   load(res.file)
   if(!exists("output")) stop("Restart file ", res.file, " is not appropiate.")
   if(!any(class(output)=="calibrar.results")) stop("Restart file ", res.file, " is not appropiate.")
@@ -33,11 +33,22 @@
   return(invisible())
 }
 
-.createOutputFile = function(output, control) {
+.createOutputFile = function(output, control, type="results") {
+  
   if(is.null(control$restart.file)) return(invisible())
-  res.file = paste0(control$restart.file, ".results")
+  res.file = paste0(control$restart.file, ".", type)
   class(output) = c("calibrar.results", class(output))
+  
+  if(type=="results") {
+    if(file.exists(res.file)) {
+      nfile = sprintf("%s.backup%s", res.file, format(Sys.time(), "%Y%m%d%H%M%S"))
+      suppressWarnings(file.rename(from=res.file, to=nfile))
+    }
+    suppressWarnings(file.remove(paste0(control$restart.file, ".partial")))
+  }
+  
   save(output, file = res.file, compress=FALSE)
-  suppressWarnings(file.remove(paste0(control$restart.file, ".restart")))
-  return(invisible())
+  suppressWarnings(file.remove(paste0(control$restart.file, ".restart"))) 
+  return(invisible(NULL))
+  
 }
