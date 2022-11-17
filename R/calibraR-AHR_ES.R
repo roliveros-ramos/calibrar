@@ -72,6 +72,8 @@
 .createPopulation = function(opt) {
   
   out = rtnorm2(n=opt$seed, mean=opt$MU, sd=opt$SD, lower=opt$lower, upper=opt$upper)
+  out[, 1] = opt$MU # add the mean, it doesn't change the expected average of the population
+  
   return(out)
 
 }
@@ -90,8 +92,10 @@
   
   fn = match.fun(fn)
   pop = opt$pop
+  gen = opt$gen
   parallel = opt$control$parallel
   run      = opt$control$run
+  nvar     = opt$control$nvar
   
   pathTmp = getwd()               # get the current path
   on.exit(setwd(pathTmp))         # back to the original path after execution
@@ -99,14 +103,19 @@
   if(isTRUE(parallel)) {
     # optimize parallel execution, reduce data transfer
     
-    FITNESS  =  foreach(i=0:(opt$seed-1), .combine=rbind, .verbose=FALSE, .inorder=FALSE) %dopar% {
+    FITNESS  =  foreach(i=0:(opt$seed-1), .verbose=FALSE, .inorder=FALSE) %dopar% {
 
-      Fitness = fn(pop[, i+1], .i=i)  # internally set to ith wd 
+      Fitness = fn(pop[, i+1], .i=i)  # internally set to ith wd
+      if(is.null(Fitness)) {
+        .write_calibrar_dump(run=run, gen=gen, i=i)
+      }
+        
       Fitness = c(i+1, Fitness)
       Fitness
       
     }
     
+    FITNESS = .rbind_fitness(FITNESS)
     FITNESS = FITNESS[sort(FITNESS[,1], index.return=TRUE)$ix,][,-1, drop=FALSE]
     
   } else {
@@ -116,8 +125,11 @@
     for(i in 0:(opt$seed-1)) {
       
       Fitness = fn(pop[,i+1], .i=i)
+      if(is.null(Fitness)) {
+        .write_calibrar_dump(run=run, gen=gen, i=i)
+        Fitness = Inf
+      }
       FITNESS	=	rbind(FITNESS, Fitness)
-      
     }
     
   }

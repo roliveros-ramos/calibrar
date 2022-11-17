@@ -153,7 +153,10 @@ calibrate.default = function(par, fn, gr = NULL, ..., method = "AHR-ES",
   if(!isTRUE(restart) & isTRUE(control$verbose)) message(msg0)
   
   conv = .checkConvergence(control, nphases)
-  
+ 
+  if(!is.null(control$master)) message(sprintf("Using 'master' directory: %s", control$master))
+  if(!is.null(control$run)) message(sprintf("Using 'run' directory: %s", control$run))
+   
   # -------------------------------------------
   # start the sequential parameter estimation
   # -------------------------------------------
@@ -182,7 +185,7 @@ calibrate.default = function(par, fn, gr = NULL, ..., method = "AHR-ES",
     output$phases[[phase]] = temp # trim?
     output$phase = phase + 1
     
-    .createOutputFile(output, control, type="partial") 
+    .createOutputFile(output, control, type="partial", phase=phase) 
     
     par = temp$par #update parameter guess
     control = .updateControl(control=control, opt=temp, method=method)  # update CVs? 
@@ -326,9 +329,9 @@ calibration_setup = function(file, control=list(), ...) {
   
   calibrationInfo = read.csv(file, stringsAsFactors=FALSE, ...)
   
-  fullNames = c("variable", "type", "calibrate", "weight", "use_data", "file", "varid", "col_skip", "nrows")
+  fullNames = c("variable", "type", "calibrate", "cv", "weight", "use_data", "file", "varid", "col_skip", "nrows")
   # mandatory columns
-  minNames = c("variable", "type", "calibrate", "weight", "use_data", "file")
+  minNames = c("variable", "type", "calibrate", "use_data", "file")
   doesNotMatch = !(names(calibrationInfo) %in% fullNames)
   dnm = names(calibrationInfo)[doesNotMatch]
   
@@ -339,16 +342,20 @@ calibration_setup = function(file, control=list(), ...) {
   sim  = if(length(im)>1) " variables are " else " variable is "
   
   msg1 = sprintf("Error in %s (%s %s not match).", file, paste(sapply(dnm, sQuote), collapse=", "), sdnm)
-  msg2 = sprintf("Error in %s (%s %s not match).", file, paste(sapply(im, sQuote), collapse=", "), sim)
+  msg2 = sprintf("Error in %s (%s %s missing).", file, paste(sapply(im, sQuote), collapse=", "), sim)
   
   if(any(doesNotMatch)) stop(msg1)
   if(any(isMissing)) stop(msg2)
   
-  # cating correct data types
+  if(is.null(calibrationInfo$weight) & is.null(calibrationInfo$cv))
+    stop("Either 'cv' or 'weight' columns must be specified.")
+  
+  # parsing correct data types
   calibrationInfo$variable  = as.character(calibrationInfo$variable)
   calibrationInfo$type      = as.character(calibrationInfo$type)
   calibrationInfo$calibrate = as.logical(calibrationInfo$calibrate)
-  calibrationInfo$weight    = as.numeric(calibrationInfo$weight)
+  if(!is.null(calibrationInfo$weight)) calibrationInfo$weight    = as.numeric(calibrationInfo$weight)
+  if(!is.null(calibrationInfo$cv)) calibrationInfo$cv    = as.numeric(calibrationInfo$cv)
   calibrationInfo$use_data  = as.logical(calibrationInfo$use_data)
   calibrationInfo$file      = as.character(calibrationInfo$file)
   calibrationInfo$varid     = as.character(calibrationInfo$varid)
@@ -357,6 +364,19 @@ calibration_setup = function(file, control=list(), ...) {
   if(is.null(control$nrows)) control$nrows = NA
 
   # optional columns 
+  
+  if(is.null(calibrationInfo$weight))
+    calibrationInfo$weight = 1/(2*calibrationInfo$cv^2)
+  
+  if(any(is.na(calibrationInfo$weight))) {
+    if(is.null(calibrationInfo$cv)) stop("NAs found in 'weight' column.")
+    isna = is.na(calibrationInfo$weight)
+    calibrationInfo$weight[isna] = 1/(2*calibrationInfo$cv[isna]^2)
+  }
+  
+  if(any(is.na(calibrationInfo$weight))) stop("NAs found in 'weight' column.")
+  if(any(calibrationInfo$weight <= 0)) stop("All weights must be positive.")
+  
   if(is.null(calibrationInfo$varid))
     calibrationInfo$varid = NA
   
@@ -452,6 +472,8 @@ calibration_data = function(setup, path=".", verbose=TRUE, file=NULL, ...) {
 calibration_objFn = function(model, setup, observed, aggFn=NULL, 
                                    aggregate=FALSE, ...) {
 
+  fn_name = deparse(substitute(model))
+  
   fn   = match.fun(model)
   
   if(is.null(aggFn)) aggFn = .weighted.sum
@@ -464,11 +486,17 @@ calibration_objFn = function(model, setup, observed, aggFn=NULL,
   
   weights = setup$weight[setup$calibrate]
 
+  msg = sprintf("The '%s' function returned NULL, please check.", fn_name)
+  
   # check for names in observed and simulated
   fn1  = function(par) {
     aggFn = match.fun(aggFn)
     simulated = fn(par, ...)
-    # apply objFn to all outputs
+    # in case the model produce a NULL, keep moving.
+    if(is.null(simulated)) {
+      message(msg)
+      return(NULL)
+    } 
     output = .calculateObjetiveValue(obs=observed, sim=simulated, info=setup)
     if(isTRUE(aggregate)) output = aggFn(x=output, w=weights)
     return(output)
