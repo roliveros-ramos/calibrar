@@ -5,20 +5,18 @@
 
 .getRestart = function(control, ...) {
   res.file = paste0(control$restart.file, ".restart")
-  load(res.file)
-  if(!exists("opt")) stop("Restart file ", res.file, " is not appropiate.")
-  if(!exists("trace")) stop("Restart file ", res.file, " is not appropiate.")
-  if(!any(class(opt)=="optimES.restart")) stop("Restart file ", res.file, " is not appropiate.")
-  opt   = get("opt")
-  trace = get("trace")
-  return(list(opt=opt, trace=trace))
+  x = readRDS(res.file)
+  msg = sprintf("Restart file '%s' is corrupt.", res.file)
+  if(!all(c("opt", "trace") %in% names(x))) stop(msg)
+  if(!inherits(x$opt, "optimES.restart")) stop(msg)
+  return(x)
 }
 
 .getResults = function(control, type="results", ...) {
   res.file = paste0(control$restart.file, ".", type)
-  load(res.file)
-  if(!exists("output")) stop("Restart file ", res.file, " is not appropiate.")
-  if(!any(class(output)=="calibrar.results")) stop("Restart file ", res.file, " is not appropiate.")
+  output = readRDS(res.file)
+  msg = sprintf("Restart file '%s' is corrupt.", res.file)
+  if(!inherits(output, "calibrar.results")) stop(msg)
   class(output) = "list"
   return(output)
 }
@@ -29,11 +27,11 @@
   res.file = paste0(control$restart.file, ".restart")
   class(opt) = c("optimES.restart", class(opt))
   force(trace)
-  save(list=c("opt", "trace"), file = res.file, compress=FALSE)
-  return(invisible())
+  saveRDS(list(opt=opt, trace=trace), file = res.file)
+  return(invisible(TRUE))
 }
 
-.createOutputFile = function(output, control, type="results") {
+.createOutputFile = function(output, control, type="results", phase=0) {
   
   if(is.null(control$restart.file)) return(invisible())
   res.file = paste0(control$restart.file, ".", type)
@@ -47,7 +45,13 @@
     suppressWarnings(file.remove(paste0(control$restart.file, ".partial")))
   }
   
-  save(output, file = res.file, compress=FALSE)
+  saveRDS(output, file = res.file)
+  
+  if(type=="partial") {
+    pfile = sprintf(".%s.phase%d", res.file, phase)
+    file.copy(from=res.file, to=pfile, overwrite = TRUE)
+  }
+  
   suppressWarnings(file.remove(paste0(control$restart.file, ".restart"))) 
   return(invisible(NULL))
   
