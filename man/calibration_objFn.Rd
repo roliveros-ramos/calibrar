@@ -4,14 +4,7 @@
 \alias{calibration_objFn}
 \title{Create an objective function to be used with optimization routines}
 \usage{
-calibration_objFn(
-  model,
-  setup,
-  observed,
-  aggFn = .weighted.sum,
-  aggregate = FALSE,
-  ...
-)
+calibration_objFn(model, setup, observed, aggFn = NULL, aggregate = FALSE, ...)
 }
 \arguments{
 \item{model}{Function to run the model and produce a list of outputs.}

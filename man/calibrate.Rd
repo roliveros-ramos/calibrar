@@ -29,8 +29,9 @@ other optimization functions.}
 
 \item{\dots}{Additional parameters to be passed to \code{fn}.}
 
-\item{method}{The optimization method to be used. The 'default' method
-is the AHR-ES (Oliveros & Shin, 2016). All the methods from stats::optim,
+\item{method}{The optimization method to be used. The default method
+is the AHR-ES (Adaptative Hierarchical Recombination Evolutionary Strategy, 
+Oliveros-Ramos & Shin, 2016). All the methods from stats::optim,
 optimx::optimx and cmaes::cma_es are available.}
 
 \item{lower}{Lower threshold value(s) for parameters. One value or a vector 

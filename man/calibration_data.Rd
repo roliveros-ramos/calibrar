@@ -4,7 +4,7 @@
 \alias{calibration_data}
 \title{Get observed data for the calibration of a model}
 \usage{
-calibration_data(setup, path = ".", ...)
+calibration_data(setup, path = ".", verbose = TRUE, file = NULL, ...)
 }
 \arguments{
 \item{setup}{A data.frame with the information about the calibration, 
@@ -12,6 +12,8 @@ normally created with the \code{\link{calibration_setup}} function.
 See details.}
 
 \item{path}{Path to the directory to look up for the data. Paths in setup are considered relatives to this path.}
+
+\item{file}{Optional file to save the created object (as an 'rds' file.)}
 
 \item{\dots}{Additional arguments to \code{read.csv} function 
 to read the data files.}
