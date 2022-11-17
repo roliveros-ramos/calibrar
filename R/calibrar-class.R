@@ -14,7 +14,7 @@ print.calibrar.results = function(x, ...) {
 
 #' @export
 coef.calibrar.results = function(object, ...) {
-  return(unlist(object$par))
+  return(object$par)
 }
 
 #' @export

@@ -48,6 +48,7 @@
         out = fn(parx, ...)/control$fnscale
         output = rbind(output, t(as.matrix(out)))
       }
+      if(is.null(output)) return(NULL)
       return(as.numeric(colMeans(output)))
       
     }
@@ -68,6 +69,7 @@
         out = fn(parx, ...)/control$fnscale
         output = rbind(output, t(as.matrix(out)))
       }
+      if(is.null(output)) return(NULL)
       return(as.numeric(colMeans(output)))
       
     }
@@ -428,21 +430,17 @@
     opt$gen  = opt$gen + 1
     opt$ages = opt$ages + 1
     
-    # create a new population
-    
+    # 1. create a new population
     if(all(opt$SIGMA==0)) break
     opt$pop = .createPopulation(opt)
     
-    # evaluate the function in the population: evaluate fn, aggregate fitness
-    
+    # 2. evaluate the function in the population: evaluate fn, aggregate fitness
     opt$fitness = .calculateFitness(opt, fn=fn)
     
-    # select best 'individuals'
-    
+    # 3. select best 'individuals'
     opt$selected = .selection(opt)
     
-    # create the new parents: MU and SD
-    
+    # 4. create the new parents: MU and SD
     opt = .calculateOptimalWeights(opt)
     opt = .updatePopulation(opt)
     
@@ -451,6 +449,7 @@
       
       trace$par[opt$gen, ] = opt$MU
       trace$best[opt$gen]  = opt$selected$best$fit.global
+      trace$value[opt$gen] = control$aggFn(opt$fitness[1, ], control$weights)
       
       if(control$trace>1) {
         trace$sd[opt$gen, ]  = opt$SIGMA
@@ -460,15 +459,20 @@
       if(control$trace>2) {
         
         if(is.null(trace$fitness)) 
-          trace$fitness = matrix(NA, nrow=control$maxgen, ncol=ncol(opt$fitness)) 
+          trace$fitness = matrix(NA, nrow=control$maxgen, ncol=ncol(opt$fitness))
         
-        trace$fitness[opt$gen, ] = colMeans(opt$fitness[opt$selected$supsG, , drop=FALSE])
+        if(nrow(trace$fitness) < control$maxgen) {
+          .nt = nrow(trace$fitness)
+          trace$fitness = rbind(trace$fitness, 
+                                matrix(NA, nrow=control$maxgen-.nt, ncol=ncol(opt$fitness))) 
+        }
+          
+        trace$fitness[opt$gen, ] = opt$fitness[1, , drop=FALSE]
         
       }
       
       if(opt$gen%%control$REPORT==0) {
-        if(control$trace>3) trace$value[opt$gen] = control$aggFn(fn(opt$MU), control$weights)
-        if(control$trace>4) trace$opt[[opt$gen]] = opt
+        if(control$trace>3) trace$opt[[opt$gen]] = opt
       }
 
     }

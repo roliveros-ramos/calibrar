@@ -6,9 +6,12 @@
   for(j in seq_len(nrow(info))) {
     if(!info$calibrate[j]) next
     var = info$variable[j]
-    msg = "Variable '%s' not found in %s data."
-    if(!(var %in% names(obs))) stop(sprintf(msg, var, "observed"))
-    if(!(var %in% names(sim))) stop(sprintf(msg, var, "simulated"))
+    msg = "Variable '%s' not found in %s data (existing variables: %s)."
+    if(!(var %in% names(obs))) 
+      stop(sprintf(msg, var, "observed", paste(sQuote(names(sim)), collapse=", ")))
+    if(!(var %in% names(sim)))
+      stop(sprintf(msg, var, "simulated", paste(sQuote(names(sim)), collapse=", ")))
+
     fit = c(fit, .fitness(obs=obs[[var]], sim=sim[[var]], FUN=info$type[j]))
   }
   names(fit) = info$variable[which(info$calibrate)]
@@ -289,7 +292,7 @@ format_difftime = function(x, y, ...) {
 
   # specific options must be taken in .optimES.  
   con = list(trace = 0, fnscale = 1, parscale = rep.int(1L, length(which(active))), maxit = NULL, maxgen=NULL,
-             abstol = -Inf, reltol = sqrt(.Machine$double.eps), REPORT = 10L, nCores=parallel::detectCores(), 
+             abstol = -Inf, reltol = sqrt(.Machine$double.eps), REPORT = 10L, ncores=parallel::detectCores(), 
              alpha=0.05, age.max=1, selection=0.5, step=0.5, nvar=NULL, weights=1, sigma=NULL,
              method=method, aggFn=.weighted.sum, parallel=FALSE, run=NULL, master=NULL, useCV=TRUE,
              convergence=1e-6, stochastic=FALSE, verbose=FALSE, restart.file=NULL)
@@ -312,6 +315,10 @@ format_difftime = function(x, y, ...) {
     con$master = NULL
   }
   
+  con$ncores = as.integer(con$ncores)
+  if(is.null(con$ncores) | is.na(con$ncores)) stop("Control option 'ncores' must be a positive integer.")
+  if(is.null(con$ncores) < 1) con$ncores = 1
+  
   if(!is.null(con$master) & is.null(con$run)) {
     con$run = tempdir()
     msg = sprintf("Evaluating 'fn' in %s.", con$run)
@@ -329,9 +336,9 @@ format_difftime = function(x, y, ...) {
   }
   con$popsize = max(con$popsize, popOpt)
   if(isTRUE(con$parallel)) {
-    popOptP = ceiling(con$popsize/con$nCores)*con$nCores
+    popOptP = ceiling(con$popsize/con$ncores)*con$ncores
     if(con$popsize != popOptP) {
-      message(sprintf("Optimizing 'popsize' to work with %d cores...", con$nCores))
+      message(sprintf("Optimizing 'popsize' to work with %d cores...", con$ncores))
       message(sprintf("   Optimal population size (%d) has been increased to %d.\n", popOpt, popOptP))
     }
       
@@ -475,3 +482,34 @@ format_difftime = function(x, y, ...) {
   stop(sprintf("Dimensions higher than %d are not currently supported.", length(dim(x))-1))
   
 }
+
+
+.write_calibrar_dump = function(run, gen, i) {
+  if(is.null(run)) return(invisible(NULL))
+  dump = file.path(run, "..", "_calibrar.dump")
+  if(!dir.exists(dump)) dir.create(dump, recursive = TRUE)
+  ipath = file.path(run, sprintf("i%d", i))
+  opath = file.path(dump, sprintf("gen%d_i%d", gen, i))
+  if(!dir.exists(opath)) dir.create(opath, recursive=TRUE)
+  file.copy(from=file.path(ipath, dir(ipath)), to=opath, recursive=TRUE)
+  msg = "There was a problem running your function (generation %d, individual %d). Check '%s' for debugging."
+  message(sprintf(msg, gen, i, opath))
+  return(invisible(NULL))
+}
+
+.mylength = function(x, n) {
+  if(length(x)!=1) return(x)
+  length(x) = n
+  x[is.na(x)] = Inf
+  return(x)
+}
+
+
+.rbind_fitness = function(x) {
+  n = max(sapply(x, FUN=length))
+  out = do.call(rbind, lapply(x, FUN=.mylength, n=n))
+  return(out)
+}
+
+
+
