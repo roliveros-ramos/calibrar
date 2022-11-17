@@ -3,17 +3,21 @@
 #'
 #' @param obs observed data as expected by FUN.
 #' @param sim simulated data matching 'obs'
-#' @param FUN the error function.
+#' @param FUN the error function. Current accepted values area: 'norm2', 
+#' 'lnorm2', 'lnorm3', 'multinomial', 'pois', 'penalty0', 'penalty1', 'penalty2' and 'normp'.
 #' @param ... 
 #'
-#' @return the value of FUN(obs, sim)
+#' @return the value of FUN(obs, sim, ...)
 #' @export
-fitness = function(obs, sim, FUN, ...) {
+objFn = function(obs, sim, FUN, ...) {
   FUN = match.fun(FUN)
   output = FUN(obs=obs, sim=sim, ...)
   return(output)
 }
 
+#' @export
+#' @rdname objFn 
+fitness = objFn
 
 # Provided ----------------------------------------------------------------
 
@@ -24,6 +28,14 @@ pois = function(obs, sim, ...) {
 
 normp = function(obs, sim, ...) {
   penalty = sum((sim)^2, na.rm=TRUE)
+  return(penalty)
+}
+
+re = normp
+
+penalty = function(obs, sim, n=100, ...) {
+  # assumes a fixed sample size of 'n'
+  penalty = n*mean((sim)^2, na.rm=TRUE)
   return(penalty)
 }
 
@@ -51,6 +63,39 @@ lnorm3  = function(obs, sim, tiny = 1e-2, ...) {
   return(nlogLike)
 }
 
+lnorm4  = function(obs, sim, tiny = 1e-2, b=1, c=2, ...) {
+  if(all(!is.finite(sim))) return(Inf)
+  penq = rangeq(obs=obs, sim=sim, b=b, c=c, dump=TRUE)
+  q = attr(penq, "q")
+  obs = log(obs+tiny) 
+  sim = log(sim+tiny)
+  nlogLike = sum((obs-sim-log(q))^2, na.rm=TRUE)
+  return(nlogLike + penq)
+}
+
+lnorm4b  = function(obs, sim, tiny = 1e-2, b=1, c=2, ...) {
+  if(all(!is.finite(sim))) return(Inf)
+  penq = rangeq(obs=obs, sim=sim, b=b, c=c, dump=FALSE)
+  q = attr(penq, "q")
+  obs = log(obs+tiny) 
+  sim = log(sim+tiny)
+  nlogLike = sum((obs-sim-log(q))^2, na.rm=TRUE)
+  return(nlogLike + penq)
+}
+
+rangeq = function(obs, sim, b=1, c=2, dump=TRUE) {
+  ratio = obs/sim
+  ratio[is.nan(ratio)] = NA
+  n = sum(!is.na(ratio))
+  q = mean(ratio, na.rm=TRUE)
+  if(isTRUE(dump)) {
+    pen = n*(pmax(abs((log2(q))), b)^c - b^c)
+  } else {
+    pen = sum((pmax(abs((log2(ratio))), b)^c - b^c))
+  }
+  attr(pen, "q") = q
+  return(pen)
+}
 
 multinom = function(sim, obs, size=20, tiny=1e-3) {
   
