@@ -412,8 +412,11 @@ calibration_data = function(setup, path=".", verbose=TRUE, file=NULL, ...) {
   
   observed  = list()
   useData = as.logical(setup$use_data)
+  isActive = as.logical(setup$calibrate)
   
   message("Creating observed data list for calibration...","\n")
+  
+  readData = useData & isActive
   
   for(iVar in seq_len(nrow(setup))) {
     
@@ -421,7 +424,7 @@ calibration_data = function(setup, path=".", verbose=TRUE, file=NULL, ...) {
     varid   = setup$varid[iVar]
     col_skip = setup$col_skip[iVar]
     nrows = setup$nrows[iVar]
-    if(useData[iVar]) {
+    if(readData[iVar]) {
       observed[[iVar]] = .read_data(file=ifile, col_skip=col_skip, varid=varid, nrows=nrows, ...)
     } else {
       observed[[iVar]] = NA
@@ -432,9 +435,9 @@ calibration_data = function(setup, path=".", verbose=TRUE, file=NULL, ...) {
   msg0 = "Loaded observed data for variable: %s.\n"
   msg1 = "Loaded observed data for variables: %s.\n"
   
-  msg = if(sum(useData, na.rm=TRUE)==1) msg0 else msg1 
+  msg = if(sum(readData, na.rm=TRUE)==1) msg0 else msg1 
   
-  if(isTRUE(verbose)) message(sprintf(msg, paste(sQuote(setup$variable[useData]), collapse=", ")))
+  if(isTRUE(verbose)) message(sprintf(msg, paste(sQuote(setup$variable[readData]), collapse=", ")))
   
   names(observed) = as.character(setup$variable)
   
