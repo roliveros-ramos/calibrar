@@ -67,3 +67,35 @@ plot.spline.par = function(x, ...) {
   }
 }
 
+
+
+
+# Gaussian dispersion -----------------------------------------------------
+
+#' Calculate a discretization of the 2D Gaussian Kernel
+#'
+#' @param par A list, including the mean and covariance matrix.
+#' @param lower A vector, indicating the lower bound for the calculation.
+#' @param upper A vector, indicating the upper bound for the calculation.
+#' @param n The number of cells for each dimension, can be one or two numbers.
+#' @param checkSymmetry TRUE by default, checks if the covariance matrix is symmetric. 
+#' @param ... Additional arguments, currently not used.
+#'
+#' @return A list, with 'x', 'y' and 'z' components.
+#' @export
+gaussian_kernel = function(par, lower, upper, n=10, checkSymmetry=TRUE, ...) {
+  mean  = par$mean
+  sigma = par$sigma
+  if(length(mean)!=2) stop("The 'mean' vector has to be of length 2.")
+  if(nrow(sigma)!=2 | ncol(sigma)!=2) 
+    stop("The covariance matrix 'sigma' must have dimension 2.")
+  lim = apply(cbind(lower, upper, n), 1, 
+              FUN = function(x) pretty(seq(x[1], x[2], length.out=x[3]), x[3]))
+  names(lim) =  c("x", "y")
+  x = do.call(expand.grid, lim)
+  out = dmvnorm(x=x, mean=mean, sigma = sigma, checkSymmetry=checkSymmetry)
+  out = array(out, dim=sapply(lim, length))
+  out = c(lim, z=list(out))
+  return(out)
+}
+

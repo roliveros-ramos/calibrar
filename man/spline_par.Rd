@@ -4,7 +4,7 @@
 \alias{spline_par}
 \title{Predict time-varying parameters using splines.}
 \usage{
-spline_par(par, n, knots = NULL, periodic = FALSE)
+spline_par(par, n, knots = NULL, periodic = FALSE, period = NULL)
 }
 \arguments{
 \item{n}{Number of points. Time (independent variable) is assumed to be between 0 and n with length(par) equidistant points (including 0 and n).}
