@@ -317,7 +317,8 @@ format_difftime = function(x, y, ...) {
   
   con$ncores = as.integer(con$ncores)
   if(is.null(con$ncores) | is.na(con$ncores)) stop("Control option 'ncores' must be a positive integer.")
-  if(is.null(con$ncores) < 1) con$ncores = 1
+  if(is.null(con$ncores)) con$ncores = 1
+  if(con$ncores < 1) con$ncores = 1
   
   if(!is.null(con$master) & is.null(con$run)) {
     con$run = tempdir()
