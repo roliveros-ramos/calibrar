@@ -195,6 +195,8 @@ calibrate.default = function(par, fn, gr = NULL, ..., method = "AHR-ES",
       wd = getwd()
       .setWorkDir(control$run, i=0)
       xpar = relist(flesh = par, skeleton = skeleton)
+      ifile = sprintf(".%s-phase%d.par", control$restart, phase)
+      saveRDS(xpar, file=ifile)
       partial = try(fnx(xpar))
       setwd(wd)
       if(!inherits(partial, "try-error")) {
