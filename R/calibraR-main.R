@@ -15,7 +15,7 @@
 #' set.seed(880820)
 #' path = NULL # NULL to use the current directory
 #' # create the demonstration files
-#' demo = calibrarDemo(model="PoissonMixedModel", L=5, T=100) 
+#' demo = calibrar_demo(model="PoissonMixedModel", L=5, T=100) 
 #' # get calibration information
 #' calibrationInfo = getCalibrationInfo(path=demo$path)
 #' # get observed data

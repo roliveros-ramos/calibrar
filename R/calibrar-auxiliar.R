@@ -22,7 +22,7 @@
 #' set.seed(880820)
 #' path = NULL # NULL to use the current directory
 #' # create the demonstration files
-#' demo = calibrarDemo(model="PoissonMixedModel", L=5, T=100) 
+#' demo = calibrar_demo(model="PoissonMixedModel", L=5, T=100) 
 #' # get calibration information
 #' calibrationInfo = getCalibrationInfo(path=demo$path)
 #' # get observed data
@@ -50,7 +50,7 @@
 #' summary(ahr)
 #' } 
 #' @export 
-calibrarDemo = function(path=NULL, model=NULL,  ...) {
+calibrar_demo = function(path=NULL, model=NULL,  ...) {
   
   if(is.null(path)) path = getwd()
   if(is.null(model)) {
@@ -73,11 +73,20 @@ calibrarDemo = function(path=NULL, model=NULL,  ...) {
   
 }
 
+#' @export 
+calibrarDemo = function(path=NULL, model=NULL,  ...) {
+  
+  .Deprecated("calibrar_demo", package="calibrar")
+  return(calibrar_demo(path=path, model=model,  ...))                
+  
+}
+
 #' @export
 #' @method print calibrar.demo
 print.calibrar.demo = function(x, ...) {
   print.default(x, ...)
 }
+
 
 
 # Some other useful stuff -------------------------------------------------
