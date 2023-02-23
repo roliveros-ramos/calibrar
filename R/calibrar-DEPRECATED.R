@@ -157,3 +157,12 @@ createObjectiveFunction = function(runModel, info, observed, aggFn=.weighted.sum
   return(fn1) 
   
 }
+
+#' @rdname calibrar_demo
+#' @export 
+calibrarDemo = function(path=NULL, model=NULL,  ...) {
+  
+  .Deprecated("calibrar_demo", package="calibrar")
+  return(calibrar_demo(path=path, model=model,  ...))                
+  
+}

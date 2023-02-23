@@ -73,13 +73,7 @@ calibrar_demo = function(path=NULL, model=NULL,  ...) {
   
 }
 
-#' @export 
-calibrarDemo = function(path=NULL, model=NULL,  ...) {
-  
-  .Deprecated("calibrar_demo", package="calibrar")
-  return(calibrar_demo(path=path, model=model,  ...))                
-  
-}
+
 
 #' @export
 #' @method print calibrar.demo
