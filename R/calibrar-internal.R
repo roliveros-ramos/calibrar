@@ -453,7 +453,7 @@ format_difftime = function(x, y, ...) {
 .mycbind = function(...) {
   
   xall = list(...)
-  x = Xall[[1]]
+  x = xall[[1]]
   
   if(length(dim(x)) <  2) return(cbind(...))
   
