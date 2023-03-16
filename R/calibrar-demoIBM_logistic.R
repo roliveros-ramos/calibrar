@@ -1,6 +1,6 @@
 # Generate simulated data -------------------------------------------------
 
-.generateIBMLotkaVolterra = function(path, r=0.1, m=0.05, alpha=5e-4, beta=5e-4,
+.generateIBMLogistic = function(path, r=0.1, m=0.05, alpha=5e-4, beta=5e-4,
                                      D=list(N=8e-5, P=8e-5), 
                                      L=list(N=0.2, P=0.2), T=100, 
                                      uselog=FALSE, seed=880820, ...) {
