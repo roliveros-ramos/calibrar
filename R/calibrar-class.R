@@ -110,10 +110,10 @@ print.summary.calibrar.results = function(x, digits=3, ...) {
   return(invisible())
 }
 
-# Methods for optimES.result class ----------------------------------------
+# Methods for ahres.result class ----------------------------------------
 
 #' @export
-print.optimES.result = function(x, short=FALSE, ...) {
+print.ahres.result = function(x, short=FALSE, ...) {
   
   cat("\nFunction value:", x$value, "\n")
   if(!isTRUE(short)) {
@@ -126,23 +126,23 @@ print.optimES.result = function(x, short=FALSE, ...) {
 }
 
 #' @export
-coef.optimES.result = function(object, ...) {
+coef.ahres.result = function(object, ...) {
   return(object$par)
 }
 
 #' @export
-plot.optimES.result = function(x, ...) {
+plot.ahres.result = function(x, ...) {
   return(invisible(NULL))
 }
 
 #' @export
-summary.optimES.result = function(object, ...) {
-  class(object) = "summary.optimES.result"
+summary.ahres.result = function(object, ...) {
+  class(object) = "summary.ahres.result"
   return(object)
 }
 
 #' @export 
-print.summary.optimES.result = function(x, ...) {
+print.summary.ahres.result = function(x, ...) {
   cat("\nFunction value:", x$value, "\n")
   cat("Parameters:\n")
   print(x=x$par, ...)

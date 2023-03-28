@@ -9,12 +9,12 @@ calibrate(
   fn,
   gr,
   ...,
-  method,
   lower,
   upper,
+  phases,
+  method,
   control,
   hessian,
-  phases,
   replicates
 )
 }
@@ -29,11 +29,6 @@ other optimization functions.}
 
 \item{\dots}{Additional parameters to be passed to \code{fn}.}
 
-\item{method}{The optimization method to be used. The default method
-is the AHR-ES (Adaptative Hierarchical Recombination Evolutionary Strategy, 
-Oliveros-Ramos & Shin, 2016). All the methods from stats::optim,
-optimx::optimx and cmaes::cma_es are available.}
-
 \item{lower}{Lower threshold value(s) for parameters. One value or a vector 
 of the same length as par. If one value is provided, it is used for all 
 parameters. \code{NA} means \code{-Inf}. By default \code{-Inf} is used (unconstrained).}
@@ -42,14 +37,18 @@ parameters. \code{NA} means \code{-Inf}. By default \code{-Inf} is used (unconst
 of the same length as par. If one value is provided, it is used for all 
 parameters. \code{NA} means \code{Inf}. By default \code{Inf} is used (unconstrained).}
 
+\item{phases}{An optional vector of the same length as \code{par}, 
+indicating the phase at which each parameter becomes active. If omitted, 
+default value is 1 for all parameters, performing a single optimization.}
+
+\item{method}{The optimization method to be used. The default method
+is the AHR-ES (Adaptative Hierarchical Recombination Evolutionary Strategy, 
+Oliveros-Ramos & Shin, 2016). See details for the methods available.}
+
 \item{control}{Parameter for the control of the algorithm itself, see details.}
 
 \item{hessian}{Logical. Should a numerically differentiated Hessian matrix be returned?
 Currently not implemented.}
-
-\item{phases}{An optional vector of the same length as \code{par}, 
-indicating the phase at which each parameter becomes active. If omitted, 
-default value is 1 for all parameters, performing a single optimization.}
 
 \item{replicates}{The number of replicates for the evaluation of \code{fn}.
 The default value is 1. A value greater than 1 is only useful for stochastic
@@ -66,12 +65,12 @@ a scalar value if the returned value is a vector. Some optimization algorithm ca
 exploite the additional information provided by a vectorial output from \code{fn}.
 }
 \examples{
-calibrate(par=rep(NA, 5), fn=SphereN)
+calibrate(par=rep(NA, 5), fn=sphereN)
 \dontrun{
-calibrate(par=rep(NA, 5), fn=SphereN, replicates=3)
-calibrate(par=rep(0.5, 5), fn=SphereN, replicates=3, lower=-5, upper=5)
-calibrate(par=rep(0.5, 5), fn=SphereN, replicates=3, lower=-5, upper=5, phases=c(1,1,1,2,3))
-calibrate(par=rep(0.5, 5), fn=SphereN, replicates=c(1,1,4), lower=-5, upper=5, phases=c(1,1,1,2,3))
+calibrate(par=rep(NA, 5), fn=sphereN, replicates=3)
+calibrate(par=rep(0.5, 5), fn=sphereN, replicates=3, lower=-5, upper=5)
+calibrate(par=rep(0.5, 5), fn=sphereN, replicates=3, lower=-5, upper=5, phases=c(1,1,1,2,3))
+calibrate(par=rep(0.5, 5), fn=sphereN, replicates=c(1,1,4), lower=-5, upper=5, phases=c(1,1,1,2,3))
 }
 }
 \author{

@@ -23,13 +23,17 @@ summary.calibrar.function = function(object, ...) {
 #' displacement.
 #' @author Ricardo Oliveros--Ramos
 #' @keywords stochastic random
-#' @examples
-#' SphereN(rep(0, 10))
+#' @examples sphereN(rep(0, 10))
+#' @aliases sphereN
 #' @export
-SphereN = function(x, sd=0.1, aggregate=TRUE) {
+sphereN = function(x, sd=0.1, aggregate=TRUE) {
   # f(0,...,0) = 0
   # x_i \in ]-Inf, Inf[
   x = x + rnorm(length(x), sd=sd)
   out = x^2
   if(isTRUE(aggregate)) return(sum(out)) else return(out) 
 }
+
+  
+  
+  

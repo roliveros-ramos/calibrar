@@ -290,7 +290,7 @@ format_difftime = function(x, y, ...) {
   
   fn = match.fun(fn)
 
-  # specific options must be taken in .optimES.  
+  # specific options must be taken in .ahres.  
   con = list(trace = 0, fnscale = 1, parscale = rep.int(1L, length(which(active))), maxit = NULL, maxgen=NULL,
              abstol = -Inf, reltol = sqrt(.Machine$double.eps), REPORT = 10L, ncores=parallel::detectCores(), 
              alpha=0.05, age.max=1, selection=0.5, step=0.5, nvar=NULL, weights=1, sigma=NULL,

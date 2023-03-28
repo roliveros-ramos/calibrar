@@ -56,22 +56,21 @@ NULL
 #' @param gr the gradient of \code{fn}. Ignored, added for portability with
 #' other optimization functions.
 #' @param \dots Additional parameters to be passed to \code{fn}.
-#' @param method The optimization method to be used. The default method
-#' is the AHR-ES (Adaptative Hierarchical Recombination Evolutionary Strategy, 
-#' Oliveros-Ramos & Shin, 2016). All the methods from stats::optim,
-#' optimx::optimx and cmaes::cma_es are available.
 #' @param lower Lower threshold value(s) for parameters. One value or a vector 
 #' of the same length as par. If one value is provided, it is used for all 
 #' parameters. \code{NA} means \code{-Inf}. By default \code{-Inf} is used (unconstrained).
 #' @param upper Upper threshold value(s) for parameters. One value or a vector 
 #' of the same length as par. If one value is provided, it is used for all 
 #' parameters. \code{NA} means \code{Inf}. By default \code{Inf} is used (unconstrained). 
-#' @param control Parameter for the control of the algorithm itself, see details.
-#' @param hessian Logical. Should a numerically differentiated Hessian matrix be returned?
-#' Currently not implemented. 
 #' @param phases An optional vector of the same length as \code{par}, 
 #' indicating the phase at which each parameter becomes active. If omitted, 
 #' default value is 1 for all parameters, performing a single optimization.
+#' @param method The optimization method to be used. The default method
+#' is the AHR-ES (Adaptative Hierarchical Recombination Evolutionary Strategy, 
+#' Oliveros-Ramos & Shin, 2016). See details for the methods available.
+#' @param control Parameter for the control of the algorithm itself, see details.
+#' @param hessian Logical. Should a numerically differentiated Hessian matrix be returned?
+#' Currently not implemented. 
 #' @param replicates The number of replicates for the evaluation of \code{fn}.
 #' The default value is 1. A value greater than 1 is only useful for stochastic
 #' functions.
@@ -80,24 +79,24 @@ NULL
 #' exploite the additional information provided by a vectorial output from \code{fn}.
 #' @author Ricardo Oliveros-Ramos
 #' @examples
-#' calibrate(par=rep(NA, 5), fn=SphereN)
+#' calibrate(par=rep(NA, 5), fn=sphereN)
 #' \dontrun{
-#' calibrate(par=rep(NA, 5), fn=SphereN, replicates=3)
-#' calibrate(par=rep(0.5, 5), fn=SphereN, replicates=3, lower=-5, upper=5)
-#' calibrate(par=rep(0.5, 5), fn=SphereN, replicates=3, lower=-5, upper=5, phases=c(1,1,1,2,3))
-#' calibrate(par=rep(0.5, 5), fn=SphereN, replicates=c(1,1,4), lower=-5, upper=5, phases=c(1,1,1,2,3))
+#' calibrate(par=rep(NA, 5), fn=sphereN, replicates=3)
+#' calibrate(par=rep(0.5, 5), fn=sphereN, replicates=3, lower=-5, upper=5)
+#' calibrate(par=rep(0.5, 5), fn=sphereN, replicates=3, lower=-5, upper=5, phases=c(1,1,1,2,3))
+#' calibrate(par=rep(0.5, 5), fn=sphereN, replicates=c(1,1,4), lower=-5, upper=5, phases=c(1,1,1,2,3))
 #' }
 #' @export
-calibrate = function(par, fn, gr, ..., method, lower, upper, control, 
-                     hessian, phases, replicates) {
+calibrate = function(par, fn, gr, ..., lower, upper, phases, method, control, 
+                     hessian, replicates) {
   UseMethod("calibrate")
 }
 
-
 #' @export
-calibrate.default = function(par, fn, gr = NULL, ..., method = "AHR-ES",
-                     lower = NULL, upper = NULL, control = list(), 
-                     hessian = FALSE, phases = NULL, replicates=1) {
+calibrate.default = function(par, fn, gr = NULL, ..., 
+                             lower = NULL, upper = NULL, phases = NULL, 
+                             method = "AHR-ES", control = list(), 
+                             hessian = FALSE, replicates=1) {
 
   if(method=="AHR-ES") method = "default"
   
@@ -234,11 +233,12 @@ calibrate.default = function(par, fn, gr = NULL, ..., method = "AHR-ES",
   
 }
 
-# optimES -----------------------------------------------------------------
+# AHR-ES ------------------------------------------------------------------
 
-#' @title Optimization using Evolutionary Strategies
+#' @title Adaptative Hierarchical Recombination Evolutionary Strategy for 
+#' derivative-free and black-box optimization 
 #' @description This function performs the optimization of a function using 
-#' evolutionary strategies, by default the AHR-ES (Oliveros & Shin, 2015). 
+#' the Adaptative Hierarchical Recombination Evolutionary Strategy (AHR-ES, Oliveros & Shin, 2015). 
 #' @param par A numeric vector. The length of the par argument defines the 
 #' number of parameters to be estimated (i.e. the dimension of the problem).
 #' @param fn The function to be minimized.
@@ -261,9 +261,9 @@ calibrate.default = function(par, fn, gr = NULL, ..., method = "AHR-ES",
 #' is the 'default' method, corresponding to the AHR-ES (Oliveros & Shin, 2015).
 #' @author Ricardo Oliveros-Ramos
 #' @examples
-#' optimES(par=rep(1, 5), fn=SphereN)
+#' ahres(par=rep(1, 5), fn=sphereN)
 #' @export
-optimES = function (par, fn, gr = NULL, ..., lower = -Inf, upper = Inf, active=NULL, 
+ahres = function(par, fn, gr = NULL, ..., lower = -Inf, upper = Inf, active=NULL, 
                     control = list(), hessian = FALSE, method = "default") {
   
   
@@ -295,16 +295,16 @@ optimES = function (par, fn, gr = NULL, ..., lower = -Inf, upper = Inf, active=N
     fn(parx, ...)/control$fnscale
   }
   
-  output = .optimES(par=par, fn=fn1, lower=lower, upper=upper, control=control, isActive = isActive)
+  output = .ahres(par=par, fn=fn1, lower=lower, upper=upper, control=control, isActive = isActive)
   
   paropt = guess
-  paropt[isActive] = output$ppar 
+  paropt[isActive] = output$.par 
   
   if(is.null(names(paropt))) names(paropt) = .printSeq(npar, preffix="par")
   
   output = list(par=paropt, output, active=list(par=isActive, flag=activeFlag))
   
-  class(output) = c("optimES.result", class(output))
+  class(output) = c("ahres.result", class(output))
   
   return(output)
   

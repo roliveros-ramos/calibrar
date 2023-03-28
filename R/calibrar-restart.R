@@ -8,7 +8,7 @@
   x = readRDS(res.file)
   msg = sprintf("Restart file '%s' is corrupt.", res.file)
   if(!all(c("opt", "trace") %in% names(x))) stop(msg)
-  if(!inherits(x$opt, "optimES.restart")) stop(msg)
+  if(!inherits(x$opt, "ahres.restart")) stop(msg)
   return(x)
 }
 
@@ -25,7 +25,7 @@
   if(is.null(control$restart.file)) return(invisible())
   if((opt$gen%%control$REPORT)!=0) return(invisible())
   res.file = paste0(control$restart.file, ".restart")
-  class(opt) = c("optimES.restart", class(opt))
+  class(opt) = c("ahres.restart", class(opt))
   force(trace)
   saveRDS(list(opt=opt, trace=trace), file = res.file)
   return(invisible(TRUE))
