@@ -27,4 +27,4 @@ Encoding: UTF-8
 URL: http://roliveros-ramos.github.io/calibrar
 BugReports: https://github.com/roliveros-ramos/calibrar/issues
 ByteCompile: TRUE
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
