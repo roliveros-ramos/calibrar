@@ -39,16 +39,21 @@
   calibrationInfo$variable  = c("prey", "predator")
   calibrationInfo$type      = "lnorm2"
   calibrationInfo$calibrate = TRUE
-  calibrationInfo$weights   = 1
-  calibrationInfo$useData   = TRUE
+  calibrationInfo$weight   = 1
+  calibrationInfo$use_data   = TRUE
+  calibrationInfo$file   = c("data/prey.csv", "data/predator.csv")
+  calibrationInfo$varid   = c("prey", "predator")
+  
   
   calibrationInfo = as.data.frame(calibrationInfo)
   
-  write.csv(calibrationInfo, file.path(main.folder, "calibrationInfo.csv"), row.names=FALSE)
-  
+  write.csv(calibrationInfo, file.path(main.folder, "calibration_settings.csv"), row.names=FALSE)
+
   constants = list(T=T)
   
-  output = c(list(path=main.folder, par=par_real), constants, parInfo)
+  output = c(list(file=file.path(main.folder, "calibration_settings.csv"), 
+                  path = main.folder,
+                  par=par_real), constants, parInfo)
   
   return(output)
   
