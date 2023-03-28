@@ -59,25 +59,29 @@
   # calibrationInfo.csv
   
   calibrationInfo = list()
-  calibrationInfo$variable  = paste0("site_", sprintf(paste0("%0", nsites, "d"), seq_len(L)))
-  calibrationInfo$type      = "pois"
-  calibrationInfo$calibrate = TRUE
-  calibrationInfo$weights   = 1
-  calibrationInfo$useData   = TRUE
+  calibrationInfo$variable   = paste0("site_", sprintf(paste0("%0", nsites, "d"), seq_len(L)))
+  calibrationInfo$type       = "pois"
+  calibrationInfo$calibrate  = TRUE
+  calibrationInfo$weight     = 1
+  calibrationInfo$use_data   = TRUE
+  calibrationInfo$file       = file.path("data", paste0(calibrationInfo$variable, ".csv"))
+  calibrationInfo$varid      = "x"
   
   calibrationInfo = as.data.frame(calibrationInfo)
   
   calibrationInfo2 = list()
-  calibrationInfo2$variable = "gammas"
-  calibrationInfo2$type     = "normp"
+  calibrationInfo2$variable  = "gammas"
+  calibrationInfo2$type      = "normp"
   calibrationInfo2$calibrate = TRUE
-  calibrationInfo2$weights   = 1/(2*sd^2)
-  calibrationInfo2$useData   = FALSE
+  calibrationInfo2$weight    = 1/(2*sd^2)
+  calibrationInfo2$use_data  = FALSE
+  calibrationInfo2$file      = NA 
+  calibrationInfo2$varid     = NA
   
   calibrationInfo2 = as.data.frame(calibrationInfo2)
   calibrationInfo = rbind(calibrationInfo, calibrationInfo2)
   
-  write.csv(calibrationInfo, file.path(main.folder, "calibrationInfo.csv"),
+  write.csv(calibrationInfo, file.path(main.folder, "calibration_settings.csv"),
             row.names=FALSE)
   
   constants = list(T=T, L=L)
