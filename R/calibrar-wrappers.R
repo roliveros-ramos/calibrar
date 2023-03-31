@@ -76,6 +76,10 @@
     
   } # end fn1
   
+  # this need to be added so functions can use disk (specially in parallel)
+  # add to every function calling the wrappers
+  pathTmp = getwd()               # get the current path
+  on.exit(setwd(pathTmp))         # back to the original path after execution
   
   imethod = "default"
   optimMethods  = c("Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN",
@@ -125,37 +129,15 @@
   
   # reshaping full parameters
   paropt = guess
-  paropt[isActive] = output$.par 
+  paropt[isActive] = output$par 
   if(is.null(names(paropt))) names(paropt) = .printSeq(npar, preffix="par")
+  # here to rename 'par' to '.par'
+  names(output)[names(output)=="par"] = ".par"
 
   # final outputs
   output = c(list(par=paropt), output, list(active=list(par=isActive, flag=activeFlag)))
   
   class(output) = c("ahres.result", class(output)) # change name
-  
-  return(output)
-  
-}
-
-
-# wrapper for optim -------------------------------------------------------
-
-.optim = function(par, fn, gr, lower, upper, control, hessian, method) {
-  
-  pathTmp = getwd()               # get the current path
-  on.exit(setwd(pathTmp))         # back to the original path after execution
-  
-  # what to do with methods not accepting bound conditions?
-  if(!(method %in% c("L-BFGS-B", "Brent"))) {
-    lower = -Inf
-    upper = Inf
-  }
-  
-  output = suppressWarnings(stats::optim(par=par, fn=fn, gr=gr, method=method, lower=lower, 
-                                         upper=upper, control=control, hessian=hessian))
-  
-  names(output)[names(output)=="par"] = ".par"
-  if(is.null(output$hessian)) output$hessian = NULL
   
   return(output)
   
@@ -175,7 +157,7 @@
   output = suppressWarnings(optimr::optimr(par=par, fn=fn, gr=gr, method=method, lower=lower, 
                                         upper=upper, control=control, hessian=hessian))
   
-  names(output)[names(output)=="par"] = ".par"  
+  # names(output)[names(output)=="par"] = ".par"  
   if(is.null(output$hessian)) output$hessian = NULL
     
   return(output)
@@ -222,7 +204,7 @@
   counts = c('function'=out$feval, 'gradient'=0)
   convergence = 0
   
-  output = list(.par=par, value=value, counts=counts, convergence=0)
+  output = list(par=par, value=value, counts=counts, convergence=0)
 
 # tol
 # maxfeval
@@ -266,7 +248,7 @@
   output = suppressWarnings(Rcgmin::Rcgmin(par=par, fn=fn, gr=gr, lower=lower, 
                                            upper=upper, control=control))
   
-  names(output)[names(output)=="par"] = ".par"
+  # names(output)[names(output)=="par"] = ".par"
   
   return(output)
   
@@ -285,7 +267,7 @@
   output = suppressWarnings(Rvmmin::Rvmmin(par=par, fn=fn, gr=gr, lower=lower, 
                                            upper=upper, control=control))
   
-  names(output)[names(output)=="par"] = ".par"
+  # names(output)[names(output)=="par"] = ".par"
   
   return(output)
   
@@ -306,7 +288,7 @@
     if(!is.finite(output$value)) warning("Infinite value reached for fn.")
   }
   
-  names(output)[names(output)=="par"] = ".par"
+  # names(output)[names(output)=="par"] = ".par"
   
   return(output)
   
@@ -326,7 +308,7 @@
                                               upper=upper, control=control))
   
   output = list()
-  output$.par  = xoutput$par
+  output$par  = xoutput$par
   output$value = xoutput$value
   output$counts = xoutput$counts
   output$convergence = xoutput$convergence
@@ -346,7 +328,7 @@
   output = suppressWarnings(GenSA::GenSA(par=par, fn=fn, lower=lower, 
                                          upper=upper, control=control))
   
-  names(output)[names(output)=="par"] = ".par"
+  # names(output)[names(output)=="par"] = ".par"
   output$counts = c('function'=output$counts,
                     gradient=NA)
   
@@ -369,7 +351,7 @@
   xoutput = suppressWarnings(DEoptim::DEoptim(fn=fn, lower=lower, upper=upper, control=control))
   
   output = list()
-  output$.par  = xoutput$optim$bestmem
+  output$par  = xoutput$optim$bestmem
   output$value = xoutput$optim$bestval
   output$counts = c('function'=xoutput$optim$nfeval,
                     gradient=NA)
@@ -393,7 +375,7 @@
                                         options=control))
   
   output = list()
-  output$.par  = xoutput$population[, xoutput$leader]
+  output$par  = xoutput$population[, xoutput$leader]
   output$value = xoutput$cost[xoutput$leader]
   output$counts = c('function'=xoutput$migrations*length(xoutput$cost),
                     gradient=NA)
@@ -417,7 +399,7 @@
                                             Domains = cbind(lower, upper),
                                             print.level=print.level))
   
-  names(output)[names(output)=="par"] = ".par"
+  # names(output)[names(output)=="par"] = ".par"
   output$counts = c('function'=output$popsize*output$generations, gradient=NA)
   return(output)
   
@@ -439,7 +421,7 @@
   output = suppressWarnings(pso::psoptim(par=par, fn=fn, gr=gr, lower=lower, 
                                          upper=upper, control=control))
   
-  names(output)[names(output)=="par"] = ".par"
+  # names(output)[names(output)=="par"] = ".par"
   
   return(output)
   
@@ -562,7 +544,7 @@
   names(opt$MU) = names(par)
   opt$counts = c('function'=opt$gen*control$popsize, generations=opt$gen)
   
-  output = list(.par=opt$MU, value=value, counts=opt$counts, 
+  output = list(par=opt$MU, value=value, counts=opt$counts, 
                 trace=trace, partial=partial, convergence=1)
   
   
@@ -570,6 +552,17 @@
   
 }
 
+# manage control options
+
+check_control = function(control, default) {
+  nm_full = names(default)
+  ignored = setdiff(names(control), nm_full)
+  msg = sprintf("Ignoring control arguments: %s.", paste(sQuote(ignored), collapse=", "))
+  if(length(ignored)) warning(msg)
+  keep = names(default)[nm_full %in% names(control)]
+  default[keep] = control[keep]
+  return(default)
+}
 
 # Auxiliar functions to run fn on disk ------------------------------------
 
