@@ -555,6 +555,8 @@
 # manage control options
 
 check_control = function(control, default) {
+  
+  control = control[!sapply(control, is.null)] # remove NULL values
   nm_full = names(default)
   ignored = setdiff(names(control), nm_full)
   msg = sprintf("Ignoring control arguments: %s.", paste(sQuote(ignored), collapse=", "))
