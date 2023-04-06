@@ -1,7 +1,6 @@
-
 #' Numerical computation of the gradient
 #' 
-#' This function calculates the gradient of a function, numerically, including the positibility
+#' This function calculates the gradient of a function, numerically, including the possibility
 #' of doing it in parallel.
 #'
 #' @param fn The function
@@ -18,12 +17,13 @@ gradient = function(fn, x, method, control, ...) {
   UseMethod("gradient")
 }
 
-gradient.default = function(fn, x, method, control=list(), ...) {
+gradient.default = function(fn, x, method=NULL, control=list(), ...) {
 
   # cluster structure must be defined outside
   # by default, not running in parallel  
   if(is.null(control$parallel)) control$parallel = FALSE
-  
+  if(is.null(method)) method = "richardson"
+    
   if(isTRUE(control$parallel)) {
     
     df = switch(method,
@@ -31,7 +31,7 @@ gradient.default = function(fn, x, method, control=list(), ...) {
                 forward    = .grad_simple_parallel(fn, x, side=+1, control=control, ...),
                 backward   = .grad_simple_parallel(fn, x, side=-1, control=control, ...),
                 richardson = .grad_richardson_parallel(fn, x, control=control, ...),
-                stop("Undefined method."))
+                stop("Undefined method for gradient computation."))
     
   } else {
 
@@ -40,7 +40,7 @@ gradient.default = function(fn, x, method, control=list(), ...) {
                 forward    = .grad_simple(fn, x, side=+1, control=control, ...),
                 backward   = .grad_simple(fn, x, side=-1, control=control, ...),
                 richardson = .grad_richardson(fn, x, control=control, ...),
-                stop("Undefined method."))
+                stop("Undefined method for gradient computation."))
     
   }
    
@@ -202,8 +202,7 @@ gradient.default = function(fn, x, method, control=list(), ...) {
 
 .grad_richardson_parallel = function(fn, x, control=list(), ...) {
   # richardson method uses 2*r*n function evaluations, 2*r*n can be paralleled,
-  # so computing time is 1 function. The default is r=4. , so 8 function evaluations eq,
-  # and it's 4 times more costly in resources than central or simple method.
+  # so computing time is 1 function. 
   
   r = if(is.null(control$r)) 4 else control$r # number of iterations, by default 4.
   v = if(is.null(control$v)) 2 else control$v # reduction factor of h, by default 2.
