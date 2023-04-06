@@ -42,7 +42,7 @@
              steptol = 1e-6, iterlim = 100, check.analyticals = TRUE)
   con$stepmax = max(1000 * sqrt(sum((par/con$typsize)^2)), 1000)
   
-  control = check_control(control=control, default=con)
+  control = check_control(control=control, default=con, minimal = FALSE)
 
   attr(fn, "gradient") = gr
   attr(fn, "hessian")  = NULL

@@ -7,7 +7,7 @@
   npar = length(par)
   # defaults for Rcgmin (taken from Rcgmin::Rcgmin)
   con = list(maxit = 500, maximize = FALSE, trace = 0, eps = 1e-07, 
-               dowarn = TRUE, tol = 0, checkgrad=FALSE, checkbounds=TRUE)
+               dowarn = TRUE, tol = 0, checkgrad=FALSE)
   
   control = check_control(control=control, default=con)
   
@@ -31,11 +31,11 @@
   con = list(maxit = 500 + 2L*npar, maxfeval = 3000 + 10L*npar, maximize = FALSE, 
              trace = 0, eps = 1e-07, dowarn = TRUE, acctol = 1e-04, 
              stepredn = 0.2, reltest = 100, stopbadupdate = TRUE, 
-             checkgrad=FALSE, checkbounds=TRUE, keepinputpar=FALSE)
+             checkgrad=FALSE)
   
   control = check_control(control=control, default=con)
   
-  output = suppressWarnings(Rvmmin::Rvmmin(par=par, fn=fn, gr=gr, lower=lower, 
+  output = suppressWarnings(Rvmmin2(par=par, fn=fn, gr=gr, lower=lower, 
                                            upper=upper, control=control))
   
   # let's ensure there's always the hessian component listed.
@@ -63,6 +63,65 @@
   output$message = NA
   # let's ensure there's always the hessian component listed.
   if(is.null(output$hessian)) output$hessian = NULL
+  
+  return(output)
+  
+}
+
+
+# BB:spg ------------------------------------------------------------------
+
+.spg = function(par, fn, gr, lower, upper, control, hessian, method) {
+  
+  npar = length(par)
+  
+  quiet = TRUE
+  if(!is.null(control$trace))  quiet = ifelse(control$trace>0, TRUE, FALSE)
+  if(!is.null(control$trace))  control$trace = ifelse(control$trace>1, TRUE, FALSE)
+  
+  method = if(!is.null(control$spg.method)) control$spg.method else 3
+  
+  # defaults for spg (taken from BB::spg)
+  con = list(M = 10, maxit = 1500, ftol = 1e-10, gtol = 1e-05, 
+             maxfeval = 10000, maximize = FALSE, trace = FALSE, triter = 10, 
+             eps = 1e-07, checkGrad = NULL, checkGrad.tol = 1e-06)
+  
+  control = check_control(control=control, default=con)
+  
+  xoutput = suppressWarnings(BB::spg(par=par, fn=fn, gr=gr, lower=lower, 
+                                    upper=upper, control=control, 
+                                    method=method, quiet=quiet))
+  
+  output = list()
+  output$par  = xoutput$par
+  output$value = xoutput$value
+  output$counts = c('function'=xoutput$feval, 'gradient'=NA)	
+  output$convergence = xoutput$convergence
+  output$message = xoutput$message
+  output$hessian = NULL
+  
+  return(output)
+  
+}
+
+
+# wrapper for lbfgsb3 -----------------------------------------------------
+
+.lbfgsb3 = function(par, fn, gr, lower, upper, control, hessian, method) {
+  
+  ctrl = list(maxit = 500, trace = 0, iprint = 0L)
+  control[!(names(control) %in% names(ctrl))] = NULL
+  
+  xoutput = suppressWarnings(lbfgsb3c::lbfgsb3(par=par, fn=fn, gr=gr, lower=lower,
+                                               upper=upper, control=control))
+  
+  output = list()
+  output$par  = xoutput$par
+  output$value = xoutput$value
+  output$counts = xoutput$counts
+  output$convergence = xoutput$convergence
+  output$message = xoutput$message
+  output$hessian = NULL
   
   return(output)
   
