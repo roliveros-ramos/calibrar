@@ -19,7 +19,7 @@ calibrate(
 )
 }
 \arguments{
-\item{par}{A numeric vector. The length of the par argument defines the 
+\item{par}{A numeric vector or list. The length of the par argument defines the 
 number of parameters to be estimated (i.e. the dimension of the problem).}
 
 \item{fn}{The function to be minimized.}

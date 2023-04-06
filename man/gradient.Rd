@@ -21,7 +21,7 @@ gradient(fn, x, method, control, ...)
 The gradient of \code{fn} at \code{x}.
 }
 \description{
-This function calculates the gradient of a function, numerically, including the positibility
+This function calculates the gradient of a function, numerically, including the possibility
 of doing it in parallel.
 }
 \examples{
