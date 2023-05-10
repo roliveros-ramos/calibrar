@@ -18,6 +18,7 @@ Imports:
   optimr, 
   foreach,
   parallel,
+  Rvmmin,
   stats,
   utils
 Suggests: 
