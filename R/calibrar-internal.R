@@ -284,12 +284,45 @@ format_difftime = function(x, y, ...) {
   
 }
 
+.checkParscale = function(control, npar) {
+  parscale = if(!is.null(control$parscale)) unlist(control$parscale) else rep(1, npar)
+  if(length(parscale) != npar) stop("Control argument 'parscale' is not compatible with par.")
+  return(parscale)
+}
+
+.checkFnscale = function(control) {
+  
+  fnscale  = control$fnscale
+  maximize = control$maximize
+  
+  if(is.null(fnscale)) {
+    if(is.null(maximize))  fnscale = +1
+    if(!is.null(maximize)) 
+      fnscale = if(isTRUE(maximize)) -1 else +1 
+  } else {
+    if(!is.null(maximize)) {
+      if(isTRUE(maximize) & fnscale > 0) stop("fnscale and maximize are not compatible.") 
+    }
+  }
+  if(fnscale == 0) stop("Control argument 'fnscale' cannot be zero!")
+  
+  return(fnscale)
+  
+}
+
 .optPopSize = function(n, selection) floor(0.5*(4 + floor(3*log(n)))/selection)
 
 .checkControl = function(control, method, par, fn, active, skeleton, replicates=1, ...) {
   
   fn = match.fun(fn)
 
+  con = list(trace = 0, fnscale = 1, parscale = rep.int(1L, length(which(active))),
+             nvar=NULL, aggFn=.weighted.sum,
+             stochastic=FALSE, 
+             ncores=parallel::detectCores(), parallel=FALSE, 
+             run=NULL, master=NULL, restart.file=NULL,
+             verbose=FALSE)
+  
   # specific options must be taken in .ahres.  
   con = list(trace = 0, fnscale = 1, parscale = rep.int(1L, length(which(active))), maxit = NULL, maxgen=NULL,
              abstol = -Inf, reltol = sqrt(.Machine$double.eps), REPORT = 10L, ncores=parallel::detectCores(), 
