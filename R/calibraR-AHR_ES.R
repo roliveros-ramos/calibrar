@@ -1,4 +1,132 @@
 
+.ahres = function(par, fn, gr, lower, upper, control, method, hessian, isActive) {
+  
+  pathTmp = getwd()               # get the current path
+  on.exit(setwd(pathTmp))         # back to the original path after execution
+  
+  # control options
+  # function modification
+  
+  copyMaster(control) # set a copy of master for all individuals
+  
+  # get restart for the current phase
+  restart = .restartCalibration(control) # flag: TRUE or FALSE
+  if(isTRUE(restart)) {
+    
+    res = .getRestart(control=control)
+    opt   = res$opt
+    trace = res$trace
+    
+    .messageByGen(opt, trace, restart=TRUE)
+    
+  } else {
+    
+    opt = .newOpt(par=par, lower=lower, upper=upper, control=control)
+    
+    trace = NULL
+    
+    if(control$REPORT>0 & control$trace>0) {
+      
+      trace = list()
+      trace$control = control
+      trace$par   = matrix(NA, nrow=control$maxgen, ncol=length(isActive))
+      trace$value = rep(NA, control$maxgen)
+      trace$best  = rep(NA, control$maxgen)
+      
+      if(control$trace>1) {
+        trace$sd   = matrix(NA, nrow=control$maxgen, ncol=length(isActive))   
+        trace$step = rep(NA, control$maxgen)     
+      }
+      
+      if(control$trace>2) trace$fitness = NULL
+      
+      if(control$trace>3) trace$opt = vector("list", control$maxgen)
+      
+    }
+  }
+  
+  # start new optimization
+  while(isTRUE(.continueEvolution(opt, control))) {
+    
+    tm1 = Sys.time()
+    
+    opt$gen  = opt$gen + 1
+    opt$ages = opt$ages + 1
+    
+    # 1. create a new population
+    if(all(opt$SIGMA==0)) break
+    opt$pop = .createPopulation(opt)
+    
+    # 2. evaluate the function in the population: evaluate fn, aggregate fitness
+    opt$fitness = .calculateFitness(opt, fn=fn)
+    
+    # 3. select best 'individuals'
+    opt$selected = .selection(opt)
+    
+    # 4. create the new parents: MU and SD
+    opt = .calculateOptimalWeights(opt)
+    opt = .updatePopulation(opt)
+    
+    # save detailed outputs
+    if(control$REPORT>0 & control$trace>0) {
+      
+      trace$par[opt$gen, ] = opt$MU
+      trace$best[opt$gen]  = opt$selected$best$fit.global
+      trace$value[opt$gen] = control$aggFn(opt$fitness[1, ], control$weights)
+      
+      if(control$trace>1) {
+        trace$sd[opt$gen, ]  = opt$SIGMA
+        trace$step[opt$gen]  = opt$step       
+      }
+      
+      if(control$trace>2) {
+        
+        if(is.null(trace$fitness)) 
+          trace$fitness = matrix(NA, nrow=control$maxgen, ncol=ncol(opt$fitness))
+        
+        if(nrow(trace$fitness) < control$maxgen) {
+          .nt = nrow(trace$fitness)
+          trace$fitness = rbind(trace$fitness, 
+                                matrix(NA, nrow=control$maxgen-.nt, ncol=ncol(opt$fitness))) 
+        }
+        
+        trace$fitness[opt$gen, ] = opt$fitness[1, , drop=FALSE]
+        
+      }
+      
+      if(opt$gen%%control$REPORT==0) {
+        if(control$trace>3) trace$opt[[opt$gen]] = opt
+      }
+      
+    }
+    
+    # save restart
+    .createRestartFile(opt=opt, trace=trace, control=control)
+    tm2 = Sys.time()
+    
+    if(control$verbose & opt$gen%%control$REPORT==0) {
+      .messageByGen(opt, trace, level=control$trace, long=format_difftime(tm1, tm2))
+    }
+    
+    
+  } # end generations loop
+  
+  partial = fn(opt$MU, .i=0)
+  value = control$aggFn(x=partial, w=control$weights) # check if necessary
+  names(opt$MU) = names(par)
+  opt$counts = c('function'=opt$gen*control$popsize, generations=opt$gen)
+  
+  output = list(par=opt$MU, value=value, counts=opt$counts, 
+                trace=trace, partial=partial, convergence=1)
+  
+  
+  return(output)
+  
+}
+
+
+# Auxiliar functions ------------------------------------------------------
+
 .continueEvolution = function(opt, control) {
   out = (opt$gen <= (control$maxgen - 1)) & (opt$step >= control$convergence)
 #   out = (opt$gen <= control$maxit)
