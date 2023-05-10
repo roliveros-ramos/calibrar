@@ -1,6 +1,5 @@
 tfn = function(x) sum(x^2) + 10
 
-
 # optim2 ------------------------------------------------------------------
 
 algorithms = c("Nelder-Mead", "BFGS", "L-BFGS-B", "CG", "SANN",
