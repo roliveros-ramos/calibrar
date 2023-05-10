@@ -65,7 +65,7 @@
   calibrationInfo$weight     = 1
   calibrationInfo$use_data   = TRUE
   calibrationInfo$file       = file.path("data", paste0(calibrationInfo$variable, ".csv"))
-  calibrationInfo$varid      = "x"
+  calibrationInfo$varid      = paste0("L", sprintf(paste0("%0", nsites, "d"), seq_len(L)))
   
   calibrationInfo = as.data.frame(calibrationInfo)
   
@@ -86,7 +86,8 @@
   
   constants = list(T=T, L=L)
   
-  output = c(list(path=main.folder, par=par_real), constants, parInfo)
+  output = c(list(path=main.folder, par=par_real, 
+                  file=file.path(main.folder, "calibration_settings.csv")), constants, parInfo)
   
   return(output)
   
