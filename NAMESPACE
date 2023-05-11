@@ -3,6 +3,7 @@
 S3method(calibrate,default)
 S3method(coef,ahres.result)
 S3method(coef,calibrar.results)
+S3method(gradient,default)
 S3method(plot,ahres.result)
 S3method(plot,calibrar.results)
 S3method(plot,spline.par)

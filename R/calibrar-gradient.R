@@ -7,53 +7,42 @@
 #' @param x The value to compute the gradient at.
 #' @param method The method used. Currently implemented: central, backward, forward and Richardson. See details.
 #' @param control A list of control arguments. Notably, control$parallel=TRUE activates parallel computation.
+#' @param parallel Boolean, should numerical derivatives be calculated in parallel?
 #' @param ... Additional arguments to be passed to \code{fn}.
 #'
 #' @return The gradient of \code{fn} at \code{x}.
 #' @export
 #'
 #' @examples gradient(fn=function(x) sum(x^3))
-gradient = function(fn, x, method, control, ...) {
+gradient = function(fn, x, method, control, parallel, ...) {
   UseMethod("gradient")
 }
 
-gradient.default = function(fn, x, method=NULL, control=list(), ...) {
+#' @export
+gradient.default = function(fn, x, method=NULL, control=list(), parallel=FALSE, ...) {
 
   # cluster structure must be defined outside
   # by default, not running in parallel  
-  if(is.null(control$parallel)) control$parallel = FALSE
+
   if(is.null(method)) method = "richardson"
     
-  if(isTRUE(control$parallel)) {
-    
     df = switch(method,
-                central    = .grad_central_parallel(fn, x, control=control, ...),
-                forward    = .grad_simple_parallel(fn, x, side=+1, control=control, ...),
-                backward   = .grad_simple_parallel(fn, x, side=-1, control=control, ...),
-                richardson = .grad_richardson_parallel(fn, x, control=control, ...),
+                central    = .grad_central(fn, x, control=control, parallel=parallel, ...),
+                forward    = .grad_simple(fn, x, side=+1, control=control, parallel=parallel, ...),
+                backward   = .grad_simple(fn, x, side=-1, control=control, parallel=parallel, ...),
+                richardson = .grad_richardson(fn, x, control=control, parallel=parallel, ...),
                 stop("Undefined method for gradient computation."))
     
-  } else {
 
-    df = switch(method,
-                central    = .grad_central(fn, x, control=control, ...),
-                forward    = .grad_simple(fn, x, side=+1, control=control, ...),
-                backward   = .grad_simple(fn, x, side=-1, control=control, ...),
-                richardson = .grad_richardson(fn, x, control=control, ...),
-                stop("Undefined method for gradient computation."))
-    
-  }
-   
   return(df)
   
 }
-  
 
 # Implementation of methods for gradient computation ----------------------
 
-.grad_simple = function(fn, x, side=1, control=list(), ...) {
-  # simple method uses n+1 function evaluation, n can be parallelized,
-  # so computer time is 2 functions.
+.grad_simple = function(fn, x, side=1, control=list(), parallel=FALSE, ...) {
+  # simple method uses n+1 function evaluation, n+1 can be parallelized,
+  # so computer time is 1 function evaluation.
   
   n = length(x)
   
@@ -64,183 +53,135 @@ gradient.default = function(fn, x, method=NULL, control=list(), ...) {
   
   h = .get_h(x, control, method="simple")*side
   
-  fx = fn(x, ...)
-  
-  df = rep(NA_real_, n)
-  
-  for(i in seq_len(n)) {
-    dx = h*(i == seq_len(n))
-    df[i] = (fn(x + dx, ...) - fx)/h[i]
+  if(!isTRUE(parallel)) {
+    
+    fx = fn(x, ...)
+    df = rep(NA_real_, n)
+    for(i in seq_len(n)) {
+      dx = h*(i == seq_len(n))
+      df[i] = (fn(x + dx, ...) - fx)/h[i]
+    }
+    
+  } else {
+    
+    DX = diag(n+1)
+    diag(DX) = c(0, h)
+    
+    f = foreach(i=seq(from=1, to=n+1), .combine=c, .verbose=FALSE, .inorder=TRUE) %dopar% {
+      dx  = DX[i, ]
+      fi = fn(x + dx, ...)
+      fi
+    }
+    fx = f[1] # fx = f(i=0)
+    df = (f[-1] - fx)/h
+    
   }
+
+  
   return(df)
 }
 
 
-.grad_central = function(fn, x, control=list(), ...) {
-  # central method uses 2*n function evaluation, n can be parallelized,
-  # so computing time is 2 functions.
+.grad_central = function(fn, x, control=list(), parallel=FALSE, ...) {
+  # central method uses 2*n function evaluation, 2*n can be parallelized,
+  # so computing time is 1 function evaluation.
   
   n = length(x)
-
   h = .get_h(x, control, method="simple")
   
-  df = rep(NA_real_, n)
-  
-  for(i in seq_len(n)) {
-    dx = h*(i == seq_len(n))
-    df[i] = (fn(x + dx, ...) - fn(x - dx, ...))/(2*h[i])
+  if(!isTRUE(parallel)) {
+    
+    df = rep(NA_real_, n)
+    for(i in seq_len(n)) {
+      dx = h*(i == seq_len(n))
+      df[i] = (fn(x + dx, ...) - fn(x - dx, ...))/(2*h[i])
+    }    
+    
+  } else {
+    
+    DX = diag(2*n)
+    diag(DX) = c(h, -h)
+
+    f = foreach(i=seq(from=1, to=2*n), .combine=c, .verbose=FALSE, .inorder=TRUE) %dopar% {
+      dx = DX[i, ]
+      fi = fn(x + dx, ...)
+      fi
+    }
+    fp = head(f, n)
+    fm = tail(f, n)
+    df = (fp - fm)/(2*h)
+    
   }
   
   return(df)
 }
 
-.grad_richardson = function(fn, x, control=list(), ...) {
-  # richardson method uses 2*r*n function evaluations, n can be parallelized,
-  # so computing time is 2*r. The default is r=4, so 8 function evaluations eq,
-  # and it's 4 times more costly than central or simple method.
+
+.grad_richardson = function(fn, x, control=list(), parallel=FALSE, ...) {
+  # richardson method uses 2*r*n function evaluations, 2*r*n can be parallelized,
+  # so computing time is 1 function evaluation.
 
   r = if(is.null(control$r)) 4 else control$r # number of iterations, by default 4.
   v = if(is.null(control$v)) 2 else control$v # reduction factor of h, by default 2.
   
   n = length(x)
-  
   h = .get_h(x, control, method="start")
-
-  DF = matrix(NA_real_, nrow=r, ncol=n)
   
-  for(k in seq_len(r)) {
+  if(!isTRUE(parallel)) {
     
-    # gradient as usual
-    for(i in seq_len(n)) {
-      
-      if((k > 1) && (abs(DF[(k - 1), i]) < 1e-20)) {
-        # set derivative to zero when below 1e-20, why hardcoded?
-        DF[k, i] = 0
-        
-      } else {
-        
-        dx = h*(i == seq_len(n))
-        DF[k, i] = (fn(x + dx, ...) - fn(x - dx, ...))/(2*h[i])
-        
-        if(any(is.na(DF[k, i])))
-          stop(sprintf("function returns NA at %g distance from x.", h))
-        
+    DF = matrix(NA_real_, nrow=r, ncol=n)
+    for(k in seq_len(r)) {
+      # gradient as usual
+      for(i in seq_len(n)) {
+        if((k > 1) && (abs(DF[(k - 1), i]) < 1e-20)) {
+          # set derivative to zero when below 1e-20, why hardcoded?
+          DF[k, i] = 0
+        } else {
+          dx = h*(i == seq_len(n))
+          DF[k, i] = (fn(x + dx, ...) - fn(x - dx, ...))/(2*h[i])
+          if(any(is.na(DF[k, i])))
+            stop(sprintf("function returns NA at %g distance from x.", h))
+        }
       }
+      # reduce h and try again
+      h = h/v
     }
-    # reduce h and try again
-    h = h/v
     
-  }
+  } else {
+    
+    H = matrix(NA_real_, nrow=r, ncol=n)
+    for(k in seq_len(r)) H[k, ] = h/(v^(k-1))
+    
+    DX = NULL
+    for(k in seq_len(r)) {
+      HX = diag(n)
+      diag(HX) = H[k, ]
+      DX = rbind(DX, HX, -HX)
+    }
+      
+    f = foreach(i=seq(from=1, to=2*r*n), .combine=c, .verbose=FALSE, .inorder=TRUE) %dopar% {
+      dx  = DX[i, ]
+      fi = fn(x + dx, ...)
+      fi
+    }
+    
+    f = matrix(f, nrow=r, ncol=2*n, byrow = TRUE)
+    fp = f[, 1:n, drop=FALSE]
+    fm = f[, -(1:n), drop=FALSE]
+    DF = (fp - fm)/(2*H)
+    
+  } # end of parallel conditional.
   
-  # ponderate all estimates
+  # ponderate all estimates (same for all cases)
   for(m in seq_len(r - 1)) {
-    
     ind0 = 2:(r + 1 - m)
     ind1 = 1:(r - m)
     DF = (DF[ind0, , drop = FALSE]*(4^m) - DF[ind1, , drop = FALSE])/(4^m - 1)
-    
   }
   
   return(as.numeric(DF))
   
 }
-
-
-# Implementation of methods in parallel -----------------------------------
-
-.grad_simple_parallel = function(fn, x, side=1, control=list(), ...) {
-  # simple method uses n+1 function evaluation, n+1 can be paralleled,
-  # so computer time is 1 functions.
-  
-  n = length(x)
-  
-  if(length(side)==1)   side = rep(side, n)
-  if(length(side)!=n)   stop("Argument 'side' should have the same length as x.")
-  if(any(is.na(side)))  side[is.na(side)] = 1
-  if(any(abs(side)!=1)) stop("Argument 'side' should have values +1 or -1.")
-  
-  h = .get_h(x, control, method="simple")*side
-  
-  DX = rbind(0, diag(h))
-  
-  f = foreach(i=seq(from=1, to=n+1), .combine=c, .verbose=FALSE, .inorder=TRUE) %dopar% {
-    dx  = DX[i, ]
-    fi = fn(x + dx, ...)
-    fi
-  }
-  
-  fx = f[1] # fx = f(i=0)
-  df = (f[-1] - fx)/h
-  
-  return(df)
-}
-
-
-
-.grad_central_parallel = function(fn, x, control=list(), ...) {
-  # central method uses 2*n function evaluation, 2*n can be paralleled,
-  # so computing time is 1 function.
-  
-  n = length(x)
-  
-  h = .get_h(x, control, method="simple")
-
-  DX = rbind(diag(h), diag(-h)) 
-  
-  f = foreach(i=seq(from=1, to=2*n), .combine=c, .verbose=FALSE, .inorder=TRUE) %dopar% {
-    dx  = DX[i, ]
-    fi = fn(x + dx, ...)
-    fi
-  }
-  
-  fp = head(f, n)
-  fm = tail(f, n)
-  df = (fp - fm)/(2*h)
-  
-  return(df)
-}
-
-.grad_richardson_parallel = function(fn, x, control=list(), ...) {
-  # richardson method uses 2*r*n function evaluations, 2*r*n can be paralleled,
-  # so computing time is 1 function. 
-  
-  r = if(is.null(control$r)) 4 else control$r # number of iterations, by default 4.
-  v = if(is.null(control$v)) 2 else control$v # reduction factor of h, by default 2.
-  
-  n = length(x)
-  
-  h = .get_h(x, control, method="start")
-  
-  H = matrix(NA_real_, nrow=r, ncol=n)
-  for(k in seq_len(r)) H[k, ] = h/(v^(k-1))
-  
-  DX = NULL
-  for(k in seq_len(r)) DX = rbind(DX, diag(H[k, ]), diag(-H[k, ]))
-  
-  f = foreach(i=seq(from=1, to=2*r*n), .combine=c, .verbose=FALSE, .inorder=TRUE) %dopar% {
-    dx  = DX[i, ]
-    fi = fn(x + dx, ...)
-    fi
-  }
-  
-  f = matrix(f, nrow=r, ncol=2*n, byrow = TRUE)
-  fp = f[, 1:n]
-  fm = f[, -(1:n)]
-  DF = (fp - fm)/(2*H)
-  
-  # ponderate all estimates
-  for(m in seq_len(r - 1)) {
-    ind0 = 2:(r + 1 - m)
-    ind1 = 1:(r - m)
-    DF = (DF[ind0, , drop = FALSE]*(4^m) - DF[ind1, , drop = FALSE])/(4^m - 1)
-  }
-  
-  df = as.numeric(DF)
-  
-  return(df)
-  
-}
-
 
 
 # Auxiliar functions ------------------------------------------------------
