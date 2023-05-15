@@ -1,6 +1,10 @@
+library(calibrar)
+
 tfn = function(x) sum(x^3 + 10*x) 
 
 # gradient ----------------------------------------------------------------
+
+foreach::registerDoSEQ()
 
 methods = c("forward", "backward", "central", "richardson")
 
