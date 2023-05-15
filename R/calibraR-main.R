@@ -46,7 +46,7 @@ NULL
 
 # calibrate ---------------------------------------------------------------
 
-#' @title Sequential parameter estimation for the calibration of models
+#' @title Sequential parameter estimation for the calibration of complex models
 #' @description This function performs the optimization of a function, possibly 
 #' in sequential phases of increasing complexity, and it is designed for the 
 #' calibration of a model, by minimizing the error function \code{fn} associated to it.  
@@ -243,7 +243,6 @@ calibrate.default = function(par, fn, gr = NULL, ...,
 #'
 #' @param active Boolean vector of the same length as par, indicating if the 
 #' parameter is used in the optimization (TRUE) or hold at a fixed value (FALSE).
-#' @param parallel Use parallel computation of gradients? 
 #'
 #' @export
 #'
@@ -349,7 +348,7 @@ optim2 = function(par, fn, gr = NULL, ...,
            "hjn"         = .hjn(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian), 
            "spg"         = .spg(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian), 
            "LBFGSB3"     = .lbfgsb3(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian), 
-           "AHR-ES"      = ahres(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian), 
+           "AHR-ES"      = .ahres(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian), 
            stop(printf("UNSUPPORTED METHOD: %s.", sQuote(method)), call. = FALSE)
     )
   
@@ -371,75 +370,80 @@ optim2 = function(par, fn, gr = NULL, ...,
 #' derivative-free and black-box optimization 
 #' @description This function performs the optimization of a function using 
 #' the Adaptative Hierarchical Recombination Evolutionary Strategy (AHR-ES, Oliveros & Shin, 2015). 
-#' @param par A numeric vector. The length of the par argument defines the 
-#' number of parameters to be estimated (i.e. the dimension of the problem).
-#' @param fn The function to be minimized.
-#' @param gr the gradient of \code{fn}. Ignored, added for portability with
-#' other optimization functions.
-#' @param \dots Additional parameters to be passed to \code{fn}.
-#' @param lower Lower threshold value(s) for parameters. One value or a vector 
-#' of the same length as par. If one value is provided, it is used for all 
-#' parameters. \code{NA} means \code{-Inf}. By default \code{-Inf} is used (unconstrained).
-#' @param upper Upper threshold value(s) for parameters. One value or a vector 
-#' of the same length as par. If one value is provided, it is used for all 
-#' parameters. \code{NA} means \code{Inf}. By default \code{Inf} is used (unconstrained). 
-#' @param active A boolean vector of the same length of \code{par}. If \code{TRUE}, the
-#' parameter is optimized, if \code{FALSE} the parameter is fixed to the value specified
-#' in \code{par}.
-#' @param control Parameter for the control of the algorithm itself, see details.
-#' @param hessian Logical. Should a numerically differentiated Hessian matrix be returned?
-#' Currently not implemented. 
-#' @param method The optimization method to be used. Currently, the only implemented
-#' is the 'default' method, corresponding to the AHR-ES (Oliveros & Shin, 2015).
+#'
 #' @author Ricardo Oliveros-Ramos
 #' @examples
 #' ahres(par=rep(1, 5), fn=sphereN)
+#' @inheritParams calibrate
+#' @inheritParams optim2
 #' @export
-ahres = function(par, fn, gr = NULL, ..., lower = -Inf, upper = Inf, active=NULL, 
-                    control = list(), hessian = FALSE, method = "default") {
+ahres = function(par, fn, gr = NULL, ..., lower = -Inf, upper = +Inf, active = NULL, 
+                 control = list(), hessian = FALSE, parallel=FALSE) {
   
+  # par can be a list
+  skeleton = as.relistable(par)
+  par    = unlist(par)
+  lower  = unlist(lower)
+  upper  = unlist(upper)
+  active = unlist(active)
   
   npar = length(par)
-
-  if(is.null(names(par))) names(par) = .printSeq(npar, preffix="par")
   
-  active = .checkActive(active=active, npar=npar)
-  bounds = .checkBounds(lower=lower, upper=upper, npar=npar)
-  guess  = .checkOpt(par=par, lower=bounds$lower, upper=bounds$upper)
+  # par can be re-scaled
+  parscale = .checkParscale(control=control, npar=npar)
+  control$parscale = NULL # reset parscale
+  
+  par   = par/parscale
+  lower = lower/parscale
+  upper = upper/parscale
+  
+  # function can be re-scaled
+  fnscale = .checkFnscale(control=control)
+  control$fnscale = NULL # reset fnscale
+  
+  # Checking par
+  active     = .checkActive(active=active, npar=npar)
+  bounds     = .checkBounds(lower=lower, upper=upper, npar=npar)
+  guess      = .checkOpt(par=par, lower=bounds$lower, upper=bounds$upper)
+  
+  par     = guess
+  lower   = bounds$lower
+  upper   = bounds$upper
   
   isActive = which(active)
   activeFlag = isTRUE(all(active))
   
-  par    = guess[isActive]
-  lower  = bounds$lower[isActive]
-  upper  = bounds$upper[isActive]
+  if(is.null(names(par))) names(par) = .printSeq(npar, preffix="par")
   
-  npar = length(par)
+  # getting functions
+  fn = match.fun(fn)
+  if(!is.null(gr)) warning("Gradient ignored by this method.")
   
-  # closure for function evaluation
-  fn   = match.fun(fn)
-  
-  control = .checkControl(control=control, method=method, par=par, fn=fn, active=active, ...)
-  
-  fn1  = function(par, ..i=0) {
+  # when 'parscale' and 'fnscale' are supplied, 
+  # optimization is carried out over the scaled function
+  fn1  = function(par) {
     parx = guess
     parx[isActive] = par
-    fn(parx, ...)/control$fnscale
+    parx = relist(flesh = parx*parscale, skeleton = skeleton)
+    output = fn(parx, ...)/fnscale
+    return(output)
   }
   
-  output = .ahres(par=par, fn=fn1, lower=lower, upper=upper, control=control, isActive = isActive)
+  # here, make methods explicit (one by one)
+  output = .ahres(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian)
   
+  # reshaping full parameters, un-scaling par
   paropt = guess
-  paropt[isActive] = output$par 
+  paropt[isActive] = output$par
+  paropt = paropt*parscale
   output$par = paropt
-  
-  if(is.null(names(output$par))) names(output$par) = .printSeq(npar, preffix="par")
+  # value need to be unscaled
+  output$value = output$value*fnscale
   
   output = c(output, active=list(par=isActive, flag=activeFlag))
-  
   class(output) = c("ahres.result", class(output))
   
-  return(output)
+  return(output) 
   
 }
 

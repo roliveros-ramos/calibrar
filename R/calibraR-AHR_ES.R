@@ -111,7 +111,7 @@
     
   } # end generations loop
   
-  partial = fn(opt$MU, .i=0)
+  partial = fn(opt$MU, ..i=0)
   value = control$aggFn(x=partial, w=control$weights) # check if necessary
   names(opt$MU) = names(par)
   opt$counts = c('function'=opt$gen*control$popsize, generations=opt$gen)
@@ -233,7 +233,7 @@
     
     FITNESS  =  foreach(i=0:(opt$seed-1), .verbose=FALSE, .inorder=FALSE) %dopar% {
 
-      Fitness = fn(pop[, i+1], .i=i)  # internally set to ith wd
+      Fitness = fn(pop[, i+1], ..i=i)  # internally set to ith wd
       if(is.null(Fitness)) {
         .write_calibrar_dump(run=run, gen=gen, i=i)
       }
@@ -252,7 +252,7 @@
     
     for(i in 0:(opt$seed-1)) {
       
-      Fitness = fn(pop[,i+1], .i=i)
+      Fitness = fn(pop[,i+1], ..i=i)
       if(is.null(Fitness)) {
         .write_calibrar_dump(run=run, gen=gen, i=i)
         Fitness = Inf
