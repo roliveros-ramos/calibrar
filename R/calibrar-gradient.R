@@ -24,8 +24,7 @@ gradient.default = function(fn, x, method=NULL, control=list(), parallel=FALSE, 
   # cluster structure must be defined outside
   # by default, not running in parallel  
 
-  
-  use_disk = ifelse(!is.null(attr(fn1, "..i")), TRUE, FALSE) 
+  use_disk = ifelse(!is.null(attr(fn, "..i")), TRUE, FALSE) 
   
   if(is.null(method)) method = "richardson"
     
