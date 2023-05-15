@@ -74,6 +74,7 @@ NULL
 #' @param replicates The number of replicates for the evaluation of \code{fn}.
 #' The default value is 1. A value greater than 1 is only useful for stochastic
 #' functions.
+#' @param parallel Logical. Use parallel computation of gradients?  
 #' @details In the control list, \code{aggFn} is a function to aggregate \code{fn} to 
 #' a scalar value if the returned value is a vector. Some optimization algorithm can 
 #' exploite the additional information provided by a vectorial output from \code{fn}.
@@ -88,7 +89,7 @@ NULL
 #' }
 #' @export
 calibrate = function(par, fn, gr, ..., lower, upper, phases, method, control, 
-                     hessian, replicates) {
+                     hessian, replicates, parallel) {
   UseMethod("calibrate")
 }
 
@@ -96,14 +97,14 @@ calibrate = function(par, fn, gr, ..., lower, upper, phases, method, control,
 calibrate.default = function(par, fn, gr = NULL, ..., 
                              lower = NULL, upper = NULL, phases = NULL, 
                              method = "AHR-ES", control = list(), 
-                             hessian = FALSE, replicates=1) {
+                             hessian = FALSE, replicates=1, parallel=FALSE) {
   
   # check function and method
   multiMethods = "AHR-ES" # list of methods supporting multi-objective
   
   if(inherits(fn, "objFn") & !(method %in% multiMethods)) {
     agg = attr(fn, "aggregate")
-    if(is.null(agg)) warning("Update your objective function to the last version of the package.")
+    if(is.null(agg)) warning("Update your objective function to the last version of the 'calibrar' package.")
     if(!isTRUE(agg)) 
       stop(sprintf("Method '%s' does not support multi-objective optimization, use aggregate=TRUE in 'createObjectiveFunction'.",
                    method))
@@ -150,6 +151,8 @@ calibrate.default = function(par, fn, gr = NULL, ...,
   
   conv = .checkConvergence(control, nphases)
  
+  control$parallel = parallel
+  
   if(!is.null(control$master)) message(sprintf("Using 'master' directory: %s", control$master))
   if(!is.null(control$run)) message(sprintf("Using 'run' directory: %s", control$run))
    
@@ -418,7 +421,7 @@ ahres = function(par, fn, gr = NULL, ..., lower = -Inf, upper = Inf, active=NULL
   
   control = .checkControl(control=control, method=method, par=par, fn=fn, active=active, ...)
   
-  fn1  = function(par, .i=0) {
+  fn1  = function(par, ..i=0) {
     parx = guess
     parx[isActive] = par
     fn(parx, ...)/control$fnscale
