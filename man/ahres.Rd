@@ -11,15 +11,15 @@ ahres(
   gr = NULL,
   ...,
   lower = -Inf,
-  upper = Inf,
+  upper = +Inf,
   active = NULL,
   control = list(),
   hessian = FALSE,
-  method = "default"
+  parallel = FALSE
 )
 }
 \arguments{
-\item{par}{A numeric vector. The length of the par argument defines the 
+\item{par}{A numeric vector or list. The length of the par argument defines the 
 number of parameters to be estimated (i.e. the dimension of the problem).}
 
 \item{fn}{The function to be minimized.}
@@ -27,7 +27,7 @@ number of parameters to be estimated (i.e. the dimension of the problem).}
 \item{gr}{the gradient of \code{fn}. Ignored, added for portability with
 other optimization functions.}
 
-\item{\dots}{Additional parameters to be passed to \code{fn}.}
+\item{...}{Additional parameters to be passed to \code{fn}.}
 
 \item{lower}{Lower threshold value(s) for parameters. One value or a vector 
 of the same length as par. If one value is provided, it is used for all 
@@ -37,17 +37,15 @@ parameters. \code{NA} means \code{-Inf}. By default \code{-Inf} is used (unconst
 of the same length as par. If one value is provided, it is used for all 
 parameters. \code{NA} means \code{Inf}. By default \code{Inf} is used (unconstrained).}
 
-\item{active}{A boolean vector of the same length of \code{par}. If \code{TRUE}, the
-parameter is optimized, if \code{FALSE} the parameter is fixed to the value specified
-in \code{par}.}
+\item{active}{Boolean vector of the same length as par, indicating if the 
+parameter is used in the optimization (TRUE) or hold at a fixed value (FALSE).}
 
 \item{control}{Parameter for the control of the algorithm itself, see details.}
 
 \item{hessian}{Logical. Should a numerically differentiated Hessian matrix be returned?
 Currently not implemented.}
 
-\item{method}{The optimization method to be used. Currently, the only implemented
-is the 'default' method, corresponding to the AHR-ES (Oliveros & Shin, 2015).}
+\item{parallel}{Logical. Use parallel computation of gradients?}
 }
 \description{
 This function performs the optimization of a function using 

@@ -49,7 +49,7 @@ parameter is used in the optimization (TRUE) or hold at a fixed value (FALSE).}
 \item{hessian}{Logical. Should a numerically differentiated Hessian matrix be returned?
 Currently not implemented.}
 
-\item{parallel}{Use parallel computation of gradients?}
+\item{parallel}{Logical. Use parallel computation of gradients?}
 }
 \value{
 A list with components:

@@ -15,7 +15,8 @@ calibrate(
   method,
   control,
   hessian,
-  replicates
+  replicates,
+  parallel
 )
 }
 \arguments{
@@ -53,6 +54,8 @@ Currently not implemented.}
 \item{replicates}{The number of replicates for the evaluation of \code{fn}.
 The default value is 1. A value greater than 1 is only useful for stochastic
 functions.}
+
+\item{parallel}{Logical. Use parallel computation of gradients?}
 }
 \description{
 This function performs the optimization of a function, possibly 
