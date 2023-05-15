@@ -24,13 +24,16 @@ gradient.default = function(fn, x, method=NULL, control=list(), parallel=FALSE, 
   # cluster structure must be defined outside
   # by default, not running in parallel  
 
+  
+  use_disk = ifelse(!is.null(attr(fn1, "..i")), TRUE, FALSE) 
+  
   if(is.null(method)) method = "richardson"
     
     df = switch(method,
-                central    = .grad_central(fn, x, control=control, parallel=parallel, ...),
-                forward    = .grad_simple(fn, x, side=+1, control=control, parallel=parallel, ...),
-                backward   = .grad_simple(fn, x, side=-1, control=control, parallel=parallel, ...),
-                richardson = .grad_richardson(fn, x, control=control, parallel=parallel, ...),
+                central    = .grad_central(fn, x, control=control, parallel=parallel, use_disk=use_disk, ...),
+                forward    = .grad_simple(fn, x, side=+1, control=control, parallel=parallel, use_disk=use_disk, ...),
+                backward   = .grad_simple(fn, x, side=-1, control=control, parallel=parallel, use_disk=use_disk, ...),
+                richardson = .grad_richardson(fn, x, control=control, parallel=parallel, use_disk=use_disk, ...),
                 stop("Undefined method for gradient computation."))
     
 
@@ -40,7 +43,7 @@ gradient.default = function(fn, x, method=NULL, control=list(), parallel=FALSE, 
 
 # Implementation of methods for gradient computation ----------------------
 
-.grad_simple = function(fn, x, side=1, control=list(), parallel=FALSE, ...) {
+.grad_simple = function(fn, x, side=1, control=list(), parallel=FALSE, use_disk=FALSE, ...) {
   # simple method uses n+1 function evaluation, n+1 can be parallelized,
   # so computer time is 1 function evaluation.
   
@@ -55,11 +58,11 @@ gradient.default = function(fn, x, method=NULL, control=list(), parallel=FALSE, 
   
   if(!isTRUE(parallel)) {
     
-    fx = fn(x, ...)
+    fx = if(!use_disk) fn(x, ...) else fn(x)
     df = rep(NA_real_, n)
     for(i in seq_len(n)) {
       dx = h*(i == seq_len(n))
-      df[i] = (fn(x + dx, ...) - fx)/h[i]
+      df[i] = if(!use_disk) (fn(x + dx, ...) - fx)/h[i] else (fn(x + dx) - fx)/h[i]
     }
     
   } else {
@@ -69,20 +72,19 @@ gradient.default = function(fn, x, method=NULL, control=list(), parallel=FALSE, 
     
     f = foreach(i=seq(from=1, to=n+1), .combine=c, .verbose=FALSE, .inorder=TRUE) %dopar% {
       dx  = DX[i, ]
-      fi = fn(x + dx, ...)
+      fi = if(!use_disk) fn(x + dx, ...) else fn(x + dx, ..i=i)
       fi
     }
     fx = f[1] # fx = f(i=0)
     df = (f[-1] - fx)/h
     
   }
-
   
   return(df)
 }
 
 
-.grad_central = function(fn, x, control=list(), parallel=FALSE, ...) {
+.grad_central = function(fn, x, control=list(), parallel=FALSE, use_disk=FALSE, ...) {
   # central method uses 2*n function evaluation, 2*n can be parallelized,
   # so computing time is 1 function evaluation.
   
@@ -94,7 +96,7 @@ gradient.default = function(fn, x, method=NULL, control=list(), parallel=FALSE, 
     df = rep(NA_real_, n)
     for(i in seq_len(n)) {
       dx = h*(i == seq_len(n))
-      df[i] = (fn(x + dx, ...) - fn(x - dx, ...))/(2*h[i])
+      df[i] = if(!use_disk) (fn(x + dx, ...) - fn(x - dx, ...))/(2*h[i]) else (fn(x + dx) - fn(x - dx))/(2*h[i])
     }    
     
   } else {
@@ -104,7 +106,7 @@ gradient.default = function(fn, x, method=NULL, control=list(), parallel=FALSE, 
 
     f = foreach(i=seq(from=1, to=2*n), .combine=c, .verbose=FALSE, .inorder=TRUE) %dopar% {
       dx = DX[i, ]
-      fi = fn(x + dx, ...)
+      fi = if(!use_disk) fn(x + dx, ...) else fn(x + dx, ..i=i)
       fi
     }
     fp = head(f, n)
@@ -117,7 +119,7 @@ gradient.default = function(fn, x, method=NULL, control=list(), parallel=FALSE, 
 }
 
 
-.grad_richardson = function(fn, x, control=list(), parallel=FALSE, ...) {
+.grad_richardson = function(fn, x, control=list(), parallel=FALSE, use_disk=FALSE, ...) {
   # richardson method uses 2*r*n function evaluations, 2*r*n can be parallelized,
   # so computing time is 1 function evaluation.
 
@@ -138,7 +140,7 @@ gradient.default = function(fn, x, method=NULL, control=list(), parallel=FALSE, 
           DF[k, i] = 0
         } else {
           dx = h*(i == seq_len(n))
-          DF[k, i] = (fn(x + dx, ...) - fn(x - dx, ...))/(2*h[i])
+          DF[k, i] = if(!use_disk) (fn(x + dx, ...) - fn(x - dx, ...))/(2*h[i]) else (fn(x + dx) - fn(x - dx))/(2*h[i])
           if(any(is.na(DF[k, i])))
             stop(sprintf("function returns NA at %g distance from x.", h))
         }
@@ -161,7 +163,7 @@ gradient.default = function(fn, x, method=NULL, control=list(), parallel=FALSE, 
       
     f = foreach(i=seq(from=1, to=2*r*n), .combine=c, .verbose=FALSE, .inorder=TRUE) %dopar% {
       dx  = DX[i, ]
-      fi = fn(x + dx, ...)
+      fi = if(!use_disk) fn(x + dx, ...) else fn(x + dx, ..i=i)
       fi
     }
     
@@ -229,7 +231,7 @@ gradient.default = function(fn, x, method=NULL, control=list(), parallel=FALSE, 
 # Notes for future self ---------------------------------------------------
 
 # args: skeleton, active 
-# # here we have to transform fn so it takes .i and change folder to run if necessary.
+# # here we have to transform fn so it takes ..i and change folder to run if necessary.
 # skeleton = skeleton
 # if(is.null(skeleton)) skeleton = as.relistable(par)
 # 
@@ -256,10 +258,10 @@ gradient.default = function(fn, x, method=NULL, control=list(), parallel=FALSE, 
 # # 2. is re-listed according to skeleton
 # # 3. is re-scaled according to control$fnscale
 # # 4. is evaluated 'replicates' times
-# # 5. is evaluated in the 'control$run/.i' folder.
+# # 5. is evaluated in the 'control$run/..i' folder.
 # if(is.null(control$master)) {
 #   
-#   fn1  = function(x, .i=0) {
+#   fn1  = function(x, ..i=0) {
 #     
 #     parx = guess
 #     parx[isActive] = par
@@ -275,11 +277,11 @@ gradient.default = function(fn, x, method=NULL, control=list(), parallel=FALSE, 
 #   
 # } else {
 #   
-#   fn1  = function(par, .i=0) {
+#   fn1  = function(par, ..i=0) {
 #     
 #     cwd = getwd()
 #     on.exit(setwd(cwd))
-#     .setWorkDir(control$run, i=.i) 
+#     .setWorkDir(control$run, i=..i) 
 #     
 #     parx = guess
 #     parx[isActive] = par
