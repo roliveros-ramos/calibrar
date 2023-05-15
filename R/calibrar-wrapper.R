@@ -1,3 +1,6 @@
+
+# calibrate ---------------------------------------------------------------
+
 .calibrar = function (par, fn, gr = NULL, ..., lower = -Inf, upper = Inf, active=NULL, 
                       control = list(), hessian = FALSE, method = NULL, skeleton=NULL,
                       replicates=1) {
@@ -7,13 +10,26 @@
   
   npar = length(par)
   
+  parallel = control$parallel
+  
   # check active parameters
   active = .checkActive(active=active, npar=npar)
   isActive = which(active)
   activeFlag = isTRUE(all(active))
   
+  # par can be re-scaled
+  parscale = .checkParscale(control=control, npar=npar)
+  control$parscale = NULL # reset parscale
+  par   = par/parscale
+  lower = lower/parscale
+  upper = upper/parscale
+  
+  # function can be scaled
+  fnscale = .checkFnscale(control=control)
+  control$fnscale = NULL # reset fnscale
+  
   # update to active parameters only
-  guess  = par
+  guess  = par # the full original set of parameters
   par    = guess[isActive]
   lower  = lower[isActive]
   upper  = upper[isActive]
@@ -29,542 +45,126 @@
   control = .checkControl(control=control, method=method, par=guess, fn=fn, 
                           active=active, skeleton=skeleton, 
                           replicates=replicates, ...)
-
-  # here we modify 'fn' so:
-  # 1. use 'isActive' to mask some parameters ('guess' is reference)
-  # 2. is re-listed according to skeleton
-  # 3. is re-scaled according to control$fnscale
-  # 4. is evaluated 'replicates' times
-  # 5. is evaluated in the 'control$run/.i' folder.
-  if(is.null(control$master)) {
-    
-    fn1  = function(par, .i=0) {
-      
-      parx = guess
-      parx[isActive] = par
-      parx = relist(flesh = parx, skeleton = skeleton)
-      output = NULL
-      for(i in seq_len(replicates)) {
-        out = fn(parx, ...)/control$fnscale
-        output = rbind(output, t(as.matrix(out)))
-      }
-      if(is.null(output)) return(NULL)
-      return(as.numeric(colMeans(output)))
-      
-    }
-    
-  } else {
-
-    fn1  = function(par, .i=0) {
-      
-      cwd = getwd()
-      on.exit(setwd(cwd))
-      .setWorkDir(control$run, i=.i) 
-      
-      parx = guess
-      parx[isActive] = par
-      parx = relist(flesh = parx, skeleton = skeleton)
-      output = NULL
-      for(i in seq_len(replicates)) {
-        out = fn(parx, ...)/control$fnscale
-        output = rbind(output, t(as.matrix(out)))
-      }
-      if(is.null(output)) return(NULL)
-      return(as.numeric(colMeans(output)))
-      
-    }
-    
-  } # end fn1
   
+  run = control$run
+
   # this need to be added so functions can use disk (specially in parallel)
   # add to every function calling the wrappers
   pathTmp = getwd()               # get the current path
   on.exit(setwd(pathTmp))         # back to the original path after execution
   
-  imethod = "default"
-  optimMethods  = c("Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN",
-                    "Brent")
-  optimxMethods = c("nlm", "nlminb", "spg", "ucminf", "newuoa", "bobyqa")
-  psoMethods    = c("PSO", "PSO2007", "PSO2011", "hybridPSO")
-  dfMethods     = c("nmkb", "hjkb", "mads")
+  # here we modify 'fn' so:
+  # 0. it is evaluated in the '$run/..i' folder if necessary
+  # 1. use 'isActive' to mask some parameters ('guess' is reference)
+  # 2. is re-listed according to skeleton
+  # 3. is re-scaled according to control$fnscale and control$parscale
+  # 4. is evaluated a 'replicates' number of times
+  fn1  = function(par, ..i=0) {
+    
+    if(!is.null(run)) {
+      cwd = getwd()
+      on.exit(setwd(cwd))
+      .setWorkDir(run, i=..i) 
+    }
+    
+    parx = guess
+    parx[isActive] = par
+    parx = relist(flesh = parx*parscale, skeleton = skeleton)
+    output = NULL
+    for(i in seq_len(replicates)) {
+      out = fn(parx, ...)/fnscale
+      output = rbind(output, t(as.matrix(out)))
+    }
+    if(is.null(output)) return(NULL)
+    return(as.numeric(colMeans(output)))
+    
+  }
   
-  if(method %in% optimMethods) imethod = "optim"
-  if(method %in% optimxMethods) imethod = "optimx"
-  if(method %in% psoMethods) imethod = "pso"
-  if(method == "Rcgmin") imethod = "Rcgmin"  
-  if(method == "Rvmmin") imethod = "Rvmmin"  
-  if(method == "cmaes") imethod = "cmaes"  
-  if(method == "lbfgsb3") imethod = "lbfgsb3"  
-  if(method == "genSA") imethod = "genSA"
-  if(method == "soma") imethod = "soma"
-  if(method == "genoud") imethod = "genoud"
-  if(method == "DE") imethod = "DEoptim"
+  attr(fn1, "..i") = TRUE
   
+  # GRADIENT
+  gr.control = control$gradient
+  gr.method  = control$gr.method # if NULL, uses default.
+  
+  if(!is.null(gr)) {
+    # here we modify 'gr' so:
+    # 0. No modification, we assume gradient is computed in memmory.
+    # 1. use 'isActive' to mask some parameters ('guess' is reference)
+    # 2. is re-listed according to skeleton
+    # 3. is re-scaled according to control$fnscale and control$parscale
+    # 4. No replication: if provided, we assume is deterministic.
+    gr1  = function(par) {
+      parx = guess
+      parx[isActive] = par
+      parx = relist(flesh = parx*parscale, skeleton = skeleton)
+      grad = gr(parx, ...)*parscale/fnscale
+      grad = grad[isActive]
+      return(grad)
+    }
+  } else {
+    gr1  = function(par) {
+      # gradient is computed in the already re-scaled fn (fn1).
+      gradient(fn=fn1, x=par, method=gr.method, control=gr.control, parallel=parallel, ...)
+    }    
+  }
+  
+  # here, make methods explicit (one by one)
   output = 
-    switch(imethod, 
-           default = .ahres(par=par, fn=fn1, gr=gr, lower=lower, upper=upper, control=control, 
-                              hessian=hessian, method=method, isActive=isActive),
-           optim   = .optim(par=par, fn=fn1, gr=gr, lower=lower, upper=upper, control=control, 
-                            hessian=hessian, method=method),
-           optimx  = .optimx(par=par, fn=fn1, gr=gr, lower=lower, upper=upper, control=control, 
-                             hessian=hessian, method=method),
-           Rcgmin  = .Rcgmin(par=par, fn=fn1, gr=gr, lower=lower, upper=upper, control=control, 
-                             hessian=hessian, method=method),
-           Rvmmin  = .Rvmmin(par=par, fn=fn1, gr=gr, lower=lower, upper=upper, control=control, 
-                             hessian=hessian, method=method),
-           pso     = .pso(par=par, fn=fn1, gr=gr, lower=lower, upper=upper, control=control, 
-                          hessian=hessian, method=method),
-           cmaes   = .cmaes(par=par, fn=fn1, lower=lower, upper=upper, control=control),
-           lbfgsb3 = .lbfgsb3(par=par, fn=fn1, gr=gr, lower=lower, upper=upper, control=control, 
-                              hessian=hessian, method=method),
-           genSA   = .genSA(par=par, fn=fn1, gr=gr, lower=lower, upper=upper, control=control, 
-                            hessian=hessian, method=method),
-           soma    = .soma(par=par, fn=fn1, gr=gr, lower=lower, upper=upper, control=control, 
-                           hessian=hessian, method=method),
-           genoud  = .genoud(par=par, fn=fn1, gr=gr, lower=lower, upper=upper, control=control, 
-                             hessian=hessian, method=method),
-           DEoptim = .DE(par=par, fn=fn1, gr=gr, lower=lower, upper=upper, control=control, 
-                         hessian=hessian, method=method)
+    switch(method, 
+           "Nelder-Mead" = .optim(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian, method="Nelder-Mead"), 
+           "BFGS"        = .optim(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian, method="BFGS"), 
+           "CG"          = .optim(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian, method="CG"), 
+           "L-BFGS-B"    = .optim(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian, method="L-BFGS-B"),
+           "SANN"        = .optim(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian, method="SANN"),
+           "Brent"       = .optim(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian, method="Brent"), 
+           "nlm"         = .nlm(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian), 
+           "nlminb"      = .nlminb(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian), 
+           "Rcgmin"      = .Rcgmin(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian), 
+           "Rvmmin"      = .Rvmmin(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian), 
+           "hjn"         = .hjn(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian), 
+           "spg"         = .spg(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian), 
+           "LBFGSB3"     = .lbfgsb3(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian), 
+           "AHR-ES"      = .ahres(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian), 
+           stop(sprintf("UNSUPPORTED METHOD: %s.", sQuote(method)), call. = FALSE)
     )
   
   # reshaping full parameters
   paropt = guess
-  paropt[isActive] = output$par 
+  paropt[isActive] = output$par
+  paropt = paropt*parscale
+  
   if(is.null(names(paropt))) names(paropt) = .printSeq(npar, preffix="par")
   # here to rename 'par' to '.par'
+  output$par = paropt[isActive]
+  output$value = output$value*fnscale
   names(output)[names(output)=="par"] = ".par"
 
   # final outputs
   output = c(list(par=paropt), output, list(active=list(par=isActive, flag=activeFlag)))
   
-  class(output) = c("ahres.result", class(output)) # change name
-  
   return(output)
   
 }
 
 
-# wrapper for optimx ------------------------------------------------------
-
-.optimx = function(par, fn, gr, lower, upper, control, hessian, method) {
-  
-  pathTmp = getwd()               # get the current path
-  on.exit(setwd(pathTmp))         # back to the original path after execution
-  
-  parNames = names(par)
-  control = NULL # check!
-  
-  output = suppressWarnings(optimr::optimr(par=par, fn=fn, gr=gr, method=method, lower=lower, 
-                                        upper=upper, control=control, hessian=hessian))
-  
-  # names(output)[names(output)=="par"] = ".par"  
-  if(is.null(output$hessian)) output$hessian = NULL
-    
-  return(output)
-  
-}
-
-# wrapper for dfoptim -----------------------------------------------------
-
-.dfoptim = function(par, fn, gr, lower, upper, control, hessian, method) {
-  
-  pathTmp = getwd()               # get the current path
-  on.exit(setwd(pathTmp))         # back to the original path after execution
-  
-  parNames = names(par)
-  
-  control$trace = TRUE # 
-  control$info = control$trace
-  
-  ctl = switch(method,
-    mads = list(tol = 1e-06, 
-                maxfeval = 10000, 
-                maximize = FALSE, 
-                pollStyle = "lite", deltaInit = 0.01, expand = 4, 
-                lineSearch = 20, seed = 880820, trace = FALSE),
-    hjkb = list(tol = 1e-06, 
-                maxfeval = Inf, 
-                maximize = FALSE, 
-                target = Inf, info = FALSE),
-    nmkb = list(tol = 1e-06, 
-                maxfeval = min(5000, max(1500, 20 * length(par)^2)), 
-                maximize = FALSE,
-                regsimp = TRUE, restarts.max = 3, trace = FALSE)
-  )
-  
-  
-  control = NULL # check!
-  
-  out = suppressWarnings(switch(method,
-    mads = mads(par=par, fn=fn, lower=lower, upper=upper, scale=1, control=control),
-    hjkb = hjkb(par=par, fn=fn, lower=lower, upper=upper, control=control),
-    nmkb = nmkb(par=par, fn=fn, lower=lower, upper=upper, control=control)
-    ))
-  
-  counts = c('function'=out$feval, 'gradient'=0)
-  convergence = 0
-  
-  output = list(par=par, value=value, counts=counts, convergence=0)
-
-# tol
-# maxfeval
-# maximize
-  
-# mads control  
-# trace
-# pollStyle
-# deltaInit
-# expand
-# lineSearch
-# seed
-
-# nmkb control
-# regsimp
-# restarts.max
-# trace
-
-# hjkb control
-# target
-# info
-  
-  return(output)
-  
-}
-
-# mads(par, fn, lower=-Inf, upper=Inf, scale=1, control = list(), ...)
-# hjkb(par, fn, lower = -Inf, upper = Inf, control = list(), ...)
-# nmkb(par, fn, lower=-Inf, upper=Inf, control = list(), ...)
-
-# wrapper for Rcgmin ------------------------------------------------------
-
-.Rcgmin = function(par, fn, gr, lower, upper, control, hessian, method) {
-  
-  pathTmp = getwd()               # get the current path
-  on.exit(setwd(pathTmp))         # back to the original path after execution
-  
-  parNames = names(par)
-  control = NULL # check!
-  
-  output = suppressWarnings(Rcgmin::Rcgmin(par=par, fn=fn, gr=gr, lower=lower, 
-                                           upper=upper, control=control))
-  
-  # names(output)[names(output)=="par"] = ".par"
-  
-  return(output)
-  
-}
-
-# # wrapper for Rvmmin ----------------------------------------------------
-
-.Rvmmin = function(par, fn, gr, lower, upper, control, hessian, method) {
-  
-  pathTmp = getwd()               # get the current path
-  on.exit(setwd(pathTmp))         # back to the original path after execution
-  
-  parNames = names(par)
-  control = NULL # check!
-  
-  output = suppressWarnings(Rvmmin::Rvmmin(par=par, fn=fn, gr=gr, lower=lower, 
-                                           upper=upper, control=control))
-  
-  # names(output)[names(output)=="par"] = ".par"
-  
-  return(output)
-  
-}
-
-# wrapper for cma_es ------------------------------------------------------
-
-.cmaes = function(par, fn, lower, upper, control) {
-  
-  pathTmp = getwd()               # get the current path
-  on.exit(setwd(pathTmp))         # back to the original path after execution
-  
-  npar = length(unlist(par))
-  output = suppressWarnings(cmaes::cma_es(par=par, fn=fn, lower=lower, upper=upper, control=control))
-  
-  if(is.null(output$par)) {
-    output$par = relist(rep(NA, npar), skeleton=par)
-    if(!is.finite(output$value)) warning("Infinite value reached for fn.")
-  }
-  
-  # names(output)[names(output)=="par"] = ".par"
-  
-  return(output)
-  
-}
-
-# wrapper for lbfgsb3 -----------------------------------------------------
-
-.lbfgsb3 = function(par, fn, gr, lower, upper, control, hessian, method) {
-  
-  pathTmp = getwd()               # get the current path
-  on.exit(setwd(pathTmp))         # back to the original path after execution
-  
-  ctrl = list(maxit = 500, trace = 0, iprint = 0L)
-  control[!(names(control) %in% names(ctrl))] = NULL
-  
-  xoutput = suppressWarnings(lbfgsb3c::lbfgsb3(par=par, fn=fn, gr=gr, lower=lower,
-                                              upper=upper, control=control))
-  
-  output = list()
-  output$par  = xoutput$par
-  output$value = xoutput$value
-  output$counts = xoutput$counts
-  output$convergence = xoutput$convergence
-  output$message = NULL
-  
-  return(output)
-  
-}
-
-# wrapper for genSA -------------------------------------------------------
-
-.genSA = function(par, fn, gr, lower, upper, control, hessian, method) {
-  
-  pathTmp = getwd()               # get the current path
-  on.exit(setwd(pathTmp))         # back to the original path after execution
-  
-  output = suppressWarnings(GenSA::GenSA(par=par, fn=fn, lower=lower, 
-                                         upper=upper, control=control))
-  
-  # names(output)[names(output)=="par"] = ".par"
-  output$counts = c('function'=output$counts,
-                    gradient=NA)
-  
-  return(output)
-  
-}
-# wrapper for DEoptim -----------------------------------------------------
-
-.DE = function(par, fn, gr, lower, upper, control, hessian, method) {
-  
-  pathTmp = getwd()               # get the current path
-  on.exit(setwd(pathTmp))         # back to the original path after execution
-  
-  if(isTRUE(control$parallel)) control$parallelType=2
-  
-  ctrl = DEoptim::DEoptim.control()
-  control[!(names(control) %in% names(ctrl))] = NULL
-  
-  # think how to pass 'par'. Initial pop?
-  xoutput = suppressWarnings(DEoptim::DEoptim(fn=fn, lower=lower, upper=upper, control=control))
-  
-  output = list()
-  output$par  = xoutput$optim$bestmem
-  output$value = xoutput$optim$bestval
-  output$counts = c('function'=xoutput$optim$nfeval,
-                    gradient=NA)
-  output$convergence = NA
-  output$message = NULL
-  
-  return(output)
-  
-}
-# wrapper for soma --------------------------------------------------------
-
-.soma = function(par, fn, gr, lower, upper, control, hessian, method) {
-  
-  pathTmp = getwd()               # get the current path
-  on.exit(setwd(pathTmp))         # back to the original path after execution
-  
-  control = NULL # check!
-  
-  xoutput = suppressWarnings(soma::soma(costFunction=fn, 
-                                        bounds=list(min=lower, max=upper), 
-                                        options=control))
-  
-  output = list()
-  output$par  = xoutput$population[, xoutput$leader]
-  output$value = xoutput$cost[xoutput$leader]
-  output$counts = c('function'=xoutput$migrations*length(xoutput$cost),
-                    gradient=NA)
-  output$convergence = NA
-  output$message = NULL
-  
-  return(output)
-  
-}
-
-# wrapper for genoud ------------------------------------------------------
-
-.genoud = function(par, fn, gr, lower, upper, control, hessian, method) {
-  
-  pathTmp = getwd()               # get the current path
-  on.exit(setwd(pathTmp))         # back to the original path after execution
-  
-  print.level = if(control$verbose) control$trace else 0
-  
-  output = suppressWarnings(rgenoud::genoud(fn=fn, nvars=length(par), starting.values=par, 
-                                            Domains = cbind(lower, upper),
-                                            print.level=print.level))
-  
-  # names(output)[names(output)=="par"] = ".par"
-  output$counts = c('function'=output$popsize*output$generations, gradient=NA)
-  return(output)
-  
-}
-
-# wrapper for pso ---------------------------------------------------------
-
-.pso = function(par, fn, gr, lower, upper, control, hessian, method) {
-  
-  pathTmp = getwd()               # get the current path
-  on.exit(setwd(pathTmp))         # back to the original path after execution
-  
-  hybrid = if(method=="hybridPSO") TRUE else FALSE
-  method = if(any(method=="PSO", method=="PSO2007", method=="hybridPSO")) 
-    "SPSO2007" else "SPSO2011"
-  
-  control = c(control, type=method, hybrid=hybrid)
-  
-  output = suppressWarnings(pso::psoptim(par=par, fn=fn, gr=gr, lower=lower, 
-                                         upper=upper, control=control))
-  
-  # names(output)[names(output)=="par"] = ".par"
-  
-  return(output)
-  
-}
-
-# ahres internal ----------------------------------------------------------
+# optimh ------------------------------------------------------------------
 
 
-.ahres = function(par, fn, gr, lower, upper, control, method, hessian, isActive) {
-  
-  pathTmp = getwd()               # get the current path
-  on.exit(setwd(pathTmp))         # back to the original path after execution
- 
-  copyMaster(control) # set a copy of master for all individuals
+# Manage control options --------------------------------------------------
 
-  # get restart for the current phase
-  restart = .restartCalibration(control) # flag: TRUE or FALSE
-  if(isTRUE(restart)) {
-    
-    res = .getRestart(control=control)
-    opt   = res$opt
-    trace = res$trace
-    
-    .messageByGen(opt, trace, restart=TRUE)
-    
-  } else {
-    
-    opt = .newOpt(par=par, lower=lower, upper=upper, control=control)
-    
-    trace = NULL
-    
-    if(control$REPORT>0 & control$trace>0) {
-      
-      trace = list()
-      trace$control = control
-      trace$par   = matrix(NA, nrow=control$maxgen, ncol=length(isActive))
-      trace$value = rep(NA, control$maxgen)
-      trace$best  = rep(NA, control$maxgen)
-      
-      if(control$trace>1) {
-        trace$sd   = matrix(NA, nrow=control$maxgen, ncol=length(isActive))   
-        trace$step = rep(NA, control$maxgen)     
-      }
-      
-      if(control$trace>2) trace$fitness = NULL
-      
-      if(control$trace>3) trace$opt = vector("list", control$maxgen)
-      
-    }
-  }
-  
-  # start new optimization
-  while(isTRUE(.continueEvolution(opt, control))) {
-    
-    tm1 = Sys.time()
-    
-    opt$gen  = opt$gen + 1
-    opt$ages = opt$ages + 1
-    
-    # 1. create a new population
-    if(all(opt$SIGMA==0)) break
-    opt$pop = .createPopulation(opt)
-    
-    # 2. evaluate the function in the population: evaluate fn, aggregate fitness
-    opt$fitness = .calculateFitness(opt, fn=fn)
-    
-    # 3. select best 'individuals'
-    opt$selected = .selection(opt)
-    
-    # 4. create the new parents: MU and SD
-    opt = .calculateOptimalWeights(opt)
-    opt = .updatePopulation(opt)
-    
-    # save detailed outputs
-    if(control$REPORT>0 & control$trace>0) {
-      
-      trace$par[opt$gen, ] = opt$MU
-      trace$best[opt$gen]  = opt$selected$best$fit.global
-      trace$value[opt$gen] = control$aggFn(opt$fitness[1, ], control$weights)
-      
-      if(control$trace>1) {
-        trace$sd[opt$gen, ]  = opt$SIGMA
-        trace$step[opt$gen]  = opt$step       
-      }
-      
-      if(control$trace>2) {
-        
-        if(is.null(trace$fitness)) 
-          trace$fitness = matrix(NA, nrow=control$maxgen, ncol=ncol(opt$fitness))
-        
-        if(nrow(trace$fitness) < control$maxgen) {
-          .nt = nrow(trace$fitness)
-          trace$fitness = rbind(trace$fitness, 
-                                matrix(NA, nrow=control$maxgen-.nt, ncol=ncol(opt$fitness))) 
-        }
-          
-        trace$fitness[opt$gen, ] = opt$fitness[1, , drop=FALSE]
-        
-      }
-      
-      if(opt$gen%%control$REPORT==0) {
-        if(control$trace>3) trace$opt[[opt$gen]] = opt
-      }
-
-    }
-    
-    # save restart
-    .createRestartFile(opt=opt, trace=trace, control=control)
-    tm2 = Sys.time()
-    
-    if(control$verbose & opt$gen%%control$REPORT==0) {
-      .messageByGen(opt, trace, level=control$trace, long=format_difftime(tm1, tm2))
-    }
-      
-    
-  } # end generations loop
-  
-  partial = fn(opt$MU, .i=0)
-  value = control$aggFn(x=partial, w=control$weights) # check if necessary
-  names(opt$MU) = names(par)
-  opt$counts = c('function'=opt$gen*control$popsize, generations=opt$gen)
-  
-  output = list(par=opt$MU, value=value, counts=opt$counts, 
-                trace=trace, partial=partial, convergence=1)
-  
-  
-  return(output)
-  
-}
-
-# manage control options
-
-check_control = function(control, default) {
+check_control = function(control, default, minimal=TRUE) {
   
   control = control[!sapply(control, is.null)] # remove NULL values
   nm_full = names(default)
   ignored = setdiff(names(control), nm_full)
-  msg = sprintf("Ignoring control arguments: %s.", paste(sQuote(ignored), collapse=", "))
-  if(length(ignored)) warning(msg)
   keep = names(default)[nm_full %in% names(control)]
+  if(isTRUE(minimal)) return(control[keep])
+  msg = sprintf("Ignoring control arguments: %s.", paste(sQuote(ignored), collapse=", "))
+  if(length(ignored)) message(msg)
   default[keep] = control[keep]
   return(default)
 }
+
 
 # Auxiliar functions to run fn on disk ------------------------------------
 
