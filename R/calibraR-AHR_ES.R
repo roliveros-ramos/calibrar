@@ -1,25 +1,31 @@
 
-.ahres = function(par, fn, gr, lower, upper, control, method, hessian, isActive) {
-  
-  pathTmp = getwd()               # get the current path
-  on.exit(setwd(pathTmp))         # back to the original path after execution
-  
-  # control options
-  # function modification
-  
-  copyMaster(control) # set a copy of master for all individuals
+.ahres = function(par, fn, gr, lower, upper, control, method, hessian) {
   
   # get restart for the current phase
   restart = .restartCalibration(control) # flag: TRUE or FALSE
+  
+  # default control options
+  npar = length(par)
+  con = list(trace = 0, fnscale = 1, parscale = rep.int(1L, npar), maxgen=2000L,
+             abstol = -Inf, reltol = sqrt(.Machine$double.eps), REPORT = 10L, 
+             alpha=0.05, age.max=1, selection=0.5, step=0.5, weights=1,
+             aggFn=.weighted.sum, useCV=TRUE,
+             convergence=1e-6, ncores=1, parallel=FALSE)
+  popOpt = .optPopSize(n=length(par), selection=con$selection)
+  con$popsize = popOpt
+  con$maxit = con$popsize*con$maxgen
+  # end of default control options
+  
   if(isTRUE(restart)) {
     
     res = .getRestart(control=control)
     opt   = res$opt
     trace = res$trace
-    
     .messageByGen(opt, trace, restart=TRUE)
     
   } else {
+    
+    control = .check_control_ahres(control=control, default=con)
     
     opt = .newOpt(par=par, lower=lower, upper=upper, control=control)
     
@@ -29,12 +35,12 @@
       
       trace = list()
       trace$control = control
-      trace$par   = matrix(NA, nrow=control$maxgen, ncol=length(isActive))
+      trace$par   = matrix(NA, nrow=control$maxgen, ncol=length(par))
       trace$value = rep(NA, control$maxgen)
       trace$best  = rep(NA, control$maxgen)
       
       if(control$trace>1) {
-        trace$sd   = matrix(NA, nrow=control$maxgen, ncol=length(isActive))   
+        trace$sd   = matrix(NA, nrow=control$maxgen, ncol=length(par))   
         trace$step = rep(NA, control$maxgen)     
       }
       
@@ -225,15 +231,17 @@
   run      = opt$control$run
   nvar     = opt$control$nvar
   
+  use_disk = ifelse(!is.null(attr(fn, "..i")), TRUE, FALSE) 
+  
   pathTmp = getwd()               # get the current path
   on.exit(setwd(pathTmp))         # back to the original path after execution
   
   if(isTRUE(parallel)) {
     # optimize parallel execution, reduce data transfer
     
-    FITNESS  =  foreach(i=0:(opt$seed-1), .verbose=FALSE, .inorder=FALSE) %dopar% {
+    FITNESS  =  foreach(i=1:opt$seed, .verbose=FALSE, .inorder=FALSE) %dopar% {
 
-      Fitness = fn(pop[, i+1], ..i=i)  # internally set to ith wd
+      Fitness = if(use_disk) fn(pop[, i], ..i=i) else fn(pop[, i])  # internally set to ith wd
       if(is.null(Fitness)) {
         .write_calibrar_dump(run=run, gen=gen, i=i)
       }
@@ -250,9 +258,9 @@
     
     FITNESS	=	NULL
     
-    for(i in 0:(opt$seed-1)) {
+    for(i in 1:opt$seed) {
       
-      Fitness = fn(pop[,i+1], ..i=i)
+      Fitness = if(use_disk) fn(pop[, i], ..i=i) else fn(pop[, i])
       if(is.null(Fitness)) {
         .write_calibrar_dump(run=run, gen=gen, i=i)
         Fitness = Inf
@@ -391,4 +399,32 @@
     
   return(opt)
   
+}
+
+.check_control_ahres = function(control, default) {
+  
+  popOpt = default$popsize
+  control = check_control(control=control, default=default, minimal=FALSE, verbose=FALSE)
+  # update population size and selection rate
+  if(control$popsize < popOpt) {
+    warning("'popsize' is too small, using default value.")
+    message(sprintf("Population size set to %d (optimal value).", popOpt))
+  }
+  control$popsize = max(control$popsize, popOpt)
+  
+  if(isTRUE(control$parallel)) {
+    popOptP = ceiling(control$popsize/control$ncores)*control$ncores
+    if(control$popsize != popOptP) {
+      message(sprintf("Optimizing 'popsize' to work with %d cores...", control$ncores))
+      message(sprintf("   Optimal population size (%d) has been increased to %d.\n", popOpt, popOptP))
+    }
+    
+    control$popsize = popOptP
+    control$selection = control$selection*popOpt/popOptP
+  }
+  # update maximum number of function evaluations and generations
+  if(!is.null(control$maxit) & !is.null(control$maxgen)) 
+    warning("'maxit' and 'maxgen' provided, ignoring 'maxit'.")
+  control$maxgen = ceiling(control$maxit/control$popsize)
+  return(control)
 }
