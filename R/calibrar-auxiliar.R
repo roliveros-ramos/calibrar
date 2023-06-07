@@ -228,6 +228,9 @@ print.calibrar.demo = function(x, ...) {
     
     iifile = ovalues[[ii[1]]]
     xpos = grep(names(values), pattern=names(ovalues)[ii[1]])
+    ckey = unique(names(values[xpos]))
+    msg = sprintf("Duplicated key value for '%s'.", ckey)
+    if(length(xpos)>1) stop(msg)
     ifile = file.path(attr(iifile, "path"), iifile)
     if(!file.exists(ifile)) {
       msg = sprintf("Configuration file '%s' not found. \n File '%s' not found in %s.", 
