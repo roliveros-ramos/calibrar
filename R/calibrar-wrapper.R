@@ -42,16 +42,7 @@
   fn   = match.fun(fn)
   if(!is.null(gr)) gr = match.fun(gr)
   
-  control = .checkControl(control=control, method=method, par=guess, fn=fn, 
-                          active=active, skeleton=skeleton, 
-                          replicates=replicates, ...)
-  
   run = control$run
-
-  # this need to be added so functions can use disk (specially in parallel)
-  # add to every function calling the wrappers
-  pathTmp = getwd()               # get the current path
-  on.exit(setwd(pathTmp))         # back to the original path after execution
   
   # here we modify 'fn' so:
   # 0. it is evaluated in the '$run/..i' folder if necessary
@@ -108,6 +99,11 @@
     }    
   }
   
+  # this need to be added so functions can use disk (specially in parallel)
+  pathTmp = getwd()               # get the current path
+  on.exit(setwd(pathTmp))         # back to the original path after execution
+  copyMaster(control) # set a copy of master for all individuals
+  
   # here, make methods explicit (one by one)
   output = 
     switch(method, 
@@ -152,7 +148,7 @@
 
 # Manage control options --------------------------------------------------
 
-check_control = function(control, default, minimal=TRUE) {
+check_control = function(control, default, minimal=TRUE, verbose=TRUE) {
   
   control = control[!sapply(control, is.null)] # remove NULL values
   nm_full = names(default)
@@ -160,7 +156,7 @@ check_control = function(control, default, minimal=TRUE) {
   keep = names(default)[nm_full %in% names(control)]
   if(isTRUE(minimal)) return(control[keep])
   msg = sprintf("Ignoring control arguments: %s.", paste(sQuote(ignored), collapse=", "))
-  if(length(ignored)) message(msg)
+  if(length(ignored) & verbose) message(msg)
   default[keep] = control[keep]
   return(default)
 }
@@ -169,15 +165,15 @@ check_control = function(control, default, minimal=TRUE) {
 # Auxiliar functions to run fn on disk ------------------------------------
 
 copyMaster = function(control, n=NULL) {
-  if(is.null(n)) n = control$popsize
+  if(is.null(control$master)) return(invisible())
+  if(is.null(control$run))
+    stop("You must specify a 'run' directory to copy the contents of the 'master' folder.")
+  if(is.null(n)) n = control$batchsize
   for(i in (seq_len(n) - 1)) .copyMaster(control, i)
   return(invisible())
 }
 
 .copyMaster = function(control, i) {
-  if(is.null(control$master)) return(invisible())
-  if(is.null(control$run))
-    stop("You must specify a 'run' directory to copy the contents of the 'master' folder.")
   newDir = .getWorkDir(control$run, i)
   if(!dir.exists(newDir)) dir.create(newDir, recursive=TRUE)
   if(isTRUE(control$master)) return(invisible(newDir))

@@ -312,10 +312,101 @@ format_difftime = function(x, y, ...) {
 
 .optPopSize = function(n, selection) floor(0.5*(4 + floor(3*log(n)))/selection)
 
-.checkControl = function(control, method, par, fn, active, skeleton, replicates=1, ...) {
+.checkControl_calibrate = function(control, method, par, fn, ...) {
   
   fn = match.fun(fn)
 
+  con = list(ncores=parallel::detectCores(), 
+             nvar=NULL, run=NULL, master=NULL, stochastic=FALSE, verbose=FALSE, restart.file=NULL,
+             gradient = list(), gr.method="forward")
+  
+  controlDef  = names(con)       # default options
+  controlUser = names(control)   # user provided options
+  
+  con[controlUser] = control
+  
+  if(!is.list(con$gradient)) 
+    stop("Control argument 'gradient' must be a list with the control options for numerical gradient computation.")
+  
+  # get unknown options
+  unknown = controlUser[!(controlUser %in% controlDef)]
+  
+  # check for wrong master argument (not a path nor NULL)
+  if(!is.character(con$master) & !is.null(con$master)) {
+    warning("Control parameter 'master' must be a path or NULL, ignoring user provided value.")
+    con$master = NULL
+  }
+  
+  con$ncores = as.integer(con$ncores)
+  if(is.null(con$ncores) | is.na(con$ncores)) stop("Control option 'ncores' must be a positive integer.")
+  if(is.null(con$ncores)) con$ncores = 1
+  if(con$ncores < 1) con$ncores = 1
+  
+  if(!is.null(con$master) & is.null(con$run)) {
+    con$run = tempdir()
+    msg = sprintf("Evaluating 'fn' in %s.", con$run)
+    message(msg)
+  }
+  
+  if(!is.null(con$run)) {
+    if(!dir.exists(con$run)) dir.create(con$run, recursive=TRUE)
+  }
+  
+  if(!is.null(con$aggFn)) {
+    
+    if(is.null(con$weights)) con$weights = 1
+
+    # check number of variables
+    if(is.null(con$nvar)) con$nvar = length(fn(par, ...)) # CHECK HERE
+    
+    # aggregation function for global fitness
+    con$aggFn = match.fun(con$aggFn) 
+    
+    # update and check weights (for multiobjective optimization)
+    if(length(con$weights)==1) con$weights = rep(con$weights, con$nvar)
+    if(length(con$weights)!=con$nvar) stop("Vector of weights should match the length of the output of fn.")
+    if(any(con$weights<0)) stop("Weights should be positive numbers.")
+    if(any(is.na(con$weights))) stop("Weights cannot be NA.")    
+    
+  }
+  
+  if(length(unknown)!=0) 
+    warning("Unknown control parameters: ", paste0(paste(unknown, collapse = ", ")),".")
+  
+  return(con)
+  
+}
+
+
+.batchsize = function(par, method, control) {
+  
+  n = length(unlist(par))
+  
+  batchsize = 1
+  
+  # calculation for gradient-based methods
+  gr.method = control$gr.method
+  if(is.null(gr.method)) method = "Richardson"
+  
+  r = if(!is.null(control$gradient$r)) control$gradient$r else 4
+  
+  ng = switch(gr.method,
+              central    = 2*n,
+              forward    = n+1,
+              backward   = n+1,
+              richardson = 2*r*n,
+              stop("Undefined method for gradient computation."))
+  
+  # for all the rest, we need to add a line for every new method
+  
+  
+  
+}
+
+.checkControl_old = function(control, method, par, fn, active, skeleton, replicates=1, ...) {
+  
+  fn = match.fun(fn)
+  
   con = list(trace = 0, fnscale = 1, parscale = rep.int(1L, length(which(active))),
              nvar=NULL, aggFn=.weighted.sum,
              stochastic=FALSE, 
@@ -375,7 +466,7 @@ format_difftime = function(x, y, ...) {
       message(sprintf("Optimizing 'popsize' to work with %d cores...", con$ncores))
       message(sprintf("   Optimal population size (%d) has been increased to %d.\n", popOpt, popOptP))
     }
-      
+    
     con$popsize = popOptP
     con$selection = con$selection*popOpt/popOptP
   }
@@ -401,7 +492,7 @@ format_difftime = function(x, y, ...) {
   if(is.null(con$maxit) & is.null(con$maxgen)) con$maxgen = 2000L
   
   con$maxit = con$popsize*con$maxgen
-
+  
   if(method=="default") {
     
     # check for user-provided variances (sigma)

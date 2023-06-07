@@ -9,8 +9,8 @@
   con = list(trace = 0, fnscale = 1, parscale = rep.int(1L, npar), maxgen=2000L,
              abstol = -Inf, reltol = sqrt(.Machine$double.eps), REPORT = 10L, 
              alpha=0.05, age.max=1, selection=0.5, step=0.5, weights=1,
-             aggFn=.weighted.sum, useCV=TRUE,
-             convergence=1e-6, ncores=1, parallel=FALSE)
+             aggFn=.weighted.sum, nvar=1, useCV=TRUE,
+             convergence=1e-6, ncores=1, parallel=FALSE, verbose=FALSE)
   popOpt = .optPopSize(n=length(par), selection=con$selection)
   con$popsize = popOpt
   con$maxit = con$popsize*con$maxgen
@@ -424,7 +424,7 @@
   }
   # update maximum number of function evaluations and generations
   if(!is.null(control$maxit) & !is.null(control$maxgen)) 
-    warning("'maxit' and 'maxgen' provided, ignoring 'maxit'.")
+    message("'maxit' and 'maxgen' provided, ignoring 'maxit'.")
   control$maxgen = ceiling(control$maxit/control$popsize)
   return(control)
 }

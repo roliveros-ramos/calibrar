@@ -99,19 +99,44 @@ calibrate.default = function(par, fn, gr = NULL, ...,
                              method = "AHR-ES", control = list(), 
                              hessian = FALSE, replicates=1, parallel=FALSE) {
   
+  # calibrate should dispatch on 'fn'
+  if(inherits(fn, "objFn")) {
+    control$nvar = attr(fn, "nvar")
+    control$weights = attr(fn, "weights")
+    names(control$weights) = attr(fn, "variables")
+  }
+  
   # check function and method
   multiMethods = "AHR-ES" # list of methods supporting multi-objective
   
-  if(inherits(fn, "objFn") & !(method %in% multiMethods)) {
-    agg = attr(fn, "aggregate")
-    if(is.null(agg)) warning("Update your objective function to the last version of the 'calibrar' package.")
-    if(!isTRUE(agg)) 
-      stop(sprintf("Method '%s' does not support multi-objective optimization, use aggregate=TRUE in 'createObjectiveFunction'.",
-                   method))
+  if(!(method %in% multiMethods)) {
+  
+    if(inherits(fn, "objFn")) {
+      agg = attr(fn, "aggregate")
+      if(is.null(agg)) warning("Update your objective function to the last version of the 'calibrar' package.")
+      if(!isTRUE(agg)) 
+        stop(sprintf("Method '%s' does not support multi-objective optimization, use aggregate=TRUE in 'createObjectiveFunction'.",
+                     method))
+    }
+    
+    if(!is.null(control$nvar)) 
+      if(control$nvar != 1) stop(sprintf("Method '%s' does not support multi-objective optimization, 'fn' must be scalar.",
+                                         method))
+    control$nvar = 1
+    
+  } else {
+    
+    # only run it if not provided in fn
+    if(is.null(control$nvar)) control$nvar = length(fn(par, ...))
+    
   }
   
+  if(inherits(fn, "objFn")) control$aggFn = attr(fn, "aggFn")
   fnx = attr(fn, "fn")
   if(!is.null(fnx)) fnx = match.fun(fnx)
+  
+  control = .checkControl_calibrate(control=control, method=method, par=par, fn=fn, ...)
+  # here, we calculate 'batchsize' according to the method, copyMaster is called just once.
   
   # check for a partial results file to restart from a completed phase
   restart = .restartCalibration(control, type="partial")
@@ -129,7 +154,7 @@ calibrate.default = function(par, fn, gr = NULL, ...,
   
   fn = match.fun(fn)
   if(!is.null(gr)) gr = match.fun(gr)
-  
+
   phases     = .checkPhases(phases=phases, npar=npar)
   bounds     = .checkBounds(lower=lower, upper=upper, npar=npar)
   guess      = .checkOpt(par=par, lower=bounds$lower, upper=bounds$upper)
@@ -259,10 +284,8 @@ calibrate.default = function(par, fn, gr = NULL, ...,
 #' @examples 
 #' optim2(par=rep(NA, 5), fn=sphereN)
 #' @inheritParams calibrate
-optim2 = function(par, fn, gr = NULL, ..., 
-                  method = NULL, 
-                  lower = -Inf, upper = +Inf, active = NULL, 
-                  control = list(), hessian = FALSE, parallel=FALSE) {
+optim2 = function(par, fn, gr = NULL, ..., lower = -Inf, upper = +Inf, active = NULL, 
+                  method = NULL, control = list(), hessian = FALSE, parallel=FALSE) {
   
   # par can be a list
   skeleton = as.relistable(par)
@@ -611,8 +634,7 @@ calibration_data = function(setup, path=".", verbose=TRUE, file=NULL, ...) {
 #' @author Ricardo Oliveros-Ramos
 #' @seealso \code{\link{calibration_data}}, \code{\link{calibration_setup}}.
 #' @export
-calibration_objFn = function(model, setup, observed, aggFn=NULL, 
-                                   aggregate=FALSE, ...) {
+calibration_objFn = function(model, setup, observed, aggFn=NULL, aggregate=FALSE, ...) {
 
   fn_name = deparse(substitute(model))
   
@@ -656,6 +678,7 @@ calibration_objFn = function(model, setup, observed, aggFn=NULL,
   attr(fn1, "variables") = setup$variable[setup$calibrate]
   attr(fn1, "aggregate") = aggregate
   attr(fn1, "fn") = fnx
+  attr(fn1, "aggFn") = aggFn
   return(fn1) 
   
 }
