@@ -109,21 +109,14 @@
 
 .lbfgsb3 = function(par, fn, gr, lower, upper, control, hessian, method) {
   
-  ctrl = list(maxit = 500, trace = 0, iprint = 0L)
-  control[!(names(control) %in% names(ctrl))] = NULL
+  con = list(trace = 0L, maxit = 100L, iprint = -1L, lmm = 5, 
+             factr = 1e+07, pgtol = 0, reltol = 0, abstol = 0, info = FALSE)
   
-  xoutput = suppressWarnings(lbfgsb3c::lbfgsb3(par=par, fn=fn, gr=gr, lower=lower,
+  control = check_control(control=control, default=con)
+  
+  output = suppressWarnings(lbfgsb3c::lbfgsb3(par=par, fn=fn, gr=gr, lower=lower,
                                                upper=upper, control=control))
-  
-  output = list()
-  output$par  = xoutput$par
-  output$value = xoutput$value
-  output$counts = xoutput$counts
-  output$convergence = xoutput$convergence
-  output$message = xoutput$message
-  output$hessian = NULL
   
   return(output)
   
 }
-
