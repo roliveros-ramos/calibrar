@@ -6,14 +6,13 @@
   
   # default control options
   npar = length(par)
-  con = list(trace = 0, fnscale = 1, parscale = rep.int(1L, npar), maxgen=2000L,
+  con = list(trace = 0, fnscale = 1, parscale = rep.int(1L, npar), maxit=2000L,
              abstol = -Inf, reltol = sqrt(.Machine$double.eps), REPORT = 10L, 
              alpha=0.05, age.max=1, selection=0.5, step=0.5, weights=1,
-             aggFn=.weighted.sum, nvar=1, useCV=TRUE,
+             aggFn=.weighted.sum, nvar=1, useCV=TRUE, maxgen=NULL,
              convergence=1e-6, ncores=1, parallel=FALSE, verbose=FALSE)
   popOpt = .optPopSize(n=length(par), selection=con$selection)
   con$popsize = popOpt
-  con$maxit = con$popsize*con$maxgen
   # end of default control options
   
   if(isTRUE(restart)) {
@@ -51,6 +50,8 @@
     }
   }
   
+  # copy master folder after optimizing popsize
+  copy_master_folder(control, n=control$popsize) 
   # start new optimization
   while(isTRUE(.continueEvolution(opt, control))) {
     
@@ -246,7 +247,7 @@
         .write_calibrar_dump(run=run, gen=gen, i=i)
       }
         
-      Fitness = c(i+1, Fitness)
+      Fitness = c(i, Fitness)
       Fitness
       
     }
@@ -416,15 +417,23 @@
     popOptP = ceiling(control$popsize/control$ncores)*control$ncores
     if(control$popsize != popOptP) {
       message(sprintf("Optimizing 'popsize' to work with %d cores...", control$ncores))
-      message(sprintf("   Optimal population size (%d) has been increased to %d.\n", popOpt, popOptP))
+      message(sprintf("\tOptimal population size (%d) has been increased to %d.\n", popOpt, popOptP))
     }
     
     control$popsize = popOptP
     control$selection = control$selection*popOpt/popOptP
   }
   # update maximum number of function evaluations and generations
-  if(!is.null(control$maxit) & !is.null(control$maxgen)) 
-    message("'maxit' and 'maxgen' provided, ignoring 'maxit'.")
-  control$maxgen = ceiling(control$maxit/control$popsize)
+  if(!is.null(control$maxit) & !is.null(control$maxgen))
+    message("'maxit' and 'maxgen' provided, ignoring 'maxgen'.")
+  
+  if(is.null(control$maxit) & is.null(control$maxgen))
+    stop("You must provide 'maxit' or 'maxgen' for 'AHR-ES' method.")
+  
+  if(is.null(control$maxit) & !is.null(control$maxgen))
+    control$maxit = control$maxgen
+  
+  control$maxgen = control$maxit
+  
   return(control)
 }

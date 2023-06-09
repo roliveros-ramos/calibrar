@@ -189,7 +189,7 @@ calibrate.default = function(par, fn, gr = NULL, ...,
     if(output$phase > nphases) break
     
     control$maxgen      = conv$maxgen[phase]
-    control$maxiter     = conv$maxiter[phase]
+    control$maxit       = conv$maxit[phase]
     control$convergence = conv$convergence[phase]
 
     active = (phases <= phase) # NAs are corrected in .calibrar 
@@ -387,6 +387,129 @@ optim2 = function(par, fn, gr = NULL, ..., lower = -Inf, upper = +Inf, active = 
   
 }
 
+# optimh ------------------------------------------------------------------
+
+
+#' Optimization by heuristic algorithms
+#'
+#' @export
+#'
+#' @return
+#' A list with components:
+#' \describe{
+#' \item{par}{The best set of parameters found.}
+#' \item{value}{The value of fn corresponding to par.}
+#' \item{counts}{A two-element integer vector giving the number of calls to fn and gr respectively. This excludes those calls needed to compute the Hessian, if requested, and any calls to fn to compute a finite-difference approximation to the gradient.}
+#' \item{convergence}{An integer code. 0 indicates successful completion. }
+#' \item{message}{A character string giving any additional information returned by the optimizer, or NULL.}
+#' \item{hessian}{Only if argument hessian is true. A symmetric matrix giving an estimate of the Hessian at the solution found. Note that this is the Hessian of the unconstrained problem even if the box constraints are active.}
+#' }
+#' @examples 
+#' optim2(par=rep(NA, 5), fn=sphereN)
+#' @inheritParams optim2
+optimh = function(par, fn, gr = NULL, ..., lower = -Inf, upper = +Inf, active = NULL, 
+                  method = NULL, control = list(), hessian = FALSE, parallel=FALSE) {
+  
+  # par can be a list
+  skeleton = as.relistable(par)
+  par    = unlist(par)
+  lower  = unlist(lower)
+  upper  = unlist(upper)
+  active = unlist(active)
+  
+  npar = length(par)
+  
+  # par can be re-scaled
+  parscale = .checkParscale(control=control, npar=npar)
+  control$parscale = NULL # reset parscale
+  
+  par   = par/parscale
+  lower = lower/parscale
+  upper = upper/parscale
+  
+  # function can be re-scaled
+  fnscale = .checkFnscale(control=control)
+  control$fnscale = NULL # reset fnscale
+  
+  # Checking par
+  active     = .checkActive(active=active, npar=npar)
+  bounds     = .checkBounds(lower=lower, upper=upper, npar=npar)
+  guess      = .checkOpt(par=par, lower=bounds$lower, upper=bounds$upper)
+  
+  par     = guess
+  lower   = bounds$lower
+  upper   = bounds$upper
+  
+  isActive = which(active)
+  activeFlag = isTRUE(all(active))
+  
+  if(is.null(names(par))) names(par) = .printSeq(npar, preffix="par")
+  
+  # getting functions
+  fn = match.fun(fn)
+  if(!is.null(gr)) gr = match.fun(gr)
+  
+  # when 'parscale' and 'fnscale' are supplied, 
+  # optimization is carried out over the scaled function
+  fn1  = function(par) {
+    parx = guess
+    parx[isActive] = par
+    parx = relist(flesh = parx*parscale, skeleton = skeleton)
+    output = fn(parx, ...)/fnscale
+    return(output)
+  }
+  
+  # GRADIENT
+  gr.control = c(list(parallel=parallel), control$gradient)
+  gr.method  = control$gr.method # if NULL, uses default.
+  
+  if(!is.null(gr)) {
+    gr1  = function(par) {
+      parx = guess
+      parx[isActive] = par
+      parx = relist(flesh = parx*parscale, skeleton = skeleton)
+      grad = gr(parx, ...)*parscale/fnscale
+      grad = grad[isActive]
+      return(grad)
+    }
+  } else {
+    gr1  = function(par) {
+      gradient(fn=fn1, x=par, method=gr.method, control=gr.control, ...)
+    }    
+  }
+  
+  # here, make methods explicit (one by one)
+  output = 
+    switch(method, 
+           "Nelder-Mead" = .optim(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian, method="Nelder-Mead"), 
+           "BFGS"        = .optim(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian, method="BFGS"), 
+           "CG"          = .optim(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian, method="CG"), 
+           "L-BFGS-B"    = .optim(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian, method="L-BFGS-B"),
+           "SANN"        = .optim(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian, method="SANN"),
+           "Brent"       = .optim(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian, method="Brent"), 
+           "nlm"         = .nlm(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian), 
+           "nlminb"      = .nlminb(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian), 
+           "Rcgmin"      = .Rcgmin(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian), 
+           "Rvmmin"      = .Rvmmin(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian), 
+           "hjn"         = .hjn(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian), 
+           "spg"         = .spg(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian), 
+           "LBFGSB3"     = .lbfgsb3(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian), 
+           "AHR-ES"      = .ahres(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian), 
+           stop(printf("UNSUPPORTED METHOD: %s.", sQuote(method)), call. = FALSE)
+    )
+  
+  # reshaping full parameters, un-scaling par
+  paropt = guess
+  paropt[isActive] = output$par
+  paropt = paropt*parscale
+  output$par = paropt
+  # value need to be unscaled
+  output$value = output$value*fnscale
+  
+  return(output) 
+  
+}
+
 # AHR-ES ------------------------------------------------------------------
 
 #' @title Adaptative Hierarchical Recombination Evolutionary Strategy for 
@@ -453,7 +576,7 @@ ahres = function(par, fn, gr = NULL, ..., lower = -Inf, upper = +Inf, active = N
   }
   
   # here, make methods explicit (one by one)
-  output = .ahres(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian)
+  output = .ahres(par=par, fn=fn1, gr=NULL, lower=lower, upper=upper, control=control, hessian=hessian)
   
   # reshaping full parameters, un-scaling par
   paropt = guess

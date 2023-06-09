@@ -381,12 +381,24 @@ format_difftime = function(x, y, ...) {
 .batchsize = function(par, method, control) {
   
   n = length(unlist(par))
-  
-  batchsize = 1
+
+  # for methods that optimise number of runs in parallel, set to NULL
+  # and call copyMaster internally.
+  internal_methods = c("AHR-ES")
+  if(method %in% internal_methods) {
+    return(NULL)
+  }
+
+  # for methods that do not use derivatives and no parallel implementation is 
+  # available, return 1.
+  deriv_free_methods = c("Nelder-Mead", "SANN", "Brent", "hjn")
+  if(method %in% deriv_free_methods) {
+    return(1)
+  }
   
   # calculation for gradient-based methods
   gr.method = control$gr.method
-  if(is.null(gr.method)) method = "Richardson"
+  if(is.null(gr.method)) method = "richardson"
   
   r = if(!is.null(control$gradient$r)) control$gradient$r else 4
   
@@ -397,9 +409,7 @@ format_difftime = function(x, y, ...) {
               richardson = 2*r*n,
               stop("Undefined method for gradient computation."))
   
-  # for all the rest, we need to add a line for every new method
-  
-  
+  return(ng)
   
 }
 
@@ -522,23 +532,23 @@ format_difftime = function(x, y, ...) {
 .checkConvergence = function(control, nphases) {
   
   maxgen      = control$maxgen
-  maxiter     = control$maxiter
+  maxit       = control$maxit  
   convergence = control$convergence
   
   if(length(maxgen)==1) maxgen = rep(maxgen, nphases)
-  if(length(maxiter)==1) maxiter = rep(maxiter, nphases)
+  if(length(maxit)==1) maxit = rep(maxit, nphases)
   if(length(convergence)==1) convergence = rep(convergence, nphases)
   
   if(!is.null(maxgen) & length(maxgen)!=nphases) 
     stop("'maxgen' length must match number of calibration phases.")
   
-  if(!is.null(maxiter) & length(maxiter)!=nphases) 
-    stop("'maxiter' length must match number of calibration phases.")
+  if(!is.null(maxit) & length(maxit)!=nphases) 
+    stop("'maxit' length must match number of calibration phases.")
   
   if(!is.null(convergence) & length(convergence)!=nphases) 
     stop("'convergence' length must match number of calibration phases.")
   
-  return(list(maxgen=maxgen, maxiter=maxiter, convergence=convergence))
+  return(list(maxgen=maxgen, maxit=maxit, convergence=convergence))
   
 }
 
