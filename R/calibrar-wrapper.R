@@ -102,7 +102,8 @@
   # this need to be added so functions can use disk (specially in parallel)
   pathTmp = getwd()               # get the current path
   on.exit(setwd(pathTmp))         # back to the original path after execution
-  copyMaster(control) # set a copy of master for all individuals
+  n = .batchsize(par=par, method=method, control=control)
+  copy_master_folder(control, n=n) # set a copy of master for all individuals
   
   # here, make methods explicit (one by one)
   output = 
@@ -164,12 +165,12 @@ check_control = function(control, default, minimal=TRUE, verbose=TRUE) {
 
 # Auxiliar functions to run fn on disk ------------------------------------
 
-copyMaster = function(control, n=NULL) {
+copy_master_folder = function(control, n=NULL) {
   if(is.null(control$master)) return(invisible())
   if(is.null(control$run))
     stop("You must specify a 'run' directory to copy the contents of the 'master' folder.")
-  if(is.null(n)) n = control$batchsize
-  for(i in (seq_len(n) - 1)) .copyMaster(control, i)
+  if(is.null(n)) return(invisible())
+  for(i in (seq_len(n+1) - 1)) .copyMaster(control, i)
   return(invisible())
 }
 
