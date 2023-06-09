@@ -3,18 +3,40 @@
 
 .cmaes = function(par, fn, lower, upper, control) {
   
-  pathTmp = getwd()               # get the current path
-  on.exit(setwd(pathTmp))         # back to the original path after execution
-  
   npar = length(unlist(par))
+  
+  if(!is.null(control$trace)) control$trace = ifelse(control$trace>1, TRUE, FALSE)
+  
+  # all default values!
+  con = list(trace = FALSE, fnscale = 1, stopfitness = -Inf, maxit = 100 * npar^2,
+             sigma = 0.5, keep.best = TRUE, vectorized = FALSE, diag = FALSE,
+             lambda = 4 + floor(3 * log(npar)))
+  
+  con = within(con, {
+    stop.tolx = 1e-12 * sigma
+    diag.sigma = diag
+    diag.eigen = diag
+    diag.value = diag
+    diag.pop = diag
+    mu = floor(lambda/2)
+    weights = log(mu + 1) - log(1:mu)
+    weights = weights/sum(weights)
+    mueff = sum(weights)^2/sum(weights^2)
+    ccum = 4/(npar + 4)
+    cs = (mueff + 2)/(npar + mueff + 3)
+    ccov.mu = mueff
+    ccov.1 = (1/ccov.mu) * 2/(npar + 1.4)^2 + (1 - 1/ccov.mu) * ((2 * ccov.mu - 1)/((npar + 2)^2 + 2 * ccov.mu))
+    damps = 1 + 2 * max(0, sqrt((mueff - 1)/(npar + 1)) - 1) + cs
+  })
+  
+  control = check_control(control=control, default=con)
+  
   output = suppressWarnings(cmaes::cma_es(par=par, fn=fn, lower=lower, upper=upper, control=control))
   
   if(is.null(output$par)) {
     output$par = relist(rep(NA, npar), skeleton=par)
     if(!is.finite(output$value)) warning("Infinite value reached for fn.")
   }
-  
-  # names(output)[names(output)=="par"] = ".par"
   
   return(output)
   
@@ -26,25 +48,37 @@
 
 .genSA = function(par, fn, gr, lower, upper, control, hessian, method) {
   
-  pathTmp = getwd()               # get the current path
-  on.exit(setwd(pathTmp))         # back to the original path after execution
+  con = list(maxit = 5000, threshold.stop = NULL, temperature = 5230, 
+             visiting.param = 2.62, acceptance.param = -5, max.time = NULL, 
+             nb.stop.improvement = 1e+06, smooth = TRUE, max.call = 1e+07, 
+             simple.function = FALSE, trace.fn = NULL, verbose = FALSE, 
+             trace.mat = TRUE, seed = -100377, high.dim = TRUE, tem.restart = 0.1,
+             markov.length = 2 * length(lower))
   
-  output = suppressWarnings(GenSA::GenSA(par=par, fn=fn, lower=lower, 
+  control = check_control(control=control, default=con)
+  
+  xoutput = suppressWarnings(GenSA::GenSA(par=par, fn=fn, lower=lower, 
                                          upper=upper, control=control))
   
-  # names(output)[names(output)=="par"] = ".par"
-  output$counts = c('function'=output$counts,
-                    gradient=NA)
+  output = list()
+  output$par  = xoutput$par
+  output$value = xoutput$value
+  output$counts = c('function'=xoutput$counts, 'gradient'=0)	
+  output$convergence = 0
+  output$message = NA
+  output$hessian = NULL
   
   return(output)
   
 }
+
+
+
+
+
 # wrapper for DEoptim -----------------------------------------------------
 
 .DE = function(par, fn, gr, lower, upper, control, hessian, method) {
-  
-  pathTmp = getwd()               # get the current path
-  on.exit(setwd(pathTmp))         # back to the original path after execution
   
   if(isTRUE(control$parallel)) control$parallelType=2
   
@@ -69,9 +103,6 @@
 
 .soma = function(par, fn, gr, lower, upper, control, hessian, method) {
   
-  pathTmp = getwd()               # get the current path
-  on.exit(setwd(pathTmp))         # back to the original path after execution
-  
   control = NULL # check!
   
   xoutput = suppressWarnings(soma::soma(costFunction=fn, 
@@ -94,16 +125,12 @@
 
 .genoud = function(par, fn, gr, lower, upper, control, hessian, method) {
   
-  pathTmp = getwd()               # get the current path
-  on.exit(setwd(pathTmp))         # back to the original path after execution
-  
   print.level = if(control$verbose) control$trace else 0
   
   output = suppressWarnings(rgenoud::genoud(fn=fn, nvars=length(par), starting.values=par, 
                                             Domains = cbind(lower, upper),
                                             print.level=print.level))
   
-  # names(output)[names(output)=="par"] = ".par"
   output$counts = c('function'=output$popsize*output$generations, gradient=NA)
   return(output)
   
@@ -113,9 +140,6 @@
 
 .pso = function(par, fn, gr, lower, upper, control, hessian, method) {
   
-  pathTmp = getwd()               # get the current path
-  on.exit(setwd(pathTmp))         # back to the original path after execution
-  
   hybrid = if(method=="hybridPSO") TRUE else FALSE
   method = if(any(method=="PSO", method=="PSO2007", method=="hybridPSO")) 
     "SPSO2007" else "SPSO2011"
@@ -124,8 +148,6 @@
   
   output = suppressWarnings(pso::psoptim(par=par, fn=fn, gr=gr, lower=lower, 
                                          upper=upper, control=control))
-  
-  # names(output)[names(output)=="par"] = ".par"
   
   return(output)
   
