@@ -83,14 +83,11 @@
   con = DEoptim::DEoptim.control()
   control = check_control(control=control, default=con)
   
-  # we pass 'par' as initial population.
+  # we pass 'par' as initial population (gaussian with uniform-like variance).
   if(is.null(control$initialpop)) {
-    range = .calculateRange(lower, upper)
-    MU    = as.numeric(par)
-    SD	  = .calculateSigma(range)
-    control$initialpop = t(rtnorm2(n=control$NP, mean=MU, sd=SD, lower=lower, upper=upper))
+    control$initialpop = t(.createRandomPopulation(n=control$NP, mean=par, lower=lower, upper=upper)) 
   }
-  
+
   # think how to pass 'par'. Initial pop?
   xoutput = suppressWarnings(DEoptim::DEoptim(fn=fn, lower=lower, upper=upper, control=control))
   
@@ -111,9 +108,15 @@
   
   control = NULL # check!
   
+  con = soma::all2one()
+  control = check_control(control=control, default=con)
+  
+  # we pass 'par' as initial population (gaussian with uniform-like variance).
+  init = .createRandomPopulation(n=control$NP, mean=par, lower=lower, upper=upper) 
+  
   xoutput = suppressWarnings(soma::soma(costFunction=fn, 
                                         bounds=list(min=lower, max=upper), 
-                                        options=control))
+                                        options=control, init=init))
   
   output = list()
   output$par  = xoutput$population[, xoutput$leader]
@@ -126,6 +129,7 @@
   return(output)
   
 }
+
 
 # wrapper for genoud ------------------------------------------------------
 
