@@ -143,7 +143,7 @@
 
 # Initialize population ---------------------------------------------------
 
-.calculateSigma = function(x, control) {
+.calculateSigma = function(x, control=list()) {
   sigma = control$sigma
   if(is.null(control$sigma)) sigma = rep(NA, length(x))
   out = x^2/12
