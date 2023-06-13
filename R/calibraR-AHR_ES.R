@@ -158,6 +158,16 @@
   return(out)
 }
 
+
+.createRandomPopulation = function(n, mean, lower, upper) {
+  mean = as.numeric(mean)
+  lower = as.numeric(lower)
+  upper = as.numeric(upper)
+  SD	  = .calculateSigma(.calculateRange(lower, upper))
+  out = rtnorm2(n=n, mean=mean, sd=SD, lower=lower, upper=upper)
+  return(out)
+}
+
 .newOpt = function(par, lower, upper, control) {
   
   opt = list()
