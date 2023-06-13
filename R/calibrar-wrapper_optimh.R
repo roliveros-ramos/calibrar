@@ -74,16 +74,22 @@
 
 
 
-
-
 # wrapper for DEoptim -----------------------------------------------------
 
 .DE = function(par, fn, gr, lower, upper, control, hessian, method) {
   
-  if(isTRUE(control$parallel)) control$parallelType=2
+  if(isTRUE(control$parallel)) control$parallelType="auto"
   
-  ctrl = DEoptim::DEoptim.control()
-  control[!(names(control) %in% names(ctrl))] = NULL
+  con = DEoptim::DEoptim.control()
+  control = check_control(control=control, default=con)
+  
+  # we pass 'par' as initial population.
+  if(is.null(control$initialpop)) {
+    range = .calculateRange(lower, upper)
+    MU    = as.numeric(par)
+    SD	  = .calculateSigma(range)
+    control$initialpop = t(rtnorm2(n=control$NP, mean=MU, sd=SD, lower=lower, upper=upper))
+  }
   
   # think how to pass 'par'. Initial pop?
   xoutput = suppressWarnings(DEoptim::DEoptim(fn=fn, lower=lower, upper=upper, control=control))
