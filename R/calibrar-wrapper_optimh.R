@@ -135,13 +135,43 @@
 
 .genoud = function(par, fn, gr, lower, upper, control, hessian, method) {
   
-  print.level = if(control$verbose) control$trace else 0
+  if(is.null(control$print.level))
+    control$print.level = if(control$verbose) control$trace else 0
+  if(!is.null(control$maxit)) control$max.generations = control$maxit
+    
+    
+  con = list(pop.size=1000, max.generations=100, 
+             wait.generations=10, hard.generation.limit=TRUE, 
+             MemoryMatrix=TRUE, default.domains=10, 
+             solution.tolerance=0.001, boundary.enforcement=0, lexical=FALSE,
+             gradient.check=TRUE, BFGS=TRUE, data.type.int=FALSE,  
+             unif.seed=880820, int.seed=880820, share.type=0, print.level=2,
+             instance.number=0, output.path="stdout", output.append=FALSE, 
+             project.path=NULL, P1=50, P2=50, P3=50, P4=50, P5=50, P6=50, P7=50, 
+             P8=50, P9=0, P9mix=NULL, BFGSburnin=0, BFGSfn=NULL, BFGShelp=NULL, 
+             control=list(), transform=FALSE, debug=FALSE, cluster=FALSE, balance=FALSE)
+  con$optim.method=ifelse(con$boundary.enforcement < 2, "BFGS", "L-BFGS-B")
   
-  output = suppressWarnings(rgenoud::genoud(fn=fn, nvars=length(par), starting.values=par, 
-                                            Domains = cbind(lower, upper),
-                                            print.level=print.level))
+  control = check_control(control=control, default=con)
   
-  output$counts = c('function'=output$popsize*output$generations, gradient=NA)
+  control$starting.values = par
+  control$fn              = fn
+  control$gr              = gr
+  control$nvars           = length(par) 
+  control$max             = FALSE 
+  control$Domains         = cbind(lower, upper)
+  control$hessian         = hessian 
+  
+  xoutput = suppressWarnings(do.call(rgenoud::genoud, args=control))
+  
+  output = list()
+  output$par  = xoutput$par
+  output$value = xoutput$value
+  output$counts = c('function'=xoutput$popsize*xoutput$generations, gradient=NA)
+  output$convergence = NA
+  output$message = NULL
+  output$hessian = xoutput$hessian
+  
   return(output)
   
 }
