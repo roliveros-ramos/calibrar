@@ -181,10 +181,20 @@
 .pso = function(par, fn, gr, lower, upper, control, hessian, method) {
   
   hybrid = if(method=="hybridPSO") TRUE else FALSE
-  method = if(any(method=="PSO", method=="PSO2007", method=="hybridPSO")) 
-    "SPSO2007" else "SPSO2011"
+  opso = c("PSO", "PSO2007", "SPSO2007", "hybridPSO")
+  method = if(method %in% opso) "SPSO2007" else "SPSO2011"
+  control$type   = method 
+  control$hybrid = hybrid
   
-  control = c(control, type=method, hybrid=hybrid)
+  con = list(trace = 0, maxit = 1000, maxf = Inf, abstol = -Inf, reltol = 0, 
+             REPORT = 10L, trace.stats = FALSE, 
+             s = if(method=="SPSO2011") 40 else floor(10+2*sqrt(length(par))),
+             k = 3, p = 1-(1-1/s)^k, w = 1/(2*log(2)), c.p = 0.5+log(2), c.g = 0.5+log(2),
+             d = NULL, v.max = NA, rand.order = TRUE, max.restart = Inf,
+             maxit.stagnate = Inf, vectorize = FALSE, hybrid = FALSE, 
+             hybrid.control = NULL, type = "SPSO2007")
+  
+  control = check_control(control=control, default=con)
   
   output = suppressWarnings(pso::psoptim(par=par, fn=fn, gr=gr, lower=lower, 
                                          upper=upper, control=control))
@@ -192,5 +202,7 @@
   return(output)
   
 }
+
+
 
 
