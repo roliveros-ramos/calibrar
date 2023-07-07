@@ -36,9 +36,11 @@
   control = check_control(control=control, default=con)
   
   out = suppressWarnings(switch(method,
-                                mads = mads(par=par, fn=fn, lower=lower, upper=upper, scale=1, control=control),
-                                hjkb = hjkb(par=par, fn=fn, lower=lower, upper=upper, control=control),
-                                nmkb = nmkb(par=par, fn=fn, lower=lower, upper=upper, control=control)
+                                mads = dfoptim::mads(par=par, fn=fn, lower=lower, upper=upper, scale=1, control=control),
+                                hjk  = dfoptim::hjk(par=par, fn=fn, control=control),
+                                hjkb = dfoptim::hjkb(par=par, fn=fn, lower=lower, upper=upper, control=control),
+                                nmk  = dfoptim::nmk(par=par, fn=fn, control=control),
+                                nmkb = dfoptim::nmkb(par=par, fn=fn, lower=lower, upper=upper, control=control)
   ))
   
   counts = c('function'=out$feval, 'gradient'=0)
