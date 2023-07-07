@@ -43,11 +43,12 @@
   # par can be re-scaled
   parscale = .checkParscale(control=control, npar=npar)
   control$parscale = NULL # reset parscale
+  
   par   = par/parscale
   lower = lower/parscale
   upper = upper/parscale
   
-  # function can be scaled
+  # function can be re-scaled
   fnscale = .checkFnscale(control=control)
   control$fnscale = NULL # reset fnscale
   
@@ -102,7 +103,7 @@
   
   if(!is.null(gr)) {
     # here we modify 'gr' so:
-    # 0. No modification, we assume gradient is computed in memmory.
+    # 0. No modification, we assume gradient is computed in memory.
     # 1. use 'isActive' to mask some parameters ('guess' is reference)
     # 2. is re-listed according to skeleton
     # 3. is re-scaled according to control$fnscale and control$parscale
@@ -117,7 +118,6 @@
     }
   } else {
     gr1  = function(par) {
-      # gradient is computed in the already re-scaled fn (fn1).
       gradient(fn=fn1, x=par, method=gr.method, control=gr.control, parallel=parallel, ...)
     }    
   }
@@ -129,45 +129,24 @@
   copy_master_folder(control, n=n) # set a copy of master for all individuals
   
   # here, make methods explicit (one by one)
-  
   output = .all_methods(method=method, par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian)
-  #   
-  # output = 
-  #   switch(method, 
-  #          "Nelder-Mead" = .optim(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian, method="Nelder-Mead"), 
-  #          "BFGS"        = .optim(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian, method="BFGS"), 
-  #          "CG"          = .optim(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian, method="CG"), 
-  #          "L-BFGS-B"    = .optim(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian, method="L-BFGS-B"),
-  #          "SANN"        = .optim(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian, method="SANN"),
-  #          "Brent"       = .optim(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian, method="Brent"), 
-  #          "nlm"         = .nlm(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian), 
-  #          "nlminb"      = .nlminb(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian), 
-  #          "Rcgmin"      = .Rcgmin(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian), 
-  #          "Rvmmin"      = .Rvmmin(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian), 
-  #          "hjn"         = .hjn(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian), 
-  #          "spg"         = .spg(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian), 
-  #          "LBFGSB3"     = .lbfgsb3(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian), 
-  #          "AHR-ES"      = .ahres(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian), 
-  #          stop(sprintf("UNSUPPORTED METHOD: %s.", sQuote(method)), call. = FALSE)
-  #   )
-  # 
-  # reshaping full parameters
+  # reshaping full parameters, un-scaling par
   paropt = guess
   paropt[isActive] = output$par
   paropt = paropt*parscale
-  
   if(is.null(names(paropt))) names(paropt) = .printSeq(npar, preffix="par")
-  # here to rename 'par' to '.par'
+  
   output$par = paropt[isActive]
   output$value = output$value*fnscale
+  # here to rename 'par' to '.par'
   names(output)[names(output)=="par"] = ".par"
-
   # final outputs
   output = c(list(par=paropt), output, list(active=list(par=isActive, flag=activeFlag)))
   
   return(output)
   
 }
+
 
 
 # Manage control options --------------------------------------------------
