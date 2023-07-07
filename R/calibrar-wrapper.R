@@ -1,3 +1,26 @@
+# all methods
+
+.all_methods = function(method, par, fn, gr, lower, upper, control, hessian) {
+  output = 
+    switch(method, 
+           "Nelder-Mead" = .optim(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian, method="Nelder-Mead"), 
+           "BFGS"        = .optim(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian, method="BFGS"), 
+           "CG"          = .optim(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian, method="CG"), 
+           "L-BFGS-B"    = .optim(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian, method="L-BFGS-B"),
+           "SANN"        = .optim(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian, method="SANN"),
+           "Brent"       = .optim(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian, method="Brent"), 
+           "nlm"         = .nlm(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian), 
+           "nlminb"      = .nlminb(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian), 
+           "Rcgmin"      = .Rcgmin(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian), 
+           "Rvmmin"      = .Rvmmin(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian), 
+           "hjn"         = .hjn(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian), 
+           "spg"         = .spg(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian), 
+           "LBFGSB3"     = .lbfgsb3(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian), 
+           "AHR-ES"      = .ahres(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian), 
+           stop(printf("UNSUPPORTED METHOD: %s.", sQuote(method)), call. = FALSE)
+    )
+  return(output)
+}
 
 # calibrate ---------------------------------------------------------------
 
@@ -106,25 +129,28 @@
   copy_master_folder(control, n=n) # set a copy of master for all individuals
   
   # here, make methods explicit (one by one)
-  output = 
-    switch(method, 
-           "Nelder-Mead" = .optim(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian, method="Nelder-Mead"), 
-           "BFGS"        = .optim(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian, method="BFGS"), 
-           "CG"          = .optim(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian, method="CG"), 
-           "L-BFGS-B"    = .optim(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian, method="L-BFGS-B"),
-           "SANN"        = .optim(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian, method="SANN"),
-           "Brent"       = .optim(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian, method="Brent"), 
-           "nlm"         = .nlm(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian), 
-           "nlminb"      = .nlminb(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian), 
-           "Rcgmin"      = .Rcgmin(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian), 
-           "Rvmmin"      = .Rvmmin(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian), 
-           "hjn"         = .hjn(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian), 
-           "spg"         = .spg(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian), 
-           "LBFGSB3"     = .lbfgsb3(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian), 
-           "AHR-ES"      = .ahres(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian), 
-           stop(sprintf("UNSUPPORTED METHOD: %s.", sQuote(method)), call. = FALSE)
-    )
   
+  output = .all_methods(method=method, par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian)
+  #   
+  # output = 
+  #   switch(method, 
+  #          "Nelder-Mead" = .optim(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian, method="Nelder-Mead"), 
+  #          "BFGS"        = .optim(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian, method="BFGS"), 
+  #          "CG"          = .optim(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian, method="CG"), 
+  #          "L-BFGS-B"    = .optim(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian, method="L-BFGS-B"),
+  #          "SANN"        = .optim(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian, method="SANN"),
+  #          "Brent"       = .optim(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian, method="Brent"), 
+  #          "nlm"         = .nlm(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian), 
+  #          "nlminb"      = .nlminb(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian), 
+  #          "Rcgmin"      = .Rcgmin(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian), 
+  #          "Rvmmin"      = .Rvmmin(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian), 
+  #          "hjn"         = .hjn(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian), 
+  #          "spg"         = .spg(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian), 
+  #          "LBFGSB3"     = .lbfgsb3(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian), 
+  #          "AHR-ES"      = .ahres(par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian), 
+  #          stop(sprintf("UNSUPPORTED METHOD: %s.", sQuote(method)), call. = FALSE)
+  #   )
+  # 
   # reshaping full parameters
   paropt = guess
   paropt[isActive] = output$par
@@ -142,9 +168,6 @@
   return(output)
   
 }
-
-
-# optimh ------------------------------------------------------------------
 
 
 # Manage control options --------------------------------------------------
