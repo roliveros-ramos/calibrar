@@ -1,3 +1,4 @@
+library(testthat)
 library(calibrar)
 
 tfn = function(x) sum(x^2) + 10
