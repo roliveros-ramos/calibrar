@@ -254,7 +254,7 @@ calibrate.default = function(par, fn, gr = NULL, ...,
   
   output = c(final, output)
   class(output) = c("calibrar.results")
-  .createOutputFile(output, control, type="results") 
+  .createOutputFile(output, control, type="results")
   
   return(output)
   
