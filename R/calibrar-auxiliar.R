@@ -200,7 +200,6 @@ print.calibrar.demo = function(x, ...) {
     return(x)
   }
   
-  
   config = readLines(file) # read lines
   config = lapply(config, .comment_trim) # remove comments
   config = lapply(config, str_trim)
@@ -229,8 +228,12 @@ print.calibrar.demo = function(x, ...) {
     iifile = ovalues[[ii[1]]]
     xpos = grep(names(values), pattern=names(ovalues)[ii[1]])
     ckey = unique(names(values[xpos]))
-    msg = sprintf("Duplicated key value for '%s'.", ckey)
-    if(length(xpos)>1) stop(msg)
+    msg = sprintf("Duplicated key value for '%s', using first ocurrence (%s).", ckey, xpos[1])
+    if(length(xpos)>1) {
+      xpos = xpos[1]
+      warning(msg)
+    }
+      
     ifile = file.path(attr(iifile, "path"), iifile)
     if(!file.exists(ifile)) {
       msg = sprintf("Configuration file '%s' not found. \n File '%s' not found in %s.", 
@@ -243,6 +246,14 @@ print.calibrar.demo = function(x, ...) {
     }
     values = append(values, xval, xpos)
     ii = ii[-1]
+  }
+  
+  # check for duplicates
+  ind = duplicated(names(values))
+  if(sum(ind) > 0) {
+    values = values[!ind]
+    dup = paste(names(conf)[ind], collapse="\n")
+    msg = sprintf("Removing %d duplicated values:\n %s", sum(ind), dup)
   }
   
   return(values)
