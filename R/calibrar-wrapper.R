@@ -3,20 +3,40 @@
 .all_methods = function(method, par, fn, gr, lower, upper, control, hessian) {
   output = 
     switch(method, 
+           # optim classic
            "Nelder-Mead" = .optim(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian, method="Nelder-Mead"), 
            "BFGS"        = .optim(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian, method="BFGS"), 
            "CG"          = .optim(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian, method="CG"), 
            "L-BFGS-B"    = .optim(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian, method="L-BFGS-B"),
            "SANN"        = .optim(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian, method="SANN"),
            "Brent"       = .optim(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian, method="Brent"), 
+           # stats
            "nlm"         = .nlm(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian), 
            "nlminb"      = .nlminb(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian), 
+           # optimr
            "Rcgmin"      = .Rcgmin(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian), 
            "Rvmmin"      = .Rvmmin(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian), 
            "hjn"         = .hjn(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian), 
            "spg"         = .spg(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian), 
            "LBFGSB3"     = .lbfgsb3(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian), 
+           # heuristic
+           "cmaes"       = .cmaes(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian),
+           "genSA"       = .genSA(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian),
+           "DE"          = .DE(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian),
+           "soma"        = .soma(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian),
+           "genoud"      = .genoud(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian),
+           # PSO
+           "PSO"         = .pso(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian, method="PSO"),
+           "hybridPSO"   = .pso(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian, method="hybridPSO"),
+           # dfoptim
+           "mads"        = .dfoptim(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian, method=method),
+           "hjk"         = .dfoptim(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian, method=method),
+           "hjkb"        = .dfoptim(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian, method=method),
+           "nmk"         = .dfoptim(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian, method=method),
+           "nmkb"        = .dfoptim(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian, method=method),
+           # calibrar
            "AHR-ES"      = .ahres(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian), 
+           
            stop(printf("UNSUPPORTED METHOD: %s.", sQuote(method)), call. = FALSE)
     )
   return(output)
