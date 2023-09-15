@@ -128,7 +128,9 @@
   # trim trace
   trace = .trim_trace_ahr(trace, n=opt$gen)
   
-  partial = fn(opt$MU, ..i=0)
+  use_disk = ifelse(!is.null(attr(fn, "..i")), TRUE, FALSE) 
+  partial = if(use_disk) fn(opt$MU, ..i=0) else fn(opt$MU) 
+  
   value = control$aggFn(x=partial, w=control$weights) # check if necessary
   names(opt$MU) = names(par)
   opt$counts = c('function'=opt$gen*control$popsize, generations=opt$gen)
