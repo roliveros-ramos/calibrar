@@ -166,7 +166,8 @@ calibrate.default = function(par, fn, gr = NULL, ...,
   
   replicates = .checkReplicates(replicates, nphases) 
   
-  output = if(isTRUE(restart)) .getResults(control=control, type="partial") else list(phase=1)
+  output = if(isTRUE(restart)) .getResults(control=control, type="partial") else list(phase=0)
+  output$phase = output$phase + 1
  
   msg0 = sprintf("\nStarting calibration from phase %d.\n", output$phase)
   msg1 = sprintf("\nRestarting calibration from phase %d.\n", output$phase)
@@ -191,6 +192,8 @@ calibrate.default = function(par, fn, gr = NULL, ...,
     control$maxgen      = conv$maxgen[phase]
     control$maxit       = conv$maxit[phase]
     control$convergence = conv$convergence[phase]
+    control$abstol      = conv$abstol[phase]
+    control$reltol      = conv$reltol[phase]
 
     active = (phases <= phase) # NAs are corrected in .calibrar 
     
@@ -207,7 +210,7 @@ calibrate.default = function(par, fn, gr = NULL, ...,
     tm2 = Sys.time()
     
     output$phases[[phase]] = temp # trim?
-    output$phase = phase + 1
+    output$phase = phase
     
     .createOutputFile(output, control, type="partial", phase=phase) 
     
@@ -239,7 +242,7 @@ calibrate.default = function(par, fn, gr = NULL, ...,
     
   } # end of phases
   
-  output$phase = output$phase - 1 # correct for last aborted phase
+  # output$phase = output$phase - 1 # correct for last aborted phase
   
   isActive = (phases>0) & !is.na(phases)
   paropt = output$phases[[nphases]]$par # save parameters of last phase
