@@ -370,8 +370,8 @@ format_difftime = function(x, y, ...) {
     
   }
   
-  if(length(unknown)!=0) 
-    warning("Unknown control parameters: ", paste0(paste(unknown, collapse = ", ")),".")
+  # if(length(unknown)!=0) 
+  #   warning("Unknown control parameters: ", paste0(paste(unknown, collapse = ", ")),".")
   
   return(con)
   
@@ -534,10 +534,14 @@ format_difftime = function(x, y, ...) {
   maxgen      = control$maxgen
   maxit       = control$maxit  
   convergence = control$convergence
+  abstol      = control$abstol
+  reltol      = control$reltol
   
   if(length(maxgen)==1) maxgen = rep(maxgen, nphases)
   if(length(maxit)==1) maxit = rep(maxit, nphases)
   if(length(convergence)==1) convergence = rep(convergence, nphases)
+  if(length(abstol)==1) abstol = rep(abstol, nphases)
+  if(length(reltol)==1) reltol = rep(reltol, nphases)
   
   if(!is.null(maxgen) & length(maxgen)!=nphases) 
     stop("'maxgen' length must match number of calibration phases.")
@@ -547,8 +551,15 @@ format_difftime = function(x, y, ...) {
   
   if(!is.null(convergence) & length(convergence)!=nphases) 
     stop("'convergence' length must match number of calibration phases.")
+
+  if(!is.null(abstol) & length(abstol)!=nphases) 
+    stop("'abstol' length must match number of calibration phases.")
   
-  return(list(maxgen=maxgen, maxit=maxit, convergence=convergence))
+  if(!is.null(reltol) & length(reltol)!=nphases) 
+    stop("'reltol' length must match number of calibration phases.")
+  
+  return(list(maxgen=maxgen, maxit=maxit, convergence=convergence, 
+              abstol=abstol, reltol=reltol))
   
 }
 
@@ -646,5 +657,31 @@ format_difftime = function(x, y, ...) {
   return(out)
 }
 
+
+# Internal stop criteria --------------------------------------------------
+
+.smooth_stop = function(x, reltol, N=10, data=FALSE) {
+  x[!is.finite(x)] = NA
+  dat = data.frame(x=seq_along(x), y=x)
+  dat = dat[complete.cases(dat), ]
+  if(nrow(dat) < N) return(FALSE)
+  mod = scam(y ~ s(x, bs="mpd"), data=dat)
+  dat$value = predict(mod, newdata = dat)
+  dat$diff = Inf
+  dat$diff[-1] = -diff(dat$value)
+  dat$tol = reltol * (abs(dat$value) + reltol)
+  if(isTRUE(data)) {
+    dat$col = ifelse(dat$diff > dat$tol, "black", "red")
+    return(dat)
+  }
+  return(tail(dat$diff < dat$tol, 1))
+}
+
+.N_stop = function(x, N) {
+  x = c(na.omit(x))
+  if(length(x) <= N) return(FALSE)
+  out = tail(filter(x, filter=rep(1/N, N), sides = 1), 1) > (1-0.1/N)
+  return(out)
+}
 
 
