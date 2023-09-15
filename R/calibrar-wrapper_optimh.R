@@ -1,7 +1,7 @@
 
 # wrapper for cma_es ------------------------------------------------------
 
-.cmaes = function(par, fn, lower, upper, control) {
+.cmaes = function(par, fn, gr, lower, upper, control, hessian, method) {
   
   npar = length(unlist(par))
   
@@ -81,6 +81,12 @@
   if(isTRUE(control$parallel)) control$parallelType="auto"
   
   con = DEoptim::DEoptim.control()
+  if(is.null(control$NP)) control$NP = 10*length(lower)
+  if(is.na(control$NP)) control$NP = 10*length(lower)
+  if(control$NP < 4) control$NP = 10*length(lower)
+  if(!is.null(control$trace))  control$trace = ifelse(control$trace>=1, TRUE, FALSE)
+  if(is.null(control$trace)) control$trace = FALSE
+  
   control = check_control(control=control, default=con)
   
   # we pass 'par' as initial population (gaussian with uniform-like variance).
@@ -109,10 +115,16 @@
   control = NULL # check!
   
   con = soma::all2one()
-  control = check_control(control=control, default=con)
+  if(is.null(control$populationSize)) control$populationSize = con$populationSize
   
+  reportr::setOutputLevel(6)
+  if(isTRUE(control$verbose)) reportr::setOutputLevel(3) 
+  control$verbose = NULL
+  
+  control = check_control(control=control, default=con)
+
   # we pass 'par' as initial population (gaussian with uniform-like variance).
-  init = .createRandomPopulation(n=control$NP, mean=par, lower=lower, upper=upper) 
+  init = .createRandomPopulation(n=control$populationSize, mean=par, lower=lower, upper=upper) 
   
   xoutput = suppressWarnings(soma::soma(costFunction=fn, 
                                         bounds=list(min=lower, max=upper), 
@@ -136,16 +148,16 @@
 .genoud = function(par, fn, gr, lower, upper, control, hessian, method) {
   
   if(is.null(control$print.level))
-    control$print.level = if(control$verbose) control$trace else 0
+    control$print.level = if(isTRUE(control$verbose)) control$trace else 0
   if(!is.null(control$maxit)) control$max.generations = control$maxit
-    
     
   con = list(pop.size=1000, max.generations=100, 
              wait.generations=10, hard.generation.limit=TRUE, 
              MemoryMatrix=TRUE, default.domains=10, 
              solution.tolerance=0.001, boundary.enforcement=0, lexical=FALSE,
              gradient.check=TRUE, BFGS=TRUE, data.type.int=FALSE,  
-             unif.seed=880820, int.seed=880820, share.type=0, print.level=2,
+             unif.seed=round(runif(1, 1, 2147483647L)), 
+             int.seed=round(runif(1, 1, 2147483647L)), share.type=0, print.level=2,
              instance.number=0, output.path="stdout", output.append=FALSE, 
              project.path=NULL, P1=50, P2=50, P3=50, P4=50, P5=50, P6=50, P7=50, 
              P8=50, P9=0, P9mix=NULL, BFGSburnin=0, BFGSfn=NULL, BFGShelp=NULL, 
@@ -181,18 +193,23 @@
 .pso = function(par, fn, gr, lower, upper, control, hessian, method) {
   
   hybrid = if(method=="hybridPSO") TRUE else FALSE
-  opso = c("PSO", "PSO2007", "SPSO2007", "hybridPSO")
-  method = if(method %in% opso) "SPSO2007" else "SPSO2011"
+  
+  if(!is.null(control$type)) control$pso.method = control$type
+    
+  method = if(!is.null(control$pso.method)) control$pso.method else "SPSO2007"
+  # opso = c("PSO", "PSO2007", "SPSO2007", "hybridPSO")
+  # method = if(method %in% opso) "SPSO2007" else "SPSO2011"
   control$type   = method 
-  control$hybrid = hybrid
+  if(hybrid) control$hybrid = hybrid
   
   con = list(trace = 0, maxit = 1000, maxf = Inf, abstol = -Inf, reltol = 0, 
              REPORT = 10L, trace.stats = FALSE, 
              s = if(method=="SPSO2011") 40 else floor(10+2*sqrt(length(par))),
-             k = 3, p = 1-(1-1/s)^k, w = 1/(2*log(2)), c.p = 0.5+log(2), c.g = 0.5+log(2),
+             k = 3, w = 1/(2*log(2)), c.p = 0.5+log(2), c.g = 0.5+log(2),
              d = NULL, v.max = NA, rand.order = TRUE, max.restart = Inf,
              maxit.stagnate = Inf, vectorize = FALSE, hybrid = FALSE, 
              hybrid.control = NULL, type = "SPSO2007")
+  con$p = 1-(1-1/con$s)^con$k
   
   control = check_control(control=control, default=con)
   

@@ -33,9 +33,9 @@
   )
   
   
-  control = check_control(control=control, default=con)
+  control = check_control(control=control, default=con, minimal=FALSE)
   
-  out = suppressWarnings(switch(method,
+  xoutput = suppressWarnings(switch(method,
                                 mads = dfoptim::mads(par=par, fn=fn, lower=lower, upper=upper, scale=1, control=control),
                                 hjk  = dfoptim::hjk(par=par, fn=fn, control=control),
                                 hjkb = dfoptim::hjkb(par=par, fn=fn, lower=lower, upper=upper, control=control),
@@ -43,10 +43,14 @@
                                 nmkb = dfoptim::nmkb(par=par, fn=fn, lower=lower, upper=upper, control=control)
   ))
   
-  counts = c('function'=out$feval, 'gradient'=0)
-  convergence = 0
-  
-  output = list(par=par, value=value, counts=counts, convergence=0)
+  output = list()
+  output$par  = xoutput$par
+  output$value = xoutput$value
+  output$counts = c('function'=xoutput$feval, 'gradient'=0)	
+  output$convergence = 0
+  output$message = NULL
+  output$hessian = NULL
+  output$trace = xoutput$iterlog
   
   return(output)
   
