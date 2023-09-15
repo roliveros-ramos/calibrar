@@ -1,7 +1,7 @@
-# calibrar package: Automated Calibration for Complex (Ecological) Models --------
+# calibrar package: Automated Calibration for Complex Models --------
 
-#' @title Automated Calibration for Complex (Ecological) Models
-#' @description Automated Calibration for Complex (Ecological) Models
+#' @title Automated Calibration for Complex Models
+#' @description Automated Calibration for Complex Models
 #' @name calibrar-package
 #' @aliases calibrar-package calibrar
 #' @docType package
@@ -87,10 +87,11 @@ NULL
 #' calibrate(par=rep(0.5, 5), fn=sphereN, replicates=3, lower=-5, upper=5, phases=c(1,1,1,2,3))
 #' calibrate(par=rep(0.5, 5), fn=sphereN, replicates=c(1,1,4), lower=-5, upper=5, phases=c(1,1,1,2,3))
 #' }
+#' @family optimizers 
 #' @export
 calibrate = function(par, fn, gr, ..., lower, upper, phases, method, control, 
                      hessian, replicates, parallel) {
-  UseMethod("calibrate")
+  UseMethod("calibrate", fn)
 }
 
 #' @export
@@ -98,6 +99,12 @@ calibrate.default = function(par, fn, gr = NULL, ...,
                              lower = NULL, upper = NULL, phases = NULL, 
                              method = "AHR-ES", control = list(), 
                              hessian = FALSE, replicates=1, parallel=FALSE) {
+  
+  methods = c("L-BFGS-B", "Brent", "nlminb", "Rcgmin", "Rvmmin", "hjn", "spg", 
+              "LBFGSB3", "cmaes", "genSA", "DE", "soma", "genoud", "PSO", 
+              "hybridPSO", "mads", "hjkb", "nmkb", "AHR-ES")
+  
+  method = match.arg(method, choices=methods)
   
   # calibrate should dispatch on 'fn'
   if(inherits(fn, "objFn")) {
@@ -264,6 +271,29 @@ calibrate.default = function(par, fn, gr = NULL, ...,
 }
 
 
+#' @export
+calibrate.TMB = function(par, fn, gr = NULL, ..., 
+                         lower = NULL, upper = NULL, phases = NULL, 
+                         method = NULL, control = list(), 
+                         hessian = NULL, replicates=1, parallel=FALSE) {
+  
+  methods = c("BFGS", "L-BFGS-B", "nlminb", "Rcgmin", "Rvmmin", "spg", 
+              "LBFGSB3", "AHR-ES")
+  
+  if(!is.null(method)) fn$method = method
+  
+  method = match.arg(fn$method, choices=methods)
+  
+  if(!is.null(hessian)) fn$hessian = hessian
+    
+  out = calibrate(par=par, fn=fn$fn, gr=fn$gr, lower=lower, upper=upper, 
+                  phases=phases, method=method, control=control, 
+                  hessian=fn$hessian, replicates=1, parallel=parallel)
+  
+  return(out)
+  
+}
+
 # optim2 ------------------------------------------------------------------
 
 
@@ -271,8 +301,6 @@ calibrate.default = function(par, fn, gr = NULL, ...,
 #'
 #' @param active Boolean vector of the same length as par, indicating if the 
 #' parameter is used in the optimization (TRUE) or hold at a fixed value (FALSE).
-#'
-#' @export
 #'
 #' @return
 #' A list with components:
@@ -287,195 +315,46 @@ calibrate.default = function(par, fn, gr = NULL, ...,
 #' @examples 
 #' optim2(par=rep(NA, 5), fn=sphereN)
 #' @inheritParams calibrate
+#' @author Ricardo Oliveros-Ramos
+#' @family optimizers 
+#' @export
 optim2 = function(par, fn, gr = NULL, ..., lower = -Inf, upper = +Inf, active = NULL, 
-                  method = NULL, control = list(), hessian = FALSE, parallel=FALSE) {
+                  method = c("Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN", 
+                             "Brent", "nlm", "nlminb", "Rcgmin", "Rvmmin", "hjn", 
+                             "spg", "LBFGSB3", "AHR-ES"), 
+                  control = list(), hessian = FALSE, parallel=FALSE) {
   
-  # par can be a list
-  skeleton = as.relistable(par)
-  par    = unlist(par)
-  lower  = unlist(lower)
-  upper  = unlist(upper)
-  active = unlist(active)
+  method = match.arg(method)
   
-  npar = length(par)
+  out = .optim2(par=par, fn=fn, gr=gr, ..., lower=lower, upper=upper, active=active, 
+                method=method, control=control, hessian=hessian, parallel=parallel)
   
-  # par can be re-scaled
-  parscale = .checkParscale(control=control, npar=npar)
-  control$parscale = NULL # reset parscale
-  
-  par   = par/parscale
-  lower = lower/parscale
-  upper = upper/parscale
-  
-  # function can be re-scaled
-  fnscale = .checkFnscale(control=control)
-  control$fnscale = NULL # reset fnscale
-  
-  # Checking par
-  active     = .checkActive(active=active, npar=npar)
-  bounds     = .checkBounds(lower=lower, upper=upper, npar=npar)
-  guess      = .checkOpt(par=par, lower=bounds$lower, upper=bounds$upper)
-  
-  par     = guess
-  lower   = bounds$lower
-  upper   = bounds$upper
-  
-  isActive = which(active)
-  activeFlag = isTRUE(all(active))
-  
-  if(is.null(names(par))) names(par) = .printSeq(npar, preffix="par")
-  
-  # getting functions
-  fn = match.fun(fn)
-  if(!is.null(gr)) gr = match.fun(gr)
-  
-  # when 'parscale' and 'fnscale' are supplied, 
-  # optimization is carried out over the scaled function
-  fn1  = function(par) {
-    parx = guess
-    parx[isActive] = par
-    parx = relist(flesh = parx*parscale, skeleton = skeleton)
-    output = fn(parx, ...)/fnscale
-    return(output)
-  }
-  
-  # GRADIENT
-  gr.control = c(list(parallel=parallel), control$gradient)
-  gr.method  = control$gr.method # if NULL, uses default.
-  
-  if(!is.null(gr)) {
-    gr1  = function(par) {
-      parx = guess
-      parx[isActive] = par
-      parx = relist(flesh = parx*parscale, skeleton = skeleton)
-      grad = gr(parx, ...)*parscale/fnscale
-      grad = grad[isActive]
-      return(grad)
-    }
-  } else {
-    gr1  = function(par) {
-      gradient(fn=fn1, x=par, method=gr.method, control=gr.control, ...)
-    }    
-  }
-  
-  # here, make methods explicit (one by one)
-  output = .all_methods(method=method, par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian)
-  
-  # reshaping full parameters, un-scaling par
-  paropt = guess
-  paropt[isActive] = output$par
-  paropt = paropt*parscale
-  output$par = paropt
-  # value need to be unscaled
-  output$value = output$value*fnscale
-  
-  return(output) 
-  
+  return(out)
+    
 }
 
 # optimh ------------------------------------------------------------------
 
-
 #' Optimization by heuristic algorithms
 #'
-#' @export
-#'
-#' @return
-#' A list with components:
-#' \describe{
-#' \item{par}{The best set of parameters found.}
-#' \item{value}{The value of fn corresponding to par.}
-#' \item{counts}{A two-element integer vector giving the number of calls to fn and gr respectively. This excludes those calls needed to compute the Hessian, if requested, and any calls to fn to compute a finite-difference approximation to the gradient.}
-#' \item{convergence}{An integer code. 0 indicates successful completion. }
-#' \item{message}{A character string giving any additional information returned by the optimizer, or NULL.}
-#' \item{hessian}{Only if argument hessian is true. A symmetric matrix giving an estimate of the Hessian at the solution found. Note that this is the Hessian of the unconstrained problem even if the box constraints are active.}
-#' }
 #' @examples 
 #' optim2(par=rep(NA, 5), fn=sphereN)
 #' @inheritParams optim2
+#' @inherit optim2 return author
+#' @family optimizers 
+#' @export
 optimh = function(par, fn, gr = NULL, ..., lower = -Inf, upper = +Inf, active = NULL, 
-                  method = NULL, control = list(), hessian = FALSE, parallel=FALSE) {
+                  method = c("AHR-ES", "Nelder-Mead", "SANN", "hjn", "LBFGSB3", 
+                             "cmaes", "genSA", "DE", "soma", "genoud", "PSO", 
+                             "hybridPSO", "mads", "hjk", "hjkb", "nmk", "nmkb"), 
+                  control = list(), hessian = FALSE, parallel=FALSE) {
   
-  # par can be a list
-  skeleton = as.relistable(par)
-  par    = unlist(par)
-  lower  = unlist(lower)
-  upper  = unlist(upper)
-  active = unlist(active)
+  method = match.arg(method)
   
-  npar = length(par)
+  out = .optim2(par=par, fn=fn, gr=gr, ..., lower=lower, upper=upper, active=active, 
+                method=method, control=control, hessian=hessian, parallel=parallel)
   
-  # par can be re-scaled
-  parscale = .checkParscale(control=control, npar=npar)
-  control$parscale = NULL # reset parscale
-  
-  par   = par/parscale
-  lower = lower/parscale
-  upper = upper/parscale
-  
-  # function can be re-scaled
-  fnscale = .checkFnscale(control=control)
-  control$fnscale = NULL # reset fnscale
-  
-  # Checking par
-  active     = .checkActive(active=active, npar=npar)
-  bounds     = .checkBounds(lower=lower, upper=upper, npar=npar)
-  guess      = .checkOpt(par=par, lower=bounds$lower, upper=bounds$upper)
-  
-  par     = guess
-  lower   = bounds$lower
-  upper   = bounds$upper
-  
-  isActive = which(active)
-  activeFlag = isTRUE(all(active))
-  
-  if(is.null(names(par))) names(par) = .printSeq(npar, preffix="par")
-  
-  # getting functions
-  fn = match.fun(fn)
-  if(!is.null(gr)) gr = match.fun(gr)
-  
-  # when 'parscale' and 'fnscale' are supplied, 
-  # optimization is carried out over the scaled function
-  fn1  = function(par) {
-    parx = guess
-    parx[isActive] = par
-    parx = relist(flesh = parx*parscale, skeleton = skeleton)
-    output = fn(parx, ...)/fnscale
-    return(output)
-  }
-  
-  # GRADIENT
-  gr.control = c(list(parallel=parallel), control$gradient)
-  gr.method  = control$gr.method # if NULL, uses default.
-  
-  if(!is.null(gr)) {
-    gr1  = function(par) {
-      parx = guess
-      parx[isActive] = par
-      parx = relist(flesh = parx*parscale, skeleton = skeleton)
-      grad = gr(parx, ...)*parscale/fnscale
-      grad = grad[isActive]
-      return(grad)
-    }
-  } else {
-    gr1  = function(par) {
-      gradient(fn=fn1, x=par, method=gr.method, control=gr.control, ...)
-    }    
-  }
-  
-  # here, make methods explicit (one by one)
-  output = .all_methods(method=method, par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian)
-  
-  # reshaping full parameters, un-scaling par
-  paropt = guess
-  paropt[isActive] = output$par
-  paropt = paropt*parscale
-  output$par = paropt
-  # value need to be unscaled
-  output$value = output$value*fnscale
-  
-  return(output) 
+  return(out)
   
 }
 
@@ -491,6 +370,9 @@ optimh = function(par, fn, gr = NULL, ..., lower = -Inf, upper = +Inf, active = 
 #' ahres(par=rep(1, 5), fn=sphereN)
 #' @inheritParams calibrate
 #' @inheritParams optim2
+#' @inherit optim2 return
+#' @author Ricardo Oliveros-Ramos
+#' @family optimizers 
 #' @export
 ahres = function(par, fn, gr = NULL, ..., lower = -Inf, upper = +Inf, active = NULL, 
                  control = list(), hessian = FALSE, parallel=FALSE) {
