@@ -1,5 +1,5 @@
 Package: calibrar
-Version: 0.3.0.0014
+Version: 0.3.0.0017
 Authors@R: c(
     person("Ricardo", "Oliveros-Ramos", email="ricardo.oliveros@gmail.com", role=c("aut", "cre")))
 Title: Automated Parameter Estimation for Complex (Ecological) Models
@@ -23,6 +23,7 @@ Imports:
   utils
 Suggests: 
     deSolve,
+    scam,
     testthat (>= 3.0.0)
 License: GPL-2
 Encoding: UTF-8
