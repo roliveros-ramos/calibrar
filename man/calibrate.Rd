@@ -2,7 +2,7 @@
 % Please edit documentation in R/calibrar-main.R
 \name{calibrate}
 \alias{calibrate}
-\title{Sequential parameter estimation for the calibration of models}
+\title{Sequential parameter estimation for the calibration of complex models}
 \usage{
 calibrate(
   par,
@@ -76,6 +76,13 @@ calibrate(par=rep(0.5, 5), fn=sphereN, replicates=3, lower=-5, upper=5, phases=c
 calibrate(par=rep(0.5, 5), fn=sphereN, replicates=c(1,1,4), lower=-5, upper=5, phases=c(1,1,1,2,3))
 }
 }
+\seealso{
+Other optimizers: 
+\code{\link{ahres}()},
+\code{\link{optim2}()},
+\code{\link{optimh}()}
+}
 \author{
 Ricardo Oliveros-Ramos
 }
+\concept{optimizers}

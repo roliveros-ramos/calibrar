@@ -4,9 +4,9 @@
 \name{calibrar-package}
 \alias{calibrar-package}
 \alias{calibrar}
-\title{Automated Calibration for Complex (Ecological) Models}
+\title{Automated Calibration for Complex Models}
 \description{
-Automated Calibration for Complex (Ecological) Models
+Automated Calibration for Complex Models
 }
 \examples{
 \dontrun{

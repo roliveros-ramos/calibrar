@@ -47,6 +47,17 @@ Currently not implemented.}
 
 \item{parallel}{Logical. Use parallel computation of gradients?}
 }
+\value{
+A list with components:
+\describe{
+\item{par}{The best set of parameters found.}
+\item{value}{The value of fn corresponding to par.}
+\item{counts}{A two-element integer vector giving the number of calls to fn and gr respectively. This excludes those calls needed to compute the Hessian, if requested, and any calls to fn to compute a finite-difference approximation to the gradient.}
+\item{convergence}{An integer code. 0 indicates successful completion. }
+\item{message}{A character string giving any additional information returned by the optimizer, or NULL.}
+\item{hessian}{Only if argument hessian is true. A symmetric matrix giving an estimate of the Hessian at the solution found. Note that this is the Hessian of the unconstrained problem even if the box constraints are active.}
+}
+}
 \description{
 This function performs the optimization of a function using 
 the Adaptative Hierarchical Recombination Evolutionary Strategy (AHR-ES, Oliveros & Shin, 2015).
@@ -54,6 +65,13 @@ the Adaptative Hierarchical Recombination Evolutionary Strategy (AHR-ES, Olivero
 \examples{
 ahres(par=rep(1, 5), fn=sphereN)
 }
+\seealso{
+Other optimizers: 
+\code{\link{calibrate}()},
+\code{\link{optim2}()},
+\code{\link{optimh}()}
+}
 \author{
 Ricardo Oliveros-Ramos
 }
+\concept{optimizers}
