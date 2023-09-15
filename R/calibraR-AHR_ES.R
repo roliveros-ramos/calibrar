@@ -10,7 +10,8 @@
              abstol = -Inf, reltol = sqrt(.Machine$double.eps), REPORT = 10L, 
              alpha=0.05, age.max=1, selection=0.5, step=0.5, weights=1,
              aggFn=.weighted.sum, nvar=1, useCV=TRUE, maxgen=NULL,
-             convergence=1e-6, ncores=1, parallel=FALSE, verbose=FALSE)
+             convergence=1e-6, ncores=1, parallel=FALSE, verbose=FALSE,
+             termination_criteria = 1, max_no_improvement=10)
   popOpt = .optPopSize(n=length(par), selection=con$selection)
   con$popsize = popOpt
   # end of default control options
@@ -29,13 +30,13 @@
     opt = .newOpt(par=par, lower=lower, upper=upper, control=control)
     
     trace = NULL
-    
+      
     if(control$REPORT>0 & control$trace>0) {
       
       trace = list()
       trace$control = control
       trace$par   = matrix(NA, nrow=control$maxgen, ncol=length(par))
-      trace$value = rep(NA, control$maxgen)
+      trace$value = opt$the_values
       trace$best  = rep(NA, control$maxgen)
       
       if(control$trace>1) {
@@ -75,11 +76,17 @@
     opt = .updatePopulation(opt)
     
     # save detailed outputs
+    opt$the_values[opt$gen] = control$aggFn(opt$fitness[1, ], control$weights)
+    
+    if(control$termination_criteria %in% c(2,3)) {
+      opt$sstop[opt$gen] = .smooth_stop(opt$the_values, reltol=control$reltol, N=control$max_no_improvement)
+    }
+    
     if(control$REPORT>0 & control$trace>0) {
       
       trace$par[opt$gen, ] = opt$MU
       trace$best[opt$gen]  = opt$selected$best$fit.global
-      trace$value[opt$gen] = control$aggFn(opt$fitness[1, ], control$weights)
+      trace$value[opt$gen] = opt$the_values[opt$gen]
       
       if(control$trace>1) {
         trace$sd[opt$gen, ]  = opt$SIGMA
@@ -118,6 +125,9 @@
     
   } # end generations loop
   
+  # trim trace
+  trace = .trim_trace_ahr(trace, n=opt$gen)
+  
   partial = fn(opt$MU, ..i=0)
   value = control$aggFn(x=partial, w=control$weights) # check if necessary
   names(opt$MU) = names(par)
@@ -135,9 +145,15 @@
 # Auxiliar functions ------------------------------------------------------
 
 .continueEvolution = function(opt, control) {
-  out = (opt$gen <= (control$maxgen - 1)) & (opt$step >= control$convergence)
-#   out = (opt$gen <= control$maxit)
-# reltol * (abs(val) + reltol)
+  termination_criteria = control$termination_criteria
+  if(is.null(termination_criteria)) termination_criteria = 0
+  out = switch(as.character(termination_criteria), 
+               "0" = TRUE,
+               "1" = (opt$step >= control$convergence),
+               "2" = !.N_stop(opt$sstop, N=control$max_no_improvement),
+               stop("Invalid termination criteria selected.")
+  )
+  out = (opt$gen <= (control$maxgen - 1)) & out
   return(out)
 }
 
@@ -206,6 +222,9 @@
   opt$weights   = control$weights
   opt$useCV     = control$useCV
   opt$alpha     = control$alpha
+  
+  opt$the_values = rep(NA, control$maxgen)
+  opt$sstop      = rep(NA, control$maxgen)
   
   opt$control   = control
   
@@ -412,6 +431,9 @@
   
 }
 
+
+# Auxiliar functions ------------------------------------------------------
+
 .check_control_ahres = function(control, default) {
   
   popOpt = default$popsize
@@ -445,5 +467,25 @@
   
   control$maxgen = control$maxit
   
+  if(control$termination_criteria %in% c(2,3)) {
+    msg = sprintf("You need to install the 'scam' package for termination criteria %s.", 
+                    control$termination_criteria)
+    if(!requireNamespace("scam", quietly = TRUE)) stop(msg)
+  }
+  
   return(control)
+  
+}
+
+
+.trim_trace_ahr = function(trace, n) {
+  ind = seq_len(n)
+  trace$par     = trace$par[ind, ]
+  trace$value   = trace$value[ind]
+  trace$best    = trace$best[ind]
+  trace$sd      = trace$sd[ind, ]
+  trace$step    = trace$step[ind]
+  trace$fitness = trace$fitness[ind, ]
+  trace$opt     = trace$opt[ind]
+  return(trace)
 }
