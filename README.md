@@ -1,6 +1,8 @@
 # calibrar
 
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/calibrar)](http://cran.r-project.org/package=calibrar)
+![GitHub R package version](https://img.shields.io/github/r-package/v/roliveros-ramos/calibrar)
+
 [![GitHub issues](https://img.shields.io/github/issues/roliveros-ramos/calibrar)](https://github.com/roliveros-ramos/calibrar/issues)
 [![](http://cranlogs.r-pkg.org/badges/calibrar)](http://cran.rstudio.com/web/packages/calibrar/index.html)
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/2132/badge)](https://bestpractices.coreinfrastructure.org/projects/2132)
