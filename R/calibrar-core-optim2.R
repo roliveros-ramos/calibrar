@@ -74,7 +74,7 @@
     }
   } else {
     gr1  = function(par) {
-      gradient(fn=fn1, x=par, method=gr.method, control=gr.control, parallel=parallel, ...)
+      gradient(fn=fn1, x=par, method=gr.method, control=gr.control, parallel=parallel)
     }    
   }
   
