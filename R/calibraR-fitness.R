@@ -5,7 +5,7 @@
 #' @param sim simulated data matching 'obs'
 #' @param FUN the error function. Current accepted values area: 'norm2', 
 #' 'lnorm2', 'lnorm3', 'multinomial', 'pois', 'penalty0', 'penalty1', 'penalty2' and 'normp'.
-#' @param ... 
+#' @param ... Additional arguments to FUN
 #'
 #' @return the value of FUN(obs, sim, ...)
 #' @export
