@@ -10,24 +10,21 @@
   # all default values!
   con = list(trace = FALSE, fnscale = 1, stopfitness = -Inf, maxit = 100 * npar^2,
              sigma = 0.5, keep.best = TRUE, vectorized = FALSE, diag = FALSE,
-             lambda = 4 + floor(3 * log(npar)))
+             lambda = 4 + floor(3 * log(npar)), ccum = 4/(npar + 4))
   
-  con = within(con, {
-    stop.tolx = 1e-12 * sigma
-    diag.sigma = diag
-    diag.eigen = diag
-    diag.value = diag
-    diag.pop = diag
-    mu = floor(lambda/2)
-    weights = log(mu + 1) - log(1:mu)
-    weights = weights/sum(weights)
-    mueff = sum(weights)^2/sum(weights^2)
-    ccum = 4/(npar + 4)
-    cs = (mueff + 2)/(npar + mueff + 3)
-    ccov.mu = mueff
-    ccov.1 = (1/ccov.mu) * 2/(npar + 1.4)^2 + (1 - 1/ccov.mu) * ((2 * ccov.mu - 1)/((npar + 2)^2 + 2 * ccov.mu))
-    damps = 1 + 2 * max(0, sqrt((mueff - 1)/(npar + 1)) - 1) + cs
-  })
+  con$stop.tolx = 1e-12 * con$sigma
+  con$diag.sigma = con$diag
+  con$diag.eigen = con$diag
+  con$diag.value = con$diag
+  con$diag.pop = con$diag
+  con$mu = floor(con$lambda/2)
+  con$weights = log(con$mu + 1) - log(seq_len(con$mu))
+  con$weights = con$weights/sum(con$weights)
+  con$mueff = sum(con$weights)^2/sum(con$weights^2)
+  con$cs = (con$mueff + 2)/(npar + con$mueff + 3)
+  con$ccov.mu = con$mueff
+  con$ccov.1 = (1/con$ccov.mu) * 2/(npar + 1.4)^2 + (1 - 1/con$ccov.mu) * ((2 * con$ccov.mu - 1)/((npar + 2)^2 + 2 * con$ccov.mu))
+  con$damps = 1 + 2 * max(0, sqrt((con$mueff - 1)/(npar + 1)) - 1) + con$cs
   
   control = check_control(control=control, default=con)
   
