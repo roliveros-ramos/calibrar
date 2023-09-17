@@ -1,3 +1,6 @@
+library(calibrar)
+library(testthat)
+
 tfn = function(x) sum(x^2) + 10
 
 # optimh ------------------------------------------------------------------

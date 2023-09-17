@@ -1,4 +1,5 @@
 library(calibrar)
+library(testthat)
 
 tfn = function(x) sum(x^3 + 10*x) 
 
