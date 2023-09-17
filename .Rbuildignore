@@ -4,3 +4,4 @@ TO_DO.txt
 cran-comments.md
 NEWS.md
 ^\docs$
+docs
