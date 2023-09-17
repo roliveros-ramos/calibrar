@@ -14,23 +14,33 @@ Description: Automated parameter estimation for complex models in R.
 Depends: 
   R (>= 2.15)
 Imports:
+  BB,
   cmaes,
+  DEoptim,
+  dfoptim,
+  GenSA,
   graphics,
   optimr, 
   foreach,
+  lbfgsb3c,
   parallel,
+  pso,
   Rcgmin,
+  rgenoud,
   Rvmmin,
+  soma,
   stats,
   stringr,
   utils
 Suggests: 
     deSolve,
+    ibm,
     scam,
     testthat (>= 3.0.0)
 License: GPL-2
 Encoding: UTF-8
-URL: https://roliveros-ramos.github.io/calibrar
+VignetteBuilder: knitr
+URL: https://roliveros-ramos.github.io/calibrar/
 BugReports: https://github.com/roliveros-ramos/calibrar/issues
 ByteCompile: TRUE
 RoxygenNote: 7.2.3
