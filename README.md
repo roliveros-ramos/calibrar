@@ -28,3 +28,9 @@ Or the development version from github:
 # install.packages("devtools")
 devtools::install_github("roliveros-ramos/calibrar")
 ```
+
+
+## Code of Conduct
+
+Please note that the calibrar package is released with a [Contributor Code of Conduct](https://www.contributor-covenant.org/version/2/1/code_of_conduct/). By contributing to this project, you agree to abide by its terms.
+
