@@ -318,7 +318,7 @@ Rvmmin2 = function(par, fn, gr = NULL, lower = NULL,
   ############# end test gr ####################
   # Assume bounds already checked 150108
   f<-try(fn(bvec, ...), silent=TRUE) # Compute the function.
-  if ((class(f) == "try-error") | is.na(f) | is.null(f) | is.infinite(f)) {
+  if ((inherits(f, "try-error")) | is.na(f) | is.null(f) | is.infinite(f)) {
     msg <- "Initial point gives inadmissible function value"
     conv <- 20
     if (trace > 0) 
@@ -457,7 +457,7 @@ Rvmmin2 = function(par, fn, gr = NULL, lower = NULL,
         if (changed) {
           # compute new step, if possible
           f <- try(fn(bvec, ...))
-          if (class(f) == "try-error") f <- .Machine$double.xmax
+          if (inherits(f, "try-error")) f <- .Machine$double.xmax
           if (maximize) f <- -f
           if (trace > 2) cat("New f=",f," lower = ",(f < fmin),"\n")
           ifn <- ifn + 1
@@ -519,7 +519,7 @@ Rvmmin2 = function(par, fn, gr = NULL, lower = NULL,
       }  # end reactivate constraints loop
       ###   }  # if bounds
       test <- try(g <- mygr(bvec, ...), silent = TRUE) 
-      if (class(test) == "try-error") stop("Bad gradient!!")
+      if (inherits(test, "try-error")) stop("Bad gradient!!")
       if (any(is.nan(g))) stop("NaN in gradient")
       ig <- ig + 1
       if (maximize) g <- -g
