@@ -27,26 +27,26 @@ Vignettes are long form documentation commonly included in packages. Because the
 
 ```{r, echo=TRUE, results='hide'}
 library(calibrar)
-calibrate(par=rep(NA, 5), fn=SphereN)
+calibrate(par=rep(NA, 5), fn=sphereN)
 ```
 
 ```{r, echo=TRUE, results='hide'}
 library(calibrar)
-calibrate(par=rep(NA, 5), fn=SphereN, replicates=3)
+calibrate(par=rep(NA, 5), fn=sphereN, replicates=3)
 ```
 
 ```{r, echo=TRUE, results='hide'}
 library(calibrar)
-calibrate(par=rep(0.5, 5), fn=SphereN, replicates=3, lower=-5, upper=5)
+calibrate(par=rep(0.5, 5), fn=sphereN, replicates=3, lower=-5, upper=5)
 ```
 
 ```{r, echo=TRUE, results='hide'}
-calibrate(par=rep(0.5, 5), fn=SphereN, replicates=c(1,1,4), lower=-5, upper=5, phases=c(1,1,1,2,3))
+calibrate(par=rep(0.5, 5), fn=sphereN, replicates=c(1,1,4), lower=-5, upper=5, phases=c(1,1,1,2,3))
 ```
 
 ```{r, echo=TRUE, results='hide'}
 # this calibration save results on the disk for restart purposes
-calibrate(par=rep(0.5, 5), fn=SphereN, replicates=3, lower=-5, upper=5, phases=c(1,1,1,2,3), control=list(restart.file="sphere"))
+calibrate(par=rep(0.5, 5), fn=sphereN, replicates=3, lower=-5, upper=5, phases=c(1,1,1,2,3), control=list(restart.file="sphere"))
 ```
 
 ### Running in parallel
@@ -59,7 +59,7 @@ ncores = 6 # number of cores to be used
 cl = makeCluster(ncores, type="SOCK")
 registerDoSNOW(cl) # register the parallel backend
 # this is slower than sequential for very fast models (like this one)
-calib = calibrate(par=rep(0.5, 5), fn=SphereN, 
+calib = calibrate(par=rep(0.5, 5), fn=sphereN, 
                   replicates=3, 
                   lower=rep(-5, 5), 
                   upper=rep(+5, 5), 
@@ -135,7 +135,7 @@ es2 = calibrate(par=start, fn=obj, x=x, y=y,
                            lower=lower, upper=upper)
 
 cat("Running optim CG\n")
-cg  = calibrate(par=start, fn=obj, x=x, y=y, method="CG")
+cg  = calibrate(par=start, fn=obj, x=x, y=y, method="Rcgmin")
 
 cat("Running optim SANN\n")
 sann = calibrate(par=start, fn=obj, x=x, y=y, method="SANN")
@@ -144,7 +144,7 @@ cat("Running optimx Nelder-Mead\n")
 nm = calibrate(par=start, fn=obj, x=x, y=y, method="Nelder-Mead")
 
 cat("Running optimx BFGS\n")
-bfgs = calibrate(par=start, fn=obj, x=x, y=y, method="BFGS")
+bfgs = calibrate(par=start, fn=obj, x=x, y=y, method="L-BFGS-B")
 
 cat("Running cmaes CMA-ES\n")
 cma = calibrate(par=start, fn=obj, x=x, y=y, 
@@ -177,26 +177,6 @@ knitr::kable(final)
 
 ### Fitting an stochastic model: an IBM Lotka-Volterra model
 
-
-```{r, echo=TRUE, results='hide'}
-
-```
-
-```{r, echo=TRUE, results='hide'}
-
-```
-
-```{r, echo=TRUE, results='hide'}
-
-```
-
-```{r, echo=TRUE, results='hide'}
-
-```
-
-```{r, echo=TRUE, results='hide'}
-
-```
 
 ## Figures
 
