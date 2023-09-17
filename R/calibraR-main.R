@@ -102,7 +102,8 @@ calibrate.default = function(par, fn, gr = NULL, ...,
   
   methods = c("L-BFGS-B", "Brent", "nlminb", "Rcgmin", "Rvmmin", "hjn", "spg", 
               "LBFGSB3", "cmaes", "genSA", "DE", "soma", "genoud", "PSO", 
-              "hybridPSO", "mads", "hjkb", "nmkb", "AHR-ES")
+              "hybridPSO", "mads", "hjkb", "nmkb", "AHR-ES", "Nelder-Mead", 
+              "CG", "BFGS", "SANN")
   
   method = match.arg(method, choices=methods)
   
