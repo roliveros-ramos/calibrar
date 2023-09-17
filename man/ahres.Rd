@@ -66,7 +66,7 @@ the Adaptative Hierarchical Recombination Evolutionary Strategy (AHR-ES, Olivero
 ahres(par=rep(1, 5), fn=sphereN)
 }
 \seealso{
-Other optimizers: 
+Other optimisers: 
 \code{\link{calibrate}()},
 \code{\link{optim2}()},
 \code{\link{optimh}()}
@@ -74,4 +74,4 @@ Other optimizers:
 \author{
 Ricardo Oliveros-Ramos
 }
-\concept{optimizers}
+\concept{optimisers}

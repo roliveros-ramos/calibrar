@@ -19,6 +19,8 @@
 
 \item{keep.names}{Should names be kept as they are? By default, are converted to lower case, as is expected in OSMOSE.}
 
+\item{conf.key}{String indicating the leading key to find an additional configuration file.}
+
 \item{...}{Additional arguments, not currently in use.}
 }
 \description{

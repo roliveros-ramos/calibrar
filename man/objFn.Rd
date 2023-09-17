@@ -17,7 +17,7 @@ fitness(obs, sim, FUN, ...)
 \item{FUN}{the error function. Current accepted values area: 'norm2', 
 'lnorm2', 'lnorm3', 'multinomial', 'pois', 'penalty0', 'penalty1', 'penalty2' and 'normp'.}
 
-\item{...}{}
+\item{...}{Additional arguments to FUN}
 }
 \value{
 the value of FUN(obs, sim, ...)

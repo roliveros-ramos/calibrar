@@ -70,7 +70,7 @@ General-purpose optimization
 optim2(par=rep(NA, 5), fn=sphereN)
 }
 \seealso{
-Other optimizers: 
+Other optimisers: 
 \code{\link{ahres}()},
 \code{\link{calibrate}()},
 \code{\link{optimh}()}
@@ -78,4 +78,4 @@ Other optimizers:
 \author{
 Ricardo Oliveros-Ramos
 }
-\concept{optimizers}
+\concept{optimisers}

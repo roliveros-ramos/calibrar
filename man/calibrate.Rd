@@ -77,7 +77,7 @@ calibrate(par=rep(0.5, 5), fn=sphereN, replicates=c(1,1,4), lower=-5, upper=5, p
 }
 }
 \seealso{
-Other optimizers: 
+Other optimisers: 
 \code{\link{ahres}()},
 \code{\link{optim2}()},
 \code{\link{optimh}()}
@@ -85,4 +85,4 @@ Other optimizers:
 \author{
 Ricardo Oliveros-Ramos
 }
-\concept{optimizers}
+\concept{optimisers}

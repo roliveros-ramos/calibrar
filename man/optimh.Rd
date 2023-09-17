@@ -70,7 +70,7 @@ Optimization by heuristic algorithms
 optim2(par=rep(NA, 5), fn=sphereN)
 }
 \seealso{
-Other optimizers: 
+Other optimisers: 
 \code{\link{ahres}()},
 \code{\link{calibrate}()},
 \code{\link{optim2}()}
@@ -78,4 +78,4 @@ Other optimizers:
 \author{
 Ricardo Oliveros-Ramos
 }
-\concept{optimizers}
+\concept{optimisers}

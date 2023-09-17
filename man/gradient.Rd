@@ -27,5 +27,5 @@ This function calculates the gradient of a function, numerically, including the 
 of doing it in parallel.
 }
 \examples{
-gradient(fn=function(x) sum(x^3))
+gradient(fn=function(x) sum(x^3), x=0)
 }
