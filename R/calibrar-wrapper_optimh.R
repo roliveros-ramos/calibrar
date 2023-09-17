@@ -114,16 +114,16 @@
   con = soma::all2one()
   if(is.null(control$populationSize)) control$populationSize = con$populationSize
   
-  reportr::setOutputLevel(6)
-  if(isTRUE(control$verbose)) reportr::setOutputLevel(3) 
-  control$verbose = NULL
+  # reportr::setOutputLevel(6)
+  # if(isTRUE(control$verbose)) reportr::setOutputLevel(3) 
+  # control$verbose = NULL
   
   control = check_control(control=control, default=con)
 
   # we pass 'par' as initial population (gaussian with uniform-like variance).
   init = .createRandomPopulation(n=control$populationSize, mean=par, lower=lower, upper=upper) 
   
-  xoutput = suppressWarnings(soma::soma(costFunction=fn, 
+  xoutput = suppressWarnings(soma(costFunction=fn, 
                                         bounds=list(min=lower, max=upper), 
                                         options=control, init=init))
   
