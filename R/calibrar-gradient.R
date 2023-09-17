@@ -13,7 +13,7 @@
 #' @return The gradient of \code{fn} at \code{x}.
 #' @export
 #'
-#' @examples gradient(fn=function(x) sum(x^3))
+#' @examples gradient(fn=function(x) sum(x^3), x=0)
 gradient = function(fn, x, method, control, parallel, ...) {
   UseMethod("gradient")
 }

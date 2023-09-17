@@ -1,9 +1,10 @@
 #' Predict time-varying parameters using splines.
 #'
-#' @param x Values at knots
+#' @param par Values at knots
 #' @param n Number of points. Time (independent variable) is assumed to be between 0 and n with length(par) equidistant points (including 0 and n).
 #' @param knots Position of knots. Default, is length(x) equidistant points between 0 and 1. Always are re-scaled to 0 to 1.
 #' @param periodic boolean, is the spline periodic?
+#' @param period If periodic is TRUE, it specify the time period.
 #'
 #' @return A list with the interpolates values as 'x' and 'time'.
 #' @export

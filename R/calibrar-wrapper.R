@@ -37,7 +37,7 @@
            # calibrar
            "AHR-ES"      = .ahres(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian), 
            
-           stop(printf("UNSUPPORTED METHOD: %s.", sQuote(method)), call. = FALSE)
+           stop(sprintf("UNSUPPORTED METHOD: %s.", sQuote(method)), call. = FALSE)
     )
   return(output)
 }
