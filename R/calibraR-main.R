@@ -87,7 +87,7 @@ NULL
 #' calibrate(par=rep(0.5, 5), fn=sphereN, replicates=3, lower=-5, upper=5, phases=c(1,1,1,2,3))
 #' calibrate(par=rep(0.5, 5), fn=sphereN, replicates=c(1,1,4), lower=-5, upper=5, phases=c(1,1,1,2,3))
 #' }
-#' @family optimizers 
+#' @family optimisers 
 #' @export
 calibrate = function(par, fn, gr, ..., lower, upper, phases, method, control, 
                      hessian, replicates, parallel) {
@@ -208,7 +208,7 @@ calibrate.default = function(par, fn, gr = NULL, ...,
                    phase, sum(active, na.rm=TRUE), npar, date())
     if(isTRUE(control$verbose)) message(msg2)
     
-    # call optimizers using .calibrar handler
+    # call optimisers using .calibrar handler
     tm1 = Sys.time()
     temp = .calibrar(par=par, fn=fn, gr = gr, ..., method = method, 
                    lower = lower, upper = upper, control = control, 
@@ -316,7 +316,7 @@ calibrate.TMB = function(par, fn, gr = NULL, ...,
 #' optim2(par=rep(NA, 5), fn=sphereN)
 #' @inheritParams calibrate
 #' @author Ricardo Oliveros-Ramos
-#' @family optimizers 
+#' @family optimisers 
 #' @export
 optim2 = function(par, fn, gr = NULL, ..., lower = -Inf, upper = +Inf, active = NULL, 
                   method = c("Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN", 
@@ -341,7 +341,7 @@ optim2 = function(par, fn, gr = NULL, ..., lower = -Inf, upper = +Inf, active = 
 #' optim2(par=rep(NA, 5), fn=sphereN)
 #' @inheritParams optim2
 #' @inherit optim2 return author
-#' @family optimizers 
+#' @family optimisers 
 #' @export
 optimh = function(par, fn, gr = NULL, ..., lower = -Inf, upper = +Inf, active = NULL, 
                   method = c("AHR-ES", "Nelder-Mead", "SANN", "hjn", "LBFGSB3", 
@@ -372,7 +372,7 @@ optimh = function(par, fn, gr = NULL, ..., lower = -Inf, upper = +Inf, active = 
 #' @inheritParams optim2
 #' @inherit optim2 return
 #' @author Ricardo Oliveros-Ramos
-#' @family optimizers 
+#' @family optimisers 
 #' @export
 ahres = function(par, fn, gr = NULL, ..., lower = -Inf, upper = +Inf, active = NULL, 
                  control = list(), hessian = FALSE, parallel=FALSE) {
@@ -537,6 +537,7 @@ calibration_setup = function(file, control=list(), ...) {
 #' See details.
 #' @param path Path to the directory to look up for the data. Paths in setup are considered relatives to this path.
 #' @param file Optional file to save the created object (as an 'rds' file.)
+#' @param verbose If TRUE, detailed messages of the process are printed.
 #' @param \dots Additional arguments to \code{read.csv} function 
 #' to read the data files.
 #' @return A list with the observed data needed for a calibration, to be used 
@@ -544,7 +545,7 @@ calibration_setup = function(file, control=list(), ...) {
 #' @author Ricardo Oliveros-Ramos
 #' @seealso \code{\link{createObjectiveFunction}}, \code{\link{getCalibrationInfo}}.
 #' @export
-calibration_data = function(setup, path=".", verbose=TRUE, file=NULL, ...) {
+calibration_data = function(setup, path=".", file=NULL, verbose=TRUE, ...) {
   
   observed  = list()
   useData = as.logical(setup$use_data)
