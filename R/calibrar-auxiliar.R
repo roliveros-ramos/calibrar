@@ -148,6 +148,7 @@ print.calibrar.demo = function(x, ...) {
 #'
 #' @param recursive Should 'osmose.configuration' keys be read as additional configuration files? Default is TRUE.
 #' @param keep.names Should names be kept as they are? By default, are converted to lower case, as is expected in OSMOSE.
+#' @param conf.key String indicating the leading key to find an additional configuration file.
 #' @param ... Additional arguments, not currently in use.
 #'
 #' @export
@@ -252,7 +253,7 @@ print.calibrar.demo = function(x, ...) {
   ind = duplicated(names(values))
   if(sum(ind) > 0) {
     values = values[!ind]
-    dup = paste(names(conf)[ind], collapse="\n")
+    dup = paste(names(config)[ind], collapse="\n")
     msg = sprintf("Removing %d duplicated values:\n %s", sum(ind), dup)
   }
   
