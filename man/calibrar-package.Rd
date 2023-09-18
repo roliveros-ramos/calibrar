@@ -8,6 +8,16 @@
 \description{
 Automated Calibration for Complex Models
 }
+\details{
+calibrar package: Automated Calibration for Complex Models
+
+\if{html}{\figure{logo_small.png}{options: align='right' alt='logo' width='150'}}
+
+This package allows the parameter estimation (i.e. calibration) of complex models, including stochastic ones. It implements generic functions that can be used for fitting any type of models, especially those with non-differentiable objective functions, with the same syntax as base::optim. 
+It supports multiple phases estimation (sequential parameter masking), constrained optimization (bounding box restrictions) and automatic parallel computation of numerical gradients. 
+Some common maximum likelihood estimation methods and automated construction of the objective function from simulated model outputs is provided.  
+See <http://roliveros-ramos.github.io/calibrar> for more details.
+}
 \examples{
 \dontrun{
 require(calibrar)
@@ -16,9 +26,9 @@ path = NULL # NULL to use the current directory
 # create the demonstration files
 demo = calibrar_demo(model="PoissonMixedModel", L=5, T=100) 
 # get calibration information
-calibrationInfo = getCalibrationInfo(path=demo$path)
+calibrationInfo = calibration_setup(file=demo$path)
 # get observed data
-observed = getObservedData(info=calibrationInfo, path=demo$path)
+observed = calibration_data(setup=calibrationInfo, path=demo$path)
 # read forcings for the model
 forcing = read.csv(file.path(demo$path, "master", "environment.csv"), row.names=1)
 # Defining 'runModel' function
@@ -32,7 +42,7 @@ return(output)
 cat("Real parameters used to simulate data\n")
 print(demo$par)
 # objective functions
-obj  = createObjectiveFunction(runModel=runModel, info=calibrationInfo, 
+obj  = calibration_objFn(model=runModel, setup=calibrationInfo, 
                                observed=observed, forcing=forcing)
 cat("Starting calibration...\n")
 control = list(weights=calibrationInfo$weights, maxit=3.6e5) # control parameters
