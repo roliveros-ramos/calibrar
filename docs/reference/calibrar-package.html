@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">calibrar</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.0.9020</span>
       </span>
     </div>
 
@@ -63,6 +63,15 @@
     </div>
 
 
+    <div id="details">
+    <h2>Details</h2>
+    <p>calibrar package: Automated Calibration for Complex Models</p>
+<p><img src="figures/logo_small.png" align="right" alt="logo" width="150"></p>
+<p>This package allows the parameter estimation (i.e. calibration) of complex models, including stochastic ones. It implements generic functions that can be used for fitting any type of models, especially those with non-differentiable objective functions, with the same syntax as base::optim. 
+It supports multiple phases estimation (sequential parameter masking), constrained optimization (bounding box restrictions) and automatic parallel computation of numerical gradients. 
+Some common maximum likelihood estimation methods and automated construction of the objective function from simulated model outputs is provided.  
+See &lt;http://roliveros-ramos.github.io/calibrar&gt; for more details.</p>
+    </div>
     <div id="references">
     <h2>References</h2>
     <p>calibrar: an R package for the calibration of ecological models (Oliveros-Ramos and Shin 2014)</p>
@@ -82,9 +91,9 @@
 <span class="r-in"><span><span class="co"># create the demonstration files</span></span></span>
 <span class="r-in"><span><span class="va">demo</span> <span class="op">=</span> <span class="fu"><a href="calibrar_demo.html">calibrar_demo</a></span><span class="op">(</span>model<span class="op">=</span><span class="st">"PoissonMixedModel"</span>, L<span class="op">=</span><span class="fl">5</span>, T<span class="op">=</span><span class="fl">100</span><span class="op">)</span> </span></span>
 <span class="r-in"><span><span class="co"># get calibration information</span></span></span>
-<span class="r-in"><span><span class="va">calibrationInfo</span> <span class="op">=</span> <span class="fu"><a href="getCalibrationInfo.html">getCalibrationInfo</a></span><span class="op">(</span>path<span class="op">=</span><span class="va">demo</span><span class="op">$</span><span class="va">path</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">calibrationInfo</span> <span class="op">=</span> <span class="fu"><a href="calibration_setup.html">calibration_setup</a></span><span class="op">(</span>file<span class="op">=</span><span class="va">demo</span><span class="op">$</span><span class="va">path</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># get observed data</span></span></span>
-<span class="r-in"><span><span class="va">observed</span> <span class="op">=</span> <span class="fu"><a href="getObservedData.html">getObservedData</a></span><span class="op">(</span>info<span class="op">=</span><span class="va">calibrationInfo</span>, path<span class="op">=</span><span class="va">demo</span><span class="op">$</span><span class="va">path</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">observed</span> <span class="op">=</span> <span class="fu"><a href="calibration_data.html">calibration_data</a></span><span class="op">(</span>setup<span class="op">=</span><span class="va">calibrationInfo</span>, path<span class="op">=</span><span class="va">demo</span><span class="op">$</span><span class="va">path</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># read forcings for the model</span></span></span>
 <span class="r-in"><span><span class="va">forcing</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">demo</span><span class="op">$</span><span class="va">path</span>, <span class="st">"master"</span>, <span class="st">"environment.csv"</span><span class="op">)</span>, row.names<span class="op">=</span><span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># Defining 'runModel' function</span></span></span>
@@ -98,7 +107,7 @@
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Real parameters used to simulate data\n"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">demo</span><span class="op">$</span><span class="va">par</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># objective functions</span></span></span>
-<span class="r-in"><span><span class="va">obj</span>  <span class="op">=</span> <span class="fu"><a href="createObjectiveFunction.html">createObjectiveFunction</a></span><span class="op">(</span>runModel<span class="op">=</span><span class="va">runModel</span>, info<span class="op">=</span><span class="va">calibrationInfo</span>, </span></span>
+<span class="r-in"><span><span class="va">obj</span>  <span class="op">=</span> <span class="fu"><a href="calibration_objFn.html">calibration_objFn</a></span><span class="op">(</span>model<span class="op">=</span><span class="va">runModel</span>, setup<span class="op">=</span><span class="va">calibrationInfo</span>, </span></span>
 <span class="r-in"><span>                               observed<span class="op">=</span><span class="va">observed</span>, forcing<span class="op">=</span><span class="va">forcing</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Starting calibration...\n"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">control</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>weights<span class="op">=</span><span class="va">calibrationInfo</span><span class="op">$</span><span class="va">weights</span>, maxit<span class="op">=</span><span class="fl">3.6e5</span><span class="op">)</span> <span class="co"># control parameters</span></span></span>
