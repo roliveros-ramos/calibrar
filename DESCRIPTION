@@ -1,18 +1,14 @@
 Package: calibrar
-Version: 0.3.0
+Version: 0.3.0.9020
 Authors@R: c(
     person("Ricardo", "Oliveros-Ramos", email="ricardo.oliveros@gmail.com", role=c("aut", "cre")))
 Title: Automated Parameter Estimation for Complex Models
-Description: Automated parameter estimation for complex models in R. 
-  This package allows the parameter estimation or calibration of complex models, 
-  including stochastic ones. It is a generic tool that can be used for fitting 
-  any type of models, especially those with non-differentiable objective functions. 
-  It supports multiple phases and constrained optimization. 
-  It implements maximum likelihood estimation methods and automated construction 
-  of the objective function from simulated model outputs. 
-  See <https://roliveros-ramos.github.io/calibrar/> for more details.
+Description:   This package allows the parameter estimation (i.e. calibration) of complex models, including stochastic ones. It implements generic functions that can be used for fitting any type of models, especially those with non-differentiable objective functions, with the same syntax as base::optim. 
+  It supports multiple phases estimation (sequential parameter masking), constrained optimization (bounding box restrictions) and automatic parallel computation of numerical gradients. 
+  Some common maximum likelihood estimation methods and automated construction of the objective function from simulated model outputs is provided.  
+  See <http://roliveros-ramos.github.io/calibrar> for more details.
 Depends: 
-  R (>= 2.15)
+  R (>= 3.0)
 Imports:
   BB,
   cmaes,
