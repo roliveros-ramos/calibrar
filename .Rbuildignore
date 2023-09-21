@@ -6,3 +6,4 @@ NEWS.md
 ^\docs$
 docs
 pkgdown
+^\.github$

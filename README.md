@@ -13,6 +13,7 @@ issues](https://img.shields.io/github/issues/roliveros-ramos/calibrar)](https://
 [![](http://cranlogs.r-pkg.org/badges/calibrar)](http://cran.rstudio.com/web/packages/calibrar/index.html)
 [![OpenSSF Best
 Practices](https://www.bestpractices.dev/projects/2132/badge)](https://www.bestpractices.dev/projects/2132)
+[![R-CMD-check](https://github.com/roliveros-ramos/calibrar/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/roliveros-ramos/calibrar/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 ## Overview
