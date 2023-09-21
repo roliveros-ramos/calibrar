@@ -15,12 +15,11 @@ knitr::opts_chunk$set(
 # calibrar <a href="https://roliveros-ramos.github.io/calibrar/"><img src="man/figures/logo_small.png" align="right" height="138" /></a>
 
 <!-- badges: start -->
-
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/calibrar)](http://cran.r-project.org/package=calibrar)
 ![GitHub R package version](https://img.shields.io/github/r-package/v/roliveros-ramos/calibrar?label=GitHub)
 [![GitHub issues](https://img.shields.io/github/issues/roliveros-ramos/calibrar)](https://github.com/roliveros-ramos/calibrar/issues)
-[![](http://cranlogs.r-pkg.org/badges/calibrar)](http://cran.rstudio.com/web/packages/calibrar/index.html)
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/2132/badge)](https://www.bestpractices.dev/projects/2132)
+[![](http://cranlogs.r-pkg.org/badges/calibrar)](http://cran.rstudio.com/web/packages/calibrar/index.html)
 [![R-CMD-check](https://github.com/roliveros-ramos/calibrar/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/roliveros-ramos/calibrar/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
