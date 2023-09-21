@@ -1,0 +1,31 @@
+reference:
+- title: Main functions
+  desc: >
+    Functions for general purpose optimization, 
+    with support for parallel computation of derivatives.
+- contents:
+  - calibrate
+  - optim2
+  - optimh
+  - ahres 
+  - gradient
+  - calibrar-package
+- title: Setting up a calibration
+  desc: >
+    Functions to easily setup a new calibration for a complex
+    model, from an R function running the model. 
+- contents:
+  - starts_with("calibration_")
+  - objFn
+  - calibrar_demo
+- title: Parameter modelling
+- contents:
+  - gaussian_kernel
+  - spline_par
+- title: Test optimization functions
+- contents:
+  - sphereN
+- title: Auxiliar functions
+- contents:
+  - .get_command_argument
+  - .read_configuration
