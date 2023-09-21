@@ -168,14 +168,14 @@ exploite the additional information provided by a vectorial output from <code>fn
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">calibrate</span><span class="op">(</span>par<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fl">5</span><span class="op">)</span>, fn<span class="op">=</span><span class="va">sphereN</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Phase 1 finished in 0.64s (5 of 5 parameters active)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Function value: 0.0428674</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Parameter values: -0.00531 -0.0142 0.0103 -0.0334 0.0274</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Phase 1 finished in 0.42s (5 of 5 parameters active)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Function value: 0.116009</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Parameter values: 0.0434 -0.00626 0.0122 -0.0486 -0.0384</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Calibration finished.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Function value: 0.04286739 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Function value: 0.116009 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Parameters:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] -0.005312895 -0.014196700  0.010276471 -0.033388727  0.027423140</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1]  0.043408793 -0.006256053  0.012216638 -0.048579221 -0.038431668</span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span><span class="fu">calibrate</span><span class="op">(</span>par<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fl">5</span><span class="op">)</span>, fn<span class="op">=</span><span class="va">sphereN</span>, replicates<span class="op">=</span><span class="fl">3</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">calibrate</span><span class="op">(</span>par<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">5</span><span class="op">)</span>, fn<span class="op">=</span><span class="va">sphereN</span>, replicates<span class="op">=</span><span class="fl">3</span>, lower<span class="op">=</span><span class="op">-</span><span class="fl">5</span>, upper<span class="op">=</span><span class="fl">5</span><span class="op">)</span></span></span>
