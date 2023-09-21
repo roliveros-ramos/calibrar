@@ -16,6 +16,7 @@
 #' in combination with the \code{\link{createObjectiveFunction}}.
 #' @author Ricardo Oliveros-Ramos
 #' @seealso \code{\link{createObjectiveFunction}}, \code{\link{getCalibrationInfo}}.
+#' @noRd
 getObservedData = function(info, path, data.folder="data", ...) {
   
   .Deprecated("calibration_data", package="calibrar")
@@ -57,6 +58,7 @@ getObservedData = function(info, path, data.folder="data", ...) {
 #' and \code{\link{getObservedData}}.
 #' @author Ricardo Oliveros-Ramos
 #' @seealso \code{\link{createObjectiveFunction}}, \code{\link{getObservedData}}.
+#' @noRd
 getCalibrationInfo = function(path, file="calibrationInfo.csv", stringsAsFactors=FALSE, ...) {
   
   .Deprecated("calibration_setup", package="calibrar")
@@ -115,6 +117,7 @@ getCalibrationInfo = function(path, file="calibrationInfo.csv", stringsAsFactors
 #' comparison with observed data. 
 #' @author Ricardo Oliveros-Ramos
 #' @seealso \code{\link{getObservedData}}, \code{\link{getCalibrationInfo}}.
+#' @noRd
 createObjectiveFunction = function(runModel, info, observed, aggFn=.weighted.sum, 
                                    aggregate=FALSE, ...) {
   

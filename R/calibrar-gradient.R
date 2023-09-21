@@ -1,9 +1,9 @@
-#' Numerical computation of the gradient
+#' Numerical computation of the gradient, with parallel capabilities
 #' 
 #' This function calculates the gradient of a function, numerically, including the possibility
 #' of doing it in parallel.
 #'
-#' @param fn The function
+#' @param fn The function to calculate the gradient.
 #' @param x The value to compute the gradient at.
 #' @param method The method used. Currently implemented: central, backward, forward and Richardson. See details.
 #' @param control A list of control arguments. Notably, control$parallel=TRUE activates parallel computation.
