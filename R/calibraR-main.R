@@ -307,7 +307,7 @@ calibrate.TMB = function(par, fn, gr = NULL, ...,
 # optim2 ------------------------------------------------------------------
 
 
-#' General-purpose optimization
+#' General-purpose optimization with parallel numerical gradient computation
 #'
 #' @param active Boolean vector of the same length as par, indicating if the 
 #' parameter is used in the optimization (TRUE) or hold at a fixed value (FALSE).
@@ -345,7 +345,7 @@ optim2 = function(par, fn, gr = NULL, ..., lower = -Inf, upper = +Inf, active = 
 
 # optimh ------------------------------------------------------------------
 
-#' Optimization by heuristic algorithms
+#' General-purpose optimization using heuristic algorithms
 #'
 #' @examples 
 #' optim2(par=rep(NA, 5), fn=sphereN)
@@ -354,7 +354,7 @@ optim2 = function(par, fn, gr = NULL, ..., lower = -Inf, upper = +Inf, active = 
 #' @family optimisers 
 #' @export
 optimh = function(par, fn, gr = NULL, ..., lower = -Inf, upper = +Inf, active = NULL, 
-                  method = c("AHR-ES", "Nelder-Mead", "SANN", "hjn", "LBFGSB3", 
+                  method = c("AHR-ES", "Nelder-Mead", "SANN", "hjn",  
                              "cmaes", "genSA", "DE", "soma", "genoud", "PSO", 
                              "hybridPSO", "mads", "hjk", "hjkb", "nmk", "nmkb"), 
                   control = list(), hessian = FALSE, parallel=FALSE) {
@@ -370,7 +370,7 @@ optimh = function(par, fn, gr = NULL, ..., lower = -Inf, upper = +Inf, active = 
 
 # AHR-ES ------------------------------------------------------------------
 
-#' @title Adaptative Hierarchical Recombination Evolutionary Strategy for 
+#' @title Adaptative Hierarchical Recombination Evolutionary Strategy (AHR-ES) for 
 #' derivative-free and black-box optimization 
 #' @description This function performs the optimization of a function using 
 #' the Adaptative Hierarchical Recombination Evolutionary Strategy (AHR-ES, Oliveros & Shin, 2015). 

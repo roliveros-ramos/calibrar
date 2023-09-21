@@ -2,12 +2,12 @@
 % Please edit documentation in R/calibrar-gradient.R
 \name{gradient}
 \alias{gradient}
-\title{Numerical computation of the gradient}
+\title{Numerical computation of the gradient, with parallel capabilities}
 \usage{
 gradient(fn, x, method, control, parallel, ...)
 }
 \arguments{
-\item{fn}{The function}
+\item{fn}{The function to calculate the gradient.}
 
 \item{x}{The value to compute the gradient at.}
 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/calibrar-main.R
 \name{ahres}
 \alias{ahres}
-\title{Adaptative Hierarchical Recombination Evolutionary Strategy for 
+\title{Adaptative Hierarchical Recombination Evolutionary Strategy (AHR-ES) for 
 derivative-free and black-box optimization}
 \usage{
 ahres(

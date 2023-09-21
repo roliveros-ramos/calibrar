@@ -2,7 +2,7 @@
 % Please edit documentation in R/calibrar-main.R
 \name{optim2}
 \alias{optim2}
-\title{General-purpose optimization}
+\title{General-purpose optimization with parallel numerical gradient computation}
 \usage{
 optim2(
   par,
@@ -64,7 +64,7 @@ A list with components:
 }
 }
 \description{
-General-purpose optimization
+General-purpose optimization with parallel numerical gradient computation
 }
 \examples{
 optim2(par=rep(NA, 5), fn=sphereN)

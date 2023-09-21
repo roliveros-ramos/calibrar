@@ -14,7 +14,6 @@ find_top = function(par, z) {
 }
 
 .getTraj = function(start, N) {
-  set.seed(931204)
   out = vector("list", N)
   i = 1
   while(i <= N) {
@@ -67,8 +66,9 @@ find_top = function(par, z) {
 }
 
 
-.shadow_text = function(p, x, y, label, family="mono", fontface=1, offset=0.05, size=23, col="black") {
-  
+.shadow_text = function(p, x, y, label, family="mono", fontface=1, offset=0.05, size=23, col="black", petit=FALSE) {
+
+  if(petit) size=size/2  
   cols = if(col=="white") c(col, "black") else c(col, "white")
   
   p = p + geom_text(x=x+offset, y=y-offset, label=label, 
@@ -79,19 +79,19 @@ find_top = function(par, z) {
 }
 
 add_line = function(p, data, lwd=1.2, opt="blue") {
-  data = .cut_path(data)
+  # data = .cut_path(data)
   tt2 = data.frame(x = head(data$x,-1), xend = tail(data$x,-1), 
                    y = head(data$y,-1), yend = tail(data$y,-1))
-  p = p + geom_line(aes(x=x, y=y, z=1), data=data,
+  p = p + geom_path(aes(x=x, y=y, z=1), data=data,
                     col="white", alpha=0.5, lwd=lwd)
   # p = p + geom_line(aes(x=x, y=y, z=1), data=data,
                     # col="red")
-  p = p + geom_arrowsegment(aes(x=x, xend=xend, y=y, 
+  p = p + geom_arrowsegment(aes(x=x, xend=xend, y=y,
                                 yend=yend, z=1), data=tt2,
-                            col="red", lwd=0.4, 
+                            col="red", lwd=0.4,
                             arrow_positions = 0.5,
                             arrow_fills = "red",
-                            arrows = arrow(type="closed", 
+                            arrows = arrow(type="closed",
                                            length=unit(0.07, units="cm")))
   
   p = p + geom_point(aes(x=x, y=y, z=1), data=head(data, -1),
@@ -107,8 +107,10 @@ add_line = function(p, data, lwd=1.2, opt="blue") {
 
 make_sticker = function(save = TRUE, behind = TRUE, border = TRUE,
                         u_color = "black", bins = 20, palette = NULL,
-                        rev=FALSE, col="black") {
+                        rev=FALSE, col="black", opt="blue", petit=FALSE) {
   
+ 
+  lab = sprintf("%d: %s", i+1, ifelse(is.null(palette), NA, palette)) 
   
   p = ggplot(mt, aes(x=x, y=y, z=z))
   p = p + geom_contour_filled(show.legend = FALSE, bins=bins) 
@@ -120,27 +122,29 @@ make_sticker = function(save = TRUE, behind = TRUE, border = TRUE,
   
   if(behind) {
     p = .shadow_text(p, x=0.5, y=0.5, label="calibrar", 
-                     fontface=2, offset=0.003, size=24, col=col)
+                     fontface=2, offset=0.003, size=24, col=col, petit=petit)
   }
   
-  p = add_line(p, traj5a, lwd=1.5)
-  # p = add_line(p, traj5b)
+  # p = add_line(p, traj5a, lwd=1.5)
+  # p = add_line(p, traj5b, lwd=1.5)
   p = add_line(p, traj5c, lwd=1.5)
-  # p = add_line(p, traj5d)
-  # p = add_line(p, traj5e)
-  # p = add_line(p, traj5f)
-  p = add_line(p, traj5g, lwd=1.5)
-  p = add_line(p, traj5h, lwd=1.5)
+  # p = add_line(p, traj5d, lwd=1.5)
+  # p = add_line(p, traj5e, lwd=1.5)
+  # p = add_line(p, traj5f, lwd=1.5)
+  # p = add_line(p, traj5g, lwd=1.5)
+  # p = add_line(p, traj5h, lwd=1.5, opt=opt)
   
   if(!behind) {
     p = .shadow_text(p, x=0.5, y=0.5, label="calibrar", 
-                     fontface=2, offset=0.003, size=24, col=col)
+                     fontface=2, offset=0.003, size=24, col=col, petit=petit)
   }
   
   p = p + theme_void() + theme_transparent()
   
   # plot(p)
   
+  logo = if(!petit) "man/figures/logo.png" else "man/figures/logo_small.png"
+    
   s = sticker(
     # image
     p,
@@ -155,7 +159,7 @@ make_sticker = function(save = TRUE, behind = TRUE, border = TRUE,
     p_y = 1.12,
     p_x = 1,
     # Output file
-    filename=ifelse(save, sprintf("man/figures/%03dlogo.png", i <<- i+1), "man/figures/logo.png"),
+    filename=ifelse(save, sprintf("man/figures/%03dlogo.png", i <<- i+1), logo),
     # Background colour
     h_fill = "green", # #F0F0F0
     # Border
@@ -163,14 +167,17 @@ make_sticker = function(save = TRUE, behind = TRUE, border = TRUE,
     h_color = "black",   # 3F4243 7F2B94 3B2691 4238AF
     h_size = ifelse(border, 2, 0),
     # url
-    url = "  Robust parameter estimation for complex models",
-    u_size = 3.25,
+    url = ifelse(petit, 
+                 "Parameter estimation for complex models",
+                 "  Parameter estimation for complex models"),
+    u_size = ifelse(petit, 1.91, 3.82),
     u_color = u_color,
     white_around_sticker = TRUE,
-    dpi = 300 
+    dpi = ifelse(petit, 150, 300) 
   )
   
-  plot(s)
+  if(save) plot(s)
+  mtext(lab, 3, adj=0.05)
   
   return(invisible(s))
   

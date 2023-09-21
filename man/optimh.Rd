@@ -2,7 +2,7 @@
 % Please edit documentation in R/calibrar-main.R
 \name{optimh}
 \alias{optimh}
-\title{Optimization by heuristic algorithms}
+\title{General-purpose optimization using heuristic algorithms}
 \usage{
 optimh(
   par,
@@ -12,8 +12,8 @@ optimh(
   lower = -Inf,
   upper = +Inf,
   active = NULL,
-  method = c("AHR-ES", "Nelder-Mead", "SANN", "hjn", "LBFGSB3", "cmaes", "genSA", "DE",
-    "soma", "genoud", "PSO", "hybridPSO", "mads", "hjk", "hjkb", "nmk", "nmkb"),
+  method = c("AHR-ES", "Nelder-Mead", "SANN", "hjn", "cmaes", "genSA", "DE", "soma",
+    "genoud", "PSO", "hybridPSO", "mads", "hjk", "hjkb", "nmk", "nmkb"),
   control = list(),
   hessian = FALSE,
   parallel = FALSE
@@ -64,7 +64,7 @@ A list with components:
 }
 }
 \description{
-Optimization by heuristic algorithms
+General-purpose optimization using heuristic algorithms
 }
 \examples{
 optim2(par=rep(NA, 5), fn=sphereN)
