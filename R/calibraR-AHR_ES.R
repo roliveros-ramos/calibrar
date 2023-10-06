@@ -470,9 +470,9 @@
   control$maxgen = control$maxit
   
   if(control$termination_criteria %in% c(2,3)) {
-    msg = sprintf("You need to install the 'scam' package for termination criteria %s.", 
-                    control$termination_criteria)
-    if(!requireNamespace("scam", quietly = TRUE)) stop(msg)
+    # msg = sprintf("You need to install the 'scam' package for termination criteria %s.", 
+                    # control$termination_criteria)
+    # if(!requireNamespace("scam", quietly = TRUE)) stop(msg)
   }
   
   return(control)

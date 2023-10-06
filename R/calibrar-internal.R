@@ -665,7 +665,8 @@ format_difftime = function(x, y, ...) {
   dat = data.frame(x=seq_along(x), y=x)
   dat = dat[complete.cases(dat), ]
   if(nrow(dat) < N) return(FALSE)
-  mod = scam::scam(y ~ s(x, bs="mpd"), data=dat)
+  # mod = scam::scam(y ~ s(x, bs="mpd"), data=dat)
+  mod = loess(y ~ x, data=dat)
   dat$value = predict(mod, newdata = dat)
   dat$diff = Inf
   dat$diff[-1] = -diff(dat$value)
