@@ -5,7 +5,7 @@ tfn = function(x) sum(x^2) + 10
 
 # optimh ------------------------------------------------------------------
 
-algorithms = c("AHR-ES", "Nelder-Mead", "SANN", "hjn", "LBFGSB3", 
+algorithms = c("AHR-ES", "Nelder-Mead", "SANN", "hjn",  
                "cmaes", "genSA", "DE", "soma", "genoud", "PSO", 
                "hybridPSO", "mads", "hjk", "hjkb", "nmk", "nmkb")
 
