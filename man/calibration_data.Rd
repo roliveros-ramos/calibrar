@@ -22,14 +22,14 @@ to read the data files.}
 }
 \value{
 A list with the observed data needed for a calibration, to be used 
-in combination with the \code{\link{createObjectiveFunction}}.
+in combination with the \code{\link{calibration_objFn}}.
 }
 \description{
 Create a list with the observed data with the 
 information provided by its main argument.
 }
 \seealso{
-\code{\link{createObjectiveFunction}}, \code{\link{getCalibrationInfo}}.
+\code{\link{calibration_objFn}}, \code{\link{calibration_setup}}.
 }
 \author{
 Ricardo Oliveros-Ramos
