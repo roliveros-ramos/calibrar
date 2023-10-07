@@ -101,7 +101,7 @@
                         <h4 data-toc-skip class="author">Ricardo
 Oliveros-Ramos</h4>
             
-            <h4 data-toc-skip class="date">2023-10-06</h4>
+            <h4 data-toc-skip class="date">2023-10-07</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/roliveros-ramos/calibrar/blob/HEAD/vignettes/01-introduction.Rmd" class="external-link"><code>vignettes/01-introduction.Rmd</code></a></small>
       <div class="hidden name"><code>01-introduction.Rmd</code></div>
@@ -144,20 +144,20 @@ Bootstrap style</li>
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://roliveros-ramos.github.io/calibrar/" class="external-link">calibrar</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fl">5</span><span class="op">)</span>, fn<span class="op">=</span><span class="va">sphereN</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Phase 1 finished in 0.84s (5 of 5 parameters active)</span></span>
-<span><span class="co">#&gt; Function value: 0.0517309</span></span>
-<span><span class="co">#&gt; Parameter values: 0.0504 -0.00189 -0.0183 0.11 0.0573</span></span>
+<span><span class="co">#&gt; Phase 1 finished in 0.57s (5 of 5 parameters active)</span></span>
+<span><span class="co">#&gt; Function value: 0.167302</span></span>
+<span><span class="co">#&gt; Parameter values: -0.0138 0.0648 0.0396 -0.0279 -0.105</span></span>
 <span><span class="co">#&gt; Calibration finished.</span></span>
-<span><span class="co">#&gt; Function value: 0.05173088 </span></span>
+<span><span class="co">#&gt; Function value: 0.1673017 </span></span>
 <span><span class="co">#&gt; Parameters:</span></span>
-<span><span class="co">#&gt; [1]  0.050388394 -0.001894189 -0.018254689  0.109771118  0.057303018</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] -0.01384505  0.06480554  0.03959583 -0.02794914 -0.10458506</span></span></code></pre></div>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://roliveros-ramos.github.io/calibrar/" class="external-link">calibrar</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fl">5</span><span class="op">)</span>, fn<span class="op">=</span><span class="va">sphereN</span>, replicates<span class="op">=</span><span class="fl">3</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Phase 1 finished in 0.57s (5 of 5 parameters active)</span></span>
-<span><span class="co">#&gt; Function value: 0.0897465</span></span>
-<span><span class="co">#&gt; Parameter values: -0.0424 0.107 -0.00882 0.0445 0.0225</span></span></code></pre></div>
+<span><span class="co">#&gt; Phase 1 finished in 0.65s (5 of 5 parameters active)</span></span>
+<span><span class="co">#&gt; Function value: 0.0673572</span></span>
+<span><span class="co">#&gt; Parameter values: -0.0187 0.0946 0.0424 0.0897 0.104</span></span></code></pre></div>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://roliveros-ramos.github.io/calibrar/" class="external-link">calibrar</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">5</span><span class="op">)</span>, fn<span class="op">=</span><span class="va">sphereN</span>, replicates<span class="op">=</span><span class="fl">3</span>, lower<span class="op">=</span><span class="op">-</span><span class="fl">5</span>, upper<span class="op">=</span><span class="fl">5</span><span class="op">)</span></span>
@@ -166,13 +166,13 @@ Bootstrap style</li>
 <span><span class="co">#&gt; Warning in .checkBounds(lower = lower, upper = upper, npar = npar): Only one</span></span>
 <span><span class="co">#&gt; upper bound has been provided, used for all parameters.</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Phase 1 finished in 0.84s (5 of 5 parameters active)</span></span>
-<span><span class="co">#&gt; Function value: 0.0386659</span></span>
-<span><span class="co">#&gt; Parameter values: 0.0129 0.00657 0.00797 0.0449 0.0157</span></span>
+<span><span class="co">#&gt; Phase 1 finished in 0.98s (5 of 5 parameters active)</span></span>
+<span><span class="co">#&gt; Function value: 0.0676598</span></span>
+<span><span class="co">#&gt; Parameter values: -0.0734 0.0252 0.0436 0.0249 0.0417</span></span>
 <span><span class="co">#&gt; Calibration finished.</span></span>
-<span><span class="co">#&gt; Function value: 0.03866587 </span></span>
+<span><span class="co">#&gt; Function value: 0.06765976 </span></span>
 <span><span class="co">#&gt; Parameters:</span></span>
-<span><span class="co">#&gt; [1] 0.012894550 0.006567709 0.007968810 0.044879925 0.015742977</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] -0.07338573  0.02517861  0.04361980  0.02492674  0.04171412</span></span></code></pre></div>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">5</span><span class="op">)</span>, fn<span class="op">=</span><span class="va">sphereN</span>, replicates<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">4</span><span class="op">)</span>, lower<span class="op">=</span><span class="op">-</span><span class="fl">5</span>, upper<span class="op">=</span><span class="fl">5</span>, phases<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning in .checkBounds(lower = lower, upper = upper, npar = npar): Only one</span></span>
@@ -180,17 +180,17 @@ Bootstrap style</li>
 <span><span class="co">#&gt; Warning in .checkBounds(lower = lower, upper = upper, npar = npar): Only one</span></span>
 <span><span class="co">#&gt; upper bound has been provided, used for all parameters.</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Phase 1 finished in 0.32s (3 of 5 parameters active)</span></span>
-<span><span class="co">#&gt; Function value: 0.454039</span></span>
-<span><span class="co">#&gt; Parameter values: -0.0189 -0.188 0.126</span></span>
+<span><span class="co">#&gt; Phase 1 finished in 0.51s (3 of 5 parameters active)</span></span>
+<span><span class="co">#&gt; Function value: 0.447928</span></span>
+<span><span class="co">#&gt; Parameter values: -0.0791 0.16 0.00747</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Phase 2 finished in 0.42s (4 of 5 parameters active)</span></span>
-<span><span class="co">#&gt; Function value: 0.468496</span></span>
-<span><span class="co">#&gt; Parameter values: -0.0524 -0.0286 -0.11 -0.153</span></span>
+<span><span class="co">#&gt; Phase 2 finished in 0.26s (4 of 5 parameters active)</span></span>
+<span><span class="co">#&gt; Function value: 0.266861</span></span>
+<span><span class="co">#&gt; Parameter values: -0.0136 0.0783 -0.0175 0.0634</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Phase 3 finished in 1.00s (5 of 5 parameters active)</span></span>
-<span><span class="co">#&gt; Function value: 0.0566775</span></span>
-<span><span class="co">#&gt; Parameter values: 0.0618 0.0502 0.00383 0.0243 0.0719</span></span></code></pre></div>
+<span><span class="co">#&gt; Phase 3 finished in 0.69s (5 of 5 parameters active)</span></span>
+<span><span class="co">#&gt; Function value: 0.0544495</span></span>
+<span><span class="co">#&gt; Parameter values: 0.0638 -0.0329 -0.0235 0.00116 -0.0436</span></span></code></pre></div>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># this calibration save results on the disk for restart purposes</span></span>
 <span><span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">5</span><span class="op">)</span>, fn<span class="op">=</span><span class="va">sphereN</span>, replicates<span class="op">=</span><span class="fl">3</span>, lower<span class="op">=</span><span class="op">-</span><span class="fl">5</span>, upper<span class="op">=</span><span class="fl">5</span>, phases<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">3</span><span class="op">)</span>, control<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>restart.file<span class="op">=</span><span class="st">"sphere"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
