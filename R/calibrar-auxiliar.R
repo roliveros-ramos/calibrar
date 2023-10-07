@@ -18,35 +18,28 @@
 #' @keywords demo calibration 
 #' @examples
 #' \dontrun{
-#' require(calibrar)
+#' 
+#' summary(ahr)
 #' set.seed(880820)
 #' path = NULL # NULL to use the current directory
 #' # create the demonstration files
-#' demo = calibrar_demo(model="PoissonMixedModel", L=5, T=100) 
+#' demo = calibrar_demo(path=path, model="PredatorPrey", T=100) 
 #' # get calibration information
-#' calibrationInfo = getCalibrationInfo(path=demo$path)
+#' calibration_settings = calibration_setup(file = demo$file)
 #' # get observed data
-#' observed = getObservedData(info=calibrationInfo, path=demo$path)
-#' # read forcings for the model
-#' forcing = read.csv(file.path(demo$path, "master", "environment.csv"), row.names=1)
+#' observed = calibration_data(setup = calibration_settings, path=demo$path)
 #' # Defining 'runModel' function
-#' runModel = function(par, forcing) {
-#' output = calibrar:::.PoissonMixedModel(par=par, forcing=forcing)
-#' # adding gamma parameters for penalties
-#' output = c(output, list(gammas=par$gamma)) 
-#' return(output)
-#' }
+#' run_model = calibrar:::.PredatorPreyModel
 #' # real parameters
 #' cat("Real parameters used to simulate data\n")
-#' print(demo$par)
+#' print(unlist(demo$par)) # parameters are in a list
 #' # objective functions
-#' obj  = createObjectiveFunction(runModel=runModel, info=calibrationInfo, 
-#'                                observed=observed, forcing=forcing)
+#' obj  = calibration_objFn(model=run_model, setup=calibration_settings, observed=observed, T=demo$T)
+#' obj2 = calibration_objFn(model=run_model, setup=calibration_settings, observed=observed, T=demo$T, aggregate=TRUE)
 #' cat("Starting calibration...\n")
-#' control = list(weights=calibrationInfo$weights, maxit=3.6e5) # control parameters
-#' cat("Running optimization algorithms\n", "\t", date(), "\n")
+#' cat("Running optimization algorithms\n", "\t")
 #' cat("Running optim AHR-ES\n")
-#' ahr = calibrate(par=demo$guess, fn=obj, lower=demo$lower, upper=demo$upper, control=control)
+#' ahr = calibrate(par=demo$guess, fn=obj, lower=demo$lower, upper=demo$upper, phases=demo$phase)
 #' summary(ahr)
 #' } 
 #' @export 

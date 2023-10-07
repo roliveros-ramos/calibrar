@@ -132,7 +132,7 @@ calibrate.default = function(par, fn, gr = NULL, ...,
       agg = attr(fn, "aggregate")
       if(is.null(agg)) warning("Update your objective function to the last version of the 'calibrar' package.")
       if(!isTRUE(agg)) 
-        stop(sprintf("Method '%s' does not support multi-objective optimization, use aggregate=TRUE in 'createObjectiveFunction'.",
+        stop(sprintf("Method '%s' does not support multi-objective optimization, use aggregate=TRUE in 'calibration_objFn'.",
                      method))
     }
     
@@ -551,9 +551,9 @@ calibration_setup = function(file, control=list(), ...) {
 #' @param \dots Additional arguments to \code{read.csv} function 
 #' to read the data files.
 #' @return A list with the observed data needed for a calibration, to be used 
-#' in combination with the \code{\link{createObjectiveFunction}}.
+#' in combination with the \code{\link{calibration_objFn}}.
 #' @author Ricardo Oliveros-Ramos
-#' @seealso \code{\link{createObjectiveFunction}}, \code{\link{getCalibrationInfo}}.
+#' @seealso \code{\link{calibration_objFn}}, \code{\link{calibration_setup}}.
 #' @export
 calibration_data = function(setup, path=".", file=NULL, verbose=TRUE, ...) {
   
