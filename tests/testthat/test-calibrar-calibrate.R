@@ -14,7 +14,7 @@ foreach::registerDoSEQ()
 
 
 algorithms = c("L-BFGS-B", "nlminb", "Rcgmin", "Rvmmin", "hjn", "spg", 
-               "LBFGSB3", "cmaes", "genSA", "DE", "soma", "genoud", "PSO", 
+               "LBFGSB3", "CMA-ES", "genSA", "DE", "soma", "genoud", "PSO", 
                "hybridPSO", "mads", "hjkb", "nmkb", "AHR-ES")
 
 # algorithms = algorithms[1:3]
