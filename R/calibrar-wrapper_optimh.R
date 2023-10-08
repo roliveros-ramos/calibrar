@@ -35,6 +35,11 @@
     if(!is.finite(output$value)) warning("Infinite value reached for fn.")
   }
   
+  output$constr.violations = NULL
+  output$diagnostic = NULL
+  
+  class(output) = "list"
+  
   return(output)
   
 }
@@ -131,8 +136,8 @@
   output$value = xoutput$cost[xoutput$leader]
   output$counts = c('function'=xoutput$migrations*length(xoutput$cost),
                     gradient=NA)
-  output$convergence = NA
-  output$message = NULL
+  output$convergence = 0
+  output$message = NA
   
   return(output)
   
