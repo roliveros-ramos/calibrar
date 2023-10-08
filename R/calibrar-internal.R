@@ -518,7 +518,7 @@ format_difftime = function(x, y, ...) {
     
   }
   
-  if(method=="cmaes") con$weights = NULL 
+  if(method=="CMA-ES") con$weights = NULL 
   # aggregation function for global fitness
   con$aggFn = match.fun(con$aggFn)
   
