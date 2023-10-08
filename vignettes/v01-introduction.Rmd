@@ -1,12 +1,14 @@
 ---
-title: "Getting started with the calibrar package"
+title: "Getting started with the `calibrar` package"
 author: "Ricardo Oliveros-Ramos"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Getting started with the calibrar}
-  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{Getting started with the `calibrar` package}
   %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: inline
 ---
 
 ```{r setup, include = FALSE}
@@ -15,59 +17,252 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 ```
+
 ## Introduction
 
-Vignettes are long form documentation commonly included in packages. Because they are part of the distribution of the package, they need to be as compact as possible. The `html_vignette` output type provides a custom style sheet (and tweaks some options) to ensure that the resulting html is as small as possible. The `html_vignette` format:
-
-- Never uses retina figures
-- Has a smaller default figure size
-- Uses a custom CSS stylesheet instead of the default Twitter Bootstrap style
+This package allows the parameter estimation (i.e. calibration) of complex models, including stochastic ones. It implements generic functions that can be used for fitting any type of models, especially those with non-differentiable objective functions, with the same syntax as `base::optim`. It supports multiple phases estimation (sequential parameter masking), constrained optimization (bounding box restrictions) and automatic parallel computation of numerical gradients. Some common maximum likelihood estimation methods and automated construction of the objective function from simulated model outputs is provided. 
 
 ## Basic usage
 
-### optim2
+This vignette covers the basic usage of the package, introducing the functions `optim2()`, `optimh()` and `calibrate()`.
 
-### optimh
+### optim2()
 
-### calibrate
+As the name sugests, `optim2()` is intended to extend the functionality of `stats::optim()` and it uses the same arguments:
+
+```{r, echo=TRUE, eval=FALSE, results='markup'}         
+optim2(
+  par,
+  fn,
+  gr = NULL,
+  ...,
+  method = c("Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN", "Brent", "nlm", "nlminb",
+    "Rcgmin", "Rvmmin", "hjn", "spg", "LBFGSB3", "AHR-ES"),
+  lower = -Inf,
+  upper = +Inf,
+  active = NULL,
+  control = list(),
+  hessian = FALSE,
+  parallel = FALSE
+)
+```
+
+The first difference is the possible values for the `method` argument. In addition to the first six also available in `optim()`, `optim2()` gives access to `stats::nlm()` and `stats::nlminb()` but with the same syntax as `optim()` to make them easy to use. In addition, three methods from the `optimr` package (`Rcgmin`, `Rvmmin`, `hjn`), the L-BFGS-B v3 implemented in the `bfgsb3c` package and the `AHR-ES` (Adaptative Hierarchical Recombination Evolutionary Strategy) implemented in this package. 
+
+In the next example, we compare the outputs of `optim()` and `optim2()`:
 
 ```{r, echo=TRUE, results='markup'}
 library(calibrar)
-calibrate(par=rep(NA, 5), fn=sphereN)
-```
-
-```{r, echo=TRUE, results='hide'}
-library(calibrar)
-calibrate(par=rep(NA, 5), fn=sphereN, replicates=3)
+optim(par=rep(1, 5), fn=function(x) sum(x^2))
 ```
 
 ```{r, echo=TRUE, results='markup'}
-library(calibrar)
-calibrate(par=rep(0.5, 5), fn=sphereN, replicates=3, lower=-5, upper=5)
+optim2(par=rep(1, 5), fn=function(x) sum(x^2))
 ```
 
-```{r, echo=TRUE, results='hide'}
-calibrate(par=rep(0.5, 5), fn=sphereN, replicates=c(1,1,4), lower=-5, upper=5, phases=c(1,1,1,2,3))
+The results are identical, as here `optim2()` acts just as a wrapper for `optim()`. Now, we can run the same example with two other methods:
+
+```{r, echo=TRUE, results='markup'}
+optim2(par=rep(1, 5), fn=function(x) sum(x^2), method="nlm")
 ```
 
-```{r, eval=FALSE}
-# this calibration save results on the disk for restart purposes
-calibrate(par=rep(0.5, 5), fn=sphereN, replicates=3, lower=-5, upper=5, phases=c(1,1,1,2,3), control=list(restart.file="sphere"))
+```{r, echo=TRUE, results='markup'}
+set.seed(880820) # for reproducibility
+optim2(par=rep(1, 5), fn=function(x) sum(x^2), method="AHR-ES")
 ```
+
+The second difference is the new argument `active`, which is a vector indicating if a parameters will be optimized (i.e. active) or fixed during the optimization process. In the next example, we will fix the third and fourth parameters to its initial values:
+
+```{r, echo=TRUE, results='markup'}
+optim2(par=rep(1, 5), fn=function(x) sum(x^2), 
+       active=c(TRUE, TRUE, FALSE, FALSE, TRUE))
+```
+
+As we can see, in the final solution, the `par`value keep the values at 1, the initial value. All the numerical gradients computed internally have also 'masked' this parameters and the derivatives are not computed for them to speed up computation time.
+
+Finally, the third difference is the new argument `parallel`, that active the parallel computation of the numerical gradient, when `gr` is not supplied:
+
+```{r, echo=TRUE, results='markup'}
+optim2(par=rep(1, 5), fn=function(x) sum(x^2), parallel=TRUE)
+```
+
+This last option will increase performance when the computation time of `fn` in considerable. We will explain in detail this feature in a following section.
+
+Additionally, the method for the computation of the numerical gradient can be chosen within the `control` list:
+
+
+```{r, echo=TRUE, results='hide', eval=FALSE}
+optim2(par=rep(0.5, 5), fn=function(x) sum(2*x^(3.1*x)), control=list(gr.method="richardson"))
+optim2(par=rep(0.5, 5), fn=function(x) sum(2*x^(3.1*x)), control=list(gr.method="central"))
+optim2(par=rep(0.5, 5), fn=function(x) sum(2*x^(3.1*x)), control=list(gr.method="forward"))
+
+```
+
+
+
+### optimh()
+
+The function `optimh()` has a similar functionality as `optim2()` but acts as a wrapper for several heuristic optimization algorithms implemented in several packages: `dfoptim`, `optimr`, `minqa`, `cmaes`, `genSA`, `DEoptim`, `soma`, `rgenoud` and `psoptim`. The `optimh()` function standardizes the inputs and outputs to those of `optim()`, providing a more convinient interface. All specific arguments of this methods can be passed to the original function using the `control` argument.
+
+```{r, echo=TRUE, eval=FALSE, results='markup'}         
+optimh(
+  par,
+  fn,
+  gr = NULL,
+  ...,
+  method = c("AHR-ES", "Nelder-Mead", "SANN", "hjn", "CMA-ES", "genSA", "DE", "soma",
+    "genoud", "PSO", "hybridPSO", "mads", "hjk", "hjkb", "nmk", "nmkb"),
+  lower = -Inf,
+  upper = +Inf,
+  active = NULL,
+  control = list(),
+  hessian = FALSE,
+  parallel = FALSE
+)
+```
+
+
+```{r, echo=TRUE, results='markup'}
+# Covariance Matrix Adaptation Evolutionary Strategy
+optimh(par=rep(1, 5), fn=function(x) sum(x^2), method="CMA-ES",
+       control=list(maxit=3000))
+```
+
+
+```{r, echo=TRUE, results='markup'}
+# Generalized Simulated Anneling
+optimh(par=rep(1, 5), fn=function(x) sum(x^2), method="genSA", 
+       lower=rep(-100, 5), upper=rep(100, 5),
+       control=list(maxit=1000, temperature=6000))
+```
+
+```{r, echo=TRUE, results='markup'}
+# Self-Organising Migrating Algorithm
+optimh(par=rep(1, 5), fn=function(x) sum(x^2), method="soma",
+       lower=rep(-100, 5), upper=rep(100, 5),
+       control=list(populationSize=12))
+```
+
+You can refer to the help pages from each package to have details about every specific method and its control arguments.
+
+
 
 ### Running in parallel
 
-Examples with optim2 and calibrate
+Most algorithms implemented in `optim2()` and some in `optimh` can benefit of parallel computation. For the methods that uses the numerical computation of the gradient, this will be calculated in parallel. In order to support any type of parallel implementation, the parallel setup is NOT automatic, and must be done by the user previous to executed the optimization, as described in the following example:
 
-```{r, echo=TRUE, results='hide', eval=FALSE}
-library(calibrar)
+```{r, echo=FALSE, results='hide', eval=TRUE, message=FALSE}
+library(parallel)
 library(doSNOW)
-set.seed(880820)
-ncores = 6 # number of cores to be used
+```
+
+```{r, echo=TRUE, results='markup', eval=TRUE}
+library(parallel)
+library(doSNOW)
+ncores = parallel::detectCores() - 1 # number of cores to be used
 cl = makeCluster(ncores, type="SOCK")
 registerDoSNOW(cl) # register the parallel backend
 # this is slower than sequential for very fast models (like this one)
-calib = calibrate(par=rep(0.5, 5), fn=sphereN, 
+optim2(par=rep(0.5, 5), fn=function(x) sum(x^2), 
+               control=list(ncores=ncores), parallel=TRUE)
+stopCluster(cl) # close the parallel connections
+```
+
+
+## Sequential parameter estimation
+
+### calibrate()
+
+The `calibrate()` function implements an automatic sequential parameter estimation, meaning parameters can be masked (set active) progressively during sequential phases of the calibration process. 
+
+```{r, echo=TRUE, eval=FALSE, results='markup'}         
+calibrate(
+  par,
+  fn,
+  gr = NULL,
+  ...,
+  method = NULL,
+  lower = NULL,
+  upper = NULL,
+  phases = NULL,
+  control = list(),
+  hessian = FALSE,
+  replicates = 1,
+  parallel = FALSE
+)
+```
+
+With the basic syntax, the `calibrate()` function will work similarly to `optim2()` and `optimh()`, performing a simple optimization:
+
+```{r, echo=TRUE, results='markup'}
+calibrate(par=c(1,2,3,NA,NA), fn=function(x) sum(x^2))
+```
+
+If `upper` and `lower` bounds are provided, the calibrate function can take `NA` as starting values for the optimization, to some or all of the parameters:
+
+```{r, echo=TRUE, results='markup'}
+calibrate(par=c(1,2,3,NA,5), fn=function(x) sum(x^2),
+          lower=rep(-100, 5), upper=rep(100, 5))
+```
+
+### Setting up a calibration with multiple phases.
+
+Multiple `phases` can be set up by selecting a different one for each parameter. The starting value of the optimization for each phase is updated with the best parameters found in the previous phase:
+
+```{r, echo=TRUE, results='markup'}
+calibrate(par=c(1,2,3,NA,5), fn=function(x) sum(x^2),
+          lower=rep(-100, 5), upper=rep(100, 5),
+          phases=c(1,2,3,2,1))
+```
+
+When a phase is set to a negative number, the parameter is fixed at its initial value during all the calibration and it is never optimized:
+
+```{r, echo=TRUE, results='markup'}
+calibrate(par=c(1,2,3,NA,5), fn=function(x) sum(x^2),
+          lower=rep(-100, 5), upper=rep(100, 5),
+          phases=c(1,2,-1,2,1))
+```
+
+### Dealing with stochastic functions
+
+When dealing with stochastic functions, the argument `replicates` can be helful, as it allows to evaluate the objective function several times, taking the average value of them as the actual function value (as an approximation of the expected value of the function). When `replicates=1`, the algorithm used by default is "LBFGSB3", but when replicates is greater than 1, "AHR-ES" is used. The next examples use the function `sphereN()`, which computes the Euclidian distance from a point `x` to the origin of coordinates after a random displacement of its position (`?sphereN` for details.)
+
+
+```{r, echo=TRUE, results='markup'}
+calibrate(par=c(1,2,3,NA,5), fn=sphereN,
+          lower=rep(-100, 5), upper=rep(100, 5),
+          phases=c(1,2,3,2,1), replicates=3)
+```
+
+The number of replicates can be one single value or a vector with the length equal to the number of phases:
+
+```{r, echo=TRUE, results='markup'}
+calibrate(par=c(1,2,3,NA,5), fn=sphereN,
+          lower=rep(-100, 5), upper=rep(100, 5),
+          phases=c(1,2,3,2,1), replicates=c(1,1,5))
+```
+
+### Parameters as lists
+
+```{r, echo=TRUE, results='markup'}
+calibrate(par=list(par1=c(1,2,3), par2=NA, par3=5), fn=sphereN,
+          lower=rep(-100, 5), upper=rep(100, 5),
+          phases=c(1,2,-3,2,1), replicates=c(1,5))
+```
+
+Note that the function `fn` must be able to take a list as parameter set, and the user must ensure this works before hand.
+
+### Running in parallel
+
+Most algorithms implemented in the `calibrate` function can benefit of parallel computation. For the methods that uses the numerical computation of the gradient, this will be calculated in parallel as in `optim2()`. In order to support any type of parallel implementation, the parallel setup is NOT automatic, and must be done by the user previous to executed the optimization, as described in the following example:
+
+
+```{r, echo=TRUE, results='hide', eval=FALSE}
+ncores = parallel::detectCores() - 1 # number of cores to be used
+cl = makeCluster(ncores, type="SOCK")
+registerDoSNOW(cl) # register the parallel backend
+# this is slower than sequential for very fast models (like this one)
+calib = calibrate(par=rep(0.5, 5), fn=sphereN,
                   replicates=3, 
                   lower=rep(-5, 5), 
                   upper=rep(+5, 5), 
@@ -76,31 +271,5 @@ calib = calibrate(par=rep(0.5, 5), fn=sphereN,
 stopCluster(cl) # close the parallel connections
 ```
 
-### Optimization algorithms available
+Please, refer to `vignette(package="calibrar")` for additional vignettes or to the [calibrar website](http://roliveros-ramos.github.io/calibrar) for more details.
 
-
-## Worked examples
-
-
-
-## Figures
-
-The figure sizes have been customised so that you can easily put two images side-by-side. 
-
-```{r, fig.show='hold'}
-plot(1:10)
-plot(10:1)
-```
-
-You can enable figure captions by `fig_caption: yes` in YAML:
-
-    output:
-      rmarkdown::html_vignette:
-        fig_caption: yes
-
-Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
-
-Also a quote using `>`:
-
-> "He who gives up [code] safety for [code] speed deserves neither."
-([via](https://twitter.com/hadleywickham/status/504368538874703872))
