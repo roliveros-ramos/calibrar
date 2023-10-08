@@ -2,10 +2,10 @@ pandoc: 3.1.1
 pkgdown: 2.0.7
 pkgdown_sha: ~
 articles:
-  01-introduction: 01-introduction.html
-  02-parameter_estimation: 02-parameter_estimation.html
-  03-parameter_estimation_ODE: 03-parameter_estimation_ODE.html
-  04-parameter_estimation_stochastic: 04-parameter_estimation_stochastic.html
-  05-using_with_TMB: 05-using_with_TMB.html
-last_built: 2023-09-21T14:10Z
+  v01-introduction: v01-introduction.html
+  v02-parameter_estimation: v02-parameter_estimation.html
+  v03-parameter_estimation_ODE: v03-parameter_estimation_ODE.html
+  v04-parameter_estimation_stochastic: v04-parameter_estimation_stochastic.html
+  v05-using_with_TMB: v05-using_with_TMB.html
+last_built: 2023-10-08T21:26Z
 

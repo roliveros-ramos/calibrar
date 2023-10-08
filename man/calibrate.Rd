@@ -2,6 +2,7 @@
 % Please edit documentation in R/calibrar-main.R
 \name{calibrate}
 \alias{calibrate}
+\alias{calibrate.default}
 \title{Sequential parameter estimation for the calibration of complex models}
 \usage{
 calibrate(
@@ -9,14 +10,29 @@ calibrate(
   fn,
   gr,
   ...,
+  method,
   lower,
   upper,
   phases,
-  method,
   control,
   hessian,
   replicates,
   parallel
+)
+
+\method{calibrate}{default}(
+  par,
+  fn,
+  gr = NULL,
+  ...,
+  method = NULL,
+  lower = NULL,
+  upper = NULL,
+  phases = NULL,
+  control = list(),
+  hessian = FALSE,
+  replicates = 1,
+  parallel = FALSE
 )
 }
 \arguments{
@@ -30,6 +46,10 @@ other optimization functions.}
 
 \item{\dots}{Additional parameters to be passed to \code{fn}.}
 
+\item{method}{The optimization method to be used. The default method
+is the AHR-ES (Adaptative Hierarchical Recombination Evolutionary Strategy, 
+Oliveros-Ramos & Shin, 2016). See details for the methods available.}
+
 \item{lower}{Lower threshold value(s) for parameters. One value or a vector 
 of the same length as par. If one value is provided, it is used for all 
 parameters. \code{NA} means \code{-Inf}. By default \code{-Inf} is used (unconstrained).}
@@ -42,10 +62,6 @@ parameters. \code{NA} means \code{Inf}. By default \code{Inf} is used (unconstra
 indicating the phase at which each parameter becomes active. If omitted, 
 default value is 1 for all parameters, performing a single optimization.}
 
-\item{method}{The optimization method to be used. The default method
-is the AHR-ES (Adaptative Hierarchical Recombination Evolutionary Strategy, 
-Oliveros-Ramos & Shin, 2016). See details for the methods available.}
-
 \item{control}{Parameter for the control of the algorithm itself, see details.}
 
 \item{hessian}{Logical. Should a numerically differentiated Hessian matrix be returned?
@@ -55,7 +71,7 @@ Currently not implemented.}
 The default value is 1. A value greater than 1 is only useful for stochastic
 functions.}
 
-\item{parallel}{Logical. Use parallel computation of gradients?}
+\item{parallel}{Logical. Use parallel computation numerical of gradient?}
 }
 \description{
 This function performs the optimization of a function, possibly 

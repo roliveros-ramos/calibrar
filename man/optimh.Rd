@@ -9,11 +9,11 @@ optimh(
   fn,
   gr = NULL,
   ...,
+  method = c("AHR-ES", "Nelder-Mead", "SANN", "hjn", "bobyqa", "CMA-ES", "genSA", "DE",
+    "soma", "genoud", "PSO", "hybridPSO", "mads", "hjk", "hjkb", "nmk", "nmkb"),
   lower = -Inf,
   upper = +Inf,
   active = NULL,
-  method = c("AHR-ES", "Nelder-Mead", "SANN", "hjn", "cmaes", "genSA", "DE", "soma",
-    "genoud", "PSO", "hybridPSO", "mads", "hjk", "hjkb", "nmk", "nmkb"),
   control = list(),
   hessian = FALSE,
   parallel = FALSE
@@ -30,6 +30,10 @@ other optimization functions.}
 
 \item{...}{Additional parameters to be passed to \code{fn}.}
 
+\item{method}{The optimization method to be used. The default method
+is the AHR-ES (Adaptative Hierarchical Recombination Evolutionary Strategy, 
+Oliveros-Ramos & Shin, 2016). See details for the methods available.}
+
 \item{lower}{Lower threshold value(s) for parameters. One value or a vector 
 of the same length as par. If one value is provided, it is used for all 
 parameters. \code{NA} means \code{-Inf}. By default \code{-Inf} is used (unconstrained).}
@@ -41,16 +45,12 @@ parameters. \code{NA} means \code{Inf}. By default \code{Inf} is used (unconstra
 \item{active}{Boolean vector of the same length as par, indicating if the 
 parameter is used in the optimization (TRUE) or hold at a fixed value (FALSE).}
 
-\item{method}{The optimization method to be used. The default method
-is the AHR-ES (Adaptative Hierarchical Recombination Evolutionary Strategy, 
-Oliveros-Ramos & Shin, 2016). See details for the methods available.}
-
 \item{control}{Parameter for the control of the algorithm itself, see details.}
 
 \item{hessian}{Logical. Should a numerically differentiated Hessian matrix be returned?
 Currently not implemented.}
 
-\item{parallel}{Logical. Use parallel computation of gradients?}
+\item{parallel}{Logical. Use parallel computation numerical of gradient?}
 }
 \value{
 A list with components:

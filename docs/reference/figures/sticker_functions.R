@@ -52,10 +52,12 @@ find_top = function(par, z) {
   x$x = x$x - tail(x$x,1)
   x$y = x$y - tail(x$y,1)
   x$dist = sqrt(x$x^2 + x$y^2)
-  fun = splinefun(x$dist, y=x$gen)
+  # fun = splinefun(x$dist, y=x$gen)
+  mod = loess(gen ~ dist, data=x)
   ndist = exp(seq(from=log(x$dist[6]), to=-3.7, length.out=5))
   ndist = head(ndist, -1)
-  ngen = fun(ndist)
+  # ngen = fun(ndist)
+  ngen = predict(mod, newdata=data.frame(dist=ndist))
   funx = splinefun(x=traj5$gen, y=traj5$x)
   funy = splinefun(x=traj5$gen, y=traj5$y)
   
@@ -78,8 +80,8 @@ find_top = function(par, z) {
   return(p)
 }
 
-add_line = function(p, data, lwd=1.2, opt="blue") {
-  # data = .cut_path(data)
+add_line = function(p, data, lwd=1.2, opt="blue", col="red") {
+  data = .cut_path(data)
   tt2 = data.frame(x = head(data$x,-1), xend = tail(data$x,-1), 
                    y = head(data$y,-1), yend = tail(data$y,-1))
   p = p + geom_path(aes(x=x, y=y, z=1), data=data,
@@ -88,9 +90,9 @@ add_line = function(p, data, lwd=1.2, opt="blue") {
                     # col="red")
   p = p + geom_arrowsegment(aes(x=x, xend=xend, y=y,
                                 yend=yend, z=1), data=tt2,
-                            col="red", lwd=0.4,
+                            col=col, lwd=0.4,
                             arrow_positions = 0.5,
-                            arrow_fills = "red",
+                            arrow_fills = col,
                             arrows = arrow(type="closed",
                                            length=unit(0.07, units="cm")))
   
@@ -107,9 +109,12 @@ add_line = function(p, data, lwd=1.2, opt="blue") {
 
 make_sticker = function(save = TRUE, behind = TRUE, border = TRUE,
                         u_color = "black", bins = 20, palette = NULL,
-                        rev=FALSE, col="black", opt="blue", petit=FALSE) {
+                        rev=FALSE, col="black", opt="blue", line.col="red",
+                        petit=FALSE) {
   
  
+  if(exists("i", where = .GlobalEnv))
+  
   lab = sprintf("%d: %s", i+1, ifelse(is.null(palette), NA, palette)) 
   
   p = ggplot(mt, aes(x=x, y=y, z=z))
@@ -125,14 +130,14 @@ make_sticker = function(save = TRUE, behind = TRUE, border = TRUE,
                      fontface=2, offset=0.003, size=24, col=col, petit=petit)
   }
   
-  # p = add_line(p, traj5a, lwd=1.5)
-  # p = add_line(p, traj5b, lwd=1.5)
-  p = add_line(p, traj5c, lwd=1.5)
-  # p = add_line(p, traj5d, lwd=1.5)
-  # p = add_line(p, traj5e, lwd=1.5)
-  # p = add_line(p, traj5f, lwd=1.5)
-  # p = add_line(p, traj5g, lwd=1.5)
-  # p = add_line(p, traj5h, lwd=1.5, opt=opt)
+  p = add_line(p, traj5a, lwd=1.5, col=line.col)
+  # p = add_line(p, traj5b, lwd=1.5, col=line.col)
+  p = add_line(p, traj5c, lwd=1.5, col=line.col)
+  # p = add_line(p, traj5d, lwd=1.5, col=line.col)
+  # p = add_line(p, traj5e, lwd=1.5, col=line.col)
+  # p = add_line(p, traj5f, lwd=1.5, col=line.col)
+  p = add_line(p, traj5g, lwd=1.5, col=line.col)
+  p = add_line(p, traj5h, lwd=1.5, opt=opt, col=line.col)
   
   if(!behind) {
     p = .shadow_text(p, x=0.5, y=0.5, label="calibrar", 
@@ -144,7 +149,8 @@ make_sticker = function(save = TRUE, behind = TRUE, border = TRUE,
   # plot(p)
   
   logo = if(!petit) "man/figures/logo.png" else "man/figures/logo_small.png"
-    
+  if(save) i <<- i+1
+  
   s = sticker(
     # image
     p,
@@ -159,7 +165,7 @@ make_sticker = function(save = TRUE, behind = TRUE, border = TRUE,
     p_y = 1.12,
     p_x = 1,
     # Output file
-    filename=ifelse(save, sprintf("man/figures/%03dlogo.png", i <<- i+1), logo),
+    filename=ifelse(save, sprintf("man/figures/%03dlogo.png", i), logo),
     # Background colour
     h_fill = "green", # #F0F0F0
     # Border

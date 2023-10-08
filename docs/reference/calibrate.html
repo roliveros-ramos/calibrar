@@ -34,7 +34,19 @@ calibration of a model, by minimizing the error function fn associated to it."><
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
-      <a href="../articles/introduction.html">Getting started with the calibrar package for parameter estimation</a>
+      <a href="../articles/v01-introduction.html">Getting started with the `calibrar` package</a>
+    </li>
+    <li>
+      <a href="../articles/v02-parameter_estimation.html">Using the 'calibrate' function for parameter estimation</a>
+    </li>
+    <li>
+      <a href="../articles/v03-parameter_estimation_ODE.html">Parameter estimation for ODE systems</a>
+    </li>
+    <li>
+      <a href="../articles/v04-parameter_estimation_stochastic.html">Parameter estimation for stochastic models</a>
+    </li>
+    <li>
+      <a href="../articles/v05-using_with_TMB.html">Using the calibrar package with TMB</a>
     </li>
   </ul></li>
 <li>
@@ -72,14 +84,30 @@ calibration of a model, by minimizing the error function <code>fn</code> associa
 <span>  <span class="va">fn</span>,</span>
 <span>  <span class="va">gr</span>,</span>
 <span>  <span class="va">...</span>,</span>
+<span>  <span class="va">method</span>,</span>
 <span>  <span class="va">lower</span>,</span>
 <span>  <span class="va">upper</span>,</span>
 <span>  <span class="va">phases</span>,</span>
-<span>  <span class="va">method</span>,</span>
 <span>  <span class="va">control</span>,</span>
 <span>  <span class="va">hessian</span>,</span>
 <span>  <span class="va">replicates</span>,</span>
 <span>  <span class="va">parallel</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for default</span></span>
+<span><span class="fu">calibrate</span><span class="op">(</span></span>
+<span>  <span class="va">par</span>,</span>
+<span>  <span class="va">fn</span>,</span>
+<span>  gr <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  method <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  lower <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  upper <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  phases <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  control <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  hessian <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  replicates <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  parallel <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -103,6 +131,12 @@ other optimization functions.</p></dd>
 <dd><p>Additional parameters to be passed to <code>fn</code>.</p></dd>
 
 
+<dt>method</dt>
+<dd><p>The optimization method to be used. The default method
+is the AHR-ES (Adaptative Hierarchical Recombination Evolutionary Strategy, 
+Oliveros-Ramos &amp; Shin, 2016). See details for the methods available.</p></dd>
+
+
 <dt>lower</dt>
 <dd><p>Lower threshold value(s) for parameters. One value or a vector 
 of the same length as par. If one value is provided, it is used for all 
@@ -121,12 +155,6 @@ indicating the phase at which each parameter becomes active. If omitted,
 default value is 1 for all parameters, performing a single optimization.</p></dd>
 
 
-<dt>method</dt>
-<dd><p>The optimization method to be used. The default method
-is the AHR-ES (Adaptative Hierarchical Recombination Evolutionary Strategy, 
-Oliveros-Ramos &amp; Shin, 2016). See details for the methods available.</p></dd>
-
-
 <dt>control</dt>
 <dd><p>Parameter for the control of the algorithm itself, see details.</p></dd>
 
@@ -143,7 +171,7 @@ functions.</p></dd>
 
 
 <dt>parallel</dt>
-<dd><p>Logical. Use parallel computation of gradients?</p></dd>
+<dd><p>Logical. Use parallel computation numerical of gradient?</p></dd>
 
 </dl></div>
     <div id="details">
@@ -168,14 +196,14 @@ exploite the additional information provided by a vectorial output from <code>fn
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">calibrate</span><span class="op">(</span>par<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fl">5</span><span class="op">)</span>, fn<span class="op">=</span><span class="va">sphereN</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Phase 1 finished in 0.42s (5 of 5 parameters active)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Function value: 0.116009</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Parameter values: 0.0434 -0.00626 0.0122 -0.0486 -0.0384</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Phase 1 finished in 0.01s (5 of 5 parameters active)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Function value: 0.0382392</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Parameter values: -2.54e-06 -4.61e-06 -1.04e-07 -1.57e-06 2.66e-07</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Calibration finished.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Function value: 0.116009 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Function value: 0.03823919 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Parameters:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1]  0.043408793 -0.006256053  0.012216638 -0.048579221 -0.038431668</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] -2.541044e-06 -4.606371e-06 -1.040908e-07 -1.568635e-06  2.656032e-07</span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span><span class="fu">calibrate</span><span class="op">(</span>par<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fl">5</span><span class="op">)</span>, fn<span class="op">=</span><span class="va">sphereN</span>, replicates<span class="op">=</span><span class="fl">3</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">calibrate</span><span class="op">(</span>par<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">5</span><span class="op">)</span>, fn<span class="op">=</span><span class="va">sphereN</span>, replicates<span class="op">=</span><span class="fl">3</span>, lower<span class="op">=</span><span class="op">-</span><span class="fl">5</span>, upper<span class="op">=</span><span class="fl">5</span><span class="op">)</span></span></span>
