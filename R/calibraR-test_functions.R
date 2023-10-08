@@ -29,6 +29,7 @@ summary.calibrar.function = function(object, ...) {
 sphereN = function(x, sd=0.1, aggregate=TRUE) {
   # f(0,...,0) = 0
   # x_i \in ]-Inf, Inf[
+  x = unlist(x)
   x = x + rnorm(length(x), sd=sd)
   out = x^2
   if(isTRUE(aggregate)) return(sum(out)) else return(out) 
