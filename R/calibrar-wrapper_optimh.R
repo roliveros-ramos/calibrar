@@ -224,7 +224,7 @@
   if(is.null(control$iprint))
     control$iprint = if(isTRUE(control$verbose)) control$trace else 0
 
-  con = as.list(commonArgs(par, fn, control, environment()))
+  con = as.list(suppressWarnings(commonArgs(par, fn, control, environment())))
 
   control = check_control(control=control, default=con)
   
