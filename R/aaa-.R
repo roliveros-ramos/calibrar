@@ -11,3 +11,5 @@ NULL
 NULL
 #' @importFrom Rvmmin Rvmminu
 NULL
+#' @importFrom minqa bobyqa
+NULL

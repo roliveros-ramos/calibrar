@@ -70,7 +70,6 @@
 }
 
 
-
 # wrapper for DEoptim -----------------------------------------------------
 
 .DE = function(par, fn, gr, lower, upper, control, hessian, method) {
@@ -218,5 +217,30 @@
 }
 
 
+# wrapper for minqa -------------------------------------------------------
+
+.bobyqa = function(par, fn, gr, lower, upper, control, hessian, method) {
+  
+  if(is.null(control$iprint))
+    control$iprint = if(isTRUE(control$verbose)) control$trace else 0
+
+  con = as.list(commonArgs(par, fn, control, environment()))
+
+  control = check_control(control=control, default=con)
+  
+  xoutput = suppressWarnings(minqa::bobyqa(par=par, fn=fn, lower=lower, 
+                                          upper=upper, control=control))
+  
+  output = list()
+  output$par  = xoutput$par
+  output$value = xoutput$fval
+  output$counts = c('function'=xoutput$feval, gradient=NA)
+  output$convergence = xoutput$ierr
+  output$message = xoutput$msg
+  output$hessian = xoutput$hessian
+  
+  return(output)
+  
+}
 
 

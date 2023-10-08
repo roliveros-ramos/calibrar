@@ -20,7 +20,7 @@
            "spg"         = .spg(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian), 
            "LBFGSB3"     = .lbfgsb3(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian), 
            # heuristic
-           "cmaes"       = .cmaes(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian),
+           "CMA-ES"       = .cmaes(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian),
            "genSA"       = .genSA(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian),
            "DE"          = .DE(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian),
            "soma"        = .soma(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian),
@@ -34,6 +34,8 @@
            "hjkb"        = .dfoptim(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian, method=method),
            "nmk"         = .dfoptim(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian, method=method),
            "nmkb"        = .dfoptim(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian, method=method),
+           # minqa
+           "bobyqa"      = .bobyqa(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian, method=method),
            # calibrar
            "AHR-ES"      = .ahres(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian), 
            

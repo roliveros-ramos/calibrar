@@ -83,7 +83,7 @@ NULL
 #' @param replicates The number of replicates for the evaluation of \code{fn}.
 #' The default value is 1. A value greater than 1 is only useful for stochastic
 #' functions.
-#' @param parallel Logical. Use parallel computation of gradients?  
+#' @param parallel Logical. Use parallel computation numerical of gradient?  
 #' @details In the control list, \code{aggFn} is a function to aggregate \code{fn} to 
 #' a scalar value if the returned value is a vector. Some optimization algorithm can 
 #' exploite the additional information provided by a vectorial output from \code{fn}.
@@ -98,20 +98,21 @@ NULL
 #' }
 #' @family optimisers 
 #' @export
-calibrate = function(par, fn, gr, ..., lower, upper, phases, method, control, 
+calibrate = function(par, fn, gr, ..., method, lower, upper, phases, control, 
                      hessian, replicates, parallel) {
   UseMethod("calibrate", fn)
 }
 
 #' @export
-calibrate.default = function(par, fn, gr = NULL, ..., 
+#' @rdname calibrate
+calibrate.default = function(par, fn, gr = NULL, ..., method = NULL,  
                              lower = NULL, upper = NULL, phases = NULL, 
-                             method = "AHR-ES", control = list(), 
+                             control = list(), 
                              hessian = FALSE, replicates=1, parallel=FALSE) {
   
-  methods = c("L-BFGS-B", "Brent", "nlminb", "Rcgmin", "Rvmmin", "hjn", "spg", 
-              "LBFGSB3", "cmaes", "genSA", "DE", "soma", "genoud", "PSO", 
-              "hybridPSO", "mads", "hjkb", "nmkb", "AHR-ES", "Nelder-Mead", 
+  methods = c("L-BFGS-B", "nlminb", "Rcgmin", "Rvmmin", "hjn", "spg", 
+              "LBFGSB3", "CMA-ES", "genSA", "DE", "soma", "genoud", "PSO", 
+              "hybridPSO", "mads", "hjkb", "nmkb", "bobyqa", "AHR-ES", "Nelder-Mead", 
               "CG", "BFGS", "SANN")
   
   method = match.arg(method, choices=methods)
@@ -282,12 +283,12 @@ calibrate.default = function(par, fn, gr = NULL, ...,
 
 
 #' @export
-calibrate.TMB = function(par, fn, gr = NULL, ..., 
+calibrate.TMB = function(par, fn, gr = NULL, ..., method = NULL,  
                          lower = NULL, upper = NULL, phases = NULL, 
-                         method = NULL, control = list(), 
+                         control = list(), 
                          hessian = NULL, replicates=1, parallel=FALSE) {
   
-  methods = c("BFGS", "L-BFGS-B", "nlminb", "Rcgmin", "Rvmmin", "spg", 
+  methods = c("nlminb", "BFGS", "L-BFGS-B", "Rcgmin", "Rvmmin", "spg", 
               "LBFGSB3", "AHR-ES")
   
   if(!is.null(method)) fn$method = method
@@ -328,10 +329,11 @@ calibrate.TMB = function(par, fn, gr = NULL, ...,
 #' @author Ricardo Oliveros-Ramos
 #' @family optimisers 
 #' @export
-optim2 = function(par, fn, gr = NULL, ..., lower = -Inf, upper = +Inf, active = NULL, 
+optim2 = function(par, fn, gr = NULL, ..., 
                   method = c("Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN", 
                              "Brent", "nlm", "nlminb", "Rcgmin", "Rvmmin", "hjn", 
-                             "spg", "LBFGSB3", "AHR-ES"), 
+                             "spg", "LBFGSB3", "AHR-ES"),
+                  lower = -Inf, upper = +Inf, active = NULL, 
                   control = list(), hessian = FALSE, parallel=FALSE) {
   
   method = match.arg(method)
@@ -353,10 +355,11 @@ optim2 = function(par, fn, gr = NULL, ..., lower = -Inf, upper = +Inf, active = 
 #' @inherit optim2 return author
 #' @family optimisers 
 #' @export
-optimh = function(par, fn, gr = NULL, ..., lower = -Inf, upper = +Inf, active = NULL, 
-                  method = c("AHR-ES", "Nelder-Mead", "SANN", "hjn",  
-                             "cmaes", "genSA", "DE", "soma", "genoud", "PSO", 
+optimh = function(par, fn, gr = NULL, ...,  
+                  method = c("AHR-ES", "Nelder-Mead", "SANN", "hjn", "bobyqa",
+                             "CMA-ES", "genSA", "DE", "soma", "genoud", "PSO", 
                              "hybridPSO", "mads", "hjk", "hjkb", "nmk", "nmkb"), 
+                  lower = -Inf, upper = +Inf, active = NULL,
                   control = list(), hessian = FALSE, parallel=FALSE) {
   
   method = match.arg(method)
