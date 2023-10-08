@@ -126,6 +126,8 @@
   } # end generations loop
   
   # trim trace
+  last_gen = control$maxgen == opt$gen
+  
   trace = .trim_trace_ahr(trace, n=opt$gen)
   
   use_disk = ifelse(!is.null(attr(fn, "..i")), TRUE, FALSE) 
@@ -133,11 +135,29 @@
   
   value = control$aggFn(x=partial, w=control$weights) # check if necessary
   names(opt$MU) = names(par)
-  opt$counts = c('function'=opt$gen*control$popsize, generations=opt$gen)
+  opt$counts = c('function'=opt$gen*control$popsize, gradient=0)
   
-  output = list(par=opt$MU, value=value, counts=opt$counts, 
-                trace=trace, partial=partial, convergence=1)
+  msg = NULL
+  convergence = 0
   
+  if(last_gen) {
+    msg = "Maximum number of generations or function evaluations reached."
+    convergence = 1
+  }
+  
+  if(length(partial)==1) {
+
+    output = list(par=opt$MU, value=value, counts=opt$counts, 
+                  convergence=convergence, message=msg)
+    
+  } else {
+
+    output = list(par=opt$MU, value=value, partial=partial, counts=opt$counts, 
+                  convergence=convergence, message=msg)
+    
+  }
+  
+  if(!is.null(trace)) output = c(output, trace=list(trace))
   
   return(output)
   
