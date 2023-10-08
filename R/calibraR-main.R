@@ -110,6 +110,10 @@ calibrate.default = function(par, fn, gr = NULL, ..., method = NULL,
                              control = list(), 
                              hessian = FALSE, replicates=1, parallel=FALSE) {
   
+  if(is.null(method)) {
+    method = if(replicates==1) "LBFGSB3" else "AHR-ES"
+  }
+  
   methods = c("L-BFGS-B", "nlminb", "Rcgmin", "Rvmmin", "hjn", "spg", 
               "LBFGSB3", "CMA-ES", "genSA", "DE", "soma", "genoud", "PSO", 
               "hybridPSO", "mads", "hjkb", "nmkb", "bobyqa", "AHR-ES", "Nelder-Mead", 
