@@ -16,6 +16,7 @@ Imports:
   dfoptim,
   GenSA,
   graphics,
+  minqa,
   optimr, 
   foreach,
   lbfgsb3c,
