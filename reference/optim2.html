@@ -32,7 +32,7 @@
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
-      <a href="../articles/v01-introduction.html">Getting started with the calibrar package</a>
+      <a href="../articles/v01-introduction.html">Getting started with the `calibrar` package</a>
     </li>
     <li>
       <a href="../articles/v02-parameter_estimation.html">Using the 'calibrate' function for parameter estimation</a>
@@ -80,11 +80,11 @@
 <span>  <span class="va">fn</span>,</span>
 <span>  gr <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span>,</span>
+<span>  method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Nelder-Mead"</span>, <span class="st">"BFGS"</span>, <span class="st">"CG"</span>, <span class="st">"L-BFGS-B"</span>, <span class="st">"SANN"</span>, <span class="st">"Brent"</span>, <span class="st">"nlm"</span>, <span class="st">"nlminb"</span>,</span>
+<span>    <span class="st">"Rcgmin"</span>, <span class="st">"Rvmmin"</span>, <span class="st">"hjn"</span>, <span class="st">"spg"</span>, <span class="st">"LBFGSB3"</span>, <span class="st">"AHR-ES"</span><span class="op">)</span>,</span>
 <span>  lower <span class="op">=</span> <span class="op">-</span><span class="cn">Inf</span>,</span>
 <span>  upper <span class="op">=</span> <span class="op">+</span><span class="cn">Inf</span>,</span>
 <span>  active <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Nelder-Mead"</span>, <span class="st">"BFGS"</span>, <span class="st">"CG"</span>, <span class="st">"L-BFGS-B"</span>, <span class="st">"SANN"</span>, <span class="st">"Brent"</span>, <span class="st">"nlm"</span>, <span class="st">"nlminb"</span>,</span>
-<span>    <span class="st">"Rcgmin"</span>, <span class="st">"Rvmmin"</span>, <span class="st">"hjn"</span>, <span class="st">"spg"</span>, <span class="st">"LBFGSB3"</span>, <span class="st">"AHR-ES"</span><span class="op">)</span>,</span>
 <span>  control <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  hessian <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  parallel <span class="op">=</span> <span class="cn">FALSE</span></span>
@@ -111,6 +111,12 @@ other optimization functions.</p></dd>
 <dd><p>Additional parameters to be passed to <code>fn</code>.</p></dd>
 
 
+<dt>method</dt>
+<dd><p>The optimization method to be used. The default method
+is the AHR-ES (Adaptative Hierarchical Recombination Evolutionary Strategy, 
+Oliveros-Ramos &amp; Shin, 2016). See details for the methods available.</p></dd>
+
+
 <dt>lower</dt>
 <dd><p>Lower threshold value(s) for parameters. One value or a vector 
 of the same length as par. If one value is provided, it is used for all 
@@ -128,12 +134,6 @@ parameters. <code>NA</code> means <code>Inf</code>. By default <code>Inf</code> 
 parameter is used in the optimization (TRUE) or hold at a fixed value (FALSE).</p></dd>
 
 
-<dt>method</dt>
-<dd><p>The optimization method to be used. The default method
-is the AHR-ES (Adaptative Hierarchical Recombination Evolutionary Strategy, 
-Oliveros-Ramos &amp; Shin, 2016). See details for the methods available.</p></dd>
-
-
 <dt>control</dt>
 <dd><p>Parameter for the control of the algorithm itself, see details.</p></dd>
 
@@ -144,7 +144,7 @@ Currently not implemented.</p></dd>
 
 
 <dt>parallel</dt>
-<dd><p>Logical. Use parallel computation of gradients?</p></dd>
+<dd><p>Logical. Use parallel computation numerical of gradient?</p></dd>
 
 </dl></div>
     <div id="value">
@@ -187,14 +187,14 @@ Currently not implemented.</p></dd>
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">optim2</span><span class="op">(</span>par<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fl">5</span><span class="op">)</span>, fn<span class="op">=</span><span class="va">sphereN</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $par</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1]  0.0050  0.0050 -0.0125  0.0050  0.0050</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1]  0.02502289 -0.02894664  0.02066138  0.02654683  0.01871527</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.00345523</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.004303632</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $counts</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> function gradient </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      505       NA </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      502       NA </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $convergence</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
