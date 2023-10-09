@@ -153,15 +153,12 @@ Most algorithms implemented in `optim2()` and some in `optimh` can benefit of pa
 
 ```{r, echo=FALSE, results='hide', eval=TRUE, message=FALSE}
 library(parallel)
-library(doSNOW)
 ```
 
 ```{r, echo=TRUE, results='markup', eval=TRUE}
 library(parallel)
-library(doSNOW)
-ncores = parallel::detectCores() - 1 # number of cores to be used
-cl = makeCluster(ncores, type="SOCK")
-registerDoSNOW(cl) # register the parallel backend
+ncores = detectCores() - 1 # number of cores to be used
+cl = makeCluster(ncores)
 # this is slower than sequential for very fast models (like this one)
 optim2(par=rep(0.5, 5), fn=function(x) sum(x^2), 
                control=list(ncores=ncores), parallel=TRUE)
@@ -258,9 +255,9 @@ Most algorithms implemented in the `calibrate` function can benefit of parallel 
 
 
 ```{r, echo=TRUE, results='hide', eval=FALSE}
-ncores = parallel::detectCores() - 1 # number of cores to be used
-cl = makeCluster(ncores, type="SOCK")
-registerDoSNOW(cl) # register the parallel backend
+library(parallel)
+ncores = detectCores() - 1 # number of cores to be used
+cl = makeCluster(ncores)
 # this is slower than sequential for very fast models (like this one)
 calib = calibrate(par=rep(0.5, 5), fn=sphereN,
                   replicates=3, 
