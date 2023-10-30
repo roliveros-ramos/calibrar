@@ -113,11 +113,15 @@
 
 .soma = function(par, fn, gr, lower, upper, control, hessian, method) {
   
-  control = NULL # check!
+  # control = NULL # check!
   
   con = soma::all2one()
   if(is.null(control$populationSize)) control$populationSize = con$populationSize
-  
+  if(!is.null(control$maxit)) {
+    if(!is.null(control$nMigrations)) 
+      warning("Control argument 'maxit' already in use taking precedence over 'nMigrations'.")
+    control$nMigrations = control$maxit
+  }
   # reportr::setOutputLevel(6)
   # if(isTRUE(control$verbose)) reportr::setOutputLevel(3) 
   # control$verbose = NULL
