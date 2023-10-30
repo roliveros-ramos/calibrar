@@ -1,16 +1,13 @@
 
 
-.generatePoissonMixedModel = function(path, alpha=0.4, beta=-0.4, T=10, L=6, N0=100, sd_env=0.3, 
+.generatePoissonMixedModel = function(path, alpha=0.4, beta=-0.4, T=10, L=6, N0=100, sd_env=0.3, seed=0,
                                       ...) {
   
   nsites = ceiling(log10(L+1))
   
   sd = alpha/2
   
-#   env  = matrix(rnorm(T*L, mean=0, sd=sd_env), nrow=T, ncol=L)
-#   env  = env/diff(range(env))
-#   env  = round(env, 4) + 1
-  
+  set.seed(seed)
   env  = matrix(rnorm(T*L, mean=0, sd=sd_env), nrow=T, ncol=L)
   env  = apply(env, 2, cumsum)
   env  = sweep(env, 2, STATS = colMeans(env), FUN = "-")
@@ -87,7 +84,21 @@
   constants = list(T=T, L=L)
   
   output = c(list(path=main.folder, par=par_real, 
-                  file=file.path(main.folder, "calibration_settings.csv")), constants, parInfo)
+                  setup=file.path(main.folder, "calibration_settings.csv")), constants, parInfo)
+ 
+  setup = calibration_setup(file = output$setup)
+  observed = calibration_data(setup=setup, path=output$path)
+  
+  run_model = function(par, forcing) {
+    output = calibrar:::.PoissonMixedModel(par=par, forcing=forcing)
+    output = c(output, list(gammas=par$gamma)) # adding gamma parameters for penalties
+    return(output)
+  }
+  
+  obj2 = calibration_objFn(model=run_model, setup=setup, observed=observed, 
+                           forcing=forcing, aggregate=TRUE)
+  
+  output$value = obj2(output$par)
   
   return(output)
   
@@ -99,21 +110,24 @@
   # par is a list with 'alpha', 'beta' 'gamma', 'sd' and 'mu_ini'.
   T = nrow(forcing)
   L = ncol(forcing)
-  forcing = as.matrix(forcing)
   alpha  = par$alpha
   beta   = par$beta
   gamma  = if(!is.null((par$gamma))) par$gamma else rep(0, T-1)
   # gamma  = gamma - mean(gamma)
-  mu_ini = exp(par$mu_ini)
   
-  mu = matrix(nrow=T, ncol=L)
+  mu = matrix(exp(par$mu_ini), nrow=T, ncol=L, byrow = TRUE)
   
-  mu[1,] = mu_ini
+  # mu[1,] = mu_ini
   
-  for(t in seq_len(T-1)) {
-    log_mu_new = log(mu[t,]) + alpha + beta*forcing[t,] + gamma[t]
-    mu[t+1, ] = exp(log_mu_new)
-  }
+  rate = exp(apply(rbind(0, alpha + beta*forcing[-T, ] + gamma), 2, cumsum))
+  mu   = mu*rate 
+
+  # for(t in seq_len(T-1)) {
+  #   # log_mu_new = log(mu[t,]) + alpha + beta*forcing[t,] + gamma[t]
+  #   # log_mu_new = log(mu[t,]) + r0[t,]
+  #   # mu[t+1, ] = exp(log_mu_new)
+  #   mu[t+1, ] = mu[t, ]*r0[t, ]
+  # }
   
   output = as.list(as.data.frame(mu)) # return a list with the results
   # names of the outputs matching observed data names
@@ -121,4 +135,3 @@
   
   return(output)
 }
-

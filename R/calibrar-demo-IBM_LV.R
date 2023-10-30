@@ -94,7 +94,7 @@
   
   constants = list(T=T, transform=transform, maxpop=maxpop)
   
-  output = c(list(file=file.path(main.folder, "calibration_settings.csv"), 
+  output = c(list(setup=file.path(main.folder, "calibration_settings.csv"), 
                   path = main.folder,
                   par=par_real, bguess=guess, pop=opop), constants, parInfo)
   
