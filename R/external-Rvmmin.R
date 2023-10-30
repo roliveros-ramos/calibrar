@@ -850,3 +850,4 @@ bmchk <- function(par, lower = NULL, upper = NULL,
   return(bcout)
 }  ## end of bmchk.R 
 
+
