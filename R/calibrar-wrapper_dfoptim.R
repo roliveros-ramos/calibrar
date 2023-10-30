@@ -8,6 +8,9 @@
     control$info = control$trace
   } 
   
+  control$ncores = control$nvar = control$stochastic = control$gradient = 
+    control$gr.method = NULL
+   
   con = switch(method,
                mads = list(tol = 1e-06, 
                            maxfeval = 10000, 
@@ -33,7 +36,7 @@
   )
   
   
-  control = check_control(control=control, default=con, minimal=FALSE)
+  control = check_control(control=control, default=con, minimal=FALSE, verbose=FALSE)
   
   xoutput = suppressWarnings(switch(method,
                                 mads = dfoptim::mads(par=par, fn=fn, lower=lower, upper=upper, scale=1, control=control),
