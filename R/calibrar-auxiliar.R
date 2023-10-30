@@ -12,7 +12,16 @@
 #' @return A list with the following elements:
 #' \item{path}{Path were the files were saved}
 #' \item{par}{Real value of the parameters used in the demo} 
-#' \item{constants}{Constants used in the demo} 
+#' \item{setup}{Path to the calibration setup file} 
+#' \item{guess}{Values to be provided as initial guess to the calibrate function} 
+#' \item{lower}{Values to be provided as lower bounds to the calibrate function} 
+#' \item{upper}{Values to be provided as upper bounds to the calibrate function} 
+#' \item{phase}{Values to be provided as phases to the calibrate function} 
+#' \item{constants}{Constants used in the demo, any other variable not listed here.} 
+#' \item{value}{NA, set for compatibility with summary methods.} 
+#' \item{time}{NA, set for compatibility with summary methods.} 
+#' \item{counts}{NA, set for compatibility with summary methods.} 
+#' 
 #' @author Ricardo Oliveros--Ramos
 #' @references Oliveros-Ramos and Shin (2014)
 #' @keywords demo calibration 
@@ -25,10 +34,10 @@
 #' # create the demonstration files
 #' demo = calibrar_demo(path=path, model="PredatorPrey", T=100) 
 #' # get calibration information
-#' calibration_settings = calibration_setup(file = demo$file)
+#' calibration_settings = calibration_setup(file = demo$setup)
 #' # get observed data
 #' observed = calibration_data(setup = calibration_settings, path=demo$path)
-#' # Defining 'runModel' function
+#' # Defining 'run_model' function
 #' run_model = calibrar:::.PredatorPreyModel
 #' # real parameters
 #' cat("Real parameters used to simulate data\n")
@@ -43,11 +52,11 @@
 #' summary(ahr)
 #' } 
 #' @export 
-calibrar_demo = function(path=NULL, model=NULL,  ...) {
+calibrar_demo = function(path=NULL, model=NULL, ...) {
   
   if(is.null(path)) path = getwd()
   if(is.null(model)) {
-    model = "default"
+    model = "PoissonMixedModel"
     warning("Using default demo 'PoissonMixedModel'")
   }
   
@@ -55,23 +64,40 @@ calibrar_demo = function(path=NULL, model=NULL,  ...) {
                   PoissonMixedModel = .generatePoissonMixedModel(path=path, ...),
                   PredatorPrey      = .generatePredatorPreyModel(path=path, ...),
                   IBMLotkaVolterra  = .generateIBMLotkaVolterra(path, ...),
-                  .generatePoissonMixedModel(path=path, ...)  
+                  stop(sprintf("Model '%s' is not defined.", model))
                  )
-  
-  output$value = NA
-  output$time = NA
+ 
+  output$elapsed = NA
   output$counts = c('function'=NA, gradient=NA)
+  output$method = "data"
+  output$model  = model
   class(output) = c("calibrar.demo", "calibrar.results", class(output))
   return(output)                
   
 }
 
-
-
 #' @export
 #' @method print calibrar.demo
 print.calibrar.demo = function(x, ...) {
-  print.default(x, ...)
+
+  cat(sprintf("Calibration demo using model '%s'.\n", x$model))
+  if(!is.na(x$value)) cat("Target value:", x$value, "\n")
+  cat("Parameters:\n")
+  print(x=unlist(x$par), ...)
+  cat("Lower bounds:\n")
+  print(x=unlist(x$lower), ...)
+  cat("Upper bounds:\n")
+  print(x=unlist(x$upper), ...)
+  cat("Phases:\n")
+  print(x=unlist(x$phase), ...)
+
+  cat("Guess (starting point):\n")
+  print(x=unlist(x$guess), ...)
+  
+  cat(sprintf("\nFiles location: %s\n", x$path))
+  
+  return(invisible())
+  
 }
 
 
