@@ -6,12 +6,12 @@
   
   # default control options
   npar = length(par)
-  con = list(trace = 0, fnscale = 1, parscale = rep.int(1L, npar), maxit=2000L,
+  con = list(trace = 0, fnscale = 1, parscale = rep.int(1L, npar), maxit=10000+200*npar,
              abstol = -Inf, reltol = sqrt(.Machine$double.eps), REPORT = 10L, 
              alpha=0.05, age.max=1, selection=0.5, step=0.5, weights=1,
              aggFn=.weighted.sum, nvar=1, useCV=TRUE, maxgen=NULL,
              convergence=1e-6, ncores=1, parallel=FALSE, verbose=FALSE,
-             termination_criteria = 1, max_no_improvement=10)
+             termination = 2, max_no_improvement=10, fn_smoothing=5)
   popOpt = .optPopSize(n=length(par), selection=con$selection)
   con$popsize = popOpt
   # end of default control options
@@ -39,6 +39,16 @@
       trace$value = opt$the_values
       trace$best  = rep(NA, control$maxgen)
       
+      trace$timing = list()
+      trace$timing$fit   = rep(NA, control$maxgen)
+      trace$timing$trace = rep(NA, control$maxgen)
+      trace$timing$cont  = rep(NA, control$maxgen)
+      
+      if(control$termination %in% c(2,3)) {
+        trace$stop  = rep(NA, control$maxgen)
+        trace$timing$stop = rep(NA, control$maxgen)
+      }
+      
       if(control$trace>1) {
         trace$sd   = matrix(NA, nrow=control$maxgen, ncol=length(par))   
         trace$step = rep(NA, control$maxgen)     
@@ -54,7 +64,7 @@
   # copy master folder after optimizing popsize
   copy_master_folder(control, n=control$popsize) 
   # start new optimization
-  while(isTRUE(.continueEvolution(opt, control))) {
+  while(isTRUE(cc <- .continueEvolution(opt, control))) {
     
     tm1 = Sys.time()
     
@@ -78,15 +88,19 @@
     # save detailed outputs
     opt$the_values[opt$gen] = control$aggFn(opt$fitness[1, ], control$weights)
     
-    if(control$termination_criteria %in% c(2,3)) {
-      opt$sstop[opt$gen] = .smooth_stop(opt$the_values, reltol=control$reltol, N=control$max_no_improvement)
-    }
+    xtm1 = Sys.time()
+    opt$sstop[opt$gen] = smooth_stop(opt, control)
+    xtm2 = Sys.time()
+    tm_stop = format_difftime(xtm1, xtm2, value = TRUE)
     
     if(control$REPORT>0 & control$trace>0) {
+      
+      ttm1 = Sys.time()
       
       trace$par[opt$gen, ] = opt$MU
       trace$best[opt$gen]  = opt$selected$best$fit.global
       trace$value[opt$gen] = opt$the_values[opt$gen]
+      trace$stop[opt$gen]  = opt$sstop[opt$gen]
       
       if(control$trace>1) {
         trace$sd[opt$gen, ]  = opt$SIGMA
@@ -108,8 +122,19 @@
         
       }
       
-      if(opt$gen%%control$REPORT==0) {
-        if(control$trace>3) trace$opt[[opt$gen]] = opt
+      if(opt$gen %% control$REPORT==0) {
+        if(control$trace>4) trace$opt[[opt$gen]] = opt
+      }
+      
+      ttm2 = Sys.time()
+      
+      if(control$trace>3) {
+        
+      trace$timing$fit[opt$gen] = format_difftime(tm1, xtm1, value = TRUE)
+      trace$timing$trace[opt$gen] = format_difftime(ttm1, ttm2, value = TRUE)
+      trace$timing$cont[opt$gen] = max(attr(cc, "elapsed"),0) 
+      trace$timing$stop[opt$gen] = tm_stop
+      
       }
       
     }
@@ -137,7 +162,7 @@
   names(opt$MU) = names(par)
   opt$counts = c('function'=opt$gen*control$popsize, gradient=0)
   
-  msg = NULL
+  msg = sprintf("Stopping criteria reached in %d generations.", opt$gen)
   convergence = 0
   
   if(last_gen) {
@@ -148,36 +173,26 @@
   if(length(partial)==1) {
 
     output = list(par=opt$MU, value=value, counts=opt$counts, 
-                  convergence=convergence, message=msg)
+                  convergence=convergence, message=msg, generations=opt$gen)
     
   } else {
 
-    output = list(par=opt$MU, value=value, partial=partial, counts=opt$counts, 
-                  convergence=convergence, message=msg)
+    output = list(par=opt$MU, value=value, counts=opt$counts, 
+                  convergence=convergence, message=msg, generations=opt$gen, 
+                  partial=partial)
     
   }
   
-  if(!is.null(trace)) output = c(output, trace=list(trace))
-  
+  if(!is.null(trace)) {
+    output = c(output, trace=list(trace))
+  }
+    
   return(output)
   
 }
 
 
 # Auxiliar functions ------------------------------------------------------
-
-.continueEvolution = function(opt, control) {
-  termination_criteria = control$termination_criteria
-  if(is.null(termination_criteria)) termination_criteria = 0
-  out = switch(as.character(termination_criteria), 
-               "0" = TRUE,
-               "1" = (opt$step >= control$convergence),
-               "2" = !.N_stop(opt$sstop, N=control$max_no_improvement),
-               stop("Invalid termination criteria selected.")
-  )
-  out = (opt$gen <= (control$maxgen - 1)) & out
-  return(out)
-}
 
 # Initialize population ---------------------------------------------------
 
@@ -304,7 +319,7 @@
     }
     
     FITNESS = .rbind_fitness(FITNESS)
-    FITNESS = FITNESS[sort(FITNESS[,1], index.return=TRUE)$ix,][,-1, drop=FALSE]
+    FITNESS = FITNESS[order(FITNESS[,1]), ][,-1, drop=FALSE]
     
   } else {
     
@@ -345,7 +360,7 @@
               fit	       = fitness[.best, ],
               fit.global = fitness.global[.best])
   
-  supsL = apply(fitness[supsG, ,drop=FALSE], 2, FUN = function(x) sort(x, index.return=TRUE)$ix)
+  supsL = apply(fitness[supsG, ,drop=FALSE], 2, FUN = order)
   
   return(list(supsG=supsG, supsL=supsL, best=best))
   
@@ -355,10 +370,8 @@
 # Recombination -----------------------------------------------------------
 
 .norma = function(x) {
-  
-  x[x==0] = 1E-20
-  out = x/sum(x, na.rm=TRUE)
-  return(out)
+  # x[x==0] = 1E-20
+  return(x/sum(x, na.rm=TRUE))
   
 }
 
@@ -372,6 +385,7 @@
   out     = t(x)
   out     = ((cv.max - out)/(cv.max-cv.min))^b
   out     = t(out/rowSums(out))
+  out[out==0] = 1e-20
   out	    = t(apply(out, 1, .norma))
   return(out)
   
@@ -390,8 +404,12 @@
   opt.sd	= array(NA, dim=c(nrow(pop), ncol(supsL)))
   
   for(i in seq_len(ncol(supsL))) {
-    opt.ind[, i]   = apply(pop[, supsL[, i]], 1, weighted.mean, w=w.rec)
-    opt.var	       = apply(pop[, supsL[, i]]^2, 1, weighted.mean, w=w.rec) - opt.ind[, i]^2
+    pop_i          = t(pop[, supsL[, i]])*w.rec
+    opt.ind[, i]   = colSums(pop_i)
+    opt.var	       = colSums(pop_i^2) - opt.ind[, i]^2
+    # pop_i          = pop[, supsL[, i]])
+    # opt.ind[, i]   = apply(pop_i, 1, weighted.mean, w=w.rec)
+    # opt.var	       = apply(pop_i^2, 1, weighted.mean, w=w.rec) - opt.ind[, i]^2
     opt.var        = pmax(opt.var, 0)
     opt.sd[, i]    = sqrt(opt.var)
   }
@@ -489,25 +507,27 @@
   
   control$maxgen = control$maxit
   
-  if(control$termination_criteria %in% c(2,3)) {
-    # msg = sprintf("You need to install the 'scam' package for termination criteria %s.", 
-                    # control$termination_criteria)
-    # if(!requireNamespace("scam", quietly = TRUE)) stop(msg)
-  }
-  
   return(control)
   
 }
 
 
 .trim_trace_ahr = function(trace, n) {
+  if(is.null(trace)) return(NULL)
   ind = seq_len(n)
   trace$par     = trace$par[ind, ]
   trace$value   = trace$value[ind]
   trace$best    = trace$best[ind]
+  trace$stop    = trace$stop[ind]
   trace$sd      = trace$sd[ind, ]
   trace$step    = trace$step[ind]
   trace$fitness = trace$fitness[ind, ]
   trace$opt     = trace$opt[ind]
+  if(!is.null(trace$timing)) {
+    trace$timing$fit   = trace$timing$fit[ind]
+    trace$timing$trace = trace$timing$trace[ind]
+    trace$timing$cont  = trace$timing$cont[ind]
+    trace$timing$stop  = trace$timing$stop[ind]
+  }
   return(trace)
 }
