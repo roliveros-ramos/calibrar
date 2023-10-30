@@ -4,12 +4,19 @@
 #' @export
 print.calibrar.results = function(x, ...) {
   
-  cat("Calibration finished.\n")
+  cat(sprintf("Optimization using '%s' algorithm.\n", x$method))
   cat("Function value:", x$value, "\n")
+  cat("Status:", x$message, "\n")
   cat("Parameters:\n")
-  print(x=x$par, ...)
-  if(!all(x$active)) cat("* Parameters not calibrated.\n")
-   
+  print(x=unlist(x$par), ...)
+  if(!all(x$active)) cat("* Some parameters are not calibrated.\n")
+  if(!is.null(x$trace$generations)) {
+    cat(sprintf("Computation: (%d generations)\n", x$trace$generations))
+  } else {
+    cat("Computation:\n")
+  }
+  print(x$counts)
+  return(invisible(NULL))
 }
 
 #' @export
@@ -51,14 +58,17 @@ plot.calibrar.results = function(x, ...) {
   return(invisible(NULL))
 }
 
+#' @title Summary for calibration results object
+#' @param show_par Vector of names of positions of the parameters to show in the summary. 
+#' @inheritParams base::summary
 #' @export
-summary.calibrar.results = function(object, ..., pars=NULL) {
+summary.calibrar.results = function(object, ..., show_par=NULL) {
   oNames = as.character(match.call())[-1]
   objs = list(...)
   useDots = all(sapply(objs, FUN=inherits, what="calibrar.results"))
   if(useDots & length(objs)>0) {
     objs = c(list(object), objs)
-    out = lapply(objs, FUN=.summaryCalibrarResults, pars=pars)
+    out = lapply(objs, FUN=.summaryCalibrarResults, pars=show_par)
     out = do.call(rbind, out)
     rownames(out) = oNames[seq_along(objs)]
     class(out) = c("summary.calibrar.results", class(out))
@@ -67,6 +77,7 @@ summary.calibrar.results = function(object, ..., pars=NULL) {
   object$nphases = length(object$phases)
   object$nactive = sum(object$active)
   object$npar = length(unlist(object$par))
+  object$show_pars = show_par
   class(object) = "summary.calibrar.results"
   return(object)
 }
@@ -86,27 +97,40 @@ summary.calibrar.results = function(object, ..., pars=NULL) {
       xpars = unlist(unclass(xpars))[pars]
   }
   
-  out = c(value=x$value, x$counts[1], xpars)
+  out = data.frame(method=x$method, elapsed=x$elapsed, value=x$value, fn=x$counts[1], gr=x$counts[2], t(xpars))
   return(out)
 }
 
 #' @export
 print.summary.calibrar.results = function(x, digits=3, ...) {
-  if(is.matrix(x)) {
-    print(unclass(x), digits=digits, ...)
+  if(is.data.frame(x)) {
+    print.data.frame(x, digits=digits, ...)
     return(invisible())
   }
-  cat(sprintf("Calibration in %d %s.\n", x$nphases, 
-              ifelse(x$nphases==1, "phase", "phases")))
-  cat("Function value:", x$value, "\n")
-  cat("Parameters:\n")
-  print(x=unlist(unclass(x$par)), ...)
+  nphases = length(x$trace$phases)
+  cat(sprintf("Calibration in %d %s.\n\n", nphases, 
+              ifelse(nphases==1, "phase", "phases")))
+  spar = unlist(unclass(x$par))
+  if(!is.null(x$show_pars)) {
+    cat(sprintf("Optimal parameter values (%d of %d):\n",
+                length(x$show_pars),
+                length(spar)))
+    print(x=spar[x$show_pars], ...)
+  } else {
+    cat("Optimal parameter values:\n")
+    print(x=spar, ...)
+  }
   cat(sprintf("\n\t%d of %d parameters have been calibrated.\n\n", 
               x$nactive, x$npar))
-  cat("Counts:\n")
-  print(x$counts)
-  cat("Partial fitness values:\n")
-  print(x$partial)
+  cat("Method         :", x$method, "\n")
+  cat("Function value :", x$value, "\n")
+  cat(sprintf("Counts         : fn=%d, gr=%d\n", x$counts[1], x$counts[2]))
+  if(!is.null(x$partial)) {
+    val =  paste(sprintf("%0.2f", x$partial), collapse=", ")
+    cat("Partial fitness values: \n", val)
+    print()
+  }
+  cat(sprintf("Message        : %s\n", x$message))
   return(invisible())
 }
 
@@ -154,4 +178,9 @@ print.summary.ahres.result = function(x, ...) {
   cat("Counts:\n")
   print(x$counts)
   
+}
+
+#' @export
+dim.calibrar.results = function(x) {
+  length(unlist(x$par))
 }
