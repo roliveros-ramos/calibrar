@@ -38,6 +38,16 @@
   
   # closure for function evaluation
   fn = match.fun(fn)
+  
+  # if 'gr' is a character, assume it specify the type of numerical approximation
+  if(!is.null(gr) & is.character(gr)) {
+    if(!is.null(control$gr.method))  
+      warning(sprintf("Ignoring provided gr.method='%s', using gr='%s'.",
+                      control$gr.method, gr))
+    control$gr.method = gr
+    gr = NULL
+  }
+  
   if(!is.null(gr)) gr = match.fun(gr)
   
   # here we modify 'fn' so:
