@@ -33,6 +33,7 @@
   msg2 = paste0("Generation %", nx, "d finished (from restart).\n")
 
   if(is.null(long)) long = date()
+  if(opt$control$REPORT > 1) long = date()
   
   if(isTRUE(restart)) {
     out = sprintf(msg2, opt$gen)
@@ -148,8 +149,9 @@
   
 }
 
-format_difftime = function(x, y, ...) {
+format_difftime = function(x, y, ..., value=FALSE) {
   dt = as.numeric(difftime(y, x, units="secs"))
+  if(isTRUE(value)) return(dt)
   h = trunc(dt/3600)
   m = trunc((dt - h*3600)/60)
   s = dt - h*3600 - m*60
@@ -318,7 +320,7 @@ format_difftime = function(x, y, ...) {
 
   con = list(ncores=parallel::detectCores(), 
              nvar=NULL, run=NULL, master=NULL, stochastic=FALSE, verbose=FALSE, restart.file=NULL,
-             gradient = list(), gr.method="forward")
+             gradient = list(), gr.method="forward", REPORT=10L)
   
   controlDef  = names(con)       # default options
   controlUser = names(control)   # user provided options
@@ -355,19 +357,25 @@ format_difftime = function(x, y, ...) {
   if(!is.null(con$aggFn)) {
     
     if(is.null(con$weights)) con$weights = 1
-
+    
     # check number of variables
-    if(is.null(con$nvar)) con$nvar = length(fn(par, ...)) # CHECK HERE
+    if(!is.null(attr(fn, "variables"))) {
+      nvar = length(attr(fn, "variables"))
+    } else {
+      nvar = con$nvar
+    }
     
     # aggregation function for global fitness
     con$aggFn = match.fun(con$aggFn) 
     
     # update and check weights (for multiobjective optimization)
-    if(length(con$weights)==1) con$weights = rep(con$weights, con$nvar)
-    if(length(con$weights)!=con$nvar) stop("Vector of weights should match the length of the output of fn.")
+    if(length(con$weights)==1) con$weights = rep(con$weights, nvar)
+    if(length(con$weights)!=nvar) stop("Vector of weights should match the length of the output of fn.")
     if(any(con$weights<0)) stop("Weights should be positive numbers.")
     if(any(is.na(con$weights))) stop("Weights cannot be NA.")    
     
+  } else {
+    con$weights = NULL
   }
   
   # if(length(unknown)!=0) 
@@ -410,122 +418,6 @@ format_difftime = function(x, y, ...) {
               stop("Undefined method for gradient computation."))
   
   return(ng)
-  
-}
-
-.checkControl_old = function(control, method, par, fn, active, skeleton, replicates=1, ...) {
-  
-  fn = match.fun(fn)
-  
-  con = list(trace = 0, fnscale = 1, parscale = rep.int(1L, length(which(active))),
-             nvar=NULL, aggFn=.weighted.sum,
-             stochastic=FALSE, 
-             ncores=parallel::detectCores(), parallel=FALSE, 
-             run=NULL, master=NULL, restart.file=NULL,
-             verbose=FALSE)
-  
-  # specific options must be taken in .ahres.  
-  con = list(trace = 0, fnscale = 1, parscale = rep.int(1L, length(which(active))), maxit = NULL, maxgen=NULL,
-             abstol = -Inf, reltol = sqrt(.Machine$double.eps), REPORT = 10L, ncores=parallel::detectCores(), 
-             alpha=0.05, age.max=1, selection=0.5, step=0.5, nvar=NULL, weights=1, sigma=NULL,
-             method=method, aggFn=.weighted.sum, parallel=FALSE, run=NULL, master=NULL, useCV=TRUE,
-             convergence=1e-6, stochastic=FALSE, verbose=FALSE, restart.file=NULL)
-  
-  
-  popOpt = .optPopSize(n=length(which(active)), selection=con$selection)
-  con$popsize = popOpt
-  
-  controlDef  = names(con)       # default options
-  controlUser = names(control)   # user provided options
-  
-  con[controlUser] = control
-  
-  # get unknown options
-  unknown = controlUser[!(controlUser %in% controlDef)]
-  
-  # check for wrong master argument (not a path nor NULL)
-  if(!is.character(con$master) & !is.null(con$master)) {
-    warning("Control parameter 'master' must be a path or NULL, ignoring user provided value.")
-    con$master = NULL
-  }
-  
-  con$ncores = as.integer(con$ncores)
-  if(is.null(con$ncores) | is.na(con$ncores)) stop("Control option 'ncores' must be a positive integer.")
-  if(is.null(con$ncores)) con$ncores = 1
-  if(con$ncores < 1) con$ncores = 1
-  
-  if(!is.null(con$master) & is.null(con$run)) {
-    con$run = tempdir()
-    msg = sprintf("Evaluating 'fn' in %s.", con$run)
-    message(msg)
-  }
-  
-  if(!is.null(con$run)) {
-    if(!dir.exists(con$run)) dir.create(con$run, recursive=TRUE)
-  }
-  
-  # update population size and selection rate
-  if(con$popsize < popOpt) {
-    warning("'popsize' is too small, using default value.")
-    message(sprintf("Population size set to %d (optimal value).", popOpt))
-  }
-  con$popsize = max(con$popsize, popOpt)
-  if(isTRUE(con$parallel)) {
-    popOptP = ceiling(con$popsize/con$ncores)*con$ncores
-    if(con$popsize != popOptP) {
-      message(sprintf("Optimizing 'popsize' to work with %d cores...", con$ncores))
-      message(sprintf("   Optimal population size (%d) has been increased to %d.\n", popOpt, popOptP))
-    }
-    
-    con$popsize = popOptP
-    con$selection = con$selection*popOpt/popOptP
-  }
-  
-  if(inherits(fn, "objFn")) {
-    con$nvar = attr(fn, "nvar")
-    con$weights = attr(fn, "weights")
-    names(con$weights) = attr(fn, "variables")
-    if(con$verbose) {
-      
-      #print(con$weights) # TO_DO: make nicer output 
-    }
-  }
-  # check number of variables
-  xpar = if(missing(skeleton)) par else relist(par, skeleton)
-  if(is.null(con$nvar)) con$nvar = length(fn(xpar, ...)) # HERE CHECK
-  
-  # update maximum number of function evaluations and generations
-  if(!is.null(con$maxit) & !is.null(con$maxgen)) 
-    warning("'maxit' and 'maxgen' provided, ignoring 'maxit'.")
-  if(!is.null(con$maxit) & is.null(con$maxgen)) 
-    con$maxgen = ceiling(con$maxit/con$popsize/replicates)
-  if(is.null(con$maxit) & is.null(con$maxgen)) con$maxgen = 2000L
-  
-  con$maxit = con$popsize*con$maxgen
-  
-  if(method=="default") {
-    
-    # check for user-provided variances (sigma)
-    if(!is.null(con$sigma) & length(con$sigma)!=length(active)) 
-      stop("Vector of variances (sigma) must match parameter length.")
-    if(!is.null(con$sigma)) con$sigma = con$sigma[which(active)]
-    
-    # update and check weights
-    if(length(con$weights)==1) con$weights = rep(con$weights, con$nvar)
-    if(length(con$weights)!=con$nvar) stop("Vector of weights should match the length of the output of fn.")
-    if(any(con$weights<0)) stop("Weights should be positive numbers.")
-    if(any(is.na(con$weights))) stop("Weights cannot be NA.")    
-    
-  }
-  
-  if(method=="CMA-ES") con$weights = NULL 
-  # aggregation function for global fitness
-  con$aggFn = match.fun(con$aggFn)
-  
-  if(length(unknown)!=0) 
-    warning("Unknown control parameters: ", paste0(paste(unknown, collapse = ", ")),".")
-  
-  return(con)
   
 }
 
@@ -654,34 +546,6 @@ format_difftime = function(x, y, ...) {
 .rbind_fitness = function(x) {
   n = max(sapply(x, FUN=length))
   out = do.call(rbind, lapply(x, FUN=.mylength, n=n))
-  return(out)
-}
-
-
-# Internal stop criteria --------------------------------------------------
-
-.smooth_stop = function(x, reltol, N=10, data=FALSE) {
-  x[!is.finite(x)] = NA
-  dat = data.frame(x=seq_along(x), y=x)
-  dat = dat[complete.cases(dat), ]
-  if(nrow(dat) < N) return(FALSE)
-  # mod = scam::scam(y ~ s(x, bs="mpd"), data=dat)
-  mod = loess(y ~ x, data=dat)
-  dat$value = predict(mod, newdata = dat)
-  dat$diff = Inf
-  dat$diff[-1] = -diff(dat$value)
-  dat$tol = reltol * (abs(dat$value) + reltol)
-  if(isTRUE(data)) {
-    dat$col = ifelse(dat$diff > dat$tol, "black", "red")
-    return(dat)
-  }
-  return(tail(dat$diff < dat$tol, 1))
-}
-
-.N_stop = function(x, N) {
-  x = c(na.omit(x))
-  if(length(x) <= N) return(FALSE)
-  out = tail(filter(x, filter=rep(1/N, N), sides = 1), 1) > (1-0.1/N)
   return(out)
 }
 
