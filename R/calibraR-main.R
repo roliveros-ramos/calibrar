@@ -62,8 +62,9 @@ NULL
 #' @param par A numeric vector or list. The length of the par argument defines the 
 #' number of parameters to be estimated (i.e. the dimension of the problem).
 #' @param fn The function to be minimized.
-#' @param gr the gradient of \code{fn}. Ignored, added for portability with
-#' other optimization functions.
+#' @param gr A function computing the gradient of \code{fn}. If NULL, a numerical approximation
+#' of the gradient is used. It can be also a character specifying the method for the computation
+#' of the numerical gradient: 'central', 'forward' (the default), 'backward' or 'richardson'.
 #' @param \dots Additional parameters to be passed to \code{fn}.
 #' @param lower Lower threshold value(s) for parameters. One value or a vector 
 #' of the same length as par. If one value is provided, it is used for all 
@@ -111,7 +112,7 @@ calibrate.default = function(par, fn, gr = NULL, ..., method = NULL,
                              hessian = FALSE, replicates=1, parallel=FALSE) {
   
   if(is.null(method)) {
-    method = if(all(replicates==1)) "LBFGSB3" else "AHR-ES"
+    method = if(all(replicates==1)) "Rvmmin" else "AHR-ES"
   }
   
   methods = c("L-BFGS-B", "nlminb", "Rcgmin", "Rvmmin", "hjn", "spg", 
@@ -120,6 +121,8 @@ calibrate.default = function(par, fn, gr = NULL, ..., method = NULL,
               "CG", "BFGS", "SANN")
   
   method = match.arg(method, choices=methods)
+  
+  message(sprintf("Using optimization method '%s'.", method))
   
   # calibrate should dispatch on 'fn'
   if(inherits(fn, "objFn")) {
@@ -156,6 +159,15 @@ calibrate.default = function(par, fn, gr = NULL, ..., method = NULL,
   if(inherits(fn, "objFn")) control$aggFn = attr(fn, "aggFn")
   fnx = attr(fn, "fn")
   if(!is.null(fnx)) fnx = match.fun(fnx)
+
+  # if 'gr' is a character, assume it specify the type of numerical approximation
+  if(!is.null(gr) & is.character(gr)) {
+    if(!is.null(control$gr.method))  
+      warning(sprintf("Ignoring provided gr.method='%s', using gr='%s'.",
+                      control$gr.method, gr))
+    control$gr.method = gr
+    gr = NULL
+  }
   
   control = .checkControl_calibrate(control=control, method=method, par=par, fn=fn, ...)
   # here, we calculate 'batchsize' according to the method, copyMaster is called just once.
@@ -264,24 +276,34 @@ calibrate.default = function(par, fn, gr = NULL, ..., method = NULL,
     
   } # end of phases
   
-  # output$phase = output$phase - 1 # correct for last aborted phase
-  
   isActive = (phases>0) & !is.na(phases)
   paropt = output$phases[[nphases]]$par # save parameters of last phase
   
   paropt = relist(paropt, skeleton)
   class(paropt) = setdiff(class(paropt), "relistable")
   
-  final = list(par=paropt, value=output$phases[[nphases]]$value, 
-               counts=output$phases[[nphases]]$counts, 
-               partial=output$phases[[nphases]]$partial, 
-               active=isActive, fn=fn)
+  trace = output$phases[[nphases]]$trace # must be a list
+  if(is.null(trace)) trace = list()
+  if(!is.null(output$phases[[nphases]]$generations))
+    trace$generations = output$phases[[nphases]]$generations
+  trace = c(trace, list(partial=output$phases[[nphases]]$partial), output)
   
-  output = c(final, output)
-  class(output) = c("calibrar.results")
-  .createOutputFile(output, control, type="results")
+  final = list(par         = paropt, 
+               value       = output$phases[[nphases]]$value, 
+               counts      = output$phases[[nphases]]$counts,
+               convergence = output$phases[[nphases]]$convergence,
+               message     = output$phases[[nphases]]$message,
+               method      = method,
+               fn          = fn, 
+               active      = isActive,
+               elapsed     = format_difftime(tm1, tm2, value = TRUE),
+               trace       = trace)
   
-  return(output)
+  # output = c(final, output)
+  class(final) = c("calibrar.results")
+  .createOutputFile(final, control, type="results")
+  
+  return(final)
   
 }
 
@@ -353,6 +375,8 @@ optim2 = function(par, fn, gr = NULL, ...,
 
 #' General-purpose optimization using heuristic algorithms
 #'
+#' @param gr Function to compute the gradient of \code{fn}. Ignored by most methods, 
+#' added for consistency with other optimization functions.
 #' @examples 
 #' optim2(par=rep(NA, 5), fn=sphereN)
 #' @inheritParams optim2
@@ -665,12 +689,12 @@ calibration_objFn = function(model, setup, observed, aggFn=NULL, aggregate=FALSE
     return(simulated)
   }
   
-  attr(fn1, "nvar") = sum(setup$calibrate)
+  attr(fn1, "nvar") = if(aggregate) 1 else sum(setup$calibrate)
   attr(fn1, "weights") = weights
   attr(fn1, "variables") = setup$variable[setup$calibrate]
   attr(fn1, "aggregate") = aggregate
   attr(fn1, "fn") = fnx
-  attr(fn1, "aggFn") = aggFn
+  attr(fn1, "aggFn") = if(aggregate) NULL else aggFn
   return(fn1) 
   
 }
