@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
 
 ## Introduction
 
-This package allows the parameter estimation (i.e. calibration) of complex models, including stochastic ones. It implements generic functions that can be used for fitting any type of models, especially those with non-differentiable objective functions, with the same syntax as `base::optim`. It supports multiple phases estimation (sequential parameter masking), constrained optimization (bounding box restrictions) and automatic parallel computation of numerical gradients. Some common maximum likelihood estimation methods and automated construction of the objective function from simulated model outputs is provided. 
+This package allows the parameter estimation (i.e. calibration) of complex models, including stochastic ones. It implements generic functions that can be used for fitting any type of models, especially those with non-differentiable objective functions, with the same syntax as `base::optim`. It supports multiple phases estimation (sequential parameter masking), constrained optimization (bounding box restrictions) and automatic parallel computation of numerical gradients. Some common maximum likelihood estimation methods and automated construction of the objective function from simulated model outputs is provided.
 
 ## Basic usage
 
@@ -28,9 +28,9 @@ This vignette covers the basic usage of the package, introducing the functions `
 
 ### optim2()
 
-As the name sugests, `optim2()` is intended to extend the functionality of `stats::optim()` and it uses the same arguments:
+As the name sugests, `optim2()` is intended to extend the functionality of `stats::optim()` and it uses the same arguments (with some additions):
 
-```{r, echo=TRUE, eval=FALSE, results='markup'}         
+```{r, echo=TRUE, eval=FALSE, results='markup'}
 optim2(
   par,
   fn,
@@ -47,7 +47,7 @@ optim2(
 )
 ```
 
-The first difference is the possible values for the `method` argument. In addition to the first six also available in `optim()`, `optim2()` gives access to `stats::nlm()` and `stats::nlminb()` but with the same syntax as `optim()` to make them easy to use. In addition, three methods from the `optimr` package (`Rcgmin`, `Rvmmin`, `hjn`), the L-BFGS-B v3 implemented in the `bfgsb3c` package and the `AHR-ES` (Adaptative Hierarchical Recombination Evolutionary Strategy) implemented in this package. 
+The first difference is the possible values for the `method` argument. In addition to the first six methods, also available in `optim()`, `optim2()` gives access to `stats::nlm()` and `stats::nlminb()` but with the same syntax as `optim()` to make them easy to use. In addition, three methods from the `optimr` package (`Rcgmin`, `Rvmmin`, `hjn`), the L-BFGS-B v3 implemented in the `bfgsb3c` package and the `AHR-ES` (Adaptative Hierarchical Recombination Evolutionary Strategy) implemented in this package.
 
 In the next example, we compare the outputs of `optim()` and `optim2()`:
 
@@ -71,14 +71,14 @@ set.seed(880820) # for reproducibility
 optim2(par=rep(1, 5), fn=function(x) sum(x^2), method="AHR-ES")
 ```
 
-The second difference is the new argument `active`, which is a vector indicating if a parameters will be optimized (i.e. active) or fixed during the optimization process. In the next example, we will fix the third and fourth parameters to its initial values:
+The second difference is the new argument `active`, which is a vector indicating if a parameters will be optimized (i.e. active) or fixed to a constant value during the optimization process. In the next example, we will fix the third and fourth parameters to its initial values:
 
 ```{r, echo=TRUE, results='markup'}
 optim2(par=rep(1, 5), fn=function(x) sum(x^2), 
        active=c(TRUE, TRUE, FALSE, FALSE, TRUE))
 ```
 
-As we can see, in the final solution, the `par`value keep the values at 1, the initial value. All the numerical gradients computed internally have also 'masked' this parameters and the derivatives are not computed for them to speed up computation time.
+As we can see, in the final solution, the `par` value keep the values at 1, the initial value provided. All the numerical gradients computed internally have also 'masked' this parameters and the derivatives are not computed for them to speed up computation time.
 
 Finally, the third difference is the new argument `parallel`, that active the parallel computation of the numerical gradient, when `gr` is not supplied:
 
@@ -90,7 +90,6 @@ This last option will increase performance when the computation time of `fn` in 
 
 Additionally, the method for the computation of the numerical gradient can be chosen within the `control` list:
 
-
 ```{r, echo=TRUE, results='hide', eval=FALSE}
 optim2(par=rep(0.5, 5), fn=function(x) sum(2*x^(3.1*x)), control=list(gr.method="richardson"))
 optim2(par=rep(0.5, 5), fn=function(x) sum(2*x^(3.1*x)), control=list(gr.method="central"))
@@ -98,13 +97,11 @@ optim2(par=rep(0.5, 5), fn=function(x) sum(2*x^(3.1*x)), control=list(gr.method=
 
 ```
 
-
-
 ### optimh()
 
-The function `optimh()` has a similar functionality as `optim2()` but acts as a wrapper for several heuristic optimization algorithms implemented in several packages: `dfoptim`, `optimr`, `minqa`, `cmaes`, `genSA`, `DEoptim`, `soma`, `rgenoud` and `psoptim`. The `optimh()` function standardizes the inputs and outputs to those of `optim()`, providing a more convinient interface. All specific arguments of this methods can be passed to the original function using the `control` argument.
+The function `optimh()` has a similar functionality as `optim2()` but acts as a wrapper for several heuristic optimization algorithms implemented in several packages: `dfoptim`, `optimr`, `minqa`, `cmaes`, `genSA`, `DEoptim`, `soma`, `rgenoud` and `psoptim`. The `optimh()` function standardizes the inputs and outputs to those of `optim()`, providing a more convenient user interface. All specific arguments of this methods can be passed to the original function using the `control` argument.
 
-```{r, echo=TRUE, eval=FALSE, results='markup'}         
+```{r, echo=TRUE, eval=FALSE, results='markup'}
 optimh(
   par,
   fn,
@@ -121,31 +118,29 @@ optimh(
 )
 ```
 
-
 ```{r, echo=TRUE, results='markup'}
 # Covariance Matrix Adaptation Evolutionary Strategy
+set.seed(880820) # for reproducibility
 optimh(par=rep(1, 5), fn=function(x) sum(x^2), method="CMA-ES",
-       control=list(maxit=3000))
+       control=list(maxit=200))
 ```
-
 
 ```{r, echo=TRUE, results='markup'}
 # Generalized Simulated Anneling
+set.seed(880820) # for reproducibility
 optimh(par=rep(1, 5), fn=function(x) sum(x^2), method="genSA", 
        lower=rep(-100, 5), upper=rep(100, 5),
-       control=list(maxit=1000, temperature=6000))
+       control=list(maxit=200, temperature=6000))
 ```
 
 ```{r, echo=TRUE, results='markup'}
 # Self-Organising Migrating Algorithm
+set.seed(880820) # for reproducibility
 optimh(par=rep(1, 5), fn=function(x) sum(x^2), method="soma",
        lower=rep(-100, 5), upper=rep(100, 5),
-       control=list(populationSize=12))
+       control=list(maxit=200))
 ```
-
-You can refer to the help pages from each package to have details about every specific method and its control arguments.
-
-
+The `maxit` control argument has been standardized to work with all methods and to represent the maximum number of iterations of the algorithm. However, the specific number of function evaluations per iteration may vary between methods. You can refer to the help pages from each package to have details about every specific method and its control arguments.
 
 ### Running in parallel
 
@@ -165,14 +160,13 @@ optim2(par=rep(0.5, 5), fn=function(x) sum(x^2),
 stopCluster(cl) # close the parallel connections
 ```
 
-
 ## Sequential parameter estimation
 
 ### calibrate()
 
-The `calibrate()` function implements an automatic sequential parameter estimation, meaning parameters can be masked (set active) progressively during sequential phases of the calibration process. 
+The `calibrate()` function implements an automatic sequential parameter estimation, meaning parameters can be un-masked (set active) progressively during sequential phases of the calibration process.
 
-```{r, echo=TRUE, eval=FALSE, results='markup'}         
+```{r, echo=TRUE, eval=FALSE, results='markup'}
 calibrate(
   par,
   fn,
@@ -202,7 +196,7 @@ calibrate(par=c(1,2,3,NA,5), fn=function(x) sum(x^2),
           lower=rep(-100, 5), upper=rep(100, 5))
 ```
 
-### Setting up a calibration with multiple phases.
+### Setting up a parameter estimation with multiple phases.
 
 Multiple `phases` can be set up by selecting a different one for each parameter. The starting value of the optimization for each phase is updated with the best parameters found in the previous phase:
 
@@ -222,8 +216,7 @@ calibrate(par=c(1,2,3,NA,5), fn=function(x) sum(x^2),
 
 ### Dealing with stochastic functions
 
-When dealing with stochastic functions, the argument `replicates` can be helful, as it allows to evaluate the objective function several times, taking the average value of them as the actual function value (as an approximation of the expected value of the function). When `replicates=1`, the algorithm used by default is "LBFGSB3", but when replicates is greater than 1, "AHR-ES" is used. The next examples use the function `sphereN()`, which computes the Euclidian distance from a point `x` to the origin of coordinates after a random displacement of its position (`?sphereN` for details.)
-
+When dealing with stochastic functions, the argument `replicates` can be helpful, as it allows to evaluate the objective function several times, taking the average value of them as the actual function value (as an approximation of the expected value of the function). When `replicates=1`, the algorithm used by default is "LBFGSB3", but when replicates is greater than 1, "AHR-ES" is used. The next examples use the function `sphereN()`, which computes the Euclidean distance from a point `x` to the origin of coordinates after a random displacement of its position (see `?sphereN` for details.)
 
 ```{r, echo=TRUE, results='markup'}
 calibrate(par=c(1,2,3,NA,5), fn=sphereN,
@@ -247,12 +240,11 @@ calibrate(par=list(par1=c(1,2,3), par2=NA, par3=5), fn=sphereN,
           phases=c(1,2,-3,2,1), replicates=c(1,5))
 ```
 
-Note that the function `fn` must be able to take a list as parameter set, and the user must ensure this works before hand.
+Note that the function `fn` must be able to take a list as parameter set, and the user must ensure this works beforehand.
 
 ### Running in parallel
 
 Most algorithms implemented in the `calibrate` function can benefit of parallel computation. For the methods that uses the numerical computation of the gradient, this will be calculated in parallel as in `optim2()`. In order to support any type of parallel implementation, the parallel setup is NOT automatic, and must be done by the user previous to executed the optimization, as described in the following example:
-
 
 ```{r, echo=TRUE, results='hide', eval=FALSE}
 library(parallel)
@@ -269,4 +261,3 @@ stopCluster(cl) # close the parallel connections
 ```
 
 Please, refer to `vignette(package="calibrar")` for additional vignettes or to the [calibrar website](http://roliveros-ramos.github.io/calibrar) for more details.
-
