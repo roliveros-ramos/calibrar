@@ -25,8 +25,8 @@ number of parameters to be estimated (i.e. the dimension of the problem).}
 
 \item{fn}{The function to be minimized.}
 
-\item{gr}{the gradient of \code{fn}. Ignored, added for portability with
-other optimization functions.}
+\item{gr}{Function to compute the gradient of \code{fn}. Ignored by most methods, 
+added for consistency with other optimization functions.}
 
 \item{...}{Additional parameters to be passed to \code{fn}.}
 

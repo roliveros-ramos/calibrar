@@ -1,5 +1,5 @@
 Package: calibrar
-Version: 0.3.0.9020
+Version: 0.3.0.9021
 Authors@R: c(
     person("Ricardo", "Oliveros-Ramos", email="ricardo.oliveros@gmail.com", role=c("aut", "cre")))
 Title: Automated Parameter Estimation for Complex Models

@@ -10,6 +10,9 @@
 .Rproj.user/
 *.Rproj
 
+# testthat
+tests/testthat/testthat-problems.rds
+
 # produced vignettes
 vignettes/*.html
 vignettes/*.pdf
@@ -18,6 +21,8 @@ vignettes/*.results
 vignettes/*.restart
 vignettes/*.partial
 vignettes/*.partial.phase*
+vignettes/*cache/
+vignettes/*Demo/
 
 .Rproj.user
 
