@@ -88,6 +88,7 @@
  
   setup = calibration_setup(file = output$setup)
   observed = calibration_data(setup=setup, path=output$path)
+  forcing = as.matrix(read.csv(file.path(output$path, "master", "environment.csv"), row.names=1))
   
   run_model = function(par, forcing) {
     output = calibrar:::.PoissonMixedModel(par=par, forcing=forcing)
