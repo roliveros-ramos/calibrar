@@ -60,15 +60,16 @@ plot.calibrar.results = function(x, ...) {
 
 #' @title Summary for calibration results object
 #' @param show_par Vector of names of positions of the parameters to show in the summary. 
+#' @param par.only Show only parameters in the summary, used when more than one optimization results are summarized.
 #' @inheritParams base::summary
 #' @export
-summary.calibrar.results = function(object, ..., show_par=NULL) {
+summary.calibrar.results = function(object, ..., show_par=NULL, par.only=FALSE) {
   oNames = as.character(match.call())[-1]
   objs = list(...)
   useDots = all(sapply(objs, FUN=inherits, what="calibrar.results"))
   if(useDots & length(objs)>0) {
     objs = c(list(object), objs)
-    out = lapply(objs, FUN=.summaryCalibrarResults, pars=show_par)
+    out = lapply(objs, FUN=.summaryCalibrarResults, pars=show_par, par.only=par.only)
     out = do.call(rbind, out)
     rownames(out) = oNames[seq_along(objs)]
     class(out) = c("summary.calibrar.results", class(out))
@@ -78,11 +79,12 @@ summary.calibrar.results = function(object, ..., show_par=NULL) {
   object$nactive = sum(object$active)
   object$npar = length(unlist(object$par))
   object$show_pars = show_par
+  object$par.only = par.only
   class(object) = "summary.calibrar.results"
   return(object)
 }
 
-.summaryCalibrarResults = function(x, pars=NULL) {
+.summaryCalibrarResults = function(x, pars=NULL, par.only=FALSE) {
   ox = x
   xpars = unclass(unlist(x$par))
   npar = length(xpars)
@@ -97,7 +99,11 @@ summary.calibrar.results = function(object, ..., show_par=NULL) {
       xpars = unlist(unclass(xpars))[pars]
   }
   
-  out = data.frame(method=x$method, elapsed=x$elapsed, value=x$value, fn=x$counts[1], gr=x$counts[2], t(xpars))
+  if(isTRUE(par.only)) {
+    out = data.frame(method=x$method, t(xpars))
+  } else {
+    out = data.frame(method=x$method, elapsed=x$elapsed, value=x$value, fn=x$counts[1], gr=x$counts[2], t(xpars))
+  }
   return(out)
 }
 
