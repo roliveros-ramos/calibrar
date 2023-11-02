@@ -5,6 +5,7 @@
 # Example code in package build process
 *-Ex.R
 .RData
+*.rda
 
 # RStudio files
 .Rproj.user/
@@ -23,6 +24,7 @@ vignettes/*.partial
 vignettes/*.partial.phase*
 vignettes/*cache/
 vignettes/*Demo/
+*Demo/
 
 .Rproj.user
 
