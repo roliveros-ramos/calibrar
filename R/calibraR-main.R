@@ -115,8 +115,9 @@ calibrate.default = function(par, fn, gr = NULL, ..., method = NULL,
     method = if(all(replicates==1)) "Rvmmin" else "AHR-ES"
   }
   
-  methods = c("L-BFGS-B", "nlminb", "Rcgmin", "Rvmmin", "hjn", "spg", 
-              "LBFGSB3", "CMA-ES", "genSA", "DE", "soma", "genoud", "PSO", 
+  methods = c("L-BFGS-B", "nlminb", "Rcgmin", "Rvmmin", 
+              "Rvmmin-old", "Rvmmin-ror",
+              "hjn", "spg", "LBFGSB3", "CMA-ES", "genSA", "DE", "soma", "genoud", "PSO", 
               "hybridPSO", "mads", "hjkb", "nmkb", "bobyqa", "AHR-ES", "Nelder-Mead", 
               "CG", "BFGS", "SANN")
   
@@ -209,7 +210,7 @@ calibrate.default = function(par, fn, gr = NULL, ..., method = NULL,
   if(isTRUE(restart)) message(msg1)
   if(!isTRUE(restart) & isTRUE(control$verbose)) message(msg0)
   
-  conv = .checkConvergence(control, nphases)
+  conv = .checkConvergence(control, nphases, method)
  
   control$parallel = parallel
   
@@ -228,6 +229,7 @@ calibrate.default = function(par, fn, gr = NULL, ..., method = NULL,
     control$convergence = conv$convergence[phase]
     control$abstol      = conv$abstol[phase]
     control$reltol      = conv$reltol[phase]
+    method              = conv$method[phase]
 
     active = (phases <= phase) # NAs are corrected in .calibrar 
     
@@ -269,6 +271,7 @@ calibrate.default = function(par, fn, gr = NULL, ..., method = NULL,
     
     msg = paste(c(sprintf("\nPhase %d finished in %s (%d of %d parameters active)",
                         phase, format_difftime(tm1, tm2), sum(active, na.rm=TRUE), npar),
+                sprintf("Method: %s", method),
                 sprintf("Function value: %g", temp$value),
                 paste(c("Parameter values:",sprintf("%0.3g", par[which(active)])), collapse=" "), 
                 "\n"), collapse="\n")

@@ -421,38 +421,51 @@ format_difftime = function(x, y, ..., value=FALSE) {
   
 }
 
-.checkConvergence = function(control, nphases) {
+.checkConvergence = function(control, nphases, method) {
   
-  maxgen      = control$maxgen
-  maxit       = control$maxit  
-  convergence = control$convergence
-  abstol      = control$abstol
-  reltol      = control$reltol
+  maxgen = .check_arg_length(control$maxgen, nphases, 'maxgen')
+  maxit  =.check_arg_length(control$maxit , nphases, 'maxit')
+  convergence = .check_arg_length(control$convergence, nphases, 'convergence')
+  abstol = .check_arg_length(control$abstol, nphases, 'abstol')
+  reltol = .check_arg_length(control$reltol, nphases, 'reltol')
+  method = .check_arg_length(method, nphases, 'method')
   
-  if(length(maxgen)==1) maxgen = rep(maxgen, nphases)
-  if(length(maxit)==1) maxit = rep(maxit, nphases)
-  if(length(convergence)==1) convergence = rep(convergence, nphases)
-  if(length(abstol)==1) abstol = rep(abstol, nphases)
-  if(length(reltol)==1) reltol = rep(reltol, nphases)
+  # if(length(maxgen)==1) maxgen = rep(maxgen, nphases)
+  # if(!is.null(maxgen) & length(maxgen)!=nphases) 
+  #   stop(sprintf(msg, 'maxgen'))
   
-  if(!is.null(maxgen) & length(maxgen)!=nphases) 
-    stop("'maxgen' length must match number of calibration phases.")
+  # if(length(maxit)==1) maxit = rep(maxit, nphases)
+  # if(!is.null(maxit) & length(maxit)!=nphases) 
+  #   stop(sprintf(msg, 'maxit'))
   
-  if(!is.null(maxit) & length(maxit)!=nphases) 
-    stop("'maxit' length must match number of calibration phases.")
+  # if(length(convergence)==1) convergence = rep(convergence, nphases)
+  # if(!is.null(convergence) & length(convergence)!=nphases) 
+  #   stop(sprintf(msg, 'convergence'))
   
-  if(!is.null(convergence) & length(convergence)!=nphases) 
-    stop("'convergence' length must match number of calibration phases.")
-
-  if(!is.null(abstol) & length(abstol)!=nphases) 
-    stop("'abstol' length must match number of calibration phases.")
+  # if(length(abstol)==1) abstol = rep(abstol, nphases)
+  # if(!is.null(abstol) & length(abstol)!=nphases) 
+  #   stop(sprintf(msg, 'abstol'))
   
-  if(!is.null(reltol) & length(reltol)!=nphases) 
-    stop("'reltol' length must match number of calibration phases.")
+  # if(length(reltol)==1) reltol = rep(reltol, nphases)
+  # if(!is.null(reltol) & length(reltol)!=nphases) 
+  #   stop(sprintf(msg, 'reltol'))
+  
+  # if(length(method)==1) method = rep(method, nphases)
+  # if(!is.null(method) & length(method)!=nphases) 
+  #   stop(sprintf(msg, 'method'))
   
   return(list(maxgen=maxgen, maxit=maxit, convergence=convergence, 
-              abstol=abstol, reltol=reltol))
+              abstol=abstol, reltol=reltol, method=method))
   
+}
+
+# TO_DO: for lower length, repeat last.
+.check_arg_length = function(arg, n, nm) {
+  msg = "'%s' length must match number of calibration phases."
+  if(length(arg)==1) arg = rep(arg, n)
+  if(!is.null(arg) & length(arg)!=n) 
+    stop(sprintf(msg, nm))
+  return(arg)
 }
 
 .setWorkDir = function(run, i) {
