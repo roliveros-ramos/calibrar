@@ -9,7 +9,7 @@ NULL
 NULL
 #' @importFrom stringr str_split str_trim str_sub str_locate
 NULL
-#' @importFrom Rvmmin Rvmminu
+#' @importFrom optimx Rcgmin
 NULL
 #' @importFrom minqa bobyqa
 NULL
