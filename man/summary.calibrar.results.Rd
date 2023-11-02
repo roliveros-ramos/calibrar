@@ -4,7 +4,7 @@
 \alias{summary.calibrar.results}
 \title{Summary for calibration results object}
 \usage{
-\method{summary}{calibrar.results}(object, ..., show_par = NULL)
+\method{summary}{calibrar.results}(object, ..., show_par = NULL, par.only = FALSE)
 }
 \arguments{
 \item{object}{an object for which a summary is desired.}
@@ -12,6 +12,8 @@
 \item{...}{additional arguments affecting the summary produced.}
 
 \item{show_par}{Vector of names of positions of the parameters to show in the summary.}
+
+\item{par.only}{Show only parameters in the summary, used when more than one optimization results are summarized.}
 }
 \description{
 Summary for calibration results object
