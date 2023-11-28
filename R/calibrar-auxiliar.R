@@ -63,6 +63,7 @@ calibrar_demo = function(path=NULL, model=NULL, ...) {
   output = switch(model, 
                   PoissonMixedModel = .generatePoissonMixedModel(path=path, ...),
                   PredatorPrey      = .generatePredatorPreyModel(path=path, ...),
+                  SIR               = .generateSIRModel(path=path, ...),
                   IBMLotkaVolterra  = .generateIBMLotkaVolterra(path, ...),
                   stop(sprintf("Model '%s' is not defined.", model))
                  )
