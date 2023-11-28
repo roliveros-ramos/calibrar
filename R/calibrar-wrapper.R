@@ -4,19 +4,21 @@
   output = 
     switch(method, 
            # optim classic
-           "Nelder-Mead" = .optim(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian, method="Nelder-Mead"), 
-           "BFGS"        = .optim(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian, method="BFGS"), 
-           "CG"          = .optim(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian, method="CG"), 
+           "Nelder-Mead" = .optim(par=par, fn=fn, gr=gr, lower=-Inf, upper=Inf, control=control, hessian=hessian, method="Nelder-Mead"), 
+           "BFGS"        = .optim(par=par, fn=fn, gr=gr, lower=-Inf, upper=Inf, control=control, hessian=hessian, method="BFGS"), 
+           "CG"          = .optim(par=par, fn=fn, gr=gr, lower=-Inf, upper=Inf, control=control, hessian=hessian, method="CG"), 
            "L-BFGS-B"    = .optim(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian, method="L-BFGS-B"),
-           "SANN"        = .optim(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian, method="SANN"),
+           "SANN"        = .optim(par=par, fn=fn, gr=gr, lower=-Inf, upper=Inf, control=control, hessian=hessian, method="SANN"),
            "Brent"       = .optim(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian, method="Brent"), 
            # stats
            "nlm"         = .nlm(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian), 
            "nlminb"      = .nlminb(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian), 
            # optimr
            "Rcgmin"      = .Rcgmin(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian), 
-           "Rvmmin"      = .Rvmminx(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian), 
-           # "Rvmmin2"     = .Rvmminx(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian), 
+           "Rcgmin-old"  = .Rcgmin_old(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian),
+           "Rvmmin"      = .Rvmmin(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian), 
+           "Rvmmin-ror"  = .Rvmmin_ror(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian),
+           "Rvmmin-old"  = .Rvmmin_old(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian),
            "hjn"         = .hjn(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian), 
            "spg"         = .spg(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian), 
            "LBFGSB3"     = .lbfgsb3(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian), 
