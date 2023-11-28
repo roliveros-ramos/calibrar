@@ -9,57 +9,94 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r setup, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
-```
-
 ## Introduction
+
+This vignette focus on the use of the `calibrate()` for parameter estimation of Ordinary Differential Equations (EDO) systems. We suggest to see the vignette 'Getting started with the `calibrar` package' before reading this one, specially if you do not have previous experience doing optimization in R. Reading the vignette 'Using the `calibrate()` function for parameter estimation' may be also very useful, as not every detail is reproduced here.
+
+```{r, cache=TRUE}
+knitr::opts_current$get(c(
+  "cache",
+  "cache.path",
+  "cache.rebuild",
+  "dependson",
+  "autodep"
+))
+```
 
 ## Fitting an EDO system: the Lotka-Volterra Predator-Prey model
 
-As before, we will start by creating a set a parameters that will be used as 'real' parameters to simulate some data.
+We will estimate the parameters for a predator-prey Lotka-Volterra model using the `calibrate()` function. The model is defined by a system of ordinary differential equations for the abundance of prey $N$ and predator $P$:
+$$\frac{dN}{dt} = rN(1-N/K)-\alpha NP$$
+$$\frac{dP}{dt} = -lP + \gamma\alpha NP$$
+The parameters to estimate are the prey’s growth rate $r$, the predator’s mortality rate $l$, the carrying capacity of the prey $K$ and $\alpha$ and $\gamma$ for the predation interaction. To start, we created the demonstration data for this model using the function `calibrar_demo()` function with `T=100` as an additional argument to specify the time horizon. 
+
 ```{r, cache=TRUE}
 library(calibrar)
 set.seed(880820)
 path = NULL # NULL to use the current directory
-# create the demonstration files
 LV = calibrar_demo(path=path, model='PredatorPrey', T=100) 
-# get calibration information
 setup = calibration_setup(file = LV$setup)
-# get observed data
 observed = calibration_data(setup=setup, path=LV$path)
-# Defining 'run_model' function
 run_model = calibrar:::.PredatorPreyModel
-# real parameters
-cat("Real parameters used to simulate data\n")
-print(unlist(LV$par)) # parameters are in a list
+coef(LV)
 ```
 The `run_model` will simulate the data, by solving the ODE system defined by the Lotka-Volterra model:
 
-```{r, echo=FALSE}
-run_model
+```{r, eval=FALSE}
+run_model = function(par, T) {
+  if(!requireNamespace("deSolve", quietly = TRUE)) 
+    stop("You need to install the 'deSolve' package.")
+  # par is a list with 'alpha', 'beta' 'gamma', 'sd' and 'mu_ini'.
+  LV = function(t, y, parms, ...) {
+    r = parms$r
+    l = parms$l
+    alpha = parms$alpha
+    gamma = parms$gamma
+    K = parms$K
+    dN = r*y[1]*(1-(y[1]/K)) - alpha*y[1]*y[2]
+    dP = -l*y[2] + gamma*alpha*y[1]*y[2]
+    return(list(c(dN, dP)))
+  }
+  times = seq(0, T)
+  y0 = c(par$initial$N, par$initial$P)
+  sol = deSolve::ode(y=y0, times=times, func=LV, parms=par, method="ode45")
+  out = as.list(as.data.frame(sol[,-1]))
+  names(out) = c("prey", "predator")
+  out$prey[is.na(out$prey)] = 0
+  out$predator[is.na(out$predator)] = 0
+  return(out)
+}
 ```
 
-We will also define the objective function. In this case, we will set two: one that summarize the objective function into a scalar value, and another one that produce two values: one for the fit of the prey and another for the fit of the predator; as some algorithm (notably, AHR-ES) can use this additional information to perform the optimization. 
+The core of the `run_model` function relies in solving the ODE system by using the `ode()` function of the `deSolve` package. In general, the `run_model` takes a `par` argument (that can be a vector or a list) and produce a named list with the simulated data. All the intermediate code solves the simulation problem of taking a set of parameters to produce numerical outputs for each simulated variable. We will also define the objective function, based on the setup created by the demo:
+
+```{r, echo=FALSE, results='asis'}
+knitr::kable(setup)
+```
+The `calibration_objFn()` will automatically create the objective function following the information in the setup, in this case, by using a log-normal distribution for the errors (`type`) and the same `weight` for both. The data is expected to be read from the files in the `file` column, files that were created when calling the demo. 
 
 ```{r}
 # objective functions
 obj = calibration_objFn(model=run_model, setup=setup, observed=observed, T=LV$T, aggregate=TRUE)
 ```
 
-```{r, cache=TRUE}
+Now we can fit the model using several optimization methods:
+
+```{r optim1, cache=TRUE}
 lbfgsb1 = calibrate(par=LV$guess, fn=obj, , method='L-BFGS-B', lower=LV$lower, upper=LV$upper, phases=LV$phase)
 lbfgsb2 = calibrate(par=LV$guess, fn=obj, lower=LV$lower, upper=LV$upper, phases=LV$phase, method="Rvmmin")
 ahr = calibrate(par=LV$guess, fn=obj, method='AHR-ES', lower=LV$lower, upper=LV$upper, phases=LV$phase)
 nm = calibrate(par=LV$guess, fn=obj, phases=LV$phase, method="Nelder-Mead")
 ```
 
+And compare them:
+
 ```{r}
 summary(LV, lbfgsb1, lbfgsb2, ahr, nm, show_par = 1:5)
 ```
+
+When a function is created with the `calibration_objFn()` it gains a `predict()` method, that can be used to simulate the model with the estimated set of parameters.
+
 ```{r}
 lbfgsb1.pred = predict(lbfgsb1)
 lbfgsb2.pred = predict(lbfgsb2)
@@ -67,6 +104,7 @@ ahr.pred     = predict(ahr)
 nm.pred      = predict(nm)
 ```
 
+and plot the results.
 
 ```{r, fig.asp=0.66, fig.width=8}
 methods = c("data", "L-BFGS-B", "AHR-ES", "Nelder-Mead")
@@ -91,8 +129,16 @@ legend(100, 1.8, legend=methods, bty="n", cex=0.75, y.intersp=0.8,
        col=c(1,1:3), lwd=2)
 ```
 
+In this example, the 'L-BFGS-B' and 'AHR-ES' algorithms were able to estimate the original parameter values, but the 'Nelder-Mead' algorithm were not. 
 
 ## Fitting an EDO system: the SIR epidemiological model
+
+As a second example, we will estimate the parameters for a SIR epidemiological model. The model is defined by a system of ordinary differential equations for the number of susceptible $S$, infected $I$ and recovered $R$ individuals:
+$$\frac{dS}{dt} = -\beta S I/N$$
+$$\frac{dI}{dt} = \beta S I/N -\gamma I$$
+$$\frac{dR}{dt} = \gamma I$$
+
+The parameters to estimate are the  average number of contacts per person per time $\beta$ and the instant probability of an infectious individual recovering $\gamma$. To start, we created the demonstration data for this model using the function `calibrar_demo()` function with `T=100` as an additional argument to specify the time horizon. 
 
 ```{r}
 path = NULL # NULL to use the current directory
@@ -102,15 +148,49 @@ observed = calibration_data(setup=setup, path=SIR$path)
 run_model = calibrar:::.SIRModel
 ```
 
+To simulate the model, we will create a function taking a vector or list of parameters `par`, that solves the EDO system and return a list with the simulated variables ($S$, $I$, $R$):
+
 ```{r}
-run_model
+run_model = function(par, T) {
+  if(!requireNamespace("deSolve", quietly = TRUE))
+    stop("You need to install the 'deSolve' package.")
+  # par is a list with 'alpha', 'beta' 'gamma', 'sd' and 'mu_ini'.
+  SIR = function(t, y, parms, ...) {
+    N = sum(unlist(parms$initial))
+    beta = parms$beta
+    gamma = parms$gamma
+    S = y[1]
+    I = y[2]
+    dS = -beta*S*I/N
+    dI = +beta*S*I/N -gamma*I
+    dR = +gamma*I
+    return(list(c(dS, dI, dR)))
+  }
+  times = seq(0, T)
+  y0 = c(par$initial$S, par$initial$I, par$initial$R)
+  sol = deSolve::ode(y=y0, times=times, func=SIR, parms=par, method="ode45")
+  out = as.list(as.data.frame(sol[,-1]))
+  names(out) = c("susceptible", "infected", "recovered")
+  out$susceptible[is.na(out$susceptible)] = 0
+  out$infected[is.na(out$infected)] = 0
+  out$recovered[is.na(out$recovered)] = 0
+  return(out)
+}
+```
+
+As in the previous example, the objective function will be created based on the `run_model()` function and the information in the `setup` table created with the demo:
+
+```{r, echo=FALSE, results='asis'}
+knitr::kable(setup)
 ```
 
 ```{r}
 obj = calibration_objFn(model=run_model, setup=setup, observed=observed, T=SIR$T, aggregate=TRUE)
 ```
 
-```{r}
+Now, we can try several optimization algorithms to estimate the parameters of the model:
+
+```{r, cache=TRUE}
 lbfgsb3 = calibrate(par=SIR$guess, fn=obj, method='LBFGSB3', lower=SIR$lower, upper=SIR$upper, phases=SIR$phase)
 lbfgsb2 = calibrate(par=SIR$guess, fn=obj, method='Rvmmin', lower=SIR$lower, upper=SIR$upper, phases=SIR$phase)
 ahr = calibrate(par=SIR$guess, fn=obj, method='AHR-ES', lower=SIR$lower, upper=SIR$upper, phases=SIR$phase)
@@ -118,8 +198,15 @@ cg = calibrate(par=SIR$guess, fn=obj, method='Rcgmin', phases=SIR$phase)
 nm = calibrate(par=SIR$guess, fn=obj, method='Nelder-Mead', phases=SIR$phase)
 ```
 
+and compare them:
+
 ```{r}
 summary(SIR, lbfgsb2, lbfgsb3, ahr, cg, nm, show_par = 1:2)
 ```
+
+In this example, the algorithms 'Rvmmin', 'AHR-ES', 'Rcgmin' and 'Nelder-Mead' are able to estimate the original parameters, but the 'LBFGSB3' fails.
+
+Please, refer to `vignette(package="calibrar")` for additional vignettes or to the [calibrar website](http://roliveros-ramos.github.io/calibrar) for more details.
+
 
 
