@@ -15,10 +15,7 @@
            "nlminb"      = .nlminb(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian), 
            # optimr
            "Rcgmin"      = .Rcgmin(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian), 
-           "Rcgmin-old"  = .Rcgmin_old(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian),
            "Rvmmin"      = .Rvmmin(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian), 
-           "Rvmmin-ror"  = .Rvmmin_ror(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian),
-           "Rvmmin-old"  = .Rvmmin_old(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian),
            "hjn"         = .hjn(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian), 
            "spg"         = .spg(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian), 
            "LBFGSB3"     = .lbfgsb3(par=par, fn=fn, gr=gr, lower=lower, upper=upper, control=control, hessian=hessian), 
