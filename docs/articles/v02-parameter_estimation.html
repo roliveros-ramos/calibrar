@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Using the 'calibrate' function for parameter estimation • calibrar</title>
+<title>Using the `calibrate()` function for parameter estimation • calibrar</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
 <link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
@@ -17,7 +17,7 @@
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><meta property="og:title" content="Using the 'calibrate' function for parameter estimation">
+<script src="../pkgdown.js"></script><meta property="og:title" content="Using the `calibrate()` function for parameter estimation">
 <meta property="og:description" content="calibrar">
 <meta property="og:image" content="/logo.png">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">calibrar</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.0.9020</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.0.9021</span>
       </span>
     </div>
 
@@ -60,7 +60,7 @@
       <a href="../articles/v01-introduction.html">Getting started with the `calibrar` package</a>
     </li>
     <li>
-      <a href="../articles/v02-parameter_estimation.html">Using the 'calibrate' function for parameter estimation</a>
+      <a href="../articles/v02-parameter_estimation.html">Using the `calibrate()` function for parameter estimation</a>
     </li>
     <li>
       <a href="../articles/v03-parameter_estimation_ODE.html">Parameter estimation for ODE systems</a>
@@ -97,12 +97,12 @@
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1 data-toc-skip>Using the ‘calibrate’ function for parameter
-estimation</h1>
+      <h1 data-toc-skip>Using the <code>calibrate()</code> function for
+parameter estimation</h1>
                         <h4 data-toc-skip class="author">Ricardo
 Oliveros-Ramos</h4>
             
-            <h4 data-toc-skip class="date">2023-10-08</h4>
+            <h4 data-toc-skip class="date">2023-11-28</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/roliveros-ramos/calibrar/blob/HEAD/vignettes/v02-parameter_estimation.Rmd" class="external-link"><code>vignettes/v02-parameter_estimation.Rmd</code></a></small>
       <div class="hidden name"><code>v02-parameter_estimation.Rmd</code></div>
@@ -111,46 +111,601 @@ Oliveros-Ramos</h4>
 
     
     
-<p>Vignettes are long form documentation commonly included in packages.
-Because they are part of the distribution of the package, they need to
-be as compact as possible. The <code>html_vignette</code> output type
-provides a custom style sheet (and tweaks some options) to ensure that
-the resulting html is as small as possible. The
-<code>html_vignette</code> format:</p>
-<ul>
-<li>Never uses retina figures</li>
-<li>Has a smaller default figure size</li>
-<li>Uses a custom CSS stylesheet instead of the default Twitter
-Bootstrap style</li>
-</ul>
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
+<p>This vignette focus on the use of the <code><a href="../reference/calibrate.html">calibrate()</a></code> for
+parameter estimation. We suggest to see the vignette ‘Getting started
+with the <code>calibrar</code> package’ before reading this one,
+specially if you do not have previous experience doing optimization in
+R.</p>
 </div>
 <div class="section level2">
-<h2 id="benchmarking-parameter-estimation-for-a-linear-model">Benchmarking parameter estimation for a linear model<a class="anchor" aria-label="anchor" href="#benchmarking-parameter-estimation-for-a-linear-model"></a>
+<h2 id="estimating-parameters-for-a-linear-model">Estimating parameters for a linear model<a class="anchor" aria-label="anchor" href="#estimating-parameters-for-a-linear-model"></a>
 </h2>
-<p>You can write math expressions, e.g. <span class="math inline">\(Y =
-X\beta + \epsilon\)</span>, footnotes<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>, and tables, e.g. using
-<code><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">knitr::kable()</a></code>.</p>
+<p>As a first example, we will estimate the parameters for a linear
+model by manually performing the optimization, in opposition of the
+standard method using the <code><a href="https://rdrr.io/r/stats/lm.html" class="external-link">stats::lm()</a></code>. The objetive of this
+is to introduce the features of the <code><a href="../reference/calibrate.html">calibrate()</a></code> function
+with a simple and fast model. Let’s start by creating some parameters
+for the linear model.</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://roliveros-ramos.github.io/calibrar/" class="external-link">calibrar</a></span><span class="op">)</span></span>
+<span><span class="va">N</span> <span class="op">=</span> <span class="fl">7</span> <span class="co"># number of variables in the linear model</span></span>
+<span><span class="cn">T</span> <span class="op">=</span> <span class="fl">100</span> <span class="co"># number of observations</span></span>
+<span><span class="va">sd</span> <span class="op">=</span> <span class="fl">0.25</span> <span class="co"># standard deviation of the gaussian noise</span></span>
+<span><span class="co"># observed data</span></span>
+<span><span class="va">x</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">N</span><span class="op">*</span><span class="cn">T</span>, sd<span class="op">=</span><span class="va">sd</span><span class="op">)</span>, nrow<span class="op">=</span><span class="cn">T</span>, ncol<span class="op">=</span><span class="va">N</span><span class="op">)</span></span>
+<span><span class="co"># slopes for the linear model (real parameters)</span></span>
+<span><span class="va">slope</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="va">N</span><span class="op">)</span> </span>
+<span><span class="co"># intercept for the linear model (real parameters)</span></span>
+<span><span class="va">intercept</span> <span class="op">=</span> <span class="va">pi</span></span>
+<span><span class="co"># real parameters</span></span>
+<span><span class="va">real</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>intercept<span class="op">=</span><span class="va">intercept</span>, slope<span class="op">=</span><span class="va">slope</span><span class="op">)</span></span>
+<span><span class="va">real</span></span>
+<span><span class="co">#&gt; $intercept</span></span>
+<span><span class="co">#&gt; [1] 3.141593</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $slope</span></span>
+<span><span class="co">#&gt; [1] 1 2 3 4 5 6 7</span></span></code></pre></div>
+<p>Now, let’s create a function so simulate the linear model.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># function to simulate the linear model</span></span>
+<span><span class="va">linear</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">par</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">==</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">par</span><span class="op">$</span><span class="va">slope</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="va">out</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">x</span><span class="op">*</span><span class="va">par</span><span class="op">$</span><span class="va">slope</span><span class="op">)</span> <span class="op">+</span> <span class="va">par</span><span class="op">$</span><span class="va">intercept</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">out</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<p>And, finally, the simulated data for the exercise:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># simulated data </span></span>
+<span><span class="va">y</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">x</span>, <span class="fl">1</span>, <span class="va">linear</span>, par<span class="op">=</span><span class="va">real</span><span class="op">)</span></span></code></pre></div>
+<p>Of course, the solution can be found using the <code><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm()</a></code>
+function:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">mod</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="va">x</span><span class="op">)</span></span>
+<span><span class="va">mod</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Call:</span></span>
+<span><span class="co">#&gt; lm(formula = y ~ x)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Coefficients:</span></span>
+<span><span class="co">#&gt; (Intercept)           x1           x2           x3           x4           x5  </span></span>
+<span><span class="co">#&gt;       3.142        1.000        2.000        3.000        4.000        5.000  </span></span>
+<span><span class="co">#&gt;          x6           x7  </span></span>
+<span><span class="co">#&gt;       6.000        7.000</span></span></code></pre></div>
+<p>Now, in order to proceed to find the solution by an explicit
+numerical optimization, we need to define the objective function to be
+minimized:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># objective function (residual squares sum)</span></span>
+<span><span class="va">obj</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">par</span>, <span class="va">x</span>, <span class="va">y</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">y_sim</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">x</span>, <span class="fl">1</span>, <span class="va">linear</span>, par<span class="op">=</span><span class="va">par</span><span class="op">)</span></span>
+<span>  <span class="va">out</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="op">(</span><span class="va">y_sim</span> <span class="op">-</span> <span class="va">y</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">out</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<p>So now we can proceed with the optimization:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># initial guess for optimization</span></span>
+<span><span class="va">start</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>intercept<span class="op">=</span><span class="fl">0</span>, slope<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">N</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">bfgs</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">start</span>, fn<span class="op">=</span><span class="va">obj</span>, x<span class="op">=</span><span class="va">x</span>, y<span class="op">=</span><span class="va">y</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Using optimization method 'Rvmmin'.</span></span>
+<span><span class="co">#&gt; Elapsed time: 0.14s</span></span>
+<span><span class="co">#&gt; Function value: 4.49808e-14</span></span>
+<span><span class="co">#&gt; Parameter values: 3.14 1 2 3 4 5 6 7</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Status: Rvmminu appears to have converged</span></span>
+<span><span class="co"># using coef to extract optimal parameters</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">bfgs</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $intercept</span></span>
+<span><span class="co">#&gt; [1] 3.141593</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $slope</span></span>
+<span><span class="co">#&gt; [1] 1 2 3 4 5 6 7</span></span></code></pre></div>
+<p>As expected, we were able to recover the real parameters of the
+model. Now, let’s specify <code>lower</code> and <code>upper</code>
+bounds for the algorithms that require them:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">lower</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/utils/relist.html" class="external-link">relist</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="va">N</span><span class="op">+</span><span class="fl">1</span><span class="op">)</span>, skeleton<span class="op">=</span><span class="va">start</span><span class="op">)</span></span>
+<span><span class="va">upper</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/utils/relist.html" class="external-link">relist</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="op">+</span><span class="fl">10</span>, <span class="va">N</span><span class="op">+</span><span class="fl">1</span><span class="op">)</span>, skeleton<span class="op">=</span><span class="va">start</span><span class="op">)</span></span></code></pre></div>
+<p>And repeat the exercise with several optimization algorithms:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">880820</span><span class="op">)</span> <span class="co"># for reproducibility</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Running optimization algorithms\n"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Running optimization algorithms</span></span>
+<span><span class="va">cg</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">start</span>, fn<span class="op">=</span><span class="va">obj</span>, x<span class="op">=</span><span class="va">x</span>, y<span class="op">=</span><span class="va">y</span>, method<span class="op">=</span><span class="st">'CG'</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Using optimization method 'CG'.</span></span>
+<span><span class="co">#&gt; Elapsed time: 0.43s</span></span>
+<span><span class="co">#&gt; Function value: 5.19333e-13</span></span>
+<span><span class="co">#&gt; Parameter values: 3.14 1 2 3 4 5 6 7</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Status: -</span></span>
+<span><span class="va">nm</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">start</span>, fn<span class="op">=</span><span class="va">obj</span>, x<span class="op">=</span><span class="va">x</span>, y<span class="op">=</span><span class="va">y</span>, method<span class="op">=</span><span class="st">'nmkb'</span>, lower<span class="op">=</span><span class="va">lower</span>, upper<span class="op">=</span><span class="va">upper</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Using optimization method 'nmkb'.</span></span>
+<span><span class="co">#&gt; Elapsed time: 0.31s</span></span>
+<span><span class="co">#&gt; Function value: 6.20831e-07</span></span>
+<span><span class="co">#&gt; Parameter values: 3.14 1 2 3 4 5 6 7</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Status: -</span></span>
+<span><span class="va">ahres</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">start</span>, fn<span class="op">=</span><span class="va">obj</span>, x<span class="op">=</span><span class="va">x</span>, y<span class="op">=</span><span class="va">y</span>, method<span class="op">=</span><span class="st">'AHR-ES'</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Using optimization method 'AHR-ES'.</span></span>
+<span><span class="co">#&gt; Elapsed time: 2.24s</span></span>
+<span><span class="co">#&gt; Function value: 3.33208e-18</span></span>
+<span><span class="co">#&gt; Parameter values: 3.14 1 2 3 4 5 6 7</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Status: Stopping criteria reached in 233 generations.</span></span>
+<span><span class="va">hjn</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">start</span>, fn<span class="op">=</span><span class="va">obj</span>, x<span class="op">=</span><span class="va">x</span>, y<span class="op">=</span><span class="va">y</span>, method<span class="op">=</span><span class="st">'hjn'</span>, lower<span class="op">=</span><span class="va">lower</span>, upper<span class="op">=</span><span class="va">upper</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Using optimization method 'hjn'.</span></span>
+<span><span class="co">#&gt; Elapsed time: 0.42s</span></span>
+<span><span class="co">#&gt; Function value: 2.15391e-13</span></span>
+<span><span class="co">#&gt; Parameter values: 3.14 1 2 3 4 5 6 7</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Status: -</span></span></code></pre></div>
+<p>And compare the results:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">ahres</span>, <span class="va">hjn</span>, <span class="va">nm</span>, <span class="va">bfgs</span>, <span class="va">cg</span>, par.only<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt;       method intercept slope1 slope2 slope3 slope4 slope5 slope6 slope7</span></span>
+<span><span class="co">#&gt; ahres AHR-ES      3.14      1      2      3      4      5      6      7</span></span>
+<span><span class="co">#&gt; hjn      hjn      3.14      1      2      3      4      5      6      7</span></span>
+<span><span class="co">#&gt; nm      nmkb      3.14      1      2      3      4      5      6      7</span></span>
+<span><span class="co">#&gt; bfgs  Rvmmin      3.14      1      2      3      4      5      6      7</span></span>
+<span><span class="co">#&gt; cg        CG      3.14      1      2      3      4      5      6      7</span></span></code></pre></div>
+<p>As we can see, for this simple example, all the algorithms used were
+able to find the solution within a reasonable time, but some were faster
+than others. In the next examples we will see this is not always the
+case, and some algorithms can perform very differently or even fail for
+a particular optimization problem.</p>
 </div>
 <div class="section level2">
-<h2 id="fitting-a-logistic-model-with-harvest">Fitting a logistic model with harvest<a class="anchor" aria-label="anchor" href="#fitting-a-logistic-model-with-harvest"></a>
+<h2 id="fitting-a-biomass-production-model-with-harvest">Fitting a biomass production model with harvest<a class="anchor" aria-label="anchor" href="#fitting-a-biomass-production-model-with-harvest"></a>
 </h2>
+<p>As a second example, we will estimate the parameters for a difference
+equation system, simulating the dynamics of the biomass <span class="math inline">\(B\)</span> of a harvested population:</p>
+<p><span class="math display">\[B_{t+1} = B_t +
+rB_t\left(1-\frac{B_t}{K}\right) - C_t,\]</span> where <span class="math inline">\(B_t\)</span> is the biomass in time t, <span class="math inline">\(C_t\)</span> is the catch during the interval
+<span class="math inline">\([t, t+1[\)</span>, <span class="math inline">\(r\)</span> is the intrinsic population growth rate
+and <span class="math inline">\(K\)</span> is the carrying capacity of
+the system.</p>
+<p>We will define some values for all the parameters so we can perform
+an optimization an try to recover them from the simulated data:</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">880820</span><span class="op">)</span></span>
+<span><span class="cn">T</span> <span class="op">=</span> <span class="fl">50</span></span>
+<span><span class="va">real</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>r<span class="op">=</span><span class="fl">0.5</span>, K<span class="op">=</span><span class="fl">1000</span>, B0<span class="op">=</span><span class="fl">600</span><span class="op">)</span></span>
+<span><span class="va">catch</span> <span class="op">=</span> <span class="fl">0.25</span><span class="op">*</span><span class="op">(</span><span class="va">real</span><span class="op">$</span><span class="va">r</span><span class="op">*</span><span class="va">real</span><span class="op">$</span><span class="va">K</span><span class="op">)</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="cn">T</span>, min<span class="op">=</span><span class="fl">0.2</span>, max<span class="op">=</span><span class="fl">1.8</span><span class="op">)</span></span></code></pre></div>
+<p>As before, a function to simulate data from the parameters (the
+model) will be needed. The requirement for this function is to have as
+first argument the parameter vector (or list) <code>par</code>:</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">run_model</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">par</span>, <span class="va">T</span>, <span class="va">catch</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">B</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="cn">T</span><span class="op">+</span><span class="fl">1</span><span class="op">)</span></span>
+<span>  <span class="va">times</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="cn">T</span><span class="op">)</span></span>
+<span>  <span class="va">B0</span> <span class="op">=</span> <span class="va">par</span><span class="op">$</span><span class="va">B0</span></span>
+<span>  <span class="va">r</span> <span class="op">=</span> <span class="va">par</span><span class="op">$</span><span class="va">r</span></span>
+<span>  <span class="va">K</span> <span class="op">=</span> <span class="va">par</span><span class="op">$</span><span class="va">K</span></span>
+<span>  <span class="va">B</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">=</span> <span class="va">B0</span></span>
+<span>  <span class="kw">for</span><span class="op">(</span><span class="va">t</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="cn">T</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">b</span> <span class="op">=</span> <span class="va">B</span><span class="op">[</span><span class="va">t</span><span class="op">]</span> <span class="op">+</span> <span class="va">r</span><span class="op">*</span><span class="va">B</span><span class="op">[</span><span class="va">t</span><span class="op">]</span><span class="op">*</span><span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">B</span><span class="op">[</span><span class="va">t</span><span class="op">]</span><span class="op">/</span><span class="va">K</span><span class="op">)</span> <span class="op">-</span> <span class="va">catch</span><span class="op">[</span><span class="va">t</span><span class="op">]</span> <span class="co"># could be negative</span></span>
+<span>    <span class="va">B</span><span class="op">[</span><span class="va">t</span><span class="op">+</span><span class="fl">1</span><span class="op">]</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">b</span>, <span class="fl">0.01</span><span class="op">*</span><span class="va">B</span><span class="op">[</span><span class="va">t</span><span class="op">]</span><span class="op">)</span> <span class="co"># smooth aproximation to zero</span></span>
+<span>  <span class="op">}</span></span>
+<span>  <span class="va">out</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>biomass<span class="op">=</span><span class="va">B</span><span class="op">)</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">out</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<p>And now we can use the <code>run_model()</code> function and the
+assumed parameters to simulate the model:</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">observed</span> <span class="op">=</span> <span class="fu">run_model</span><span class="op">(</span>par<span class="op">=</span><span class="va">real</span>, T<span class="op">=</span><span class="cn">T</span>, catch<span class="op">=</span><span class="va">catch</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">1</span><span class="op">)</span>, mar<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>,<span class="fl">3</span>,<span class="fl">1</span>,<span class="fl">1</span><span class="op">)</span>, oma<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">observed</span><span class="op">$</span><span class="va">biomass</span>, type<span class="op">=</span><span class="st">"l"</span>, lwd<span class="op">=</span><span class="fl">2</span>, ylab<span class="op">=</span><span class="st">"biomass"</span>, xlab<span class="op">=</span><span class="st">""</span>, las<span class="op">=</span><span class="fl">1</span>, ylim<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1.2</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">observed</span><span class="op">$</span><span class="va">biomass</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/mtext.html" class="external-link">mtext</a></span><span class="op">(</span><span class="st">"BIOMASS"</span>, <span class="fl">3</span>, adj<span class="op">=</span><span class="fl">0.01</span>, line <span class="op">=</span> <span class="fl">0</span>, font<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">catch</span>, type<span class="op">=</span><span class="st">"h"</span>, lwd<span class="op">=</span><span class="fl">2</span>, ylab<span class="op">=</span><span class="st">"catch"</span>, xlab<span class="op">=</span><span class="st">""</span>, las<span class="op">=</span><span class="fl">1</span>, ylim<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1.2</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">catch</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/mtext.html" class="external-link">mtext</a></span><span class="op">(</span><span class="st">"CATCH"</span>, <span class="fl">3</span>, adj<span class="op">=</span><span class="fl">0.01</span>, line <span class="op">=</span> <span class="fl">0</span>, font<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span></code></pre></div>
+<p><img src="v02-parameter_estimation_files/figure-html/logistic4-1.png" width="576"></p>
+<p>In order to carry out the optimization, we need the objective
+function to be defined, in this case, using a simple residual squares
+sum:</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">objfn</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">par</span>, <span class="va">T</span>, <span class="va">catch</span>, <span class="va">observed</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">simulated</span> <span class="op">=</span> <span class="fu">run_model</span><span class="op">(</span>par<span class="op">=</span><span class="va">par</span>, T<span class="op">=</span><span class="cn">T</span>, catch<span class="op">=</span><span class="va">catch</span><span class="op">)</span></span>
+<span>  <span class="va">value</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="op">(</span><span class="va">observed</span><span class="op">$</span><span class="va">biomass</span><span class="op">-</span><span class="va">simulated</span><span class="op">$</span><span class="va">biomass</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span>, na.rm<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">value</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<p>Finally, we need to define a starting point for the search,</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">start</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>r<span class="op">=</span><span class="fl">0.1</span>, K<span class="op">=</span><span class="fl">1.5</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">observed</span><span class="op">$</span><span class="va">biomass</span><span class="op">)</span>, B0<span class="op">=</span><span class="va">observed</span><span class="op">$</span><span class="va">biomass</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
+<p>and we are ready to try to estimate the parameters using several
+algorithms:</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">880820</span><span class="op">)</span> <span class="co"># for reproducibility</span></span>
+<span><span class="va">opt0</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">start</span>, fn <span class="op">=</span> <span class="va">objfn</span>, method<span class="op">=</span><span class="st">'LBFGSB3'</span>, T<span class="op">=</span><span class="cn">T</span>, catch<span class="op">=</span><span class="va">catch</span>, observed<span class="op">=</span><span class="va">observed</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Using optimization method 'LBFGSB3'.</span></span>
+<span><span class="co">#&gt; Elapsed time: 0.04s</span></span>
+<span><span class="co">#&gt; Function value: 34239.4</span></span>
+<span><span class="co">#&gt; Parameter values: 0.476 1.04e+03 535</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Status: Maximum number of iterations reached</span></span>
+<span><span class="va">opt1</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">start</span>, fn <span class="op">=</span> <span class="va">objfn</span>, method<span class="op">=</span><span class="st">'Rvmmin'</span>, T<span class="op">=</span><span class="cn">T</span>, catch<span class="op">=</span><span class="va">catch</span>, observed<span class="op">=</span><span class="va">observed</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Using optimization method 'Rvmmin'.</span></span>
+<span><span class="co">#&gt; Elapsed time: 0.02s</span></span>
+<span><span class="co">#&gt; Function value: 1.34546e+07</span></span>
+<span><span class="co">#&gt; Parameter values: 2.9 1.14e+03 482</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Status: Rvmminu appears to have converged</span></span>
+<span><span class="va">opt2</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">start</span>, fn <span class="op">=</span> <span class="va">objfn</span>, method<span class="op">=</span><span class="st">'CG'</span>, T<span class="op">=</span><span class="cn">T</span>, catch<span class="op">=</span><span class="va">catch</span>, observed<span class="op">=</span><span class="va">observed</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Using optimization method 'CG'.</span></span>
+<span><span class="co">#&gt; Elapsed time: 0.07s</span></span>
+<span><span class="co">#&gt; Function value: 150931</span></span>
+<span><span class="co">#&gt; Parameter values: 0.402 1.18e+03 600</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Status: -</span></span>
+<span><span class="va">opt3</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">start</span>, fn <span class="op">=</span> <span class="va">objfn</span>, method<span class="op">=</span><span class="st">'AHR-ES'</span>, T<span class="op">=</span><span class="cn">T</span>, catch<span class="op">=</span><span class="va">catch</span>, observed<span class="op">=</span><span class="va">observed</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Using optimization method 'AHR-ES'.</span></span>
+<span><span class="co">#&gt; Elapsed time: 1.74s</span></span>
+<span><span class="co">#&gt; Function value: 6.77545e-17</span></span>
+<span><span class="co">#&gt; Parameter values: 0.5 1e+03 600</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Status: Stopping criteria reached in 1590 generations.</span></span>
+<span><span class="va">opt4</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">start</span>, fn <span class="op">=</span> <span class="va">objfn</span>, method<span class="op">=</span><span class="st">'CMA-ES'</span>, T<span class="op">=</span><span class="cn">T</span>, catch<span class="op">=</span><span class="va">catch</span>, observed<span class="op">=</span><span class="va">observed</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Using optimization method 'CMA-ES'.</span></span>
+<span><span class="co">#&gt; Elapsed time: 0.10s</span></span>
+<span><span class="co">#&gt; Function value: 107373</span></span>
+<span><span class="co">#&gt; Parameter values: 0.446 1.09e+03 689</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Status: Covariance matrix 'C' is numerically not positive definite.</span></span>
+<span><span class="va">opt5</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">start</span>, fn <span class="op">=</span> <span class="va">objfn</span>, method<span class="op">=</span><span class="st">'hjn'</span>, T<span class="op">=</span><span class="cn">T</span>, catch<span class="op">=</span><span class="va">catch</span>, observed<span class="op">=</span><span class="va">observed</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Using optimization method 'hjn'.</span></span>
+<span><span class="co">#&gt; Elapsed time: 0.43s</span></span>
+<span><span class="co">#&gt; Function value: 990.325</span></span>
+<span><span class="co">#&gt; Parameter values: 0.509 988 601</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Status: -</span></span>
+<span><span class="va">opt6</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">start</span>, fn <span class="op">=</span> <span class="va">objfn</span>, method<span class="op">=</span><span class="st">'Nelder-Mead'</span>, T<span class="op">=</span><span class="cn">T</span>, catch<span class="op">=</span><span class="va">catch</span>, observed<span class="op">=</span><span class="va">observed</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Using optimization method 'Nelder-Mead'.</span></span>
+<span><span class="co">#&gt; Elapsed time: 0.02s</span></span>
+<span><span class="co">#&gt; Function value: 0.0775804</span></span>
+<span><span class="co">#&gt; Parameter values: 0.5 1e+03 600</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Status: -</span></span></code></pre></div>
+<p>The function <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> can be used to compare all the
+optimization results:</p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">opt0</span>, <span class="va">opt1</span>, <span class="va">opt2</span>, <span class="va">opt3</span>, <span class="va">opt4</span>, <span class="va">opt5</span>, <span class="va">opt6</span><span class="op">)</span></span>
+<span><span class="co">#&gt;           method elapsed    value    fn  gr     r    K  B0</span></span>
+<span><span class="co">#&gt; opt0     LBFGSB3  0.0433 3.42e+04   100 100 0.476 1039 535</span></span>
+<span><span class="co">#&gt; opt1      Rvmmin  0.0164 1.35e+07   161   8 2.900 1145 482</span></span>
+<span><span class="co">#&gt; opt2          CG  0.0737 1.51e+05   691 101 0.402 1181 600</span></span>
+<span><span class="co">#&gt; opt3      AHR-ES  1.7379 6.78e-17 11130   0 0.500 1000 600</span></span>
+<span><span class="co">#&gt; opt4      CMA-ES  0.1048 1.07e+05  1085  NA 0.446 1090 689</span></span>
+<span><span class="co">#&gt; opt5         hjn  0.4344 9.90e+02  6144  NA 0.509  988 601</span></span>
+<span><span class="co">#&gt; opt6 Nelder-Mead  0.0158 7.76e-02   221  NA 0.500 1000 600</span></span></code></pre></div>
+<p>For a better comparison, we can simulate the results for all the
+parameters found:</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">sim0</span> <span class="op">=</span> <span class="fu">run_model</span><span class="op">(</span>par<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">opt0</span><span class="op">)</span>, T<span class="op">=</span><span class="cn">T</span>, catch<span class="op">=</span><span class="va">catch</span><span class="op">)</span></span>
+<span><span class="va">sim1</span> <span class="op">=</span> <span class="fu">run_model</span><span class="op">(</span>par<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">opt1</span><span class="op">)</span>, T<span class="op">=</span><span class="cn">T</span>, catch<span class="op">=</span><span class="va">catch</span><span class="op">)</span></span>
+<span><span class="va">sim2</span> <span class="op">=</span> <span class="fu">run_model</span><span class="op">(</span>par<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">opt2</span><span class="op">)</span>, T<span class="op">=</span><span class="cn">T</span>, catch<span class="op">=</span><span class="va">catch</span><span class="op">)</span></span>
+<span><span class="va">sim3</span> <span class="op">=</span> <span class="fu">run_model</span><span class="op">(</span>par<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">opt3</span><span class="op">)</span>, T<span class="op">=</span><span class="cn">T</span>, catch<span class="op">=</span><span class="va">catch</span><span class="op">)</span></span>
+<span><span class="va">sim4</span> <span class="op">=</span> <span class="fu">run_model</span><span class="op">(</span>par<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">opt4</span><span class="op">)</span>, T<span class="op">=</span><span class="cn">T</span>, catch<span class="op">=</span><span class="va">catch</span><span class="op">)</span></span>
+<span><span class="va">sim5</span> <span class="op">=</span> <span class="fu">run_model</span><span class="op">(</span>par<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">opt5</span><span class="op">)</span>, T<span class="op">=</span><span class="cn">T</span>, catch<span class="op">=</span><span class="va">catch</span><span class="op">)</span></span></code></pre></div>
+<p>And plot some of the best results obtained (L-BFGS-B 3.0, CG and
+AHR-ES):</p>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mar<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>,<span class="fl">4</span>,<span class="fl">1</span>,<span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">observed</span><span class="op">$</span><span class="va">biomass</span>, type<span class="op">=</span><span class="st">"n"</span>, ylab<span class="op">=</span><span class="st">"BIOMASS"</span>, xlab<span class="op">=</span><span class="st">""</span>, las<span class="op">=</span><span class="fl">1</span>, ylim<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1.2</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">observed</span><span class="op">$</span><span class="va">biomass</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="va">sim0</span><span class="op">$</span><span class="va">biomass</span>, col<span class="op">=</span><span class="fl">1</span>, lwd<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="va">sim2</span><span class="op">$</span><span class="va">biomass</span>, col<span class="op">=</span><span class="fl">2</span>, lwd<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="va">sim3</span><span class="op">$</span><span class="va">biomass</span>, col<span class="op">=</span><span class="fl">3</span>, lwd<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/points.html" class="external-link">points</a></span><span class="op">(</span><span class="va">observed</span><span class="op">$</span><span class="va">biomass</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/mtext.html" class="external-link">mtext</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'LBFGSB3'</span>, <span class="st">'CG'</span>, <span class="st">'AHR-ES'</span><span class="op">)</span>, <span class="fl">1</span>, adj<span class="op">=</span><span class="fl">0.05</span>, col<span class="op">=</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span>, line<span class="op">=</span><span class="op">-</span><span class="op">(</span><span class="fl">4</span><span class="op">:</span><span class="fl">2</span><span class="op">)</span>, font<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span></code></pre></div>
+<p><img src="v02-parameter_estimation_files/figure-html/unnamed-chunk-5-1.png" width="576"></p>
+<p>So far, we have used all algorithms with their default arguments.
+Most algorithms provide control arguments that allow to improve its
+performance for a particular problem. For example, looking back to the
+results from the L-BFGS-B 3.0 method, we can see as status ‘Maximum
+number of iterations reached’, meaning the algorithm did not converge
+but stopped after the maximum number of 100 iterations allowed by
+default. This can be modified here (and for several other methods) by
+changing the <code>maxit</code> control argument:</p>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">optx</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">start</span>, fn <span class="op">=</span> <span class="va">objfn</span>, method<span class="op">=</span><span class="st">'LBFGSB3'</span>, T<span class="op">=</span><span class="cn">T</span>, catch<span class="op">=</span><span class="va">catch</span>, observed<span class="op">=</span><span class="va">observed</span>, control<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>maxit<span class="op">=</span><span class="fl">20000</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Using optimization method 'LBFGSB3'.</span></span>
+<span><span class="co">#&gt; Elapsed time: 7.56s</span></span>
+<span><span class="co">#&gt; Function value: 0.342868</span></span>
+<span><span class="co">#&gt; Parameter values: 0.5 1e+03 600</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Status: CONVERGENCE: REL_REDUCTION_OF_F_&lt;=_FACTR*EPSMCH</span></span></code></pre></div>
+<p>And we can see that with this setup, the algorithm converges to the
+right solution.</p>
+<p>We also have the possibility to set up a calibration in multiple
+phases, meaning we will solve several sequential optimizations with a
+progressively higher number of parameters. The purpose of this is to
+improve the initial search point for a final optimization with all the
+parameters active. This heuristic may help to achieve find the solution
+for some problems. For example, the Rvmmin algorithm has a status
+‘Rvmminu appears to have converged’ but was not able to converge to the
+original parameter values. So, we will try again by fixing some of the
+parameters (the initial biomass) and trying a two phases parameter
+estimation:</p>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">start</span>, fn <span class="op">=</span> <span class="va">objfn</span>, method<span class="op">=</span><span class="st">'Rvmmin'</span>, T<span class="op">=</span><span class="cn">T</span>, catch<span class="op">=</span><span class="va">catch</span>, observed<span class="op">=</span><span class="va">observed</span>, phases <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Parameter estimation in two phases.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; - Phase 1: 2 of 3 parameters active.</span></span>
+<span><span class="co">#&gt;  Using optimization method 'Rvmmin'.</span></span>
+<span><span class="co">#&gt;  Phase 1 finished (0.01s)</span></span>
+<span><span class="co">#&gt;  Function value: 1.8303e-08</span></span>
+<span><span class="co">#&gt;  Parameter values: 0.5 1e+03</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; - Phase 2: 3 of 3 parameters active.</span></span>
+<span><span class="co">#&gt;  Using optimization method 'Rvmmin'.</span></span>
+<span><span class="co">#&gt;  Phase 2 finished (0.00s)</span></span>
+<span><span class="co">#&gt;  Function value: 1.8303e-08</span></span>
+<span><span class="co">#&gt;  Parameter values: 0.5 1e+03 600</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Status: Rvmminu appears to have converged</span></span>
+<span><span class="co">#&gt; Optimization using 'Rvmmin' algorithm.</span></span>
+<span><span class="co">#&gt; Function value: 1.830304e-08 </span></span>
+<span><span class="co">#&gt; Status: Rvmminu appears to have converged </span></span>
+<span><span class="co">#&gt; Parameters:</span></span>
+<span><span class="co">#&gt;     r     K    B0 </span></span>
+<span><span class="co">#&gt; 5e-01 1e+03 6e+02 </span></span>
+<span><span class="co">#&gt; Computation:</span></span>
+<span><span class="co">#&gt; function gradient </span></span>
+<span><span class="co">#&gt;       18        1</span></span></code></pre></div>
+<p>And with two phases, now we also find the solution using the ‘Rvmmin’
+method.</p>
 </div>
 <div class="section level2">
 <h2 id="fitting-an-autoregressive-poisson-model">Fitting an autoregressive Poisson model<a class="anchor" aria-label="anchor" href="#fitting-an-autoregressive-poisson-model"></a>
 </h2>
-</div>
-<div class="section level2">
-<h2 id="using-calibrate-in-parallel">Using calibrate in parallel<a class="anchor" aria-label="anchor" href="#using-calibrate-in-parallel"></a>
-</h2>
-</div>
-<div class="footnotes footnotes-end-of-document">
-<hr>
-<ol>
-<li id="fn1"><p>A footnote here.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
-</ol>
+<p>As a third example, we will estimate the parameters for a Poisson
+Autoregressive Mixed model for the dynamics of a population in different
+sites:</p>
+<p><span class="math display">\[log(\mu_{i, t+1}) = log(\mu_{i, t}) +
+\alpha + \beta X_{i, t} + \gamma_t\]</span></p>
+<p>where <span class="math inline">\(\mu_{i, t}\)</span> is the size of
+the population in site <span class="math inline">\(i\)</span> at year
+<span class="math inline">\(t\)</span>, <span class="math inline">\(X_{i, t}\)</span> is the value of an environmental
+variable in site <span class="math inline">\(i\)</span> at year <span class="math inline">\(t\)</span>. The parameters to estimate were <span class="math inline">\(\alpha\)</span>, <span class="math inline">\(\beta\)</span>, and <span class="math inline">\(\gamma_t\)</span>, the random effects for each
+year, <span class="math inline">\(\gamma_t \sim N(0,\sigma^2)\)</span>,
+and the initial population at each site <span class="math inline">\(\mu_{i, 0}\)</span>. We assumed that the
+observations <span class="math inline">\(N_{i,t}\)</span> follow a
+Poisson distribution with mean <span class="math inline">\(\mu_{i,
+t}\)</span>. We could also create the data for this model using the
+function <code><a href="../reference/calibrar_demo.html">calibrar_demo()</a></code>, with the additional arguments
+<code>L=5</code> (five sites) and <code>T=100</code> (one hundred
+years):</p>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">path</span> <span class="op">=</span> <span class="cn">NULL</span> <span class="co"># NULL to use the current directory</span></span>
+<span><span class="va">ARPM</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrar_demo.html">calibrar_demo</a></span><span class="op">(</span>path<span class="op">=</span><span class="va">path</span>, model<span class="op">=</span><span class="st">"PoissonMixedModel"</span>, L<span class="op">=</span><span class="fl">5</span>, T<span class="op">=</span><span class="fl">100</span><span class="op">)</span> </span>
+<span><span class="co">#&gt; Creating observed data list for calibration...</span></span>
+<span><span class="co">#&gt; Loaded observed data for variables: 'site_1', 'site_2', 'site_3', 'site_4', 'site_5'.</span></span>
+<span><span class="va">setup</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibration_setup.html">calibration_setup</a></span><span class="op">(</span>file<span class="op">=</span><span class="va">ARPM</span><span class="op">$</span><span class="va">setup</span><span class="op">)</span></span>
+<span><span class="va">observed</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibration_data.html">calibration_data</a></span><span class="op">(</span>setup<span class="op">=</span><span class="va">setup</span>, path<span class="op">=</span><span class="va">ARPM</span><span class="op">$</span><span class="va">path</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Creating observed data list for calibration...</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Loaded observed data for variables: 'site_1', 'site_2', 'site_3', 'site_4', 'site_5'.</span></span>
+<span><span class="va">forcing</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">ARPM</span><span class="op">$</span><span class="va">path</span>, <span class="st">"master"</span>, <span class="st">"environment.csv"</span><span class="op">)</span>, row.names<span class="op">=</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">control</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>maxit<span class="op">=</span><span class="fl">20000</span>, eps<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">.Machine</span><span class="op">$</span><span class="va">double.eps</span><span class="op">)</span>, factr<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">.Machine</span><span class="op">$</span><span class="va">double.eps</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>Here, we also added a <code>control</code> list to increase the
+maximum number of iterations for the algorithms and the tolerance for
+the convergence. Now we can specify the <code>run_model()</code>
+function so we can simulate the model from a parameter set and define
+the objective function using the <code><a href="../reference/calibration_objFn.html">calibration_objFn()</a></code>
+function:</p>
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Defining 'run_model' function</span></span>
+<span><span class="va">run_model</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">par</span>, <span class="va">forcing</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">output</span> <span class="op">=</span> <span class="fu">calibrar</span><span class="fu">:::</span><span class="fu">.PoissonMixedModel</span><span class="op">(</span>par<span class="op">=</span><span class="va">par</span>, forcing<span class="op">=</span><span class="va">forcing</span><span class="op">)</span></span>
+<span>  <span class="va">output</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">output</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>gammas<span class="op">=</span><span class="va">par</span><span class="op">$</span><span class="va">gamma</span><span class="op">)</span><span class="op">)</span> <span class="co"># adding gamma parameters for penalties</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">obj</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibration_objFn.html">calibration_objFn</a></span><span class="op">(</span>model<span class="op">=</span><span class="va">run_model</span>, setup<span class="op">=</span><span class="va">setup</span>, observed<span class="op">=</span><span class="va">observed</span>, forcing<span class="op">=</span><span class="va">forcing</span>, aggregate<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p>With these we can proceed to the parameter estimation. Here, we will
+compare the performance of three BFGS type algorithms:</p>
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># real parameters</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">ARPM</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $alpha</span></span>
+<span><span class="co">#&gt; [1] 0.4</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $beta</span></span>
+<span><span class="co">#&gt; [1] -0.4</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $gamma</span></span>
+<span><span class="co">#&gt;  [1] -0.1252736456  0.0962670651  0.3390542168 -0.3522452588  0.0396026030</span></span>
+<span><span class="co">#&gt;  [6]  0.0794698198  0.0058450990  0.5120546777  0.2514255423 -0.1069075371</span></span>
+<span><span class="co">#&gt; [11] -0.1250454857  0.1827697374  0.2014399069  0.1438583647 -0.1209423322</span></span>
+<span><span class="co">#&gt; [16]  0.1078108813 -0.0153661771  0.3699839121 -0.1709815103  0.0065274590</span></span>
+<span><span class="co">#&gt; [21] -0.2050118962 -0.1964498151  0.0008203914 -0.0466854356 -0.0997776438</span></span>
+<span><span class="co">#&gt; [26]  0.3099425926  0.0174993833  0.2637402261 -0.1962448238 -0.0491245175</span></span>
+<span><span class="co">#&gt; [31] -0.2807867674  0.2881786295 -0.1962719982  0.2948489808 -0.1982394491</span></span>
+<span><span class="co">#&gt; [36] -0.0188994689 -0.5750283368 -0.0493732202  0.0029488980 -0.3838175407</span></span>
+<span><span class="co">#&gt; [41] -0.0575627487 -0.0693274891 -0.3679177169  0.1797177882 -0.2425710022</span></span>
+<span><span class="co">#&gt; [46] -0.0437928463  0.1128536321 -0.1050868751  0.1488748450  0.0257963506</span></span>
+<span><span class="co">#&gt; [51]  0.2976548514 -0.1325363902 -0.2321310003  0.0717548469 -0.0389692768</span></span>
+<span><span class="co">#&gt; [56] -0.0590564016  0.0993280847  0.0969825576  0.0037569001  0.1269549129</span></span>
+<span><span class="co">#&gt; [61]  0.1508888175  0.1667178070  0.1931522592  0.2587759936 -0.0273102042</span></span>
+<span><span class="co">#&gt; [66] -0.0880277376 -0.2454567829 -0.0475306139 -0.1853716313  0.0822470712</span></span>
+<span><span class="co">#&gt; [71] -0.0397729154 -0.1114899279 -0.1954314245  0.0121470497 -0.1194458959</span></span>
+<span><span class="co">#&gt; [76] -0.2517897395 -0.2820094403  0.2202608159 -0.1354484053 -0.1524347015</span></span>
+<span><span class="co">#&gt; [81] -0.0583497204 -0.1150377059 -0.0887883736 -0.0625140888 -0.1206008853</span></span>
+<span><span class="co">#&gt; [86] -0.2187869440  0.1429412383 -0.0217624526 -0.2887595871  0.1612246527</span></span>
+<span><span class="co">#&gt; [91] -0.3479670157 -0.0802640619 -0.0575164978 -0.1876814800  0.0575334278</span></span>
+<span><span class="co">#&gt; [96] -0.3010802249  0.3038594027  0.0734818712  0.3399724818</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $sd</span></span>
+<span><span class="co">#&gt; [1] 0.2</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $mu_ini</span></span>
+<span><span class="co">#&gt; [1] 5.141664 4.158883 3.433987 4.430817 4.934474</span></span></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">lbfgsb1</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">ARPM</span><span class="op">$</span><span class="va">guess</span>, fn<span class="op">=</span><span class="va">obj</span>, method<span class="op">=</span><span class="st">'L-BFGS-B'</span>, lower<span class="op">=</span><span class="va">ARPM</span><span class="op">$</span><span class="va">lower</span>, upper<span class="op">=</span><span class="va">ARPM</span><span class="op">$</span><span class="va">upper</span>, phases<span class="op">=</span><span class="va">ARPM</span><span class="op">$</span><span class="va">phase</span>, control<span class="op">=</span><span class="va">control</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Using optimization method 'L-BFGS-B'.</span></span>
+<span><span class="co">#&gt; Elapsed time: 59.49s</span></span>
+<span><span class="co">#&gt; Function value: -186093</span></span>
+<span><span class="co">#&gt; Parameter values: 0.43 -0.415 -0.109 0.103 0.224 -0.306 0.0191 0.0445 0.0534 0.432 0.199 -0.0786 -0.128 0.121 0.275 0.0471 -0.101 0.0981 -0.0389 0.371 -0.213 0.036 -0.237 -0.254 0.0572 -0.0642 -0.178 0.294 5.54e-05 0.268 -0.212 -0.0516 -0.325 0.253 -0.195 0.291 -0.243 -0.0235 -0.532 -0.0742 -0.0616 -0.297 -0.115 -0.167 -0.323 0.0585 -0.185 -0.0309 0.0992 -0.0813 0.0103 0.161 0.266 -0.103 -0.368 0.0792 -0.133 0.0369 0.0815 -0.000515 0.0957 -0.0619 0.287 0.185 0.134 0.162 0.0492 -0.143 -0.124 -0.163 -0.277 0.0741 -0.0474 -0.0123 -0.229 -0.0587 -0.17 -0.183 -0.226 -0.0318 -0.0141 -0.21 -0.0744 -0.1 -0.185 -0.137 -0.0275 -0.164 0.181 -0.2 -0.243 0.152 -0.284 -0.352 -0.0418 -0.188 0.0203 -0.0106 0.197 -0.0425 0.37</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Status: CONVERGENCE: REL_REDUCTION_OF_F &lt;= FACTR*EPSMCH</span></span>
+<span><span class="va">lbfgsb2</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">ARPM</span><span class="op">$</span><span class="va">guess</span>, fn<span class="op">=</span><span class="va">obj</span>, method<span class="op">=</span><span class="st">'Rvmmin'</span>, lower<span class="op">=</span><span class="va">ARPM</span><span class="op">$</span><span class="va">lower</span>, upper<span class="op">=</span><span class="va">ARPM</span><span class="op">$</span><span class="va">upper</span>, phases<span class="op">=</span><span class="va">ARPM</span><span class="op">$</span><span class="va">phase</span>, control<span class="op">=</span><span class="va">control</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Using optimization method 'Rvmmin'.</span></span>
+<span><span class="co">#&gt; Elapsed time: 12.25s</span></span>
+<span><span class="co">#&gt; Function value: -186095</span></span>
+<span><span class="co">#&gt; Parameter values: 0.397 -0.415 -0.0755 0.135 0.261 -0.276 0.0524 0.0757 0.085 0.467 0.231 -0.0459 -0.0946 0.155 0.308 0.0794 -0.0678 0.131 -0.00842 0.405 -0.181 0.0701 -0.205 -0.221 0.0894 -0.0332 -0.145 0.326 0.0332 0.301 -0.179 -0.0193 -0.291 0.284 -0.161 0.323 -0.209 0.00885 -0.5 -0.0401 -0.0301 -0.27 -0.0754 -0.135 -0.295 0.0923 -0.154 0.00403 0.137 -0.0503 0.0357 0.194 0.307 -0.0752 -0.339 0.117 -0.101 0.0691 0.114 0.0343 0.129 -0.0325 0.325 0.217 0.164 0.197 0.0826 -0.113 -0.0906 -0.128 -0.25 0.111 -0.015 0.0211 -0.201 -0.0202 -0.134 -0.154 -0.195 0.0029 0.0188 -0.179 -0.0423 -0.0657 -0.151 -0.104 0.00175 -0.13 0.209 -0.167 -0.206 0.187 -0.246 -0.32 -0.00722 -0.145 3.35e-05 0.0373 0.242 0.00104 0.408</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Status: Rvmminb appears to have converged</span></span>
+<span><span class="va">lbfgsb3</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">ARPM</span><span class="op">$</span><span class="va">guess</span>, fn<span class="op">=</span><span class="va">obj</span>, method<span class="op">=</span><span class="st">'LBFGSB3'</span>, lower<span class="op">=</span><span class="va">ARPM</span><span class="op">$</span><span class="va">lower</span>, upper<span class="op">=</span><span class="va">ARPM</span><span class="op">$</span><span class="va">upper</span>, phases<span class="op">=</span><span class="va">ARPM</span><span class="op">$</span><span class="va">phase</span>, control<span class="op">=</span><span class="va">control</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Using optimization method 'LBFGSB3'.</span></span>
+<span><span class="co">#&gt; Elapsed time: 31.98s</span></span>
+<span><span class="co">#&gt; Function value: -182467</span></span>
+<span><span class="co">#&gt; Parameter values: 0.378 -0.16 -0.188 -0.183 -0.181 -0.201 -0.162 -0.145 -0.144 -0.129 -0.124 -0.145 -0.145 -0.144 -0.122 -0.145 -0.154 -0.156 -0.174 -0.164 -0.254 -0.26 -0.276 -0.286 -0.276 -0.235 -0.217 -0.19 -0.188 -0.18 -0.246 -0.254 -0.27 -0.222 -0.269 -0.264 -0.324 -0.331 -0.337 -0.337 -0.337 -0.337 -0.335 -0.329 -0.325 -0.342 -0.342 -0.342 -0.248 -0.236 -0.219 -0.213 -0.215 -0.203 -0.216 -0.194 -0.193 -0.14 -0.165 -0.152 -0.15 -0.149 -0.146 -0.146 -0.146 -0.149 -0.164 -0.101 -0.399 -0.26 -0.296 -0.304 -0.278 -0.294 -0.315 -0.291 -0.312 -0.384 -0.328 -0.34 -0.341 -0.296 -0.327 -0.283 -0.284 -0.28 -0.3 -0.224 -0.253 -0.284 -0.319 -0.293 -0.337 -0.338 -0.337 -0.291 -0.331 -0.125 -0.0377 -0.195 -0.157</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Status: CONVERGENCE: REL_REDUCTION_OF_F_&lt;=_FACTR*EPSMCH</span></span></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">ARPM</span>, <span class="va">lbfgsb1</span>, <span class="va">lbfgsb2</span>, <span class="va">lbfgsb3</span>, show_par <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span></span>
+<span><span class="co">#&gt;           method elapsed   value   fn   gr alpha   beta  gamma1</span></span>
+<span><span class="co">#&gt; ARPM        data      NA -186178   NA   NA 0.400 -0.400 -0.1253</span></span>
+<span><span class="co">#&gt; lbfgsb1 L-BFGS-B    59.5 -186093 2082 2082 0.430 -0.415 -0.1085</span></span>
+<span><span class="co">#&gt; lbfgsb2   Rvmmin    12.2 -186095 2701  425 0.397 -0.415 -0.0755</span></span>
+<span><span class="co">#&gt; lbfgsb3  LBFGSB3    32.0 -182467 1131 1131 0.378 -0.160 -0.1883</span></span></code></pre></div>
+<p>In this case, the best solution found was using the ‘Rvmmin’
+algorithm, which was also the faster (12.2s). Now, we can try to carry
+out the parameter estimation in two phases:</p>
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">phases</span> <span class="op">=</span> <span class="va">ARPM</span><span class="op">$</span><span class="va">phase</span></span>
+<span><span class="va">phases</span><span class="op">$</span><span class="va">gamma</span><span class="op">[</span><span class="op">]</span> <span class="op">=</span> <span class="fl">2</span></span></code></pre></div>
+<p>And re-do every optimization:</p>
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">lbfgsb1p</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">ARPM</span><span class="op">$</span><span class="va">guess</span>, fn<span class="op">=</span><span class="va">obj</span>, method<span class="op">=</span><span class="st">'L-BFGS-B'</span>, lower<span class="op">=</span><span class="va">ARPM</span><span class="op">$</span><span class="va">lower</span>, upper<span class="op">=</span><span class="va">ARPM</span><span class="op">$</span><span class="va">upper</span>, phases<span class="op">=</span><span class="va">phases</span>, control<span class="op">=</span><span class="va">control</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Parameter estimation in two phases.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; - Phase 1: 2 of 107 parameters active.</span></span>
+<span><span class="co">#&gt;  Using optimization method 'L-BFGS-B'.</span></span>
+<span><span class="co">#&gt;  Phase 1 finished (0.06s)</span></span>
+<span><span class="co">#&gt;  Function value: -169005</span></span>
+<span><span class="co">#&gt;  Parameter values: 0.292 -0.295</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; - Phase 2: 101 of 107 parameters active.</span></span>
+<span><span class="co">#&gt;  Using optimization method 'L-BFGS-B'.</span></span>
+<span><span class="co">#&gt;  Phase 2 finished (55.15s)</span></span>
+<span><span class="co">#&gt;  Function value: -186095</span></span>
+<span><span class="co">#&gt;  Parameter values: 0.402 -0.414 -0.0807 0.13 0.256 -0.282 0.0487 0.0714 0.0787 0.462 0.226 -0.051 -0.0995 0.15 0.303 0.0746 -0.0727 0.126 -0.0115 0.398 -0.185 0.0649 -0.21 -0.226 0.0837 -0.0368 -0.15 0.32 0.029 0.295 -0.184 -0.0241 -0.296 0.28 -0.166 0.319 -0.212 0.000427 -0.505 -0.0438 -0.0344 -0.275 -0.0804 -0.139 -0.302 0.091 -0.161 -0.0019 0.134 -0.0566 0.0311 0.19 0.303 -0.0796 -0.347 0.116 -0.109 0.0654 0.11 0.0279 0.125 -0.0395 0.321 0.212 0.159 0.192 0.0779 -0.118 -0.0954 -0.133 -0.256 0.107 -0.0206 0.0175 -0.206 -0.0245 -0.14 -0.158 -0.202 0.00014 0.0158 -0.185 -0.0462 -0.07 -0.158 -0.11 -0.00274 -0.134 0.205 -0.174 -0.21 0.182 -0.252 -0.324 -0.0247 -0.16 0.0434 0.0196 0.224 0.0019 0.4</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Status: CONVERGENCE: REL_REDUCTION_OF_F &lt;= FACTR*EPSMCH</span></span>
+<span><span class="va">lbfgsb2p</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">ARPM</span><span class="op">$</span><span class="va">guess</span>, fn<span class="op">=</span><span class="va">obj</span>, method<span class="op">=</span><span class="st">'Rvmmin'</span>, lower<span class="op">=</span><span class="va">ARPM</span><span class="op">$</span><span class="va">lower</span>, upper<span class="op">=</span><span class="va">ARPM</span><span class="op">$</span><span class="va">upper</span>, phases<span class="op">=</span><span class="va">phases</span>, control<span class="op">=</span><span class="va">control</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Parameter estimation in two phases.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; - Phase 1: 2 of 107 parameters active.</span></span>
+<span><span class="co">#&gt;  Using optimization method 'Rvmmin'.</span></span>
+<span><span class="co">#&gt;  Phase 1 finished (0.02s)</span></span>
+<span><span class="co">#&gt;  Function value: -169005</span></span>
+<span><span class="co">#&gt;  Parameter values: 0.292 -0.295</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; - Phase 2: 101 of 107 parameters active.</span></span>
+<span><span class="co">#&gt;  Using optimization method 'Rvmmin'.</span></span>
+<span><span class="co">#&gt;  Phase 2 finished (9.41s)</span></span>
+<span><span class="co">#&gt;  Function value: -186095</span></span>
+<span><span class="co">#&gt;  Parameter values: 0.396 -0.415 -0.0743 0.136 0.262 -0.274 0.0536 0.0769 0.0863 0.468 0.232 -0.0446 -0.0934 0.156 0.309 0.0806 -0.0666 0.133 -0.0072 0.406 -0.179 0.0713 -0.204 -0.22 0.0907 -0.0319 -0.143 0.327 0.0345 0.302 -0.177 -0.018 -0.29 0.285 -0.16 0.324 -0.208 0.0101 -0.499 -0.0388 -0.0289 -0.268 -0.0741 -0.134 -0.293 0.0936 -0.152 0.00322 0.139 -0.049 0.0369 0.196 0.308 -0.074 -0.338 0.119 -0.1 0.0704 0.115 0.0355 0.13 -0.0313 0.326 0.219 0.166 0.198 0.0839 -0.111 -0.0894 -0.127 -0.249 0.112 -0.0137 0.0224 -0.2 -0.019 -0.133 -0.152 -0.194 0.00318 0.0207 -0.178 -0.041 -0.0644 -0.15 -0.104 0.00367 -0.129 0.21 -0.165 -0.204 0.188 -0.247 -0.324 0.000263 -0.167 0.0532 0.0194 0.239 -0.00296 0.41</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Status: Rvmminb appears to have converged</span></span>
+<span><span class="va">lbfgsb3p</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">ARPM</span><span class="op">$</span><span class="va">guess</span>, fn<span class="op">=</span><span class="va">obj</span>, method<span class="op">=</span><span class="st">'LBFGSB3'</span>, lower<span class="op">=</span><span class="va">ARPM</span><span class="op">$</span><span class="va">lower</span>, upper<span class="op">=</span><span class="va">ARPM</span><span class="op">$</span><span class="va">upper</span>, phases<span class="op">=</span><span class="va">phases</span>, control<span class="op">=</span><span class="va">control</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Parameter estimation in two phases.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; - Phase 1: 2 of 107 parameters active.</span></span>
+<span><span class="co">#&gt;  Using optimization method 'LBFGSB3'.</span></span>
+<span><span class="co">#&gt;  Phase 1 finished (20.41s)</span></span>
+<span><span class="co">#&gt;  Function value: -169005</span></span>
+<span><span class="co">#&gt;  Parameter values: 0.295 -0.298</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; - Phase 2: 101 of 107 parameters active.</span></span>
+<span><span class="co">#&gt;  Using optimization method 'LBFGSB3'.</span></span>
+<span><span class="co">#&gt;  Phase 2 finished (37.91s)</span></span>
+<span><span class="co">#&gt;  Function value: -185064</span></span>
+<span><span class="co">#&gt;  Parameter values: 0.304 -0.307 0.0233 0.0429 0.0495 0.0137 0.0515 0.0838 0.109 0.108 0.11 0.0873 0.0845 0.0942 0.1 0.0798 0.0588 0.0735 0.0701 0.0779 -0.0545 -0.0593 -0.0548 -0.0543 -0.0455 -0.0321 0.00338 0.0661 0.05 0.07 0.000428 -0.0352 -0.0667 -0.0251 -0.0384 -0.0379 -0.112 -0.114 -0.116 -0.116 -0.115 -0.115 -0.114 -0.127 -0.111 -0.109 -0.101 -0.0863 -0.0276 -0.0152 0.0156 0.0474 0.0354 0.044 0.00469 0.0399 0.0138 0.045 0.0565 0.0666 0.0677 0.0677 0.0677 0.0677 0.0677 0.0677 0.0562 0.00464 -0.0632 -0.0827 -0.0873 0.109 -0.114 -0.0975 -0.118 -0.103 -0.156 -0.104 -0.128 -0.106 -0.101 -0.0944 -0.0855 -0.0806 -0.0918 -0.0728 -0.0384 -0.0839 -0.0173 -0.0522 -0.102 -0.0172 -0.161 -0.185 -0.0937 -0.076 -0.0238 -0.0193 0.0545 0.00427 0.198</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Status: CONVERGENCE: REL_REDUCTION_OF_F_&lt;=_FACTR*EPSMCH</span></span></code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">ARPM</span>, <span class="va">lbfgsb1</span>, <span class="va">lbfgsb1p</span>, <span class="va">lbfgsb2</span>, <span class="va">lbfgsb2p</span>, <span class="va">lbfgsb3</span>, <span class="va">lbfgsb3p</span>, show_par <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span></span>
+<span><span class="co">#&gt;            method elapsed   value   fn   gr alpha   beta  gamma1</span></span>
+<span><span class="co">#&gt; ARPM         data      NA -186178   NA   NA 0.400 -0.400 -0.1253</span></span>
+<span><span class="co">#&gt; lbfgsb1  L-BFGS-B   59.49 -186093 2082 2082 0.430 -0.415 -0.1085</span></span>
+<span><span class="co">#&gt; lbfgsb1p L-BFGS-B   55.21 -186095 1998 1998 0.402 -0.414 -0.0807</span></span>
+<span><span class="co">#&gt; lbfgsb2    Rvmmin   12.25 -186095 2701  425 0.397 -0.415 -0.0755</span></span>
+<span><span class="co">#&gt; lbfgsb2p   Rvmmin    9.44 -186095 2080  329 0.396 -0.415 -0.0743</span></span>
+<span><span class="co">#&gt; lbfgsb3   LBFGSB3   31.98 -182467 1131 1131 0.378 -0.160 -0.1883</span></span>
+<span><span class="co">#&gt; lbfgsb3p  LBFGSB3   58.33 -185064 1389 1389 0.304 -0.307  0.0233</span></span></code></pre></div>
+<p>For all the algorithms, we can see and improvement in the solution
+found and even a speed up in the time needed for the optimization for
+the first two methods (‘L-BFGS-B’, ‘Rvmmin’). Finally, we can try to
+carry out the optimization in two phases, but using different algorithms
+for each phase. In principle, some algorithms may be faster or find a
+better initial starting point for the final search.</p>
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">mix1</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">ARPM</span><span class="op">$</span><span class="va">guess</span>, fn<span class="op">=</span><span class="va">obj</span>, method<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'hjn'</span>, <span class="st">'Rvmmin'</span><span class="op">)</span>, lower<span class="op">=</span><span class="va">ARPM</span><span class="op">$</span><span class="va">lower</span>, upper<span class="op">=</span><span class="va">ARPM</span><span class="op">$</span><span class="va">upper</span>, phases<span class="op">=</span><span class="va">phases</span>, control<span class="op">=</span><span class="va">control</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Parameter estimation in two phases.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; - Phase 1: 2 of 107 parameters active.</span></span>
+<span><span class="co">#&gt;  Using optimization method 'hjn'.</span></span>
+<span><span class="co">#&gt;  Phase 1 finished (2.17s)</span></span>
+<span><span class="co">#&gt;  Function value: -169005</span></span>
+<span><span class="co">#&gt;  Parameter values: 0.292 -0.295</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; - Phase 2: 101 of 107 parameters active.</span></span>
+<span><span class="co">#&gt;  Using optimization method 'Rvmmin'.</span></span>
+<span><span class="co">#&gt;  Phase 2 finished (14.50s)</span></span>
+<span><span class="co">#&gt;  Function value: -186095</span></span>
+<span><span class="co">#&gt;  Parameter values: 0.397 -0.415 -0.0749 0.135 0.261 -0.275 0.053 0.0763 0.0856 0.468 0.231 -0.0453 -0.094 0.155 0.308 0.0799 -0.0672 0.132 -0.00801 0.406 -0.18 0.0707 -0.205 -0.221 0.09 -0.0326 -0.144 0.326 0.0338 0.301 -0.178 -0.0187 -0.29 0.285 -0.16 0.324 -0.208 0.00926 -0.5 -0.0395 -0.0296 -0.269 -0.0748 -0.135 -0.294 0.0929 -0.153 0.00398 0.138 -0.0498 0.0363 0.195 0.308 -0.0747 -0.338 0.118 -0.101 0.0696 0.115 0.0349 0.129 -0.0321 0.325 0.218 0.165 0.197 0.0832 -0.112 -0.0901 -0.128 -0.25 0.112 -0.0143 0.0215 -0.2 -0.0198 -0.133 -0.153 -0.194 0.000881 0.0203 -0.178 -0.0418 -0.0651 -0.15 -0.105 0.00481 -0.131 0.209 -0.166 -0.205 0.187 -0.246 -0.321 -0.0105 -0.164 0.0532 0.0197 0.239 -0.00518 0.41</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Status: Rvmminb appears to have converged</span></span>
+<span><span class="va">mix2</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">ARPM</span><span class="op">$</span><span class="va">guess</span>, fn<span class="op">=</span><span class="va">obj</span>, method<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'Nelder-Mead'</span>, <span class="st">'Rvmmin'</span><span class="op">)</span>, lower<span class="op">=</span><span class="va">ARPM</span><span class="op">$</span><span class="va">lower</span>, upper<span class="op">=</span><span class="va">ARPM</span><span class="op">$</span><span class="va">upper</span>, phases<span class="op">=</span><span class="va">phases</span>, control<span class="op">=</span><span class="va">control</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Parameter estimation in two phases.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; - Phase 1: 2 of 107 parameters active.</span></span>
+<span><span class="co">#&gt;  Using optimization method 'Nelder-Mead'.</span></span>
+<span><span class="co">#&gt;  Phase 1 finished (0.00s)</span></span>
+<span><span class="co">#&gt;  Function value: -124445</span></span>
+<span><span class="co">#&gt;  Parameter values: 0.308 -0.358</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; - Phase 2: 101 of 107 parameters active.</span></span>
+<span><span class="co">#&gt;  Using optimization method 'Rvmmin'.</span></span>
+<span><span class="co">#&gt;  Phase 2 finished (21.18s)</span></span>
+<span><span class="co">#&gt;  Function value: -186095</span></span>
+<span><span class="co">#&gt;  Parameter values: 0.396 -0.415 -0.074 0.136 0.262 -0.274 0.0539 0.0772 0.0866 0.468 0.232 -0.0444 -0.0931 0.156 0.309 0.0809 -0.0663 0.133 -0.00686 0.406 -0.179 0.0716 -0.204 -0.22 0.0909 -0.0316 -0.143 0.327 0.0348 0.302 -0.177 -0.0178 -0.289 0.286 -0.159 0.324 -0.208 0.0105 -0.499 -0.0386 -0.0287 -0.268 -0.0738 -0.134 -0.293 0.0939 -0.152 0.0051 0.138 -0.0488 0.0372 0.196 0.308 -0.0737 -0.337 0.119 -0.0999 0.0706 0.116 0.0359 0.13 -0.031 0.326 0.219 0.166 0.198 0.0842 -0.111 -0.0891 -0.127 -0.249 0.113 -0.0132 0.0226 -0.199 -0.0186 -0.132 -0.152 -0.192 -0.00097 0.0229 -0.177 -0.0407 -0.0642 -0.15 -0.104 0.00515 -0.129 0.21 -0.165 -0.204 0.188 -0.246 -0.324 0.000538 -0.167 0.0529 0.0204 0.238 -8.15e-05 0.409</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Status: Rvmminb appears to have converged</span></span>
+<span><span class="va">mix3</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">ARPM</span><span class="op">$</span><span class="va">guess</span>, fn<span class="op">=</span><span class="va">obj</span>, method<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'CG'</span>, <span class="st">'Rvmmin'</span><span class="op">)</span>, lower<span class="op">=</span><span class="va">ARPM</span><span class="op">$</span><span class="va">lower</span>, upper<span class="op">=</span><span class="va">ARPM</span><span class="op">$</span><span class="va">upper</span>, phases<span class="op">=</span><span class="va">phases</span>, control<span class="op">=</span><span class="va">control</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Parameter estimation in two phases.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; - Phase 1: 2 of 107 parameters active.</span></span>
+<span><span class="co">#&gt;  Using optimization method 'CG'.</span></span>
+<span><span class="co">#&gt;  Phase 1 finished (0.01s)</span></span>
+<span><span class="co">#&gt;  Function value: -1824.73</span></span>
+<span><span class="co">#&gt;  Parameter values: 2.33e+03 2.36e+03</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; - Phase 2: 101 of 107 parameters active.</span></span>
+<span><span class="co">#&gt;  Using optimization method 'Rvmmin'.</span></span>
+<span><span class="co">#&gt;  Phase 2 finished (7.31s)</span></span>
+<span><span class="co">#&gt;  Function value: -186095</span></span>
+<span><span class="co">#&gt;  Parameter values: 0.396 -0.415 -0.0746 0.136 0.262 -0.275 0.0533 0.0765 0.086 0.468 0.232 -0.045 -0.0937 0.156 0.309 0.0803 -0.0669 0.132 -0.0076 0.406 -0.18 0.071 -0.204 -0.22 0.0903 -0.0322 -0.144 0.327 0.0341 0.302 -0.178 -0.0184 -0.29 0.285 -0.16 0.324 -0.208 0.00983 -0.5 -0.0391 -0.0293 -0.269 -0.0744 -0.134 -0.294 0.0933 -0.153 0.00378 0.138 -0.0493 0.0366 0.195 0.308 -0.0743 -0.338 0.118 -0.1 0.07 0.115 0.0352 0.13 -0.0316 0.325 0.218 0.165 0.198 0.0836 -0.112 -0.0897 -0.127 -0.249 0.112 -0.014 0.022 -0.2 -0.0196 -0.133 -0.153 -0.194 0.0032 0.0203 -0.178 -0.0414 -0.0648 -0.15 -0.102 -0.000385 -0.128 0.21 -0.166 -0.205 0.188 -0.246 -0.321 -0.0101 -0.164 0.0538 0.0198 0.239 -0.00341 0.41</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Status: Rvmminb appears to have converged</span></span></code></pre></div>
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">ARPM</span>, <span class="va">lbfgsb2</span>, <span class="va">lbfgsb2p</span>, <span class="va">mix1</span>, <span class="va">mix2</span>, <span class="va">mix3</span>, show_par <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span></span>
+<span><span class="co">#&gt;          method elapsed   value   fn  gr alpha   beta  gamma1</span></span>
+<span><span class="co">#&gt; ARPM       data      NA -186178   NA  NA 0.400 -0.400 -0.1253</span></span>
+<span><span class="co">#&gt; lbfgsb2  Rvmmin   12.25 -186095 2701 425 0.397 -0.415 -0.0755</span></span>
+<span><span class="co">#&gt; lbfgsb2p Rvmmin    9.44 -186095 2080 329 0.396 -0.415 -0.0743</span></span>
+<span><span class="co">#&gt; mix1     Rvmmin   16.67 -186095 4011 503 0.397 -0.415 -0.0749</span></span>
+<span><span class="co">#&gt; mix2     Rvmmin   21.18 -186095 4011 693 0.396 -0.415 -0.0740</span></span>
+<span><span class="co">#&gt; mix3     Rvmmin    7.32 -186095  729 212 0.396 -0.415 -0.0746</span></span></code></pre></div>
+<p>Here, we can see that every combination find essentially the same
+solution, but the combination using the ‘CG’ (conjugated gradient) first
+required less function and gradient evaluations, being faster.</p>
+<p>Please, refer to <code>vignette(package="calibrar")</code> for
+additional vignettes or to the <a href="http://roliveros-ramos.github.io/calibrar" class="external-link">calibrar website</a>
+for more details.</p>
 </div>
   </div>
 
