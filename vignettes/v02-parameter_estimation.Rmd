@@ -1,10 +1,10 @@
 ---
-title: "Using the 'calibrate' function for parameter estimation"
+title: "Using the `calibrate()` function for parameter estimation"
 author: "Ricardo Oliveros-Ramos"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Using the 'calibrate' function for parameter estimation}
+  %\VignetteIndexEntry{Using the `calibrate()` function for parameter estimation}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -14,25 +14,306 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+library(optimr, quietly = TRUE)
+library(optimx, quietly = TRUE)
 ```
-
-Vignettes are long form documentation commonly included in packages. Because they are part of the distribution of the package, they need to be as compact as possible. The `html_vignette` output type provides a custom style sheet (and tweaks some options) to ensure that the resulting html is as small as possible. The `html_vignette` format:
-
-- Never uses retina figures
-- Has a smaller default figure size
-- Uses a custom CSS stylesheet instead of the default Twitter Bootstrap style
-
 
 ## Introduction
 
-## Benchmarking parameter estimation for a linear model
+This vignette focus on the use of the `calibrate()` for parameter estimation. We suggest to see the vignette 'Getting started with the `calibrar` package' before reading this one, specially if you do not have previous experience doing optimization in R.
 
-You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
+## Estimating parameters for a linear model
 
-## Fitting a logistic model with harvest
+As a first example, we will estimate the parameters for a linear model by manually performing the optimization, in opposition of the standard method using the `stats::lm()`. The objetive of this is to introduce the features of the `calibrate()` function with a simple and fast model. Let's start by creating some parameters for the linear model.
+
+```{r linear1}
+library(calibrar)
+N = 7 # number of variables in the linear model
+T = 100 # number of observations
+sd = 0.25 # standard deviation of the gaussian noise
+# observed data
+x = matrix(rnorm(N*T, sd=sd), nrow=T, ncol=N)
+# slopes for the linear model (real parameters)
+slope = seq_len(N) 
+# intercept for the linear model (real parameters)
+intercept = pi
+# real parameters
+real = list(intercept=intercept, slope=slope)
+real
+```
+
+Now, let's create a function so simulate the linear model.
+
+```{r linear2}
+# function to simulate the linear model
+linear = function(x, par) {
+  stopifnot(length(x)==length(par$slope))
+  out = sum(x*par$slope) + par$intercept
+  return(out)
+}
+```
+
+And, finally, the simulated data for the exercise:
+
+```{r linear3}
+# simulated data 
+y = apply(x, 1, linear, par=real)
+```
+
+Of course, the solution can be found using the `lm()` function:
+
+```{r linear4}
+mod = lm(y ~ x)
+mod
+```
+Now, in order to proceed to find the solution by an explicit numerical optimization, we need to define the objective function to be minimized:
+
+```{r linear5}
+# objective function (residual squares sum)
+obj = function(par, x, y) {
+  y_sim = apply(x, 1, linear, par=par)
+  out = sum((y_sim - y)^2)
+  return(out)
+}
+```
+
+So now we can proceed with the optimization:
+
+```{r linear6}
+# initial guess for optimization
+start = list(intercept=0, slope=rep(0, N))
+bfgs = calibrate(par=start, fn=obj, x=x, y=y)
+# using coef to extract optimal parameters
+coef(bfgs)
+```
+As expected, we were able to recover the real parameters of the model. Now, let's specify `lower` and `upper` bounds for the algorithms that require them:
+
+```{r linear7}
+lower = relist(rep(-10, N+1), skeleton=start)
+upper = relist(rep(+10, N+1), skeleton=start)
+```
+
+And repeat the exercise with several optimization algorithms:
+
+```{r linear8, cache=TRUE, paged.print=TRUE}
+set.seed(880820) # for reproducibility
+cat("Running optimization algorithms\n")
+cg = calibrate(par=start, fn=obj, x=x, y=y, method='CG')
+nm = calibrate(par=start, fn=obj, x=x, y=y, method='nmkb', lower=lower, upper=upper)
+ahres = calibrate(par=start, fn=obj, x=x, y=y, method='AHR-ES')
+hjn = calibrate(par=start, fn=obj, x=x, y=y, method='hjn', lower=lower, upper=upper)
+```
+And compare the results:
+
+```{r}
+summary(ahres, hjn, nm, bfgs, cg, par.only=TRUE)
+```
+
+As we can see, for this simple example, all the algorithms used were able to find the solution within a reasonable time, but some were faster than others. In the next examples we will see this is not always the case, and some algorithms can perform very differently or even fail for a particular optimization problem.
+
+
+## Fitting a biomass production model with harvest
+
+As a second example, we will estimate the parameters for a difference equation system, simulating the dynamics of the biomass $B$ of a harvested population:
+
+$$B_{t+1} = B_t + rB_t\left(1-\frac{B_t}{K}\right) - C_t,$$
+where $B_t$ is the biomass in time t, $C_t$ is the catch during the interval $[t, t+1[$, $r$ is the intrinsic population growth rate and $K$ is the carrying capacity of the system.
+
+We will define some values for all the parameters so we can perform an optimization an try to recover them from the simulated data:
+```{r logistic1}
+set.seed(880820)
+T = 50
+real = list(r=0.5, K=1000, B0=600)
+catch = 0.25*(real$r*real$K)*runif(T, min=0.2, max=1.8)
+```
+
+As before, a function to simulate data from the parameters (the model) will be needed. The requirement for this function is to have as first argument the parameter vector (or list) `par`:
+
+```{r logistic2}
+run_model = function(par, T, catch) {
+  B = numeric(T+1)
+  times = seq(0, T)
+  B0 = par$B0
+  r = par$r
+  K = par$K
+  B[1] = B0
+  for(t in seq_len(T)) {
+    b = B[t] + r*B[t]*(1-B[t]/K) - catch[t] # could be negative
+    B[t+1] = max(b, 0.01*B[t]) # smooth aproximation to zero
+  }
+  out = list(biomass=B)
+  return(out)
+}
+```
+
+And now we can use the `run_model()` function and the assumed parameters to simulate the model: 
+
+```{r logistic3}
+observed = run_model(par=real, T=T, catch=catch)
+```
+
+```{r logistic4, fig.asp=0.66, fig.width=6}
+par(mfrow=c(2,1), mar=c(3,3,1,1), oma=c(1,1,1,1))
+plot(observed$biomass, type="l", lwd=2, ylab="biomass", xlab="", las=1, ylim=c(0, 1.2*max(observed$biomass)))
+mtext("BIOMASS", 3, adj=0.01, line = 0, font=2)
+plot(catch, type="h", lwd=2, ylab="catch", xlab="", las=1, ylim=c(0, 1.2*max(catch)))
+mtext("CATCH", 3, adj=0.01, line = 0, font=2)
+```
+
+In order to carry out the optimization, we need the objective function to be defined, in this case, using a simple residual squares sum: 
+```{r logistic5}
+objfn = function(par, T, catch, observed) {
+  simulated = run_model(par=par, T=T, catch=catch)
+  value = sum((observed$biomass-simulated$biomass)^2, na.rm=TRUE)
+  return(value)
+}
+```
+
+Finally, we need to define a starting point for the search,
+
+```{r}
+start = list(r=0.1, K=1.5*max(observed$biomass), B0=observed$biomass[1])
+```
+
+and we are ready to try to estimate the parameters using several algorithms:
+
+```{r logisticfit, cache=TRUE}
+set.seed(880820) # for reproducibility
+opt0 = calibrate(par=start, fn = objfn, method='LBFGSB3', T=T, catch=catch, observed=observed)
+opt1 = calibrate(par=start, fn = objfn, method='Rvmmin', T=T, catch=catch, observed=observed)
+opt2 = calibrate(par=start, fn = objfn, method='CG', T=T, catch=catch, observed=observed)
+opt3 = calibrate(par=start, fn = objfn, method='AHR-ES', T=T, catch=catch, observed=observed)
+opt4 = calibrate(par=start, fn = objfn, method='CMA-ES', T=T, catch=catch, observed=observed)
+opt5 = calibrate(par=start, fn = objfn, method='hjn', T=T, catch=catch, observed=observed)
+opt6 = calibrate(par=start, fn = objfn, method='Nelder-Mead', T=T, catch=catch, observed=observed)
+```
+
+The function `summary()` can be used to compare all the optimization results:
+
+```{r}
+summary(opt0, opt1, opt2, opt3, opt4, opt5, opt6)
+```
+
+For a better comparison, we can simulate the results for all the parameters found:
+
+```{r}
+sim0 = run_model(par=coef(opt0), T=T, catch=catch)
+sim1 = run_model(par=coef(opt1), T=T, catch=catch)
+sim2 = run_model(par=coef(opt2), T=T, catch=catch)
+sim3 = run_model(par=coef(opt3), T=T, catch=catch)
+sim4 = run_model(par=coef(opt4), T=T, catch=catch)
+sim5 = run_model(par=coef(opt5), T=T, catch=catch)
+```
+
+And plot some of the best results obtained (L-BFGS-B 3.0, CG and AHR-ES):
+
+```{r, fig.asp=0.66, fig.width=6}
+par(mar=c(3,4,1,1))
+plot(observed$biomass, type="n", ylab="BIOMASS", xlab="", las=1, ylim=c(0, 1.2*max(observed$biomass)))
+lines(sim0$biomass, col=1, lwd=2)
+lines(sim2$biomass, col=2, lwd=2)
+lines(sim3$biomass, col=3, lwd=2)
+points(observed$biomass)
+mtext(c('LBFGSB3', 'CG', 'AHR-ES'), 1, adj=0.05, col=1:3, line=-(4:2), font=2)
+```
+
+So far, we have used all algorithms with their default arguments. Most algorithms provide control arguments that allow to improve its performance for a particular problem. For example, looking back to the results from the L-BFGS-B 3.0 method, we can see as status 'Maximum number of iterations reached', meaning the algorithm did not converge but stopped after the maximum number of 100 iterations allowed by default. This can be modified here (and for several other methods) by changing the `maxit` control argument:
+
+```{r}
+optx = calibrate(par=start, fn = objfn, method='LBFGSB3', T=T, catch=catch, observed=observed, control=list(maxit=20000))
+```
+And we can see that with this setup, the algorithm converges to the right solution.
+
+We also have the possibility to set up a calibration in multiple phases, meaning we will solve several sequential optimizations with a progressively higher number of parameters. The purpose of this is to improve the initial search point for a final optimization with all the parameters active. This heuristic may help to achieve find the solution for some problems. For example, the Rvmmin algorithm has a status 'Rvmminu appears to have converged' but was not able to converge to the original parameter values. So, we will try again by fixing some of the parameters (the initial biomass) and trying a two phases parameter estimation:
+
+```{r}
+calibrate(par=start, fn = objfn, method='Rvmmin', T=T, catch=catch, observed=observed, phases = c(1,1,2))
+```
+
+And with two phases, now we also find the solution using the 'Rvmmin' method.
 
 ## Fitting an autoregressive Poisson model
 
-## Using calibrate in parallel
+As a third example, we will estimate the parameters for a Poisson Autoregressive Mixed model for the dynamics of a population in different sites:
+
+$$log(\mu_{i, t+1}) = log(\mu_{i, t}) + \alpha + \beta X_{i, t} + \gamma_t$$
+
+where $\mu_{i, t}$ is the size of the population in site $i$ at year $t$, $X_{i, t}$ is the value of an environmental variable in site $i$ at year $t$. The parameters to estimate were $\alpha$, $\beta$, and $\gamma_t$, the random effects for each year, $\gamma_t \sim N(0,\sigma^2)$, and the initial population at each site $\mu_{i, 0}$. We assumed that the observations $N_{i,t}$ follow a Poisson distribution with mean $\mu_{i, t}$. We could also create the data for this model using the function `calibrar_demo()`, with the additional arguments `L=5` (five sites) and `T=100` (one hundred years):
+
+```{r}
+path = NULL # NULL to use the current directory
+ARPM = calibrar_demo(path=path, model="PoissonMixedModel", L=5, T=100) 
+setup = calibration_setup(file=ARPM$setup)
+observed = calibration_data(setup=setup, path=ARPM$path)
+forcing = as.matrix(read.csv(file.path(ARPM$path, "master", "environment.csv"), row.names=1))
+control = list(maxit=20000, eps=sqrt(.Machine$double.eps), factr=sqrt(.Machine$double.eps))
+```
+
+Here, we also added a `control` list to increase the maximum number of iterations for the algorithms and the tolerance for the convergence. Now we can specify the `run_model()` function so we can simulate the model from a parameter set and define the objective function using the `calibration_objFn()` function: 
+
+```{r}
+# Defining 'run_model' function
+run_model = function(par, forcing) {
+  output = calibrar:::.PoissonMixedModel(par=par, forcing=forcing)
+  output = c(output, list(gammas=par$gamma)) # adding gamma parameters for penalties
+  return(output)
+}
+```
+
+```{r}
+obj = calibration_objFn(model=run_model, setup=setup, observed=observed, forcing=forcing, aggregate=TRUE)
+```
+
+With these we can proceed to the parameter estimation. Here, we will compare the performance of three BFGS type algorithms:
+
+```{r}
+# real parameters
+coef(ARPM)
+```
+
+```{r, cache=TRUE}
+lbfgsb1 = calibrate(par=ARPM$guess, fn=obj, method='L-BFGS-B', lower=ARPM$lower, upper=ARPM$upper, phases=ARPM$phase, control=control)
+lbfgsb2 = calibrate(par=ARPM$guess, fn=obj, method='Rvmmin', lower=ARPM$lower, upper=ARPM$upper, phases=ARPM$phase, control=control)
+lbfgsb3 = calibrate(par=ARPM$guess, fn=obj, method='LBFGSB3', lower=ARPM$lower, upper=ARPM$upper, phases=ARPM$phase, control=control)
+```
+
+```{r}
+summary(ARPM, lbfgsb1, lbfgsb2, lbfgsb3, show_par = 1:3)
+```
+
+In this case, the best solution found was using the 'Rvmmin' algorithm, which was also the faster (12.2s). Now, we can try to carry out the parameter estimation in two phases:
+
+```{r}
+phases = ARPM$phase
+phases$gamma[] = 2
+```
+
+And re-do every optimization:
+
+```{r, cache=TRUE}
+lbfgsb1p = calibrate(par=ARPM$guess, fn=obj, method='L-BFGS-B', lower=ARPM$lower, upper=ARPM$upper, phases=phases, control=control)
+lbfgsb2p = calibrate(par=ARPM$guess, fn=obj, method='Rvmmin', lower=ARPM$lower, upper=ARPM$upper, phases=phases, control=control)
+lbfgsb3p = calibrate(par=ARPM$guess, fn=obj, method='LBFGSB3', lower=ARPM$lower, upper=ARPM$upper, phases=phases, control=control)
+```
+
+```{r}
+summary(ARPM, lbfgsb1, lbfgsb1p, lbfgsb2, lbfgsb2p, lbfgsb3, lbfgsb3p, show_par = 1:3)
+```
+
+For all the algorithms, we can see and improvement in the solution found and even a speed up in the time needed for the optimization for the first two methods ('L-BFGS-B', 'Rvmmin'). Finally, we can try to carry out the optimization in two phases, but using different algorithms for each phase. In principle, some algorithms may be faster or find a better initial starting point for the final search.
+
+```{r, cache=TRUE}
+mix1 = calibrate(par=ARPM$guess, fn=obj, method=c('hjn', 'Rvmmin'), lower=ARPM$lower, upper=ARPM$upper, phases=phases, control=control)
+mix2 = calibrate(par=ARPM$guess, fn=obj, method=c('Nelder-Mead', 'Rvmmin'), lower=ARPM$lower, upper=ARPM$upper, phases=phases, control=control)
+mix3 = calibrate(par=ARPM$guess, fn=obj, method=c('CG', 'Rvmmin'), lower=ARPM$lower, upper=ARPM$upper, phases=phases, control=control)
+```
+
+```{r}
+summary(ARPM, lbfgsb2, lbfgsb2p, mix1, mix2, mix3, show_par = 1:3)
+```
+
+Here, we can see that every combination find essentially the same solution, but the combination using the 'CG' (conjugated gradient) first required less function and gradient evaluations, being faster.
+
+Please, refer to `vignette(package="calibrar")` for additional vignettes or to the [calibrar website](http://roliveros-ramos.github.io/calibrar) for more details.
 
 
