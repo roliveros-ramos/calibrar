@@ -51,7 +51,7 @@
   parInfo$guess = relist(c(0.2, 0.1, rep(0, T-1), par_real$sd, round(log(n[1,]),3)), par_real)
   parInfo$lower = relist(c(0, -0.5, rep(-5*sd, T-1), 0, round(rep(min(log(0.5*n[1,])),L),1)), par_real)
   parInfo$upper = relist(c(1, 0.5, rep(5*sd, T-1), 1, round(rep(max(log(1.5*n[1,])),L),1)), par_real)
-  parInfo$phase = relist(c(1, 1, rep(1, T-1), NA, rep(1, L)), par_real)
+  parInfo$phase = relist(c(1, 1, rep(1, T-1), NA, rep(NA, L)), par_real)
   
   # calibrationInfo.csv
   
