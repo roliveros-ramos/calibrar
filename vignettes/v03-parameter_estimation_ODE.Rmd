@@ -16,13 +16,110 @@ knitr::opts_chunk$set(
 )
 ```
 
-Vignettes are long form documentation commonly included in packages. Because they are part of the distribution of the package, they need to be as compact as possible. The `html_vignette` output type provides a custom style sheet (and tweaks some options) to ensure that the resulting html is as small as possible. The `html_vignette` format:
+## Introduction
 
-- Never uses retina figures
-- Has a smaller default figure size
-- Uses a custom CSS stylesheet instead of the default Twitter Bootstrap style
+## Fitting an EDO system: the Lotka-Volterra Predator-Prey model
 
-### Fitting an EDO system: the Lotka-Volterra Predator-Prey model
+As before, we will start by creating a set a parameters that will be used as 'real' parameters to simulate some data.
+```{r, cache=TRUE}
+library(calibrar)
+set.seed(880820)
+path = NULL # NULL to use the current directory
+# create the demonstration files
+LV = calibrar_demo(path=path, model='PredatorPrey', T=100) 
+# get calibration information
+setup = calibration_setup(file = LV$setup)
+# get observed data
+observed = calibration_data(setup=setup, path=LV$path)
+# Defining 'run_model' function
+run_model = calibrar:::.PredatorPreyModel
+# real parameters
+cat("Real parameters used to simulate data\n")
+print(unlist(LV$par)) # parameters are in a list
+```
+The `run_model` will simulate the data, by solving the ODE system defined by the Lotka-Volterra model:
 
-### Fitting an EDO system: the SIR epidemiological model
+```{r, echo=FALSE}
+run_model
+```
+
+We will also define the objective function. In this case, we will set two: one that summarize the objective function into a scalar value, and another one that produce two values: one for the fit of the prey and another for the fit of the predator; as some algorithm (notably, AHR-ES) can use this additional information to perform the optimization. 
+
+```{r}
+# objective functions
+obj = calibration_objFn(model=run_model, setup=setup, observed=observed, T=LV$T, aggregate=TRUE)
+```
+
+```{r, cache=TRUE}
+lbfgsb1 = calibrate(par=LV$guess, fn=obj, , method='L-BFGS-B', lower=LV$lower, upper=LV$upper, phases=LV$phase)
+lbfgsb2 = calibrate(par=LV$guess, fn=obj, lower=LV$lower, upper=LV$upper, phases=LV$phase, method="Rvmmin")
+ahr = calibrate(par=LV$guess, fn=obj, method='AHR-ES', lower=LV$lower, upper=LV$upper, phases=LV$phase)
+nm = calibrate(par=LV$guess, fn=obj, phases=LV$phase, method="Nelder-Mead")
+```
+
+```{r}
+summary(LV, lbfgsb1, lbfgsb2, ahr, nm, show_par = 1:5)
+```
+```{r}
+lbfgsb1.pred = predict(lbfgsb1)
+lbfgsb2.pred = predict(lbfgsb2)
+ahr.pred     = predict(ahr)
+nm.pred      = predict(nm)
+```
+
+
+```{r, fig.asp=0.66, fig.width=8}
+methods = c("data", "L-BFGS-B", "AHR-ES", "Nelder-Mead")
+par(mfrow=c(1,2), mar=c(4,4,1,1),
+    oma=c(1,1,1,1))
+plot(observed$prey, cex=0.75,
+     ylab="prey abundance (N)", xlab="time", las=1,
+     ylim=c(0,55))
+lines(lbfgsb1.pred$prey, col=1, lwd=4)
+lines(ahr.pred$prey, col=2, lwd=2)
+lines(nm.pred$prey, col=3, lwd=2)
+
+plot(observed$predator, cex=0.75, 
+     ylab="predator abundance (P)", xlab="time", las=1,
+     ylim=c(0,7))
+lines(lbfgsb1.pred$predator, col=1, lwd=4)
+lines(ahr.pred$predator, col=2, lwd=2)
+lines(nm.pred$predator, col=3, lwd=2)
+
+legend(100, 1.8, legend=methods, bty="n", cex=0.75, y.intersp=0.8, 
+       inset=-0.0, xjust=1, pch = c(1, rep(NA,5)), lty=c(0, rep(1,5)), 
+       col=c(1,1:3), lwd=2)
+```
+
+
+## Fitting an EDO system: the SIR epidemiological model
+
+```{r}
+path = NULL # NULL to use the current directory
+SIR = calibrar_demo(path=path, model='SIR', T=100) 
+setup = calibration_setup(file = SIR$setup)
+observed = calibration_data(setup=setup, path=SIR$path)
+run_model = calibrar:::.SIRModel
+```
+
+```{r}
+run_model
+```
+
+```{r}
+obj = calibration_objFn(model=run_model, setup=setup, observed=observed, T=SIR$T, aggregate=TRUE)
+```
+
+```{r}
+lbfgsb3 = calibrate(par=SIR$guess, fn=obj, method='LBFGSB3', lower=SIR$lower, upper=SIR$upper, phases=SIR$phase)
+lbfgsb2 = calibrate(par=SIR$guess, fn=obj, method='Rvmmin', lower=SIR$lower, upper=SIR$upper, phases=SIR$phase)
+ahr = calibrate(par=SIR$guess, fn=obj, method='AHR-ES', lower=SIR$lower, upper=SIR$upper, phases=SIR$phase)
+cg = calibrate(par=SIR$guess, fn=obj, method='Rcgmin', phases=SIR$phase)
+nm = calibrate(par=SIR$guess, fn=obj, method='Nelder-Mead', phases=SIR$phase)
+```
+
+```{r}
+summary(SIR, lbfgsb2, lbfgsb3, ahr, cg, nm, show_par = 1:2)
+```
+
 
