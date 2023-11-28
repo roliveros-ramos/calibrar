@@ -1,7 +1,7 @@
 
 # New Rvmmin --------------------------------------------------------------
 
-.Rvmminb2 = function(par, fn, gr = NULL, lower = NULL, upper = NULL, control = list(), bdmsk=NULL, ...) {
+.Rvmminb_ror = function(par, fn, gr = NULL, lower = NULL, upper = NULL, control = list(), bdmsk=NULL, ...) {
   # control defaults
   
   restart = .restartCalibration(control) # flag: TRUE or FALSE
@@ -135,12 +135,13 @@
       changed = TRUE  # Need to set so loop will start
       steplength = oldstep # 131202 - 1 seems best value (Newton step)
       
-      while ((f >= fmin) && changed && (!accpoint)) {
+      # while ((f >= fmin) && changed && (!accpoint)) {
+      while (changed && (!accpoint)) {
         # We seek a lower point, but must change parameters too
         # Box constraint -- adjust step length for free parameters
         # ROR: this is the only update needed, if so (trystep is fix, steplength is always lower)
         steplength = min(steplength, trystep, na.rm=TRUE)
-        
+        if(steplength<0) message("Negative steplength.")
         bvec = par + steplength * t
         changed = !identical((bvec + reltest), (par + reltest))
         
@@ -167,7 +168,7 @@
           }
           if (f < fmin) {
             # We have a lower point. Is it 'low enough' i.e. acceptable
-            accpoint = (f <= fmin + gradproj * steplength * acctol)
+            accpoint = (f < fmin + gradproj * steplength * acctol)
           } else {
             steplength = steplength * stepredn
           }
@@ -219,7 +220,7 @@
           } else { # currently inactive, to reactivate?
             if((bdmsk[i] + 2) * g[i] < 0) {
               # still going in the bad direction, stop it!
-              # g[i] = 0  # active mask or constraint
+              g[i] = 0  # active mask or constraint
             } else {
               # going in the right direction, activate it!
               bdmsk[i] = 1  # freeing parameter i
@@ -230,7 +231,7 @@
       ## end bounds and masks adjustment of gradient
       
       # ROR: CHECK! should we remove from the gnorm values in the border?
-      g[which(bdmsk <= 0)] = 0  # adjust for active mask or constraint 
+      #g[which(bdmsk <= 0)] = 0  # adjust for active mask or constraint
       # ind = which(bdmsk <= 0) 
       gnorm = sqrt(sum(g*g)) ## JN131202 
       if (gnorm < (1 + abs(fmin))*eps*eps ) {
@@ -287,3 +288,5 @@
   return(ans)
   
 }  ## end of Rvmminb
+
+

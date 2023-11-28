@@ -5,7 +5,7 @@ Rvmmin2 = function(par, fn, gr = NULL, lower = NULL,
   #  Author:  John C Nash
   #  Date:  April 2, 2009; revised July 28, 2009, May 21, 2012, Jan 8, 2015
   #
-  ## An R version of the Nash version of Fletcher's Variable
+  # An R version of the Nash version of Fletcher's Variable
   #   Metric minimization
   # This uses a simple backtracking line search.
   # This is a driver for both constrained and unconstrained routines.
