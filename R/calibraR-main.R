@@ -121,9 +121,8 @@ calibrate.default = function(par, fn, gr = NULL, ..., method = NULL,
               "hybridPSO", "mads", "hjkb", "nmkb", "bobyqa", "AHR-ES", "Nelder-Mead", 
               "CG", "BFGS", "SANN")
   
-  method = match.arg(method, choices=methods)
+  method = match.arg(method, choices=methods, several.ok = TRUE)
   
-  message(sprintf("Using optimization method '%s'.", method))
   
   # calibrate should dispatch on 'fn'
   if(inherits(fn, "objFn")) {
@@ -135,7 +134,7 @@ calibrate.default = function(par, fn, gr = NULL, ..., method = NULL,
   # check function and method
   multiMethods = "AHR-ES" # list of methods supporting multi-objective
   
-  if(!(method %in% multiMethods)) {
+  if(!all(method %in% multiMethods)) {
   
     if(inherits(fn, "objFn")) {
       agg = attr(fn, "aggregate")
@@ -217,9 +216,15 @@ calibrate.default = function(par, fn, gr = NULL, ..., method = NULL,
   if(!is.null(control$master)) message(sprintf("Using 'master' directory: %s", control$master))
   if(!is.null(control$run)) message(sprintf("Using 'run' directory: %s", control$run))
    
+  xtm1 = Sys.time() # timer for all phases
   # -------------------------------------------
   # start the sequential parameter estimation
   # -------------------------------------------
+ 
+  if(nphases > 1) 
+    # message(sprintf("PARAMETER ESTIMATION IN %s PHASES.", toupper(make_number(nphases))))
+    message(sprintf("Parameter estimation in %s phases.", make_number(nphases)))
+  
   for(phase in seq(from=output$phase, to=nphases)) {
     
     if(output$phase > nphases) break
@@ -230,12 +235,16 @@ calibrate.default = function(par, fn, gr = NULL, ..., method = NULL,
     control$abstol      = conv$abstol[phase]
     control$reltol      = conv$reltol[phase]
     method              = conv$method[phase]
-
+    
     active = (phases <= phase) # NAs are corrected in .calibrar 
     
-    msg2 = sprintf("Calibration phase %d (%d of %d parameters active).\n  Started at %s.\n", 
-                   phase, sum(active, na.rm=TRUE), npar, date())
-    if(isTRUE(control$verbose)) message(msg2)
+    msg2 = sprintf("\n- Phase %d: %d of %d parameters active.", 
+                   phase, sum(active, na.rm=TRUE), npar)
+    msg3 = sprintf("\tStarted at %s.\n", date())
+    if(nphases > 1) message(msg2)
+    if(isTRUE(control$verbose)) message(msg3)
+    if(nphases==1) message(sprintf("Using optimization method '%s'.", method))
+    if(nphases!=1) message(sprintf("\tUsing optimization method '%s'.", method))
     
     # call optimisers using .calibrar handler
     tm1 = Sys.time()
@@ -269,15 +278,22 @@ calibrate.default = function(par, fn, gr = NULL, ..., method = NULL,
       
     }
     
-    msg = paste(c(sprintf("\nPhase %d finished in %s (%d of %d parameters active)",
-                        phase, format_difftime(tm1, tm2), sum(active, na.rm=TRUE), npar),
-                sprintf("Method: %s", method),
-                sprintf("Function value: %g", temp$value),
-                paste(c("Parameter values:",sprintf("%0.3g", par[which(active)])), collapse=" "), 
-                "\n"), collapse="\n")
+    xmsg = temp$message
+    if(is.null(xmsg)) xmsg = NA
+    if(is.na(xmsg)) xmsg = "-"
+    
+    msg = c(sprintf("Phase %d finished (%s)", phase, format_difftime(tm1, tm2)),
+            sprintf("Elapsed time: %s", format_difftime(tm1, tm2)),
+            sprintf("Function value: %g", temp$value),
+            paste(c("Parameter values:",sprintf("%0.3g", par[which(active)])), collapse=" "))
+    
+    msg = if(nphases == 1) msg[-1] else paste("\t", msg[-2], sep="")
+    msg = if(phase == nphases) c(msg, sprintf("\nStatus: %s", xmsg)) else msg
+    msg = paste(msg, collapse="\n")
     message(msg)
     
   } # end of phases
+  xtm2 = Sys.time() # timer for all phases
   
   isActive = (phases>0) & !is.na(phases)
   paropt = output$phases[[nphases]]$par # save parameters of last phase
@@ -299,7 +315,7 @@ calibrate.default = function(par, fn, gr = NULL, ..., method = NULL,
                method      = method,
                fn          = fn, 
                active      = isActive,
-               elapsed     = format_difftime(tm1, tm2, value = TRUE),
+               elapsed     = format_difftime(xtm1, xtm2, value = TRUE),
                trace       = trace)
   
   # output = c(final, output)

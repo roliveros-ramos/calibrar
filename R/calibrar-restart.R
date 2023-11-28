@@ -31,6 +31,10 @@
   return(invisible(TRUE))
 }
 
+.createRestartFile_Rvmmin = function() {
+  return(NULL)
+}
+
 .createOutputFile = function(output, control, type="results", phase=0) {
   
   if(is.null(control$restart.file)) return(invisible())
