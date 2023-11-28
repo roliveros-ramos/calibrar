@@ -7,9 +7,9 @@
 \method{summary}{calibrar.results}(object, ..., show_par = NULL, par.only = FALSE)
 }
 \arguments{
-\item{object}{an object for which a summary is desired.}
+\item{object}{Object of class calibrar.results}
 
-\item{...}{additional arguments affecting the summary produced.}
+\item{...}{More objects of class calibrar.results as needed for comparisons.}
 
 \item{show_par}{Vector of names of positions of the parameters to show in the summary.}
 
@@ -18,3 +18,4 @@
 \description{
 Summary for calibration results object
 }
+\keyword{internal}
