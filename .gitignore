@@ -22,6 +22,8 @@ vignettes/*.results
 vignettes/*.restart
 vignettes/*.partial
 vignettes/*.partial.phase*
+vignettes/*.R
+vignettes/*files/
 vignettes/*cache/
 vignettes/*Demo/
 *Demo/
