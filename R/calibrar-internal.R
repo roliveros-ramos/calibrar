@@ -24,13 +24,15 @@
   return(output)
 }
 
-.messageByGen = function(opt, trace, level=0, restart=FALSE, long=NULL) {
+.messageByGen = function(opt, trace, level=0, restart=FALSE, long=NULL, method="AHR-ES") {
   
   nx  = ceiling(log10(opt$control$maxgen + 0.5))
 
-  msg0 = paste0("Generation %", nx, "d finished (%s).\n")
-  msg1 = paste0("Generation %", nx, "d finished (%s)\n   Function value = %.10g\n")
-  msg2 = paste0("Generation %", nx, "d finished (from restart).\n")
+  xtype = if(method %in% c("AHR-ES")) "Generation" else "Iteration"
+  
+  msg0 = paste0(xtype, " %", nx, "d finished (%s).\n")
+  msg1 = paste0(xtype, " %", nx, "d finished (%s)\n   Function value = %.10g\n")
+  msg2 = paste0(xtype, " %", nx, "d finished (from restart).\n")
 
   if(is.null(long)) long = date()
   if(opt$control$REPORT > 1) long = date()
@@ -47,7 +49,7 @@
     return(invisible(NULL))
   }
   
-  if(level>0) {
+  if(method=="AHR-ES" && level>0) {
     out = sprintf(msg1, opt$gen, long, trace$best[opt$gen])
     message(out)
     return(invisible(NULL))
@@ -58,11 +60,6 @@
   
   return(invisible(NULL))
 }
-
-# .messageByGen = function(opt, trace) {
-#   cat("--- Generation", opt$gen, "-----")
-# }
-
 
 .printSeq = function(n, preffix=NULL, suffix=NULL, sep="") {
   nx  = ceiling(log10(n))

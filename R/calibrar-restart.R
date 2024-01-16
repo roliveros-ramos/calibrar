@@ -8,7 +8,7 @@
   x = readRDS(res.file)
   msg = sprintf("Restart file '%s' is corrupt.", res.file)
   if(!all(c("opt", "trace") %in% names(x))) stop(msg)
-  if(!inherits(x$opt, "ahres.restart")) stop(msg)
+  if(!inherits(x$opt, "calibrar.restart")) stop(msg)
   return(x)
 }
 
@@ -21,18 +21,14 @@
   return(output)
 }
 
-.createRestartFile = function(opt, trace, control) {
+.createRestartFile = function(opt, trace, control, method) {
   if(is.null(control$restart.file)) return(invisible())
   if((opt$gen%%control$REPORT)!=0) return(invisible())
   res.file = paste0(control$restart.file, ".restart")
-  class(opt) = c("ahres.restart", class(opt))
+  class(opt) = c("calibrar.restart", class(opt))
   force(trace)
-  saveRDS(list(opt=opt, trace=trace), file = res.file)
+  saveRDS(list(opt=opt, trace=trace, method=method), file = res.file)
   return(invisible(TRUE))
-}
-
-.createRestartFile_Rvmmin = function() {
-  return(NULL)
 }
 
 .createOutputFile = function(output, control, type="results", phase=0) {

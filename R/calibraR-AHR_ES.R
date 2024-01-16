@@ -140,7 +140,7 @@
     }
     
     # save restart
-    .createRestartFile(opt=opt, trace=trace, control=control)
+    .createRestartFile(opt=opt, trace=trace, control=control, method="AHR-ES")
     tm2 = Sys.time()
     
     if(control$verbose & opt$gen%%control$REPORT==0) {

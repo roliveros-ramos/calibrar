@@ -1,6 +1,4 @@
 Rvmminu <- function(par, fn, gr=NULL, control = list(), ...) {
-  #
-  #
   #  Author:  John C Nash
   #  Date:    Dec 6, 2021 update
   #
