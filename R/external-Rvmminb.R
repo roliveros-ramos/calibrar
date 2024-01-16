@@ -254,22 +254,6 @@ Rvmminb = function(par, fn, gr = NULL, lower = NULL,
         steplength = min(steplength, trystep, na.rm=TRUE)
         if(steplength < smallstep) steplength = 0 # force break for neg step
         
-        # for (i in 1:n) { # loop on parameters -- vectorize?
-        #   if ((bdmsk[i] == 1) && (t[i] != 0)) {
-        #     # only concerned with free parameters and non-zero search dimension
-        #     if (t[i] < 0) {
-        #       # going down. Look at lower bound
-        #       trystep = (lower[i] - par[i])/t[i]  # t[i] < 0 so this is positive
-        #     } else {
-        #       # going up, check upper bound
-        #       trystep = (upper[i] - par[i])/t[i]  # t[i] > 0 so this is positive
-        #     }
-        #     steplength = min(steplength, trystep)  # reduce as necessary
-        #     if (steplength < smallstep) steplength = 0 # force break for neg step
-        #   }  # end steplength reduction
-        # }  # end loop on i to reduce step length
-        # end box constraint adjustment of step length
-        
         bvec = par + steplength * t
         changed = (!identical((bvec + reltest), (par + reltest)) )
         if (changed) {
