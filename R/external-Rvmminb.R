@@ -166,6 +166,7 @@ Rvmminb = function(par, fn, gr = NULL, lower = NULL,
     B         = opt$B
     bdmsk     = opt$bdmsk
     msg       = opt$msg
+    gen       = opt$gen
     
     .messageByGen(opt=opt, trace=trace, restart=TRUE, method="Rvvmin")
     
@@ -184,6 +185,7 @@ Rvmminb = function(par, fn, gr = NULL, lower = NULL,
     fmin = f # Initialize fmin
     
     trace = list()
+    gen = 0
     
   }
   
@@ -194,7 +196,9 @@ Rvmminb = function(par, fn, gr = NULL, lower = NULL,
   }
   
   # START OF MAIN LOOP
+  
   while(keepgoing) { ## main loop -- must remember to break out of it!
+    gen = gen + 1
     if (ilast == ig) { # reset the approx. inverse hessian B to unit matrix
       B = diag(1, n, n)  # create unit matrix of order n
     }
@@ -256,22 +260,23 @@ Rvmminb = function(par, fn, gr = NULL, lower = NULL,
         
         bvec = par + steplength * t
         changed = (!identical((bvec + reltest), (par + reltest)) )
-        if (changed) {
+        
+        if(changed) {
           # compute new step, if possible
           f = try(fn(bvec, ...))
-          if (inherits(f, "try-error")) f = .Machine$double.xmax
-          if (maximize) f = -f
+          if(inherits(f, "try-error")) f = .Machine$double.xmax
+          if(maximize) f = -f
           ifn = ifn + 1
-          if (ifn > maxfeval) {
+          if(ifn > maxfeval) {
             msg = "Too many function evaluations"
-            if (dowarn) warning(msg)
+            if(dowarn) warning(msg)
             conv = 1
             changed = FALSE
             keepgoing = FALSE
             break # without saving parameters
           }
-          if (is.infinite(f)) f = .Machine$double.xmax
-          if (is.na(f) | is.null(f) ) {
+          if(is.infinite(f)) f = .Machine$double.xmax
+          if( is.na(f) | is.null(f) ) {
             msg='Function is not calculable at an intermediate point'
             #  stop('f is NA')
             conv = 21
@@ -280,7 +285,7 @@ Rvmminb = function(par, fn, gr = NULL, lower = NULL,
             break
           }
           accpoint = (f < fmin + gradproj * steplength * acctol) # NOTE: < not <=
-          if (! accpoint) {
+          if(!accpoint) {
             steplength = steplength * stepredn
           }
         } # end changed
@@ -289,7 +294,7 @@ Rvmminb = function(par, fn, gr = NULL, lower = NULL,
       }  # end while ((f >= fmin) && changed )
     }  # end if gradproj<0
     
-    if (accpoint) {
+    if(accpoint) {
       fmin = f # remember to save the value 150112
       # matrix update if acceptable point.
       for (i in 1:n) { ## Reactivate constraints?
@@ -306,21 +311,20 @@ Rvmminb = function(par, fn, gr = NULL, lower = NULL,
         }  # end test on free params
       }  # end reactivate constraints loop
       test = try(g = mygr(bvec, ...), silent = FALSE)
-      if (inherits(test, "try-error")) stop("Bad gradient!!")
-      if (any(is.nan(g))) stop("NaN in gradient")
+      if(inherits(test, "try-error")) stop("Bad gradient!!")
+      if(any(is.nan(g))) stop("NaN in gradient")
       ig = ig + 1
-      if (maximize) g = -g
-      if (ig > maxit) {
+      if(maximize) g = -g
+      if(ig > maxit) {
         keepgoing = FALSE
         msg = "Too many gradient evaluations"
-        if (dowarn) warning(msg)
+        if(dowarn) warning(msg)
         conv = 1
         break
       }
       par = bvec # save parameters since point acceptable
       ## ERROR!!        g[which(bdmsk <= 0)] = 0  # adjust for active mask or constraint 
-      if (bounds) 
-      { ## Bounds and masks adjustment of gradient ##
+      if(bounds) { ## Bounds and masks adjustment of gradient ##
         ## first try with looping -- later try to vectorize
         for (i in 1:n) {
           if ((bdmsk[i] == 0)) {
@@ -357,8 +361,6 @@ Rvmminb = function(par, fn, gr = NULL, lower = NULL,
         y = as.vector(crossprod(B, c))
         D2 = as.double(1+crossprod(c,y)/D1)  
         # as.double because D2 is a 1 by 1 matrix otherwise
-        # May be able to be more efficient below -- need to use
-        #   outer function
         B = B - (outer(t, y) + outer(y, t) - D2 * outer(t, t))/D1
       }
       else {
@@ -373,7 +375,7 @@ Rvmminb = function(par, fn, gr = NULL, lower = NULL,
       if ( (ig == ilast) || (abs(gradproj) < (1 + abs(fmin))*eps*eps ) ) { # remove ig > 2
         # we reset to gradient and did new linesearch
         keepgoing = FALSE  # no progress possible
-        if (conv < 0) { # conv == -1 is used to indicate it is not set
+        if(conv < 0) { # conv == -1 is used to indicate it is not set
           conv = 0
         }
         msg = "Converged"
@@ -385,7 +387,7 @@ Rvmminb = function(par, fn, gr = NULL, lower = NULL,
 
     opt = list(keepgoing=keepgoing, bvec=bvec, par=par, ifn=ifn, ig=ig, 
                ilast=ilast, fmin=fmin, f=f, g=g, oldstep=oldstep,
-               conv=conv, B=B, bdmsk=bdmsk, msg=msg)
+               conv=conv, B=B, bdmsk=bdmsk, msg=msg, gen=gen)
               
     .createRestartFile(opt=opt, trace=trace, control=control, method="Rvvmin") # (opt, control)
         
