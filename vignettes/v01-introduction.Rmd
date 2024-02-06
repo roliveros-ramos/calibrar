@@ -12,6 +12,7 @@ editor_options:
 ---
 
 ```{r setup, include = FALSE}
+library(calibrar)
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
@@ -216,12 +217,12 @@ calibrate(par=c(1,2,3,NA,5), fn=function(x) sum(x^2),
 
 ### Dealing with stochastic functions
 
-When dealing with stochastic functions, the argument `replicates` can be helpful, as it allows to evaluate the objective function several times, taking the average value of them as the actual function value (as an approximation of the expected value of the function). When `replicates=1`, the algorithm used by default is "LBFGSB3", but when replicates is greater than 1, "AHR-ES" is used. The next examples use the function `sphereN()`, which computes the Euclidean distance from a point `x` to the origin of coordinates after a random displacement of its position (see `?sphereN` for details.)
+When dealing with stochastic functions, the argument `replicates` can be helpful, as it allows to evaluate the objective function several times, taking the average value of them as the actual function value (as an approximation of the expected value of the function). When `replicates=1`, the algorithm used by default is "LBFGSB3", but when replicates is greater than 1, "AHR-ES" is used. The next examples use the function `sphereN()`, which computes the Euclidean distance from a point `x` to the origin of coordinates after a random displacement of its position (see `?sphereN` for details). We will set the maximum number of iterations to 1000 to speed up the execution of the vignette.
 
 ```{r, echo=TRUE, results='markup'}
 calibrate(par=c(1,2,3,NA,5), fn=sphereN,
           lower=rep(-100, 5), upper=rep(100, 5),
-          phases=c(1,2,3,2,1), replicates=3)
+          phases=c(1,2,3,2,1), replicates=3, control=list(maxit=1000))
 ```
 
 The number of replicates can be one single value or a vector with the length equal to the number of phases:
@@ -229,7 +230,7 @@ The number of replicates can be one single value or a vector with the length equ
 ```{r, echo=TRUE, results='markup'}
 calibrate(par=c(1,2,3,NA,5), fn=sphereN,
           lower=rep(-100, 5), upper=rep(100, 5),
-          phases=c(1,2,3,2,1), replicates=c(1,1,5))
+          phases=c(1,2,3,2,1), replicates=c(1,1,5), control=list(maxit=1000))
 ```
 
 ### Parameters as lists
@@ -237,7 +238,7 @@ calibrate(par=c(1,2,3,NA,5), fn=sphereN,
 ```{r, echo=TRUE, results='markup'}
 calibrate(par=list(par1=c(1,2,3), par2=NA, par3=5), fn=sphereN,
           lower=rep(-100, 5), upper=rep(100, 5),
-          phases=c(1,2,-3,2,1), replicates=c(1,5))
+          phases=c(1,2,-3,2,1), replicates=c(1,5), control=list(maxit=1000))
 ```
 
 Note that the function `fn` must be able to take a list as parameter set, and the user must ensure this works beforehand.

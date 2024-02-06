@@ -198,7 +198,8 @@ calibrate.default = function(par, fn, gr = NULL, ..., method = NULL,
   upper   = bounds$upper
   nphases = max(phases, na.rm=TRUE)
   
-  replicates = .checkReplicates(replicates, nphases) 
+  replicates = .checkReplicates(replicates, nphases)
+  control$repmax = max(replicates, na.rm=TRUE)
   
   output = if(isTRUE(restart)) .getResults(control=control, type="partial") else list(phase=0)
   output$phase = output$phase + 1

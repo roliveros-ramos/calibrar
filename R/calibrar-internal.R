@@ -427,30 +427,6 @@ format_difftime = function(x, y, ..., value=FALSE) {
   reltol = .check_arg_length(control$reltol, nphases, 'reltol')
   method = .check_arg_length(method, nphases, 'method')
   
-  # if(length(maxgen)==1) maxgen = rep(maxgen, nphases)
-  # if(!is.null(maxgen) & length(maxgen)!=nphases) 
-  #   stop(sprintf(msg, 'maxgen'))
-  
-  # if(length(maxit)==1) maxit = rep(maxit, nphases)
-  # if(!is.null(maxit) & length(maxit)!=nphases) 
-  #   stop(sprintf(msg, 'maxit'))
-  
-  # if(length(convergence)==1) convergence = rep(convergence, nphases)
-  # if(!is.null(convergence) & length(convergence)!=nphases) 
-  #   stop(sprintf(msg, 'convergence'))
-  
-  # if(length(abstol)==1) abstol = rep(abstol, nphases)
-  # if(!is.null(abstol) & length(abstol)!=nphases) 
-  #   stop(sprintf(msg, 'abstol'))
-  
-  # if(length(reltol)==1) reltol = rep(reltol, nphases)
-  # if(!is.null(reltol) & length(reltol)!=nphases) 
-  #   stop(sprintf(msg, 'reltol'))
-  
-  # if(length(method)==1) method = rep(method, nphases)
-  # if(!is.null(method) & length(method)!=nphases) 
-  #   stop(sprintf(msg, 'method'))
-  
   return(list(maxgen=maxgen, maxit=maxit, convergence=convergence, 
               abstol=abstol, reltol=reltol, method=method))
   

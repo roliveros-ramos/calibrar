@@ -97,7 +97,6 @@ And repeat the exercise with several optimization algorithms:
 
 ```{r linear8, cache=TRUE, paged.print=TRUE}
 set.seed(880820) # for reproducibility
-cat("Running optimization algorithms\n")
 cg = calibrate(par=start, fn=obj, x=x, y=y, method='CG')
 nm = calibrate(par=start, fn=obj, x=x, y=y, method='nmkb', lower=lower, upper=upper)
 ahres = calibrate(par=start, fn=obj, x=x, y=y, method='AHR-ES')
@@ -252,7 +251,6 @@ control = list(maxit=20000, eps=sqrt(.Machine$double.eps), factr=sqrt(.Machine$d
 Here, we also added a `control` list to increase the maximum number of iterations for the algorithms and the tolerance for the convergence. Now we can specify the `run_model()` function so we can simulate the model from a parameter set and define the objective function using the `calibration_objFn()` function: 
 
 ```{r}
-# Defining 'run_model' function
 run_model = function(par, forcing) {
   output = calibrar:::.PoissonMixedModel(par=par, forcing=forcing)
   output = c(output, list(gammas=par$gamma)) # adding gamma parameters for penalties
@@ -281,7 +279,7 @@ lbfgsb3 = calibrate(par=ARPM$guess, fn=obj, method='LBFGSB3', lower=ARPM$lower, 
 summary(ARPM, lbfgsb1, lbfgsb2, lbfgsb3, show_par = 1:3)
 ```
 
-In this case, the best solution found was using the 'Rvmmin' algorithm, which was also the faster (12.2s). Now, we can try to carry out the parameter estimation in two phases:
+In this case, the best solution was found using the 'Rvmmin' algorithm, which was also the faster (12.2s). Now, we can try to carry out the parameter estimation in two phases:
 
 ```{r}
 phases = ARPM$phase

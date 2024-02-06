@@ -3,11 +3,13 @@
   
   # get restart for the current phase
   restart = .restartCalibration(control) # flag: TRUE or FALSE
+  repmax = if(!is.null(control$repmax)) control$repmax else 1
+  fctr = if(repmax>1) 10000 else 1
   
   # default control options
   npar = length(par)
   con = list(trace = 0, fnscale = 1, parscale = rep.int(1L, npar), maxit=10000+200*npar,
-             abstol = -Inf, reltol = sqrt(.Machine$double.eps), REPORT = 10L, 
+             abstol = -Inf, reltol = fctr*sqrt(.Machine$double.eps), REPORT = 10L, 
              alpha=0.05, age.max=1, selection=0.5, step=0.5, weights=1,
              aggFn=.weighted.sum, nvar=1, useCV=TRUE, maxgen=NULL,
              convergence=1e-6, ncores=1, parallel=FALSE, verbose=FALSE,

@@ -183,6 +183,7 @@ Rvmminb = function(par, fn, gr = NULL, lower = NULL,
     oldstep = 1
     conv = -1
     fmin = f # Initialize fmin
+    msg = "Not converged"
     
     trace = list()
     gen = 0
@@ -310,8 +311,8 @@ Rvmminb = function(par, fn, gr = NULL, lower = NULL,
           }  # end lower bd reactivate
         }  # end test on free params
       }  # end reactivate constraints loop
-      test = try(g = mygr(bvec, ...), silent = FALSE)
-      if(inherits(test, "try-error")) stop("Bad gradient!!")
+      g = try(mygr(bvec, ...), silent = FALSE)
+      if(inherits(g, "try-error")) stop("Bad gradient!!")
       if(any(is.nan(g))) stop("NaN in gradient")
       ig = ig + 1
       if(maximize) g = -g

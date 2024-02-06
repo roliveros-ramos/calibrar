@@ -106,18 +106,18 @@
   
 }
 
-# optimr::hjn -------------------------------------------------------------
+# optimx::hjn -------------------------------------------------------------
 
 .hjn = function(par, fn, gr, lower, upper, control, hessian, method) {
   
   npar = length(par)
-  # defaults for Rvmmin (taken from optimr::hjn)
+  # defaults for Rvmmin (taken from optimx::hjn)
   con = list(trace=0, stepsize=1, stepredn=0.1, maxfeval=2000*npar,
              eps = 1e-07)
   
   control = check_control(control=control, default=con)
   
-  output = suppressWarnings(optimr::hjn(par=par, fn=fn, lower=lower, 
+  output = suppressWarnings(optimx::hjn(par=par, fn=fn, lower=lower, 
                                         upper=upper, control=control))
   
   output$message = NA
