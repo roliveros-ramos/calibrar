@@ -4,9 +4,11 @@ TO_DO.txt
 cran-comments.md
 NEWS.md
 ^\docs$
-docs
+doc
 pkgdown
+sandbox
 ^\.github$
+^\.git$
 ^README.Rmd
 vignettes/.*.html
 vignettes/.*.pdf
@@ -17,4 +19,3 @@ vignettes/.*.partial
 vignettes/.*.partial.phase*
 vignettes/.*cache/
 vignettes/.*Demo/
-^.*Demo$
