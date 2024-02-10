@@ -51,7 +51,8 @@ cat("Real parameters used to simulate data\n")
 print(unlist(demo$par)) # parameters are in a list
 # objective functions
 obj  = calibration_objFn(model=run_model, setup=calibration_settings, observed=observed, T=demo$T)
-obj2 = calibration_objFn(model=run_model, setup=calibration_settings, observed=observed, T=demo$T, aggregate=TRUE)
+obj2 = calibration_objFn(model=run_model, setup=calibration_settings, observed=observed, 
+T=demo$T, aggregate=TRUE)
 cat("Starting calibration...\n")
 cat("Running optimization algorithms\n", "\t")
 cat("Running optim AHR-ES\n")

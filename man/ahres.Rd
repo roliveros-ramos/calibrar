@@ -64,7 +64,7 @@ This function performs the optimization of a function using
 the Adaptative Hierarchical Recombination Evolutionary Strategy (AHR-ES, Oliveros & Shin, 2015).
 }
 \examples{
-ahres(par=rep(1, 5), fn=sphereN)
+\dontrun{ahres(par=rep(1, 5), fn=sphereN)}
 }
 \seealso{
 Other optimisers: 
