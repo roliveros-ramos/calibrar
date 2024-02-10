@@ -91,7 +91,7 @@
   forcing = as.matrix(read.csv(file.path(output$path, "master", "environment.csv"), row.names=1))
   
   run_model = function(par, forcing) {
-    output = calibrar:::.PoissonMixedModel(par=par, forcing=forcing)
+    output = .PoissonMixedModel(par=par, forcing=forcing)
     output = c(output, list(gammas=par$gamma)) # adding gamma parameters for penalties
     return(output)
   }

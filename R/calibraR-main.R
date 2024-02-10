@@ -2,12 +2,12 @@
 
 #' calibrar package: Automated Calibration for Complex Models
 #'
-#' \if{html}{\figure{logo_small.png}{options: align='right' alt='logo' width='150'}}
+#'\if{html}{\figure{logo_small.png}{options: style='float: right' alt='logo' width='150'}}
 #'
 #' This package allows the parameter estimation (i.e. calibration) of complex models, including stochastic ones. It implements generic functions that can be used for fitting any type of models, especially those with non-differentiable objective functions, with the same syntax as base::optim. 
 #' It supports multiple phases estimation (sequential parameter masking), constrained optimization (bounding box restrictions) and automatic parallel computation of numerical gradients. 
 #' Some common maximum likelihood estimation methods and automated construction of the objective function from simulated model outputs is provided.  
-#' See <http://roliveros-ramos.github.io/calibrar> for more details.
+#' See <https://roliveros-ramos.github.io/calibrar/> for more details.
 #' 
 #' @title Automated Calibration for Complex Models
 #' @description Automated Calibration for Complex Models
@@ -116,13 +116,11 @@ calibrate.default = function(par, fn, gr = NULL, ..., method = NULL,
   }
   
   methods = c("L-BFGS-B", "nlminb", "Rcgmin", "Rvmmin", 
-              "Rvmmin-old", "Rvmmin-ror",
               "hjn", "spg", "LBFGSB3", "CMA-ES", "genSA", "DE", "soma", "genoud", "PSO", 
               "hybridPSO", "mads", "hjkb", "nmkb", "bobyqa", "AHR-ES", "Nelder-Mead", 
               "CG", "BFGS", "SANN")
   
   method = match.arg(method, choices=methods, several.ok = TRUE)
-  
   
   # calibrate should dispatch on 'fn'
   if(inherits(fn, "objFn")) {
@@ -218,10 +216,10 @@ calibrate.default = function(par, fn, gr = NULL, ..., method = NULL,
   if(!is.null(control$run)) message(sprintf("Using 'run' directory: %s", control$run))
    
   xtm1 = Sys.time() # timer for all phases
+  
   # -------------------------------------------
   # start the sequential parameter estimation
   # -------------------------------------------
- 
   if(nphases > 1) 
     # message(sprintf("PARAMETER ESTIMATION IN %s PHASES.", toupper(make_number(nphases))))
     message(sprintf("Parameter estimation in %s phases.", make_number(nphases)))
@@ -428,7 +426,7 @@ optimh = function(par, fn, gr = NULL, ...,
 #'
 #' @author Ricardo Oliveros-Ramos
 #' @examples
-#' ahres(par=rep(1, 5), fn=sphereN)
+#' \dontrun{ahres(par=rep(1, 5), fn=sphereN)}
 #' @inheritParams calibrate
 #' @inheritParams optim2
 #' @inherit optim2 return
