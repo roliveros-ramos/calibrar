@@ -312,6 +312,6 @@ summary(ARPM, lbfgsb2, lbfgsb2p, mix1, mix2, mix3, show_par = 1:3)
 
 Here, we can see that every combination find essentially the same solution, but the combination using the 'CG' (conjugated gradient) first required less function and gradient evaluations, being faster.
 
-Please, refer to `vignette(package="calibrar")` for additional vignettes or to the [calibrar website](http://roliveros-ramos.github.io/calibrar) for more details.
+Please, refer to `vignette(package="calibrar")` for additional vignettes or to the [calibrar website](https://roliveros-ramos.github.io/calibrar/) for more details.
 
 

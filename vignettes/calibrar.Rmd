@@ -261,4 +261,4 @@ calib = calibrate(par=rep(0.5, 5), fn=sphereN,
 stopCluster(cl) # close the parallel connections
 ```
 
-Please, refer to `vignette(package="calibrar")` for additional vignettes or to the [calibrar website](http://roliveros-ramos.github.io/calibrar) for more details.
+Please, refer to `vignette(package="calibrar")` for additional vignettes or to the [calibrar website](https://roliveros-ramos.github.io/calibrar/) for more details.
