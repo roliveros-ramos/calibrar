@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">calibrar</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.0.9021</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.0</span>
       </span>
     </div>
 
@@ -96,7 +96,7 @@ parameter estimation</h1>
                         <h4 data-toc-skip class="author">Ricardo
 Oliveros-Ramos</h4>
             
-            <h4 data-toc-skip class="date">2024-02-08</h4>
+            <h4 data-toc-skip class="date">2024-02-10</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/roliveros-ramos/calibrar/blob/HEAD/vignettes/v02-parameter_estimation.Rmd" class="external-link"><code>vignettes/v02-parameter_estimation.Rmd</code></a></small>
       <div class="hidden name"><code>v02-parameter_estimation.Rmd</code></div>
@@ -185,7 +185,7 @@ minimized:</p>
 <span><span class="va">bfgs</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">start</span>, fn<span class="op">=</span><span class="va">obj</span>, x<span class="op">=</span><span class="va">x</span>, y<span class="op">=</span><span class="va">y</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Using optimization method 'Rvmmin'.</span></span>
 <span><span class="co">#&gt; Elapsed time: 0.14s</span></span>
-<span><span class="co">#&gt; Function value: 5.88168e-14</span></span>
+<span><span class="co">#&gt; Function value: 6.07181e-14</span></span>
 <span><span class="co">#&gt; Parameter values: 3.14 1 2 3 4 5 6 7</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Status: Rvmminu appears to have converged</span></span>
@@ -402,7 +402,7 @@ changing the <code>maxit</code> control argument:</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">optx</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">start</span>, fn <span class="op">=</span> <span class="va">objfn</span>, method<span class="op">=</span><span class="st">'LBFGSB3'</span>, T<span class="op">=</span><span class="cn">T</span>, catch<span class="op">=</span><span class="va">catch</span>, observed<span class="op">=</span><span class="va">observed</span>, control<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>maxit<span class="op">=</span><span class="fl">20000</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Using optimization method 'LBFGSB3'.</span></span>
-<span><span class="co">#&gt; Elapsed time: 6.96s</span></span>
+<span><span class="co">#&gt; Elapsed time: 6.65s</span></span>
 <span><span class="co">#&gt; Function value: 0.342868</span></span>
 <span><span class="co">#&gt; Parameter values: 0.5 1e+03 600</span></span>
 <span><span class="co">#&gt; </span></span>
