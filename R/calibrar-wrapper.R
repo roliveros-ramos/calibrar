@@ -49,6 +49,12 @@
 check_control = function(control, default, minimal=TRUE, verbose=TRUE) {
   
   control = control[!sapply(control, is.null)] # remove NULL values
+  
+  res_control = "restart.file" %in% names(control)
+  res_default = "restart.file" %in% names(default)
+  
+  if(!res_default & res_control) stop("Restart is not implemented for this method.")
+    
   nm_full = names(default)
   ignored = setdiff(names(control), nm_full)
   keep = names(default)[nm_full %in% names(control)]

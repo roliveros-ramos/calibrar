@@ -317,12 +317,17 @@ format_difftime = function(x, y, ..., value=FALSE) {
 
   con = list(ncores=parallel::detectCores(), 
              nvar=NULL, run=NULL, master=NULL, stochastic=FALSE, verbose=FALSE, restart.file=NULL,
-             gradient = list(), gr.method="forward", REPORT=10L)
+             gradient = list(), gr.method="forward", REPORT=10L, restart.file=NULL)
   
   controlDef  = names(con)       # default options
   controlUser = names(control)   # user provided options
   
   con[controlUser] = control
+  
+  isRestartMethod = method %in% c("AHR-ES", "Rvmmin")
+  
+  if(!is.null(con$restart.file) & !isRestartMethod)
+    stop(sprintf("Restart functionality is not yet provided for method '%s'.", method))
   
   if(!is.list(con$gradient)) 
     stop("Control argument 'gradient' must be a list with the control options for numerical gradient computation.")

@@ -1,4 +1,4 @@
-Rvmmin <- function(par, fn, gr = NULL, lower = NULL, 
+Rvmmin = function(par, fn, gr = NULL, lower = NULL, 
   upper = NULL, bdmsk = NULL, control = list(), ...) {
   #
   #  Author:  John C Nash
@@ -89,73 +89,76 @@ Rvmmin <- function(par, fn, gr = NULL, lower = NULL,
   #################################################################
   npar <- length(par) # number of parameters
   # control defaults -- idea from spg
-  if (is.null(control$trace)) control$trace=0
+  if(is.null(control$trace)) control$trace=0
   # check if there are bounds
-  if (is.null(lower) || !any(is.finite(lower))) 
+  if(is.null(lower) || !any(is.finite(lower))) 
      nolower = TRUE # no lower bounds
   else nolower = FALSE
-  if (is.null(upper) || !any(is.finite(upper))) 
+  if(is.null(upper) || !any(is.finite(upper))) 
      noupper = TRUE # no upper bounds
   else noupper = FALSE
-  if (nolower && noupper && all(bdmsk == 1)) 
+  if(nolower && noupper && all(bdmsk == 1)) 
      bounds = FALSE
   else bounds = TRUE
-  if (control$trace > 1) 
-     cat("Bounds: nolower = ", nolower, "  noupper = ", noupper, 
-           " bounds = ", bounds, "\n")
+  # if (control$trace > 1) 
+  #    cat("Bounds: nolower = ", nolower, "  noupper = ", noupper, 
+  #          " bounds = ", bounds, "\n")
   if (is.null(gr)) {
      gr <- "grfwd" # use forward gradient approximation if no gradient code provided
-     if (control$trace > 0) cat("WARNING: forward gradient approximation being used\n")
+     # if (control$trace > 0) cat("WARNING: forward gradient approximation being used\n")
   } else {
      if (is.character(gr)) { # assume numerical gradient
-        if (control$trace > 0) cat("WARNING: using gradient approximation '",gr,"'\n")
+        # if (control$trace > 0) cat("WARNING: using gradient approximation '",gr,"'\n")
      } else { # analytic gradient, so check if requested
         if (is.null(control$checkgrad)) control$checkgrad <- FALSE
         if (control$checkgrad) { # check gradient
-           testgrad<-grchk(par, fn, gr, trace=control$trace, ...)
-           if (! testgrad) warning("Gradient code for Rvmmin may be faulty - check it!")
+           testgrad = grchk(par, fn, gr, trace=control$trace, ...)
+           if (!testgrad) warning("Gradient code for Rvmmin may be faulty - check it!")
         }
      } # end else
   }
   control$checkgrad<-NULL # to avoid problems in subsidiary routines
   if (is.null(control$dowarn)) control$dowarn<-TRUE
   #############################################
-  if (bounds) { 
-    if (is.null(control$checkbounds)) { control$checkbounds <- TRUE }
-    if (is.null(bdmsk)) { bdmsk <- rep(1, npar) } # ensure we have bdmsk
-    if ((length(lower) == 1) && (npar > 1) ) lower <- rep(lower, npar) 
-    if ((length(upper) == 1) && (npar > 1) ) upper <- rep(upper, npar) # fix 150604
-    if (any(is.infinite(lower))) lower[which(is.infinite(lower))] <- -.Machine$double.xmax
-    if (any(is.infinite(upper))) upper[which(is.infinite(upper))] <-  .Machine$double.xmax
+  if(bounds) {
+    if(is.null(control$checkbounds)) { control$checkbounds <- TRUE }
+    if(is.null(bdmsk)) { bdmsk <- rep(1, npar) } # ensure we have bdmsk
+    if((length(lower) == 1) && (npar > 1) ) lower <- rep(lower, npar) 
+    if((length(upper) == 1) && (npar > 1) ) upper <- rep(upper, npar) # fix 150604
+    if(any(is.infinite(lower))) lower[which(is.infinite(lower))] <- -.Machine$double.xmax
+    if(any(is.infinite(upper))) upper[which(is.infinite(upper))] <-  .Machine$double.xmax
     ### Check bounds feasible
-    if (control$checkbounds) {
-       btest <- bmchk(par, lower = lower, upper = upper, bdmsk = bdmsk, 
-             trace = control$trace)
-       if (!btest$admissible) 
-          stop("Inadmissible bounds: one or more lower > upper")
-       if (btest$parchanged) {
-          if (is.null(control$keepinputpar) || ! control$keepinputpar) { 
-             warning("Parameter out of bounds has been moved to nearest bound")
-             control$keepinputpar <- NULL # avoid problems in subsidiary routines
-             par <- btest$bvec # save the changed parameters             
-          } else stop("Parameter out of bounds")
-       }
+    if(control$checkbounds) {
+      btest <- bmchk(par, lower = lower, upper = upper, bdmsk = bdmsk, 
+                     trace = 0)
+      if (!btest$admissible) 
+        stop("Inadmissible bounds: one or more lower > upper")
+      if (btest$parchanged) {
+        if (is.null(control$keepinputpar) || ! control$keepinputpar) { 
+          warning("Parameter out of bounds has been moved to nearest bound")
+          control$keepinputpar <- NULL # avoid problems in subsidiary routines
+          par <- btest$bvec # save the changed parameters             
+        } else stop("Parameter out of bounds")
+      }
     }
     nolower <- btest$nolower
     noupper <- btest$noupper
     bounds <- btest$bounds
     bdmsk <- btest$bdmsk  # change bdmsk to values set in bmchk
-    if (control$trace > 3) {
-       cat("Adjusted bdmsk vector:")
-       print(bdmsk)
-    }
+    # if (control$trace > 3) {
+    #    cat("Adjusted bdmsk vector:")
+    #    print(bdmsk)
+    # }
     lower <- btest$lower
     upper <- btest$upper
     control$checkbounds<-NULL # to avoid problems in subsidiary routines
     ############## end bounds check #############
-    ans <- Rvmminb(par, fn, gr, lower = lower, 
-        upper = upper, bdmsk = bdmsk, control = control, ...)
+    ans = Rvmminb(par, fn, gr, lower = lower, upper = upper, bdmsk = bdmsk, 
+                  control = control, ...)
     } else {
-       ans <- Rvmminu(par, fn, gr, control = control, ...)
-    } #   return(ans) 
+      
+    ans = Rvmminu(par, fn, gr, control = control, ...)
+    
+    } #   
+  return(ans) 
 }  ## end of Rvmmin

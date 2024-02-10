@@ -13,21 +13,20 @@
              alpha=0.05, age.max=1, selection=0.5, step=0.5, weights=1,
              aggFn=.weighted.sum, nvar=1, useCV=TRUE, maxgen=NULL,
              convergence=1e-6, ncores=1, parallel=FALSE, verbose=FALSE,
-             termination = 2, max_no_improvement=10, fn_smoothing=5)
+             termination = 2, max_no_improvement=10, fn_smoothing=5, restart.file=NULL)
   popOpt = .optPopSize(n=length(par), selection=con$selection)
   con$popsize = popOpt
   # end of default control options
+  control = .check_control_ahres(control=control, default=con)
   
   if(isTRUE(restart)) {
     
-    res = .getRestart(control=control)
+    res = .getRestart(control=control) # new control is used, check. TO_DO.
     opt   = res$opt
     trace = res$trace
     .messageByGen(opt, trace, restart=TRUE)
     
   } else {
-    
-    control = .check_control_ahres(control=control, default=con)
     
     opt = .newOpt(par=par, lower=lower, upper=upper, control=control)
     

@@ -89,10 +89,11 @@ Rvmminb = function(par, fn, gr = NULL, lower = NULL,
   maxfeval = 3000 + 10L * n
   ctrl = list(maxit = maxit, maxfeval = maxfeval, maximize = FALSE, 
                trace = 0, eps = 1e-07, dowarn = TRUE, acctol = 0.0001, stepredn=0.2,
-               reltest=100.0, stopbadupdate = TRUE)
+               reltest=100.0, stopbadupdate = TRUE, restart.file=NULL, REPORT=1L)
   namc = names(control)
+  missmn = paste(namc[!(namc %in% names(ctrl))], collapse=", ")
   if (!all(namc %in% names(ctrl))) 
-    stop("unknown names in control: ", namc[!(namc %in% names(ctrl))])
+    stop(sprintf("unknown names in control: %s", missnm))
   ctrl[namc] = control  #
   maxit = ctrl$maxit  #
   maxfeval = ctrl$maxfeval  #
@@ -148,7 +149,7 @@ Rvmminb = function(par, fn, gr = NULL, lower = NULL,
   
   if(isTRUE(restart)) {
     
-    res = .getRestart(control=control)
+    res = .getRestart(control=ctrl)
     opt = res$opt
     trace = res$trace
     
@@ -207,7 +208,7 @@ Rvmminb = function(par, fn, gr = NULL, lower = NULL,
     # par = bvec  # save parameters
     if (!all(is.numeric(g))) {
       g = rep(0, n)  # 110619
-      cat("zeroing gradient because of failure\n")
+      message("zeroing gradient because of failure\n")
     }
     c = g  # save gradient
     ## Bounds and masks adjustment of gradient ##
@@ -252,7 +253,7 @@ Rvmminb = function(par, fn, gr = NULL, lower = NULL,
       changed = TRUE  # Need to set so loop will start
       steplength = oldstep # 131202 - 1 seems best value (Newton step)
       
-      while (changed && (!accpoint)) {
+      while(changed && (!accpoint)) {
         # We seek a lower point, but must change parameters too
         # Box constraint -- adjust step length for free parameters
         # ROR: this is the only update needed, if so (trystep is fix, steplength is always lower)
@@ -388,9 +389,9 @@ Rvmminb = function(par, fn, gr = NULL, lower = NULL,
 
     opt = list(keepgoing=keepgoing, bvec=bvec, par=par, ifn=ifn, ig=ig, 
                ilast=ilast, fmin=fmin, f=f, g=g, oldstep=oldstep,
-               conv=conv, B=B, bdmsk=bdmsk, msg=msg, gen=gen)
+               conv=conv, B=B, bdmsk=bdmsk, msg=msg, gen=gen, control=ctrl)
               
-    .createRestartFile(opt=opt, trace=trace, control=control, method="Rvvmin") # (opt, control)
+    .createRestartFile(opt=opt, trace=trace, control=ctrl, method="Rvvmin") # (opt, control)
         
   }  # end main loop  (while keepgoing)
   
