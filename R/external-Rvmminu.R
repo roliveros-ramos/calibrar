@@ -88,7 +88,7 @@ Rvmminu <- function(par, fn, gr=NULL, control = list(), ...) {
     reltest=100.0, stopbadupdate = TRUE)
   namc <- names(control)
   if("restart.file" %in% namc) stop("Restart is only supported with bounds.")
-  missmn = paste(namc[!(namc %in% names(ctrl))], collapse=", ")
+  missnm = paste(namc[!(namc %in% names(ctrl))], collapse=", ")
   if (!all(namc %in% names(ctrl))) 
      stop(sprintf("unknown names in control: %s", missnm))
   ctrl[namc] <- control  #
