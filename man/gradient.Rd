@@ -13,7 +13,7 @@ gradient(fn, x, method, control, parallel, ...)
 
 \item{method}{The method used. Currently implemented: central, backward, forward and Richardson. See details.}
 
-\item{control}{A list of control arguments. Notably, control$parallel=TRUE activates parallel computation.}
+\item{control}{A list of control arguments.}
 
 \item{parallel}{Boolean, should numerical derivatives be calculated in parallel?}
 
