@@ -85,7 +85,7 @@ Rvmminu <- function(par, fn, gr=NULL, control = list(), ...) {
   maxfeval <- 3000 + 10L * n
   ctrl <- list(maxit = maxit, maxfeval = maxfeval, maximize = FALSE, 
     trace = 0, eps = 1e-07, dowarn = TRUE, acctol = 0.0001, stepredn=0.2,
-    reltest=100.0, stopbadupdate = TRUE)
+    reltest=100.0, stopbadupdate = TRUE, restart.file=NULL, REPORT=1L)
   namc <- names(control)
   if("restart.file" %in% namc) stop("Restart is only supported with bounds.")
   missnm = paste(namc[!(namc %in% names(ctrl))], collapse=", ")
