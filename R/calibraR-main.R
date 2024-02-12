@@ -130,7 +130,6 @@ calibrate.default = function(par, fn, gr = NULL, ..., method = NULL,
   }
   
   # check function and method
-  multiMethods = "AHR-ES" # list of methods supporting multi-objective
   
   if(!all(method %in% multiMethods)) {
   
@@ -146,11 +145,6 @@ calibrate.default = function(par, fn, gr = NULL, ..., method = NULL,
       if(control$nvar != 1) stop(sprintf("Method '%s' does not support multi-objective optimization, 'fn' must be scalar.",
                                          method))
     control$nvar = 1
-    
-  } else {
-    
-    # only run it if not provided in fn
-    if(is.null(control$nvar)) control$nvar = length(fn(par, ...))
     
   }
   
@@ -716,3 +710,5 @@ calibration_objFn = function(model, setup, observed, aggFn=NULL, aggregate=FALSE
   return(fn1) 
   
 }
+
+multiMethods = "AHR-ES" # list of methods supporting multi-objective

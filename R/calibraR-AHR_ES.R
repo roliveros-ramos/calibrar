@@ -13,7 +13,8 @@
              alpha=0.05, age.max=1, selection=0.5, step=0.5, weights=1,
              aggFn=.weighted.sum, nvar=1, useCV=TRUE, maxgen=NULL,
              convergence=1e-6, ncores=1, parallel=FALSE, verbose=FALSE,
-             termination = 2, max_no_improvement=10, fn_smoothing=5, restart.file=NULL)
+             termination = 2, max_no_improvement=10, fn_smoothing=5, restart.file=NULL,
+             master=NULL, run=NULL)
   popOpt = .optPopSize(n=length(par), selection=con$selection)
   con$popsize = popOpt
   # end of default control options
