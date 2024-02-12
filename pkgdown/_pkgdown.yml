@@ -19,6 +19,8 @@ reference:
   - objFn
   - calibrar_demo
 - title: Parameter modelling
+  desc: >
+    Functions to easily parametrize a model. 
 - contents:
   - gaussian_kernel
   - spline_par
@@ -29,3 +31,8 @@ reference:
 - contents:
   - .get_command_argument
   - .read_configuration
+- title: Defunct functions
+- contents:
+  - getObservedData
+  - getCalibrationInfo
+  - createObjectiveFunction

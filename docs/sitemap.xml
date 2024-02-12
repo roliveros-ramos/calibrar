@@ -55,6 +55,9 @@
     <loc>/reference/ahres.html</loc>
   </url>
   <url>
+    <loc>/reference/calibrar-defunct.html</loc>
+  </url>
+  <url>
     <loc>/reference/calibrar-package.html</loc>
   </url>
   <url>
@@ -73,6 +76,9 @@
     <loc>/reference/calibration_setup.html</loc>
   </url>
   <url>
+    <loc>/reference/createObjectiveFunction-defunct.html</loc>
+  </url>
+  <url>
     <loc>/reference/createObjectiveFunction.html</loc>
   </url>
   <url>
@@ -85,7 +91,13 @@
     <loc>/reference/gaussian_kernel.html</loc>
   </url>
   <url>
+    <loc>/reference/getCalibrationInfo-defunct.html</loc>
+  </url>
+  <url>
     <loc>/reference/getCalibrationInfo.html</loc>
+  </url>
+  <url>
+    <loc>/reference/getObservedData-defunct.html</loc>
   </url>
   <url>
     <loc>/reference/getObservedData.html</loc>
