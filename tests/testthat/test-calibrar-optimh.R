@@ -7,7 +7,7 @@ tfn = function(x) sum(x^2) + 10
 
 algorithms = c("AHR-ES", "Nelder-Mead", "SANN", "hjn",  
                "CMA-ES", "genSA", "DE", "soma", "genoud", "PSO", 
-               "hybridPSO", "mads", "hjk", "hjkb", "nmk", "nmkb")
+               "hybridPSO", "mads", "hjk", "hjkb", "nmk", "nmkb", "bobyqa")
 
 for(alg in algorithms) {
   test_that(sprintf("algorithm test: '%s'.", alg), {

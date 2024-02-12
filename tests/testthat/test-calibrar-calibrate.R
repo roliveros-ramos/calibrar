@@ -28,7 +28,7 @@ algorithms = c("L-BFGS-B", "nlminb", "Rcgmin", "Rvmmin", "Nelder-Mead", "SANN",
                "hjn", "spg", "LBFGSB3", "CMA-ES", "genSA", "DE", "soma", "genoud", 
                "PSO", "hybridPSO", "mads", "hjkb", "nmkb", "bobyqa", "AHR-ES")
 
-algorithms = algorithms[6]
+# algorithms = algorithms[6]
 
 for(alg in algorithms) {
   
