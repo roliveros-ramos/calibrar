@@ -388,20 +388,25 @@ format_difftime = function(x, y, ..., value=FALSE) {
 }
 
 
-.batchsize = function(par, method, control) {
+.batchsize = function(par, method, control, parallel=FALSE) {
   
   n = length(unlist(par))
 
-  # for methods that optimise number of runs in parallel, set to NULL
-  # and call copyMaster internally.
+  if(!isTRUE(parallel)) return(1) # if parallelization is not available, only one folder needed.
+  
+  # for methods that optimise number of runs in parallel, set to 1, so
+  # tests to fn can be run before the number is optimized internally.
   internal_methods = c("AHR-ES")
   if(method %in% internal_methods) {
-    return(NULL)
+    return(1)
   }
 
   # for methods that do not use derivatives and no parallel implementation is 
   # available, return 1.
-  deriv_free_methods = c("Nelder-Mead", "SANN", "Brent", "hjn")
+  deriv_free_methods = c("Nelder-Mead", "Brent", "hjn", "bobyqa", 
+                         "CMA-ES", "genSA", "DE", "soma", "genoud", "PSO", 
+                         "mads", "hjk", "hjkb", "nmk", "nmkb")
+  
   if(method %in% deriv_free_methods) {
     return(1)
   }

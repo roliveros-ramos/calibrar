@@ -73,7 +73,7 @@ copy_master_folder = function(control, n=NULL) {
   if(is.null(control$run))
     stop("You must specify a 'run' directory to copy the contents of the 'master' folder.")
   if(is.null(n)) return(invisible())
-  for(i in (seq_len(n+1) - 1)) .copyMaster(control, i)
+  for(i in (seq_len(n+1) - 1)) .copyMaster(control, i) # i0 is additionally created
   return(invisible())
 }
 

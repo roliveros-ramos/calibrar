@@ -99,8 +99,13 @@
   # this need to be added so functions can use disk (specially in parallel)
   pathTmp = getwd()               # get the current path
   on.exit(setwd(pathTmp))         # back to the original path after execution
-  n = .batchsize(par=par, method=method, control=control)
+  n = .batchsize(par=par, method=method, control=control, parallel=parallel)
   copy_master_folder(control, n=n) # set a copy of master for all individuals
+  
+  if(all(method %in% multiMethods)) {
+    # only run it if not provided in fn
+    if(is.null(control$nvar)) control$nvar = length(fn1(par, ...))
+  }
   
   # here, make methods explicit (one by one)
   output = .all_methods(method=method, par=par, fn=fn1, gr=gr1, lower=lower, upper=upper, control=control, hessian=hessian)
