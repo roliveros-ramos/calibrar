@@ -204,7 +204,7 @@
   method = if(!is.null(control$pso.method)) control$pso.method else "SPSO2007"
   # opso = c("PSO", "PSO2007", "SPSO2007", "hybridPSO")
   # method = if(method %in% opso) "SPSO2007" else "SPSO2011"
-  control$type   = method 
+  control$type = method 
   if(hybrid) control$hybrid = hybrid
   
   con = list(trace = 0, maxit = 1000, maxf = Inf, abstol = -Inf, reltol = 0, 

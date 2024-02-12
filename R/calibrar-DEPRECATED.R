@@ -1,3 +1,12 @@
+
+#' @title Defunct functions in package \pkg{calibrar}.
+#' @description The functions listed below are defunct. When possible, alternative functions with similar
+#'   functionality are also mentioned. Help pages for defunct functions are
+#'   available at \code{help("<function>-defunct")}.
+#' @name calibrar-defunct
+#' @keywords internal
+NULL
+
 # getObservedData ---------------------------------------------------------
 
 #' @title Get observed data for the calibration of a model 
@@ -16,10 +25,20 @@
 #' in combination with the \code{\link{createObjectiveFunction}}.
 #' @author Ricardo Oliveros-Ramos
 #' @seealso \code{\link{createObjectiveFunction}}, \code{\link{getCalibrationInfo}}.
-#' @noRd
+#' 
+#' @name getObservedData-defunct
+#' @seealso \code{\link{calibrar-deprecated}}
+#' @keywords internal
+NULL
+
+#' @rdname calibrar-defunct
+#' @section \code{getObservedData}:
+#' Deprecated in v0.3, defunct in v0.9. For \code{getObservedData}, use \code{\link{calibration_data}}.
+#'
+#' @export
 getObservedData = function(info, path, data.folder="data", ...) {
   
-  .Deprecated("calibration_data", package="calibrar")
+  .Defunct("calibration_data", package="calibrar")
   
   observed  = list()
   variables = info$variable
@@ -58,38 +77,50 @@ getObservedData = function(info, path, data.folder="data", ...) {
 #' and \code{\link{getObservedData}}.
 #' @author Ricardo Oliveros-Ramos
 #' @seealso \code{\link{createObjectiveFunction}}, \code{\link{getObservedData}}.
-#' @noRd
+#' 
+#' @name getCalibrationInfo-defunct
+#' @seealso \code{\link{calibrar-deprecated}}
+#' @keywords internal
+NULL
+
+#' @rdname calibrar-defunct
+#' @section \code{getCalibrationInfo}:
+#' Deprecated in v0.3, defunct in v0.9. For \code{getCalibrationInfo}, use \code{\link{calibration_setup}}.
+#'
+#' @export
 getCalibrationInfo = function(path, file="calibrationInfo.csv", stringsAsFactors=FALSE, ...) {
   
-  .Deprecated("calibration_setup", package="calibrar")
-  caliPath = file.path(path, file)
-  calibrationInfo = read.csv(caliPath, stringsAsFactors=FALSE, ...)
+  .Defunct("calibration_setup", package="calibrar")
   
-  fullNames = c("variable", "type", "calibrate", "weights", "useData")  
-  doesNotMatch = !(names(calibrationInfo) %in% fullNames)
-  dnm = names(calibrationInfo)[doesNotMatch]
+  # caliPath = file.path(path, file)
+  # calibrationInfo = read.csv(caliPath, stringsAsFactors=FALSE, ...)
+  # 
+  # fullNames = c("variable", "type", "calibrate", "weights", "useData")  
+  # doesNotMatch = !(names(calibrationInfo) %in% fullNames)
+  # dnm = names(calibrationInfo)[doesNotMatch]
+  # 
+  # isMissing = !(fullNames %in% names(calibrationInfo))
+  # im = fullNames[isMissing]
+  # 
+  # sdnm = if(length(dnm)>1) " columns do " else " column does "
+  # sim  = if(length(im)>1) " variables are " else " variable is "
+  # msg1 = paste0("Error in ", caliPath, " file (", paste(sapply(dnm, sQuote), collapse=", "), 
+  #               sdnm, "not match).")
+  # msg2 = paste0("Error in ", caliPath, " file (", paste(sapply(im, sQuote), collapse=", "), 
+  #               sim, "missing).")
+  # 
+  # if(any(doesNotMatch)) stop(msg1)
+  # if(any(isMissing)) stop(msg2)
+  # 
+  # # cating correct data types
+  # calibrationInfo$variable  = as.character(calibrationInfo$variable)
+  # calibrationInfo$type      = as.character(calibrationInfo$type)
+  # calibrationInfo$calibrate = as.logical(calibrationInfo$calibrate)
+  # calibrationInfo$weights   = as.numeric(calibrationInfo$weights)
+  # calibrationInfo$useData   = as.logical(calibrationInfo$useData)
+  # 
+  # return(calibrationInfo)
   
-  isMissing = !(fullNames %in% names(calibrationInfo))
-  im = fullNames[isMissing]
-  
-  sdnm = if(length(dnm)>1) " columns do " else " column does "
-  sim  = if(length(im)>1) " variables are " else " variable is "
-  msg1 = paste0("Error in ", caliPath, " file (", paste(sapply(dnm, sQuote), collapse=", "), 
-                sdnm, "not match).")
-  msg2 = paste0("Error in ", caliPath, " file (", paste(sapply(im, sQuote), collapse=", "), 
-                sim, "missing).")
-  
-  if(any(doesNotMatch)) stop(msg1)
-  if(any(isMissing)) stop(msg2)
-  
-  # cating correct data types
-  calibrationInfo$variable  = as.character(calibrationInfo$variable)
-  calibrationInfo$type      = as.character(calibrationInfo$type)
-  calibrationInfo$calibrate = as.logical(calibrationInfo$calibrate)
-  calibrationInfo$weights   = as.numeric(calibrationInfo$weights)
-  calibrationInfo$useData   = as.logical(calibrationInfo$useData)
-  
-  return(calibrationInfo)
 }
 
 
@@ -117,50 +148,61 @@ getCalibrationInfo = function(path, file="calibrationInfo.csv", stringsAsFactors
 #' comparison with observed data. 
 #' @author Ricardo Oliveros-Ramos
 #' @seealso \code{\link{getObservedData}}, \code{\link{getCalibrationInfo}}.
-#' @noRd
+#' 
+#' @name createObjectiveFunction-defunct
+#' @seealso \code{\link{calibrar-deprecated}}
+#' @keywords internal
+NULL
+
+#' @rdname calibrar-defunct
+#' @section \code{createObjectiveFunction}:
+#' Deprecated in v0.3, defunct in v0.9. For \code{createObjectiveFunction}, use \code{\link{calibration_objFn}}.
+#'
+#' @export
 createObjectiveFunction = function(runModel, info, observed, aggFn=.weighted.sum, 
                                    aggregate=FALSE, ...) {
   
-  .Deprecated("calibration_objFn", package="calibrar")
+  .Defunct("calibration_objFn", package="calibrar")
   
-  fn   = match.fun(runModel)
-  aggFn = match.fun(aggFn)
-  
-  force(observed)
-  force(info)
-  force(aggregate)
-  
-  weights = info$weights[info$calibrate]
-  
-  # check for names in observed and simulated
-  fn1  = function(par) {
-    aggFn = match.fun(aggFn)
-    simulated = fn(par, ...)
-    # apply fitness to all outputs
-    output = .calculateObjetiveValue(obs=observed, sim=simulated, info=info)
-    if(isTRUE(aggregate)) output = aggFn(x=output, w=weights)
-    return(output)
-  }
-  
-  class(fn1) = c(class(fn1), "objFn")
-  
-  fnx = function(par) {
-    simulated = fn(par, ...)
-    return(simulated)
-  }
-  
-  attr(fn1, "nvar") = sum(info$calibrate)
-  attr(fn1, "weights") = weights
-  attr(fn1, "variables") = info$variables[info$calibrate]
-  attr(fn1, "aggregate") = aggregate
-  attr(fn1, "fn") = fnx
-  return(fn1) 
-  
+  # fn   = match.fun(runModel)
+  # aggFn = match.fun(aggFn)
+  # 
+  # force(observed)
+  # force(info)
+  # force(aggregate)
+  # 
+  # weights = info$weights[info$calibrate]
+  # 
+  # # check for names in observed and simulated
+  # fn1  = function(par) {
+  #   aggFn = match.fun(aggFn)
+  #   simulated = fn(par, ...)
+  #   # apply fitness to all outputs
+  #   output = .calculateObjetiveValue(obs=observed, sim=simulated, info=info)
+  #   if(isTRUE(aggregate)) output = aggFn(x=output, w=weights)
+  #   return(output)
+  # }
+  # 
+  # class(fn1) = c(class(fn1), "objFn")
+  # 
+  # fnx = function(par) {
+  #   simulated = fn(par, ...)
+  #   return(simulated)
+  # }
+  # 
+  # attr(fn1, "nvar") = sum(info$calibrate)
+  # attr(fn1, "weights") = weights
+  # attr(fn1, "variables") = info$variables[info$calibrate]
+  # attr(fn1, "aggregate") = aggregate
+  # attr(fn1, "fn") = fnx
+  # return(fn1) 
+
 }
 
 calibrarDemo = function(path=NULL, model=NULL,  ...) {
   
   .Deprecated("calibrar_demo", package="calibrar")
+  
   return(calibrar_demo(path=path, model=model,  ...))                
   
 }
