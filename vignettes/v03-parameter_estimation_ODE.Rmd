@@ -13,7 +13,7 @@ vignette: >
 
 This vignette focus on the use of the `calibrate()` for parameter estimation of Ordinary Differential Equations (EDO) systems. We suggest to see the vignette 'Getting started with the `calibrar` package' before reading this one, specially if you do not have previous experience doing optimization in R. Reading the vignette 'Using the `calibrate()` function for parameter estimation' may be also very useful, as not every detail is reproduced here.
 
-```{r, cache=TRUE}
+```{r, include=FALSE}
 knitr::opts_current$get(c(
   "cache",
   "cache.path",
