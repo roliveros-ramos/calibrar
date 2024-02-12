@@ -6,7 +6,7 @@
 #' @param fn The function to calculate the gradient.
 #' @param x The value to compute the gradient at.
 #' @param method The method used. Currently implemented: central, backward, forward and Richardson. See details.
-#' @param control A list of control arguments. Notably, control$parallel=TRUE activates parallel computation.
+#' @param control A list of control arguments. 
 #' @param parallel Boolean, should numerical derivatives be calculated in parallel?
 #' @param ... Additional arguments to be passed to \code{fn}.
 #'
@@ -47,13 +47,15 @@ gradient.default = function(fn, x, method=NULL, control=list(), parallel=FALSE, 
   # so computer time is 1 function evaluation.
   
   n = length(x)
-  
+
+  if(is.null(control$step_method)) control$step_method = "simple"
+    
   if(length(side)==1)   side = rep(side, n)
-  if(length(side)!=n)   stop("Argument 'side' should have the same length as x.")
   if(any(is.na(side)))  side[is.na(side)] = 1
+  if(length(side)!=n)   stop("Argument 'side' should have the same length as x.")
   if(any(abs(side)!=1)) stop("Argument 'side' should have values +1 or -1.")
   
-  h = .get_h(x, control, method="simple")*side
+  h = .get_h(x, control, method=control$step_method)*side
   
   if(!isTRUE(parallel)) {
     
@@ -66,8 +68,9 @@ gradient.default = function(fn, x, method=NULL, control=list(), parallel=FALSE, 
     
   } else {
     
-    DX = diag(n+1)
-    diag(DX) = c(0, h)
+    DX = diag(n)
+    diag(DX) = h
+    DX = rbind(0, DX)
     
     f = foreach(i=seq(from=1, to=n+1), .combine=c, .verbose=FALSE, .inorder=TRUE) %dopar% {
       dx  = DX[i, ]
@@ -88,7 +91,9 @@ gradient.default = function(fn, x, method=NULL, control=list(), parallel=FALSE, 
   # so computing time is 1 function evaluation.
   
   n = length(x)
-  h = .get_h(x, control, method="simple")
+  
+  if(is.null(control$step_method)) control$step_method = "simple"
+  h = .get_h(x, control, method=control$step_method)
   
   if(!isTRUE(parallel)) {
     
@@ -100,8 +105,9 @@ gradient.default = function(fn, x, method=NULL, control=list(), parallel=FALSE, 
     
   } else {
     
-    DX = diag(2*n)
-    diag(DX) = c(h, -h)
+    DX = diag(n)
+    diag(DX) = h
+    DX = rbind(DX, -DX)
 
     f = foreach(i=seq(from=1, to=2*n), .combine=c, .verbose=FALSE, .inorder=TRUE) %dopar% {
       dx = DX[i, ]
@@ -126,7 +132,9 @@ gradient.default = function(fn, x, method=NULL, control=list(), parallel=FALSE, 
   v = if(is.null(control$v)) 2 else control$v # reduction factor of h, by default 2.
   
   n = length(x)
-  h = .get_h(x, control, method="start")
+  
+  if(is.null(control$step_method)) control$step_method = "start"
+  h = .get_h(x, control, method=control$step_method)
   
   if(!isTRUE(parallel)) {
     
@@ -139,7 +147,7 @@ gradient.default = function(fn, x, method=NULL, control=list(), parallel=FALSE, 
           DF[k, i] = 0
         } else {
           dx = h*(i == seq_len(n))
-          DF[k, i] = if(!use_disk) (fn(x + dx, ...) - fn(x - dx, ...))/(2*h[i]) else (fn(x + dx) - fn(x - dx))/(2*h[i])
+          DF[k, i] = if(!use_disk) (fn(x + dx, ...) - fn(x - dx, ...))/(2*h[i]) else (fn(x + dx, ..i=i) - fn(x - dx, ..i=i))/(2*h[i])
           if(any(is.na(DF[k, i])))
             stop(sprintf("function returns NA at %g distance from x.", h))
         }
