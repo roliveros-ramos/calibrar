@@ -32,8 +32,6 @@ calibration, given a function to run the model within R, observed data
 and information about the comparison with data.
 }
 \seealso{
-\code{\link{getObservedData}}, \code{\link{getCalibrationInfo}}.
-
 \code{\link{calibrar-deprecated}}
 }
 \author{

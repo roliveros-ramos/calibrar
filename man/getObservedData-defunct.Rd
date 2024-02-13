@@ -24,8 +24,6 @@ Create a list with the observed data with the
 information provided by its main argument.
 }
 \seealso{
-\code{\link{createObjectiveFunction}}, \code{\link{getCalibrationInfo}}.
-
 \code{\link{calibrar-deprecated}}
 }
 \author{

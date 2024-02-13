@@ -22,8 +22,6 @@ A wrapper for \code{read.csv} checking column names and data types
 for the table with the calibration information.
 }
 \seealso{
-\code{\link{createObjectiveFunction}}, \code{\link{getObservedData}}.
-
 \code{\link{calibrar-deprecated}}
 }
 \author{
