@@ -30,7 +30,7 @@ $$\frac{dN}{dt} = rN(1-N/K)-\alpha NP$$
 $$\frac{dP}{dt} = -lP + \gamma\alpha NP$$
 The parameters to estimate are the prey’s growth rate $r$, the predator’s mortality rate $l$, the carrying capacity of the prey $K$ and $\alpha$ and $\gamma$ for the predation interaction. To start, we created the demonstration data for this model using the function `calibrar_demo()` function with `T=100` as an additional argument to specify the time horizon. 
 
-```{r, cache=TRUE}
+```{r cache=TRUE}
 library(calibrar)
 set.seed(880820)
 path = NULL # NULL to use the current directory
@@ -83,10 +83,10 @@ obj = calibration_objFn(model=run_model, setup=setup, observed=observed, T=LV$T,
 Now we can fit the model using several optimization methods:
 
 ```{r optim1, cache=TRUE}
-lbfgsb1 = calibrate(par=LV$guess, fn=obj, , method='L-BFGS-B', lower=LV$lower, upper=LV$upper, phases=LV$phase)
-lbfgsb2 = calibrate(par=LV$guess, fn=obj, lower=LV$lower, upper=LV$upper, phases=LV$phase, method="Rvmmin")
+lbfgsb1 = calibrate(par=LV$guess, fn=obj, method='L-BFGS-B', lower=LV$lower, upper=LV$upper, phases=LV$phase)
+lbfgsb2 = calibrate(par=LV$guess, fn=obj, method="Rvmmin", lower=LV$lower, upper=LV$upper, phases=LV$phase)
 ahr = calibrate(par=LV$guess, fn=obj, method='AHR-ES', lower=LV$lower, upper=LV$upper, phases=LV$phase)
-nm = calibrate(par=LV$guess, fn=obj, phases=LV$phase, method="Nelder-Mead")
+nm = calibrate(par=LV$guess, fn=obj, method="Nelder-Mead", phases=LV$phase)
 ```
 
 And compare them:
