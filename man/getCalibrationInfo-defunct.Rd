@@ -22,7 +22,7 @@ A wrapper for \code{read.csv} checking column names and data types
 for the table with the calibration information.
 }
 \seealso{
-\code{\link{calibrar-deprecated}}
+\code{\link{calibrar-defunct}}
 }
 \author{
 Ricardo Oliveros-Ramos

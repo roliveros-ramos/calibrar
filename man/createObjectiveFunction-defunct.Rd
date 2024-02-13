@@ -32,7 +32,7 @@ calibration, given a function to run the model within R, observed data
 and information about the comparison with data.
 }
 \seealso{
-\code{\link{calibrar-deprecated}}
+\code{\link{calibrar-defunct}}
 }
 \author{
 Ricardo Oliveros-Ramos

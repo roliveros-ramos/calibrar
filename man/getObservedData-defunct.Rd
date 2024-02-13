@@ -24,7 +24,7 @@ Create a list with the observed data with the
 information provided by its main argument.
 }
 \seealso{
-\code{\link{calibrar-deprecated}}
+\code{\link{calibrar-defunct}}
 }
 \author{
 Ricardo Oliveros-Ramos

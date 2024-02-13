@@ -25,7 +25,7 @@ NULL
 #' in combination with the \code{\link{createObjectiveFunction}}.
 #' @author Ricardo Oliveros-Ramos
 #' @name getObservedData-defunct
-#' @seealso \code{\link{calibrar-deprecated}}
+#' @seealso \code{\link{calibrar-defunct}}
 #' @keywords internal
 NULL
 
@@ -75,7 +75,7 @@ getObservedData = function(info, path, data.folder="data", ...) {
 #' and \code{\link{getObservedData}}.
 #' @author Ricardo Oliveros-Ramos
 #' @name getCalibrationInfo-defunct
-#' @seealso \code{\link{calibrar-deprecated}}
+#' @seealso \code{\link{calibrar-defunct}}
 #' @keywords internal
 NULL
 
@@ -144,7 +144,7 @@ getCalibrationInfo = function(path, file="calibrationInfo.csv", stringsAsFactors
 #' comparison with observed data. 
 #' @author Ricardo Oliveros-Ramos
 #' @name createObjectiveFunction-defunct
-#' @seealso \code{\link{calibrar-deprecated}}
+#' @seealso \code{\link{calibrar-defunct}}
 #' @keywords internal
 NULL
 
