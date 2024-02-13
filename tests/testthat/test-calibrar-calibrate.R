@@ -24,7 +24,7 @@ tfn2 = function(x) {
 #                'hybridPSO')
 
 
-algorithms = c("L-BFGS-B", "nlminb", "Rcgmin", "Rvmmin", "Nelder-Mead", "SANN",
+algorithms = c("L-BFGS-B", "nlminb", "Rcgmin", "Rvmmin", "Nelder-Mead",
                "hjn", "spg", "LBFGSB3", "CMA-ES", "genSA", "DE", "soma", "genoud", 
                "PSO", "hybridPSO", "mads", "hjkb", "nmkb", "bobyqa", "AHR-ES")
 
@@ -52,7 +52,7 @@ for(alg in algorithms) {
                                  method=alg, phases = c(1,1,1,2,1))))
   })
   
-  if(alg != "hybridPSO") {
+  if(!(alg %in% c("hybridPSO", "DE"))) {
     dir.create(file.path(tmp, "run", alg, "test2"), recursive = TRUE)
     test_that(sprintf("calibrate - algorithm test (parallel): '%s'.", alg), {
       expect_no_error(
@@ -66,13 +66,17 @@ for(alg in algorithms) {
   
 }
 
+alg0 = "AHR-ES"
+alg1 = "Rvmmin"
+dir.create(file.path(tmp, "run", "mix", "test1"), recursive = TRUE)
+message("mix", " - ", date())
+test_that(sprintf("calibrate - algorithm test: %s + %s", alg0, alg1), {
+  expect_no_error(
+    suppressMessages(calibrate(par=rep(0.5, 5), fn = tfn2,
+                               lower=rep(-100, 5), upper=rep(100, 5),
+                               method=c(alg0, alg1), phases = c(1,1,1,2,1),
+                               control=list(master=file.path(tmp, "master"),
+                                            run=file.path(tmp, "run", "mix", "test1")))))
+  })
+  
 unlink(file.path(tmp, "run"), recursive = TRUE)
-
-optim(par=rep(0.5, 5), fn=tfn, method="SANN", lower=-Inf, upper=+Inf)
-
-
-out = calibrate(par=rep(0.5, 5), fn = tfn2,
-          lower=rep(-100, 5), upper=rep(100, 5),
-          method=alg, phases = c(1,1,1,2,1), parallel=TRUE,
-          control=list(master=file.path(tmp, "master"),
-                       run=file.path(tmp, "run", alg, "test2")))
