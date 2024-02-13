@@ -151,7 +151,7 @@ Most algorithms implemented in `optim2()` and some in `optimh` can benefit of pa
 library(parallel)
 ```
 
-```{r, echo=TRUE, results='markup', eval=TRUE}
+```{r, echo=TRUE, results='markup', eval=FALSE}
 library(parallel)
 ncores = detectCores() - 1 # number of cores to be used
 cl = makeCluster(ncores)
