@@ -6,7 +6,7 @@
 #' the calibrar package
 #' 
 #' @param path Path to create the demo files 
-#' @param model Model to be used in the demo files, see details. 
+#' @param model Model to be used in the demo files, see details.
 #' @param \dots Additional parameters to be used in the construction of
 #' the demo files.
 #' @return A list with the following elements:
@@ -21,7 +21,36 @@
 #' \item{value}{NA, set for compatibility with summary methods.} 
 #' \item{time}{NA, set for compatibility with summary methods.} 
 #' \item{counts}{NA, set for compatibility with summary methods.} 
-#' 
+#' @details Current implemented models are:
+#' \describe{
+#' \item{PoissonMixedModel}{Poisson Autoregressive Mixed model for the dynamics 
+#' of a population in different sites:
+#' \deqn{log(\mu_{i, t+1}) = log(\mu_{i, t}) + \alpha + \beta X_{i, t} + \gamma_t}
+#' where \eqn{\mu_{i, t}} is the size of the population in site \eqn{i} at year \eqn{t}, 
+#' \eqn{X_{i, t}} is the value of an environmental variable in site \eqn{i} at year \eqn{t}. 
+#' The parameters to estimate were \eqn{\alpha}, \eqn{\beta}, and \eqn{\gamma_t}, the 
+#' random effects for each year, \eqn{\gamma_t \sim N(0,\sigma^2)}, and the initial 
+#' population at each site \eqn{\mu_{i, 0}}. We assumed that the observations 
+#' \eqn{N_{i,t}} follow a Poisson distribution with mean \eqn{\mu_{i, t}}.}
+#' \item{PredatorPrey}{Lotka Volterra Predator-Prey model. The model is defined 
+#' by a system of ordinary differential equations for the abundance of prey $N$ and predator $P$:
+#' \deqn{\frac{dN}{dt} = rN(1-N/K)-\alpha NP}
+#' \deqn{\frac{dP}{dt} = -lP + \gamma\alpha NP}
+#' The parameters to estimate are the prey’s growth rate \eqn{r}, the predator’s 
+#' mortality rate \eqn{l}, the carrying capacity of the prey \eqn{K} and \eqn{\alpha} 
+#' and \eqn{\gamma} for the predation interaction. Uses \code{deSolve} package 
+#' for numerical solution of the ODE system.}
+#' \item{SIR}{Susceptible-Infected-Recovered epidemiological model. 
+#' The model is defined by a system of ordinary differential equations for the 
+#' number of susceptible $S$, infected $I$ and recovered $R$ individuals:
+#' \deqn{\frac{dS}{dt} = -\beta S I/N}
+#' \deqn{\frac{dI}{dt} = \beta S I/N -\gamma I}
+#' \deqn{\frac{dR}{dt} = \gamma I}
+#' The parameters to estimate are the  average number of contacts per person per 
+#' time \eqn{\beta} and the instant probability of an infectious individual 
+#' recovering \eqn{\gamma}. Uses \code{deSolve} package for numerical solution of the ODE system.}
+#' \item{IBMLotkaVolterra}{Stochastic Individual Based Model for Lotka-Volterra model. Uses \code{ibm} package for the simulation.}
+#' }
 #' @author Ricardo Oliveros--Ramos
 #' @references Oliveros-Ramos and Shin (2014)
 #' @keywords demo calibration 
