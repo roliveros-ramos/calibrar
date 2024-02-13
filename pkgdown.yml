@@ -2,10 +2,8 @@ pandoc: 2.19.2
 pkgdown: 2.0.7
 pkgdown_sha: ~
 articles:
-  v01-introduction: v01-introduction.html
+  calibrar: calibrar.html
   v02-parameter_estimation: v02-parameter_estimation.html
   v03-parameter_estimation_ODE: v03-parameter_estimation_ODE.html
-  v04-parameter_estimation_stochastic: v04-parameter_estimation_stochastic.html
-  v05-using_with_TMB: v05-using_with_TMB.html
-last_built: 2023-10-09T12:11Z
+last_built: 2024-02-13T20:24Z
 

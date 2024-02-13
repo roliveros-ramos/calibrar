@@ -17,12 +17,15 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">calibrar</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.0.9020</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.0</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav"><li>
+  <a href="../articles/calibrar.html">Get started</a>
+</li>
+<li>
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
@@ -32,19 +35,10 @@
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
-      <a href="../articles/v01-introduction.html">Getting started with the `calibrar` package</a>
-    </li>
-    <li>
-      <a href="../articles/v02-parameter_estimation.html">Using the 'calibrate' function for parameter estimation</a>
+      <a href="../articles/v02-parameter_estimation.html">Using the `calibrate()` function for parameter estimation</a>
     </li>
     <li>
       <a href="../articles/v03-parameter_estimation_ODE.html">Parameter estimation for ODE systems</a>
-    </li>
-    <li>
-      <a href="../articles/v04-parameter_estimation_stochastic.html">Parameter estimation for stochastic models</a>
-    </li>
-    <li>
-      <a href="../articles/v05-using_with_TMB.html">Using the calibrar package with TMB</a>
     </li>
   </ul></li>
 <li>
@@ -103,8 +97,8 @@ number of parameters to be estimated (i.e. the dimension of the problem).</p></d
 
 
 <dt>gr</dt>
-<dd><p>the gradient of <code>fn</code>. Ignored, added for portability with
-other optimization functions.</p></dd>
+<dd><p>Function to compute the gradient of <code>fn</code>. Ignored by most methods, 
+added for consistency with other optimization functions.</p></dd>
 
 
 <dt>...</dt>
@@ -187,14 +181,14 @@ Currently not implemented.</p></dd>
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="optim2.html">optim2</a></span><span class="op">(</span>par<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fl">5</span><span class="op">)</span>, fn<span class="op">=</span><span class="va">sphereN</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $par</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1]  0.002815576 -0.018263236 -0.032094275 -0.009699203  0.076724236</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1]  0.02999890  0.03000130  0.03000165 -0.04999912  0.03000184</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.001176943</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.00363518</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $counts</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> function gradient </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      505       NA </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      502       NA </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $convergence</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>

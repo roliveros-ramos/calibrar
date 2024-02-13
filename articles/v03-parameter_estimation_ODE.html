@@ -40,12 +40,15 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">calibrar</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.0.9020</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.0</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
+<li>
+  <a href="../articles/calibrar.html">Get started</a>
+</li>
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
@@ -57,19 +60,10 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/v01-introduction.html">Getting started with the `calibrar` package</a>
-    </li>
-    <li>
-      <a href="../articles/v02-parameter_estimation.html">Using the 'calibrate' function for parameter estimation</a>
+      <a href="../articles/v02-parameter_estimation.html">Using the `calibrate()` function for parameter estimation</a>
     </li>
     <li>
       <a href="../articles/v03-parameter_estimation_ODE.html">Parameter estimation for ODE systems</a>
-    </li>
-    <li>
-      <a href="../articles/v04-parameter_estimation_stochastic.html">Parameter estimation for stochastic models</a>
-    </li>
-    <li>
-      <a href="../articles/v05-using_with_TMB.html">Using the calibrar package with TMB</a>
     </li>
   </ul>
 </li>
@@ -101,7 +95,7 @@
                         <h4 data-toc-skip class="author">Ricardo
 Oliveros-Ramos</h4>
             
-            <h4 data-toc-skip class="date">2023-10-09</h4>
+            <h4 data-toc-skip class="date">2024-02-13</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/roliveros-ramos/calibrar/blob/HEAD/vignettes/v03-parameter_estimation_ODE.Rmd" class="external-link"><code>vignettes/v03-parameter_estimation_ODE.Rmd</code></a></small>
       <div class="hidden name"><code>v03-parameter_estimation_ODE.Rmd</code></div>
@@ -110,31 +104,421 @@ Oliveros-Ramos</h4>
 
     
     
-<p>Vignettes are long form documentation commonly included in packages.
-Because they are part of the distribution of the package, they need to
-be as compact as possible. The <code>html_vignette</code> output type
-provides a custom style sheet (and tweaks some options) to ensure that
-the resulting html is as small as possible. The
-<code>html_vignette</code> format:</p>
-<ul>
-<li>Never uses retina figures</li>
-<li>Has a smaller default figure size</li>
-<li>Uses a custom CSS stylesheet instead of the default Twitter
-Bootstrap style</li>
-</ul>
-<div class="section level3">
-<h3 id="fitting-an-edo-system-the-lotka-volterra-predator-prey-model">Fitting an EDO system: the Lotka-Volterra Predator-Prey model<a class="anchor" aria-label="anchor" href="#fitting-an-edo-system-the-lotka-volterra-predator-prey-model"></a>
-</h3>
+<div class="section level2">
+<h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
+</h2>
+<p>This vignette focus on the use of the <code><a href="../reference/calibrate.html">calibrate()</a></code> for
+parameter estimation of Ordinary Differential Equations (EDO) systems.
+We suggest to see the vignette ‘Getting started with the
+<code>calibrar</code> package’ before reading this one, specially if you
+do not have previous experience doing optimization in R. Reading the
+vignette ‘Using the <code><a href="../reference/calibrate.html">calibrate()</a></code> function for parameter
+estimation’ may be also very useful, as not every detail is reproduced
+here.</p>
 </div>
-<div class="section level3">
-<h3 id="fitting-an-edo-system-the-sir-epidemiological-model">Fitting an EDO system: the SIR epidemiological model<a class="anchor" aria-label="anchor" href="#fitting-an-edo-system-the-sir-epidemiological-model"></a>
-</h3>
+<div class="section level2">
+<h2 id="fitting-an-edo-system-the-lotka-volterra-predator-prey-model">Fitting an EDO system: the Lotka-Volterra Predator-Prey model<a class="anchor" aria-label="anchor" href="#fitting-an-edo-system-the-lotka-volterra-predator-prey-model"></a>
+</h2>
+<p>We will estimate the parameters for a predator-prey Lotka-Volterra
+model using the <code><a href="../reference/calibrate.html">calibrate()</a></code> function. The model is defined
+by a system of ordinary differential equations for the abundance of prey
+<span class="math inline">\(N\)</span> and predator <span class="math inline">\(P\)</span>: <span class="math display">\[\frac{dN}{dt} = rN(1-N/K)-\alpha NP\]</span>
+<span class="math display">\[\frac{dP}{dt} = -lP + \gamma\alpha
+NP\]</span> The parameters to estimate are the prey’s growth rate <span class="math inline">\(r\)</span>, the predator’s mortality rate <span class="math inline">\(l\)</span>, the carrying capacity of the prey
+<span class="math inline">\(K\)</span> and <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\gamma\)</span> for the predation interaction. To
+start, we created the demonstration data for this model using the
+function <code><a href="../reference/calibrar_demo.html">calibrar_demo()</a></code> function with <code>T=100</code>
+as an additional argument to specify the time horizon.</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://roliveros-ramos.github.io/calibrar/" class="external-link">calibrar</a></span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">880820</span><span class="op">)</span></span>
+<span><span class="va">path</span> <span class="op">=</span> <span class="cn">NULL</span> <span class="co"># NULL to use the current directory</span></span>
+<span><span class="va">LV</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrar_demo.html">calibrar_demo</a></span><span class="op">(</span>path<span class="op">=</span><span class="va">path</span>, model<span class="op">=</span><span class="st">'PredatorPrey'</span>, T<span class="op">=</span><span class="fl">100</span><span class="op">)</span> </span></code></pre></div>
+<pre><code><span><span class="co">## Creating observed data list for calibration...</span></span></code></pre>
+<pre><code><span><span class="co">## Loaded observed data for variables: 'prey', 'predator'.</span></span></code></pre>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">setup</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibration_setup.html">calibration_setup</a></span><span class="op">(</span>file <span class="op">=</span> <span class="va">LV</span><span class="op">$</span><span class="va">setup</span><span class="op">)</span></span>
+<span><span class="va">observed</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibration_data.html">calibration_data</a></span><span class="op">(</span>setup<span class="op">=</span><span class="va">setup</span>, path<span class="op">=</span><span class="va">LV</span><span class="op">$</span><span class="va">path</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Creating observed data list for calibration...</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Loaded observed data for variables: 'prey', 'predator'.</span></span></code></pre>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">run_model</span> <span class="op">=</span> <span class="fu">calibrar</span><span class="fu">:::</span><span class="va">.PredatorPreyModel</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">LV</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## $r</span></span>
+<span><span class="co">## [1] 0.5</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## $l</span></span>
+<span><span class="co">## [1] 0.2</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## $K</span></span>
+<span><span class="co">## [1] 100</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## $alpha</span></span>
+<span><span class="co">## [1] 0.1</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## $gamma</span></span>
+<span><span class="co">## [1] 0.1</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## $initial</span></span>
+<span><span class="co">## $initial$N</span></span>
+<span><span class="co">## [1] 10</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## $initial$P</span></span>
+<span><span class="co">## [1] 1</span></span></code></pre>
+<p>The <code>run_model</code> will simulate the data, by solving the ODE
+system defined by the Lotka-Volterra model:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">run_model</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">par</span>, <span class="va">T</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="kw">if</span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"deSolve"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> </span>
+<span>    <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="st">"You need to install the 'deSolve' package."</span><span class="op">)</span></span>
+<span>  <span class="co"># par is a list with 'alpha', 'beta' 'gamma', 'sd' and 'mu_ini'.</span></span>
+<span>  <span class="va">LV</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">t</span>, <span class="va">y</span>, <span class="va">parms</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">r</span> <span class="op">=</span> <span class="va">parms</span><span class="op">$</span><span class="va">r</span></span>
+<span>    <span class="va">l</span> <span class="op">=</span> <span class="va">parms</span><span class="op">$</span><span class="va">l</span></span>
+<span>    <span class="va">alpha</span> <span class="op">=</span> <span class="va">parms</span><span class="op">$</span><span class="va">alpha</span></span>
+<span>    <span class="va">gamma</span> <span class="op">=</span> <span class="va">parms</span><span class="op">$</span><span class="va">gamma</span></span>
+<span>    <span class="va">K</span> <span class="op">=</span> <span class="va">parms</span><span class="op">$</span><span class="va">K</span></span>
+<span>    <span class="va">dN</span> <span class="op">=</span> <span class="va">r</span><span class="op">*</span><span class="va">y</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">*</span><span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="op">(</span><span class="va">y</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">/</span><span class="va">K</span><span class="op">)</span><span class="op">)</span> <span class="op">-</span> <span class="va">alpha</span><span class="op">*</span><span class="va">y</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">*</span><span class="va">y</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span></span>
+<span>    <span class="va">dP</span> <span class="op">=</span> <span class="op">-</span><span class="va">l</span><span class="op">*</span><span class="va">y</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">+</span> <span class="va">gamma</span><span class="op">*</span><span class="va">alpha</span><span class="op">*</span><span class="va">y</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">*</span><span class="va">y</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span></span>
+<span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">dN</span>, <span class="va">dP</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span>  <span class="va">times</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="cn">T</span><span class="op">)</span></span>
+<span>  <span class="va">y0</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">par</span><span class="op">$</span><span class="va">initial</span><span class="op">$</span><span class="va">N</span>, <span class="va">par</span><span class="op">$</span><span class="va">initial</span><span class="op">$</span><span class="va">P</span><span class="op">)</span></span>
+<span>  <span class="va">sol</span> <span class="op">=</span> <span class="fu">deSolve</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/deSolve/man/ode.html" class="external-link">ode</a></span><span class="op">(</span>y<span class="op">=</span><span class="va">y0</span>, times<span class="op">=</span><span class="va">times</span>, func<span class="op">=</span><span class="va">LV</span>, parms<span class="op">=</span><span class="va">par</span>, method<span class="op">=</span><span class="st">"ode45"</span><span class="op">)</span></span>
+<span>  <span class="va">out</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">as.list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">sol</span><span class="op">[</span>,<span class="op">-</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">out</span><span class="op">)</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"prey"</span>, <span class="st">"predator"</span><span class="op">)</span></span>
+<span>  <span class="va">out</span><span class="op">$</span><span class="va">prey</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">prey</span><span class="op">)</span><span class="op">]</span> <span class="op">=</span> <span class="fl">0</span></span>
+<span>  <span class="va">out</span><span class="op">$</span><span class="va">predator</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">predator</span><span class="op">)</span><span class="op">]</span> <span class="op">=</span> <span class="fl">0</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">out</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<p>The core of the <code>run_model</code> function relies in solving the
+ODE system by using the <code>ode()</code> function of the
+<code>deSolve</code> package. In general, the <code>run_model</code>
+takes a <code>par</code> argument (that can be a vector or a list) and
+produce a named list with the simulated data. All the intermediate code
+solves the simulation problem of taking a set of parameters to produce
+numerical outputs for each simulated variable. We will also define the
+objective function, based on the setup created by the demo:</p>
+<table style="width:100%;" class="table">
+<colgroup>
+<col width="10%">
+<col width="8%">
+<col width="11%">
+<col width="8%">
+<col width="10%">
+<col width="21%">
+<col width="10%">
+<col width="10%">
+<col width="7%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">variable</th>
+<th align="left">type</th>
+<th align="left">calibrate</th>
+<th align="right">weight</th>
+<th align="left">use_data</th>
+<th align="left">file</th>
+<th align="left">varid</th>
+<th align="right">col_skip</th>
+<th align="left">nrows</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">prey</td>
+<td align="left">lnorm2</td>
+<td align="left">TRUE</td>
+<td align="right">1</td>
+<td align="left">TRUE</td>
+<td align="left">data/prey.csv</td>
+<td align="left">prey</td>
+<td align="right">2</td>
+<td align="left">NA</td>
+</tr>
+<tr class="even">
+<td align="left">predator</td>
+<td align="left">lnorm2</td>
+<td align="left">TRUE</td>
+<td align="right">1</td>
+<td align="left">TRUE</td>
+<td align="left">data/predator.csv</td>
+<td align="left">predator</td>
+<td align="right">2</td>
+<td align="left">NA</td>
+</tr>
+</tbody>
+</table>
+<p>The <code><a href="../reference/calibration_objFn.html">calibration_objFn()</a></code> will automatically create the
+objective function following the information in the setup, in this case,
+by using a log-normal distribution for the errors (<code>type</code>)
+and the same <code>weight</code> for both. The data is expected to be
+read from the files in the <code>file</code> column, files that were
+created when calling the demo.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># objective functions</span></span>
+<span><span class="va">obj</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibration_objFn.html">calibration_objFn</a></span><span class="op">(</span>model<span class="op">=</span><span class="va">run_model</span>, setup<span class="op">=</span><span class="va">setup</span>, observed<span class="op">=</span><span class="va">observed</span>, T<span class="op">=</span><span class="va">LV</span><span class="op">$</span><span class="cn">T</span>, aggregate<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p>Now we can fit the model using several optimization methods:</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">lbfgsb1</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">LV</span><span class="op">$</span><span class="va">guess</span>, fn<span class="op">=</span><span class="va">obj</span>, method<span class="op">=</span><span class="st">'L-BFGS-B'</span>, lower<span class="op">=</span><span class="va">LV</span><span class="op">$</span><span class="va">lower</span>, upper<span class="op">=</span><span class="va">LV</span><span class="op">$</span><span class="va">upper</span>, phases<span class="op">=</span><span class="va">LV</span><span class="op">$</span><span class="va">phase</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Using optimization method 'L-BFGS-B'.</span></span></code></pre>
+<pre><code><span><span class="co">## Elapsed time: 3.68s</span></span>
+<span><span class="co">## Function value: 5.60589e-07</span></span>
+<span><span class="co">## Parameter values: 0.5 0.2 100 0.1 0.1</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Status: CONVERGENCE: REL_REDUCTION_OF_F &lt;= FACTR*EPSMCH</span></span></code></pre>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">lbfgsb2</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">LV</span><span class="op">$</span><span class="va">guess</span>, fn<span class="op">=</span><span class="va">obj</span>, method<span class="op">=</span><span class="st">"Rvmmin"</span>, lower<span class="op">=</span><span class="va">LV</span><span class="op">$</span><span class="va">lower</span>, upper<span class="op">=</span><span class="va">LV</span><span class="op">$</span><span class="va">upper</span>, phases<span class="op">=</span><span class="va">LV</span><span class="op">$</span><span class="va">phase</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Using optimization method 'Rvmmin'.</span></span></code></pre>
+<pre><code><span><span class="co">## Elapsed time: 4.06s</span></span>
+<span><span class="co">## Function value: 5.60575e-07</span></span>
+<span><span class="co">## Parameter values: 0.5 0.2 100 0.1 0.1</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Status: Rvmminb appears to have converged</span></span></code></pre>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">ahr</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">LV</span><span class="op">$</span><span class="va">guess</span>, fn<span class="op">=</span><span class="va">obj</span>, method<span class="op">=</span><span class="st">'AHR-ES'</span>, lower<span class="op">=</span><span class="va">LV</span><span class="op">$</span><span class="va">lower</span>, upper<span class="op">=</span><span class="va">LV</span><span class="op">$</span><span class="va">upper</span>, phases<span class="op">=</span><span class="va">LV</span><span class="op">$</span><span class="va">phase</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Using optimization method 'AHR-ES'.</span></span></code></pre>
+<pre><code><span><span class="co">## Elapsed time: 3m 56.3s</span></span>
+<span><span class="co">## Function value: 5.60575e-07</span></span>
+<span><span class="co">## Parameter values: 0.5 0.2 100 0.1 0.1</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Status: Stopping criteria reached in 4909 generations.</span></span></code></pre>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">nm</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">LV</span><span class="op">$</span><span class="va">guess</span>, fn<span class="op">=</span><span class="va">obj</span>, method<span class="op">=</span><span class="st">"Nelder-Mead"</span>, phases<span class="op">=</span><span class="va">LV</span><span class="op">$</span><span class="va">phase</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Using optimization method 'Nelder-Mead'.</span></span></code></pre>
+<pre><code><span><span class="co">## Elapsed time: 58.89s</span></span>
+<span><span class="co">## Function value: 1.41517</span></span>
+<span><span class="co">## Parameter values: 0.45 0.275 66.2 0.0788 0.183</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Status: -</span></span></code></pre>
+<p>And compare them:</p>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">LV</span>, <span class="va">lbfgsb1</span>, <span class="va">lbfgsb2</span>, <span class="va">ahr</span>, <span class="va">nm</span>, show_par <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##              method elapsed    value    fn gr    r     l     K  alpha gamma</span></span>
+<span><span class="co">## LV             data      NA 4.96e-07    NA NA 0.50 0.200 100.0 0.1000 0.100</span></span>
+<span><span class="co">## lbfgsb1    L-BFGS-B    3.68 5.61e-07    84 84 0.50 0.200 100.0 0.1000 0.100</span></span>
+<span><span class="co">## lbfgsb2      Rvmmin    4.06 5.61e-07   184 81 0.50 0.200 100.0 0.1000 0.100</span></span>
+<span><span class="co">## ahr          AHR-ES  236.29 5.61e-07 39272  0 0.50 0.200 100.0 0.1000 0.100</span></span>
+<span><span class="co">## nm      Nelder-Mead   58.89 1.42e+00   502 NA 0.45 0.275  66.2 0.0788 0.183</span></span></code></pre>
+<p>When a function is created with the <code><a href="../reference/calibration_objFn.html">calibration_objFn()</a></code>
+it gains a <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> method, that can be used to simulate
+the model with the estimated set of parameters.</p>
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">lbfgsb1.pred</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">lbfgsb1</span><span class="op">)</span></span>
+<span><span class="va">lbfgsb2.pred</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">lbfgsb2</span><span class="op">)</span></span>
+<span><span class="va">ahr.pred</span>     <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">ahr</span><span class="op">)</span></span>
+<span><span class="va">nm.pred</span>      <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">nm</span><span class="op">)</span></span></code></pre></div>
+<p>and plot the results.</p>
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">methods</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"data"</span>, <span class="st">"L-BFGS-B"</span>, <span class="st">"AHR-ES"</span>, <span class="st">"Nelder-Mead"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span>, mar<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4</span>,<span class="fl">4</span>,<span class="fl">1</span>,<span class="fl">1</span><span class="op">)</span>,</span>
+<span>    oma<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">observed</span><span class="op">$</span><span class="va">prey</span>, cex<span class="op">=</span><span class="fl">0.75</span>,</span>
+<span>     ylab<span class="op">=</span><span class="st">"prey abundance (N)"</span>, xlab<span class="op">=</span><span class="st">"time"</span>, las<span class="op">=</span><span class="fl">1</span>,</span>
+<span>     ylim<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">55</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="va">lbfgsb1.pred</span><span class="op">$</span><span class="va">prey</span>, col<span class="op">=</span><span class="fl">1</span>, lwd<span class="op">=</span><span class="fl">4</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="va">ahr.pred</span><span class="op">$</span><span class="va">prey</span>, col<span class="op">=</span><span class="fl">2</span>, lwd<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="va">nm.pred</span><span class="op">$</span><span class="va">prey</span>, col<span class="op">=</span><span class="fl">3</span>, lwd<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">observed</span><span class="op">$</span><span class="va">predator</span>, cex<span class="op">=</span><span class="fl">0.75</span>, </span>
+<span>     ylab<span class="op">=</span><span class="st">"predator abundance (P)"</span>, xlab<span class="op">=</span><span class="st">"time"</span>, las<span class="op">=</span><span class="fl">1</span>,</span>
+<span>     ylim<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">7</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="va">lbfgsb1.pred</span><span class="op">$</span><span class="va">predator</span>, col<span class="op">=</span><span class="fl">1</span>, lwd<span class="op">=</span><span class="fl">4</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="va">ahr.pred</span><span class="op">$</span><span class="va">predator</span>, col<span class="op">=</span><span class="fl">2</span>, lwd<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="va">nm.pred</span><span class="op">$</span><span class="va">predator</span>, col<span class="op">=</span><span class="fl">3</span>, lwd<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">1.8</span>, legend<span class="op">=</span><span class="va">methods</span>, bty<span class="op">=</span><span class="st">"n"</span>, cex<span class="op">=</span><span class="fl">0.75</span>, y.intersp<span class="op">=</span><span class="fl">0.8</span>, </span>
+<span>       inset<span class="op">=</span><span class="op">-</span><span class="fl">0.0</span>, xjust<span class="op">=</span><span class="fl">1</span>, pch <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">NA</span>,<span class="fl">5</span><span class="op">)</span><span class="op">)</span>, lty<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">5</span><span class="op">)</span><span class="op">)</span>, </span>
+<span>       col<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span>, lwd<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span></code></pre></div>
+<p><img src="v03-parameter_estimation_ODE_files/figure-html/unnamed-chunk-8-1.png" width="768"></p>
+<p>In this example, the ‘L-BFGS-B’ and ‘AHR-ES’ algorithms were able to
+estimate the original parameter values, but the ‘Nelder-Mead’ algorithm
+were not.</p>
+</div>
+<div class="section level2">
+<h2 id="fitting-an-edo-system-the-sir-epidemiological-model">Fitting an EDO system: the SIR epidemiological model<a class="anchor" aria-label="anchor" href="#fitting-an-edo-system-the-sir-epidemiological-model"></a>
+</h2>
+<p>As a second example, we will estimate the parameters for a SIR
+epidemiological model. The model is defined by a system of ordinary
+differential equations for the number of susceptible <span class="math inline">\(S\)</span>, infected <span class="math inline">\(I\)</span> and recovered <span class="math inline">\(R\)</span> individuals: <span class="math display">\[\frac{dS}{dt} = -\beta S I/N\]</span> <span class="math display">\[\frac{dI}{dt} = \beta S I/N -\gamma I\]</span>
+<span class="math display">\[\frac{dR}{dt} = \gamma I\]</span></p>
+<p>The parameters to estimate are the average number of contacts per
+person per time <span class="math inline">\(\beta\)</span> and the
+instant probability of an infectious individual recovering <span class="math inline">\(\gamma\)</span>. To start, we created the
+demonstration data for this model using the function
+<code><a href="../reference/calibrar_demo.html">calibrar_demo()</a></code> function with <code>T=100</code> as an
+additional argument to specify the time horizon.</p>
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">path</span> <span class="op">=</span> <span class="cn">NULL</span> <span class="co"># NULL to use the current directory</span></span>
+<span><span class="va">SIR</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrar_demo.html">calibrar_demo</a></span><span class="op">(</span>path<span class="op">=</span><span class="va">path</span>, model<span class="op">=</span><span class="st">'SIR'</span>, T<span class="op">=</span><span class="fl">100</span><span class="op">)</span> </span></code></pre></div>
+<pre><code><span><span class="co">## Creating observed data list for calibration...</span></span></code></pre>
+<pre><code><span><span class="co">## Loaded observed data for variables: 'susceptible', 'infected', 'recovered'.</span></span></code></pre>
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">setup</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibration_setup.html">calibration_setup</a></span><span class="op">(</span>file <span class="op">=</span> <span class="va">SIR</span><span class="op">$</span><span class="va">setup</span><span class="op">)</span></span>
+<span><span class="va">observed</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibration_data.html">calibration_data</a></span><span class="op">(</span>setup<span class="op">=</span><span class="va">setup</span>, path<span class="op">=</span><span class="va">SIR</span><span class="op">$</span><span class="va">path</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Creating observed data list for calibration...</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Loaded observed data for variables: 'susceptible', 'infected', 'recovered'.</span></span></code></pre>
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">run_model</span> <span class="op">=</span> <span class="fu">calibrar</span><span class="fu">:::</span><span class="va">.SIRModel</span></span></code></pre></div>
+<p>To simulate the model, we will create a function taking a vector or
+list of parameters <code>par</code>, that solves the EDO system and
+return a list with the simulated variables (<span class="math inline">\(S\)</span>, <span class="math inline">\(I\)</span>, <span class="math inline">\(R\)</span>):</p>
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">run_model</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">par</span>, <span class="va">T</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="kw">if</span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"deSolve"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="st">"You need to install the 'deSolve' package."</span><span class="op">)</span></span>
+<span>  <span class="co"># par is a list with 'alpha', 'beta' 'gamma', 'sd' and 'mu_ini'.</span></span>
+<span>  <span class="va">SIR</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">t</span>, <span class="va">y</span>, <span class="va">parms</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">N</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">parms</span><span class="op">$</span><span class="va">initial</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="va">beta</span> <span class="op">=</span> <span class="va">parms</span><span class="op">$</span><span class="va">beta</span></span>
+<span>    <span class="va">gamma</span> <span class="op">=</span> <span class="va">parms</span><span class="op">$</span><span class="va">gamma</span></span>
+<span>    <span class="va">S</span> <span class="op">=</span> <span class="va">y</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
+<span>    <span class="va">I</span> <span class="op">=</span> <span class="va">y</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span></span>
+<span>    <span class="va">dS</span> <span class="op">=</span> <span class="op">-</span><span class="va">beta</span><span class="op">*</span><span class="va">S</span><span class="op">*</span><span class="va">I</span><span class="op">/</span><span class="va">N</span></span>
+<span>    <span class="va">dI</span> <span class="op">=</span> <span class="op">+</span><span class="va">beta</span><span class="op">*</span><span class="va">S</span><span class="op">*</span><span class="va">I</span><span class="op">/</span><span class="va">N</span> <span class="op">-</span><span class="va">gamma</span><span class="op">*</span><span class="va">I</span></span>
+<span>    <span class="va">dR</span> <span class="op">=</span> <span class="op">+</span><span class="va">gamma</span><span class="op">*</span><span class="va">I</span></span>
+<span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">dS</span>, <span class="va">dI</span>, <span class="va">dR</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span>  <span class="va">times</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="cn">T</span><span class="op">)</span></span>
+<span>  <span class="va">y0</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">par</span><span class="op">$</span><span class="va">initial</span><span class="op">$</span><span class="va">S</span>, <span class="va">par</span><span class="op">$</span><span class="va">initial</span><span class="op">$</span><span class="va">I</span>, <span class="va">par</span><span class="op">$</span><span class="va">initial</span><span class="op">$</span><span class="va">R</span><span class="op">)</span></span>
+<span>  <span class="va">sol</span> <span class="op">=</span> <span class="fu">deSolve</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/deSolve/man/ode.html" class="external-link">ode</a></span><span class="op">(</span>y<span class="op">=</span><span class="va">y0</span>, times<span class="op">=</span><span class="va">times</span>, func<span class="op">=</span><span class="va">SIR</span>, parms<span class="op">=</span><span class="va">par</span>, method<span class="op">=</span><span class="st">"ode45"</span><span class="op">)</span></span>
+<span>  <span class="va">out</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">as.list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">sol</span><span class="op">[</span>,<span class="op">-</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">out</span><span class="op">)</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"susceptible"</span>, <span class="st">"infected"</span>, <span class="st">"recovered"</span><span class="op">)</span></span>
+<span>  <span class="va">out</span><span class="op">$</span><span class="va">susceptible</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">susceptible</span><span class="op">)</span><span class="op">]</span> <span class="op">=</span> <span class="fl">0</span></span>
+<span>  <span class="va">out</span><span class="op">$</span><span class="va">infected</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">infected</span><span class="op">)</span><span class="op">]</span> <span class="op">=</span> <span class="fl">0</span></span>
+<span>  <span class="va">out</span><span class="op">$</span><span class="va">recovered</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">recovered</span><span class="op">)</span><span class="op">]</span> <span class="op">=</span> <span class="fl">0</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">out</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<p>As in the previous example, the objective function will be created
+based on the <code>run_model()</code> function and the information in
+the <code>setup</code> table created with the demo:</p>
+<table class="table">
+<colgroup>
+<col width="12%">
+<col width="7%">
+<col width="10%">
+<col width="7%">
+<col width="9%">
+<col width="22%">
+<col width="12%">
+<col width="9%">
+<col width="6%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">variable</th>
+<th align="left">type</th>
+<th align="left">calibrate</th>
+<th align="right">weight</th>
+<th align="left">use_data</th>
+<th align="left">file</th>
+<th align="left">varid</th>
+<th align="right">col_skip</th>
+<th align="left">nrows</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">susceptible</td>
+<td align="left">lnorm2</td>
+<td align="left">TRUE</td>
+<td align="right">1</td>
+<td align="left">TRUE</td>
+<td align="left">data/susceptible.csv</td>
+<td align="left">susceptible</td>
+<td align="right">2</td>
+<td align="left">NA</td>
+</tr>
+<tr class="even">
+<td align="left">infected</td>
+<td align="left">lnorm2</td>
+<td align="left">TRUE</td>
+<td align="right">1</td>
+<td align="left">TRUE</td>
+<td align="left">data/infected.csv</td>
+<td align="left">infected</td>
+<td align="right">2</td>
+<td align="left">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">recovered</td>
+<td align="left">lnorm2</td>
+<td align="left">TRUE</td>
+<td align="right">1</td>
+<td align="left">TRUE</td>
+<td align="left">data/recovered.csv</td>
+<td align="left">recovered</td>
+<td align="right">2</td>
+<td align="left">NA</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">obj</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibration_objFn.html">calibration_objFn</a></span><span class="op">(</span>model<span class="op">=</span><span class="va">run_model</span>, setup<span class="op">=</span><span class="va">setup</span>, observed<span class="op">=</span><span class="va">observed</span>, T<span class="op">=</span><span class="va">SIR</span><span class="op">$</span><span class="cn">T</span>, aggregate<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p>Now, we can try several optimization algorithms to estimate the
+parameters of the model:</p>
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">lbfgsb3</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">SIR</span><span class="op">$</span><span class="va">guess</span>, fn<span class="op">=</span><span class="va">obj</span>, method<span class="op">=</span><span class="st">'LBFGSB3'</span>, lower<span class="op">=</span><span class="va">SIR</span><span class="op">$</span><span class="va">lower</span>, upper<span class="op">=</span><span class="va">SIR</span><span class="op">$</span><span class="va">upper</span>, phases<span class="op">=</span><span class="va">SIR</span><span class="op">$</span><span class="va">phase</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Using optimization method 'LBFGSB3'.</span></span></code></pre>
+<pre><code><span><span class="co">## Elapsed time: 10.26s</span></span>
+<span><span class="co">## Function value: 2.38126</span></span>
+<span><span class="co">## Parameter values: 0.408 0.215</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Status: CONVERGENCE: Parameters differences below xtol</span></span></code></pre>
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">lbfgsb2</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">SIR</span><span class="op">$</span><span class="va">guess</span>, fn<span class="op">=</span><span class="va">obj</span>, method<span class="op">=</span><span class="st">'Rvmmin'</span>, lower<span class="op">=</span><span class="va">SIR</span><span class="op">$</span><span class="va">lower</span>, upper<span class="op">=</span><span class="va">SIR</span><span class="op">$</span><span class="va">upper</span>, phases<span class="op">=</span><span class="va">SIR</span><span class="op">$</span><span class="va">phase</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Using optimization method 'Rvmmin'.</span></span></code></pre>
+<pre><code><span><span class="co">## Elapsed time: 0.40s</span></span>
+<span><span class="co">## Function value: 7.56969e-13</span></span>
+<span><span class="co">## Parameter values: 0.4 0.2</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Status: Rvmminb appears to have converged</span></span></code></pre>
+<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">ahr</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">SIR</span><span class="op">$</span><span class="va">guess</span>, fn<span class="op">=</span><span class="va">obj</span>, method<span class="op">=</span><span class="st">'AHR-ES'</span>, lower<span class="op">=</span><span class="va">SIR</span><span class="op">$</span><span class="va">lower</span>, upper<span class="op">=</span><span class="va">SIR</span><span class="op">$</span><span class="va">upper</span>, phases<span class="op">=</span><span class="va">SIR</span><span class="op">$</span><span class="va">phase</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Using optimization method 'AHR-ES'.</span></span></code></pre>
+<pre><code><span><span class="co">## Elapsed time: 34.49s</span></span>
+<span><span class="co">## Function value: 9.63009e-22</span></span>
+<span><span class="co">## Parameter values: 0.4 0.2</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Status: Stopping criteria reached in 1031 generations.</span></span></code></pre>
+<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cg</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">SIR</span><span class="op">$</span><span class="va">guess</span>, fn<span class="op">=</span><span class="va">obj</span>, method<span class="op">=</span><span class="st">'Rcgmin'</span>, phases<span class="op">=</span><span class="va">SIR</span><span class="op">$</span><span class="va">phase</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Using optimization method 'Rcgmin'.</span></span></code></pre>
+<pre><code><span><span class="co">## Elapsed time: 2m 53.1s</span></span>
+<span><span class="co">## Function value: 1.51603e-14</span></span>
+<span><span class="co">## Parameter values: 0.4 0.2</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Status: Too many function evaluations (&gt; 866)</span></span></code></pre>
+<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">nm</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">SIR</span><span class="op">$</span><span class="va">guess</span>, fn<span class="op">=</span><span class="va">obj</span>, method<span class="op">=</span><span class="st">'Nelder-Mead'</span>, phases<span class="op">=</span><span class="va">SIR</span><span class="op">$</span><span class="va">phase</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Using optimization method 'Nelder-Mead'.</span></span></code></pre>
+<pre><code><span><span class="co">## Elapsed time: 0.37s</span></span>
+<span><span class="co">## Function value: 2.5122e-05</span></span>
+<span><span class="co">## Parameter values: 0.4 0.2</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Status: -</span></span></code></pre>
+<p>and compare them:</p>
+<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">SIR</span>, <span class="va">lbfgsb2</span>, <span class="va">lbfgsb3</span>, <span class="va">ahr</span>, <span class="va">cg</span>, <span class="va">nm</span>, show_par <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##              method elapsed    value   fn  gr  beta gamma</span></span>
+<span><span class="co">## SIR            data      NA 4.69e-28   NA  NA 0.400 0.200</span></span>
+<span><span class="co">## lbfgsb2      Rvmmin   0.395 7.57e-13   25  16 0.400 0.200</span></span>
+<span><span class="co">## lbfgsb3     LBFGSB3  10.263 2.38e+00   86  86 0.408 0.215</span></span>
+<span><span class="co">## ahr          AHR-ES  34.495 9.63e-22 6186   0 0.400 0.200</span></span>
+<span><span class="co">## cg           Rcgmin 173.130 1.52e-14  871 116 0.400 0.200</span></span>
+<span><span class="co">## nm      Nelder-Mead   0.370 2.51e-05   73  NA 0.400 0.200</span></span></code></pre>
+<p>In this example, the algorithms ‘Rvmmin’, ‘AHR-ES’, ‘Rcgmin’ and
+‘Nelder-Mead’ are able to estimate the original parameters, but the
+‘LBFGSB3’ fails.</p>
+<p>Please, refer to <code>vignette(package="calibrar")</code> for
+additional vignettes or to the <a href="https://roliveros-ramos.github.io/calibrar/" class="external-link">calibrar website</a>
+for more details.</p>
 </div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
 
-      </div>
+        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
+    </nav>
+</div>
 
 </div>
 
