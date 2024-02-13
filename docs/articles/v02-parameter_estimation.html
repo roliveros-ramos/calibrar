@@ -96,7 +96,7 @@ parameter estimation</h1>
                         <h4 data-toc-skip class="author">Ricardo
 Oliveros-Ramos</h4>
             
-            <h4 data-toc-skip class="date">2024-02-10</h4>
+            <h4 data-toc-skip class="date">2024-02-13</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/roliveros-ramos/calibrar/blob/HEAD/vignettes/v02-parameter_estimation.Rmd" class="external-link"><code>vignettes/v02-parameter_estimation.Rmd</code></a></small>
       <div class="hidden name"><code>v02-parameter_estimation.Rmd</code></div>
@@ -184,8 +184,8 @@ minimized:</p>
 <span><span class="va">start</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>intercept<span class="op">=</span><span class="fl">0</span>, slope<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">N</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">bfgs</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">start</span>, fn<span class="op">=</span><span class="va">obj</span>, x<span class="op">=</span><span class="va">x</span>, y<span class="op">=</span><span class="va">y</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Using optimization method 'Rvmmin'.</span></span>
-<span><span class="co">#&gt; Elapsed time: 0.14s</span></span>
-<span><span class="co">#&gt; Function value: 6.07181e-14</span></span>
+<span><span class="co">#&gt; Elapsed time: 0.13s</span></span>
+<span><span class="co">#&gt; Function value: 3.92087e-14</span></span>
 <span><span class="co">#&gt; Parameter values: 3.14 1 2 3 4 5 6 7</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Status: Rvmminu appears to have converged</span></span>
@@ -207,28 +207,28 @@ bounds for the algorithms that require them:</p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">880820</span><span class="op">)</span> <span class="co"># for reproducibility</span></span>
 <span><span class="va">cg</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">start</span>, fn<span class="op">=</span><span class="va">obj</span>, x<span class="op">=</span><span class="va">x</span>, y<span class="op">=</span><span class="va">y</span>, method<span class="op">=</span><span class="st">'CG'</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Using optimization method 'CG'.</span></span>
-<span><span class="co">#&gt; Elapsed time: 0.44s</span></span>
-<span><span class="co">#&gt; Function value: 7.96079e-14</span></span>
+<span><span class="co">#&gt; Elapsed time: 0.38s</span></span>
+<span><span class="co">#&gt; Function value: 1.00008e-13</span></span>
 <span><span class="co">#&gt; Parameter values: 3.14 1 2 3 4 5 6 7</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Status: -</span></span>
 <span><span class="va">nm</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">start</span>, fn<span class="op">=</span><span class="va">obj</span>, x<span class="op">=</span><span class="va">x</span>, y<span class="op">=</span><span class="va">y</span>, method<span class="op">=</span><span class="st">'nmkb'</span>, lower<span class="op">=</span><span class="va">lower</span>, upper<span class="op">=</span><span class="va">upper</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Using optimization method 'nmkb'.</span></span>
 <span><span class="co">#&gt; Elapsed time: 0.28s</span></span>
-<span><span class="co">#&gt; Function value: 7.44343e-07</span></span>
+<span><span class="co">#&gt; Function value: 1.09321e-06</span></span>
 <span><span class="co">#&gt; Parameter values: 3.14 1 2 3 4 5 6 7</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Status: -</span></span>
 <span><span class="va">ahres</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">start</span>, fn<span class="op">=</span><span class="va">obj</span>, x<span class="op">=</span><span class="va">x</span>, y<span class="op">=</span><span class="va">y</span>, method<span class="op">=</span><span class="st">'AHR-ES'</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Using optimization method 'AHR-ES'.</span></span>
-<span><span class="co">#&gt; Elapsed time: 1.72s</span></span>
-<span><span class="co">#&gt; Function value: 6.19299e-19</span></span>
+<span><span class="co">#&gt; Elapsed time: 1.88s</span></span>
+<span><span class="co">#&gt; Function value: 1.41888e-18</span></span>
 <span><span class="co">#&gt; Parameter values: 3.14 1 2 3 4 5 6 7</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Status: Stopping criteria reached in 250 generations.</span></span>
+<span><span class="co">#&gt; Status: Stopping criteria reached in 241 generations.</span></span>
 <span><span class="va">hjn</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">start</span>, fn<span class="op">=</span><span class="va">obj</span>, x<span class="op">=</span><span class="va">x</span>, y<span class="op">=</span><span class="va">y</span>, method<span class="op">=</span><span class="st">'hjn'</span>, lower<span class="op">=</span><span class="va">lower</span>, upper<span class="op">=</span><span class="va">upper</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Using optimization method 'hjn'.</span></span>
-<span><span class="co">#&gt; Elapsed time: 0.36s</span></span>
+<span><span class="co">#&gt; Elapsed time: 0.47s</span></span>
 <span><span class="co">#&gt; Function value: 2.15391e-13</span></span>
 <span><span class="co">#&gt; Parameter values: 3.14 1 2 3 4 5 6 7</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -312,7 +312,7 @@ algorithms:</p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">880820</span><span class="op">)</span> <span class="co"># for reproducibility</span></span>
 <span><span class="va">opt0</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">start</span>, fn <span class="op">=</span> <span class="va">objfn</span>, method<span class="op">=</span><span class="st">'LBFGSB3'</span>, T<span class="op">=</span><span class="cn">T</span>, catch<span class="op">=</span><span class="va">catch</span>, observed<span class="op">=</span><span class="va">observed</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Using optimization method 'LBFGSB3'.</span></span>
-<span><span class="co">#&gt; Elapsed time: 0.04s</span></span>
+<span><span class="co">#&gt; Elapsed time: 0.05s</span></span>
 <span><span class="co">#&gt; Function value: 34239.4</span></span>
 <span><span class="co">#&gt; Parameter values: 0.476 1.04e+03 535</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -326,35 +326,35 @@ algorithms:</p>
 <span><span class="co">#&gt; Status: Rvmminu appears to have converged</span></span>
 <span><span class="va">opt2</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">start</span>, fn <span class="op">=</span> <span class="va">objfn</span>, method<span class="op">=</span><span class="st">'CG'</span>, T<span class="op">=</span><span class="cn">T</span>, catch<span class="op">=</span><span class="va">catch</span>, observed<span class="op">=</span><span class="va">observed</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Using optimization method 'CG'.</span></span>
-<span><span class="co">#&gt; Elapsed time: 0.07s</span></span>
+<span><span class="co">#&gt; Elapsed time: 0.08s</span></span>
 <span><span class="co">#&gt; Function value: 150931</span></span>
 <span><span class="co">#&gt; Parameter values: 0.402 1.18e+03 600</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Status: -</span></span>
 <span><span class="va">opt3</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">start</span>, fn <span class="op">=</span> <span class="va">objfn</span>, method<span class="op">=</span><span class="st">'AHR-ES'</span>, T<span class="op">=</span><span class="cn">T</span>, catch<span class="op">=</span><span class="va">catch</span>, observed<span class="op">=</span><span class="va">observed</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Using optimization method 'AHR-ES'.</span></span>
-<span><span class="co">#&gt; Elapsed time: 1.74s</span></span>
+<span><span class="co">#&gt; Elapsed time: 2.39s</span></span>
 <span><span class="co">#&gt; Function value: 6.77545e-17</span></span>
 <span><span class="co">#&gt; Parameter values: 0.5 1e+03 600</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Status: Stopping criteria reached in 1590 generations.</span></span>
 <span><span class="va">opt4</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">start</span>, fn <span class="op">=</span> <span class="va">objfn</span>, method<span class="op">=</span><span class="st">'CMA-ES'</span>, T<span class="op">=</span><span class="cn">T</span>, catch<span class="op">=</span><span class="va">catch</span>, observed<span class="op">=</span><span class="va">observed</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Using optimization method 'CMA-ES'.</span></span>
-<span><span class="co">#&gt; Elapsed time: 0.09s</span></span>
+<span><span class="co">#&gt; Elapsed time: 0.19s</span></span>
 <span><span class="co">#&gt; Function value: 107373</span></span>
 <span><span class="co">#&gt; Parameter values: 0.446 1.09e+03 689</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Status: Covariance matrix 'C' is numerically not positive definite.</span></span>
 <span><span class="va">opt5</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">start</span>, fn <span class="op">=</span> <span class="va">objfn</span>, method<span class="op">=</span><span class="st">'hjn'</span>, T<span class="op">=</span><span class="cn">T</span>, catch<span class="op">=</span><span class="va">catch</span>, observed<span class="op">=</span><span class="va">observed</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Using optimization method 'hjn'.</span></span>
-<span><span class="co">#&gt; Elapsed time: 0.40s</span></span>
+<span><span class="co">#&gt; Elapsed time: 0.75s</span></span>
 <span><span class="co">#&gt; Function value: 990.8</span></span>
 <span><span class="co">#&gt; Parameter values: 0.509 988 602</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Status: -</span></span>
 <span><span class="va">opt6</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">start</span>, fn <span class="op">=</span> <span class="va">objfn</span>, method<span class="op">=</span><span class="st">'Nelder-Mead'</span>, T<span class="op">=</span><span class="cn">T</span>, catch<span class="op">=</span><span class="va">catch</span>, observed<span class="op">=</span><span class="va">observed</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Using optimization method 'Nelder-Mead'.</span></span>
-<span><span class="co">#&gt; Elapsed time: 0.01s</span></span>
+<span><span class="co">#&gt; Elapsed time: 0.03s</span></span>
 <span><span class="co">#&gt; Function value: 0.0775804</span></span>
 <span><span class="co">#&gt; Parameter values: 0.5 1e+03 600</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -364,13 +364,13 @@ optimization results:</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">opt0</span>, <span class="va">opt1</span>, <span class="va">opt2</span>, <span class="va">opt3</span>, <span class="va">opt4</span>, <span class="va">opt5</span>, <span class="va">opt6</span><span class="op">)</span></span>
 <span><span class="co">#&gt;           method elapsed    value    fn  gr     r    K  B0</span></span>
-<span><span class="co">#&gt; opt0     LBFGSB3  0.0437 3.42e+04   100 100 0.476 1039 535</span></span>
-<span><span class="co">#&gt; opt1      Rvmmin  0.0160 1.35e+07   161   8 2.900 1145 482</span></span>
-<span><span class="co">#&gt; opt2          CG  0.0730 1.51e+05   691 101 0.402 1181 600</span></span>
-<span><span class="co">#&gt; opt3      AHR-ES  1.7382 6.78e-17 11130   0 0.500 1000 600</span></span>
-<span><span class="co">#&gt; opt4      CMA-ES  0.0945 1.07e+05  1085  NA 0.446 1090 689</span></span>
-<span><span class="co">#&gt; opt5         hjn  0.3998 9.91e+02  6000  NA 0.509  988 602</span></span>
-<span><span class="co">#&gt; opt6 Nelder-Mead  0.0142 7.76e-02   221  NA 0.500 1000 600</span></span></code></pre></div>
+<span><span class="co">#&gt; opt0     LBFGSB3  0.0482 3.42e+04   100 100 0.476 1039 535</span></span>
+<span><span class="co">#&gt; opt1      Rvmmin  0.0164 1.35e+07   161   8 2.900 1145 482</span></span>
+<span><span class="co">#&gt; opt2          CG  0.0819 1.51e+05   691 101 0.402 1181 600</span></span>
+<span><span class="co">#&gt; opt3      AHR-ES  2.3910 6.78e-17 11130   0 0.500 1000 600</span></span>
+<span><span class="co">#&gt; opt4      CMA-ES  0.1955 1.07e+05  1085  NA 0.446 1090 689</span></span>
+<span><span class="co">#&gt; opt5         hjn  0.7526 9.91e+02  6000  NA 0.509  988 602</span></span>
+<span><span class="co">#&gt; opt6 Nelder-Mead  0.0268 7.76e-02   221  NA 0.500 1000 600</span></span></code></pre></div>
 <p>For a better comparison, we can simulate the results for all the
 parameters found:</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
@@ -402,7 +402,7 @@ changing the <code>maxit</code> control argument:</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">optx</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">start</span>, fn <span class="op">=</span> <span class="va">objfn</span>, method<span class="op">=</span><span class="st">'LBFGSB3'</span>, T<span class="op">=</span><span class="cn">T</span>, catch<span class="op">=</span><span class="va">catch</span>, observed<span class="op">=</span><span class="va">observed</span>, control<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>maxit<span class="op">=</span><span class="fl">20000</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Using optimization method 'LBFGSB3'.</span></span>
-<span><span class="co">#&gt; Elapsed time: 6.65s</span></span>
+<span><span class="co">#&gt; Elapsed time: 12.74s</span></span>
 <span><span class="co">#&gt; Function value: 0.342868</span></span>
 <span><span class="co">#&gt; Parameter values: 0.5 1e+03 600</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -425,7 +425,7 @@ estimation:</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; - Phase 1: 2 of 3 parameters active.</span></span>
 <span><span class="co">#&gt;  Using optimization method 'Rvmmin'.</span></span>
-<span><span class="co">#&gt;  Phase 1 finished (0.01s)</span></span>
+<span><span class="co">#&gt;  Phase 1 finished (0.02s)</span></span>
 <span><span class="co">#&gt;  Function value: 1.8303e-08</span></span>
 <span><span class="co">#&gt;  Parameter values: 0.5 1e+03</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -535,21 +535,21 @@ compare the performance of three BFGS type algorithms:</p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lbfgsb1</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">ARPM</span><span class="op">$</span><span class="va">guess</span>, fn<span class="op">=</span><span class="va">obj</span>, method<span class="op">=</span><span class="st">'L-BFGS-B'</span>, lower<span class="op">=</span><span class="va">ARPM</span><span class="op">$</span><span class="va">lower</span>, upper<span class="op">=</span><span class="va">ARPM</span><span class="op">$</span><span class="va">upper</span>, phases<span class="op">=</span><span class="va">ARPM</span><span class="op">$</span><span class="va">phase</span>, control<span class="op">=</span><span class="va">control</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Using optimization method 'L-BFGS-B'.</span></span>
-<span><span class="co">#&gt; Elapsed time: 58.28s</span></span>
+<span><span class="co">#&gt; Elapsed time: 1m 30.0s</span></span>
 <span><span class="co">#&gt; Function value: -186093</span></span>
 <span><span class="co">#&gt; Parameter values: 0.43 -0.415 -0.109 0.103 0.224 -0.306 0.0191 0.0445 0.0534 0.432 0.199 -0.0786 -0.128 0.121 0.275 0.0471 -0.101 0.0981 -0.0389 0.371 -0.213 0.036 -0.237 -0.254 0.0572 -0.0642 -0.178 0.294 5.54e-05 0.268 -0.212 -0.0516 -0.325 0.253 -0.195 0.291 -0.243 -0.0235 -0.532 -0.0742 -0.0616 -0.297 -0.115 -0.167 -0.323 0.0585 -0.185 -0.0309 0.0992 -0.0813 0.0103 0.161 0.266 -0.103 -0.368 0.0792 -0.133 0.0369 0.0815 -0.000515 0.0957 -0.0619 0.287 0.185 0.134 0.162 0.0492 -0.143 -0.124 -0.163 -0.277 0.0741 -0.0474 -0.0123 -0.229 -0.0587 -0.17 -0.183 -0.226 -0.0318 -0.0141 -0.21 -0.0744 -0.1 -0.185 -0.137 -0.0275 -0.164 0.181 -0.2 -0.243 0.152 -0.284 -0.352 -0.0418 -0.188 0.0203 -0.0106 0.197 -0.0425 0.37</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Status: CONVERGENCE: REL_REDUCTION_OF_F &lt;= FACTR*EPSMCH</span></span>
 <span><span class="va">lbfgsb2</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">ARPM</span><span class="op">$</span><span class="va">guess</span>, fn<span class="op">=</span><span class="va">obj</span>, method<span class="op">=</span><span class="st">'Rvmmin'</span>, lower<span class="op">=</span><span class="va">ARPM</span><span class="op">$</span><span class="va">lower</span>, upper<span class="op">=</span><span class="va">ARPM</span><span class="op">$</span><span class="va">upper</span>, phases<span class="op">=</span><span class="va">ARPM</span><span class="op">$</span><span class="va">phase</span>, control<span class="op">=</span><span class="va">control</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Using optimization method 'Rvmmin'.</span></span>
-<span><span class="co">#&gt; Elapsed time: 13.03s</span></span>
+<span><span class="co">#&gt; Elapsed time: 19.96s</span></span>
 <span><span class="co">#&gt; Function value: -186095</span></span>
 <span><span class="co">#&gt; Parameter values: 0.397 -0.415 -0.0755 0.135 0.261 -0.276 0.0524 0.0757 0.085 0.467 0.231 -0.0459 -0.0946 0.155 0.308 0.0794 -0.0678 0.131 -0.00842 0.405 -0.181 0.0701 -0.205 -0.221 0.0894 -0.0332 -0.145 0.326 0.0332 0.301 -0.179 -0.0193 -0.291 0.284 -0.161 0.323 -0.209 0.00885 -0.5 -0.0401 -0.0301 -0.27 -0.0754 -0.135 -0.295 0.0923 -0.154 0.00403 0.137 -0.0503 0.0357 0.194 0.307 -0.0752 -0.339 0.117 -0.101 0.0691 0.114 0.0343 0.129 -0.0325 0.325 0.217 0.164 0.197 0.0826 -0.113 -0.0906 -0.128 -0.25 0.111 -0.015 0.0211 -0.201 -0.0202 -0.134 -0.154 -0.195 0.0029 0.0188 -0.179 -0.0423 -0.0657 -0.151 -0.104 0.00175 -0.13 0.209 -0.167 -0.206 0.187 -0.246 -0.32 -0.00722 -0.145 3.35e-05 0.0373 0.242 0.00104 0.408</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Status: Rvmminb appears to have converged</span></span>
 <span><span class="va">lbfgsb3</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">ARPM</span><span class="op">$</span><span class="va">guess</span>, fn<span class="op">=</span><span class="va">obj</span>, method<span class="op">=</span><span class="st">'LBFGSB3'</span>, lower<span class="op">=</span><span class="va">ARPM</span><span class="op">$</span><span class="va">lower</span>, upper<span class="op">=</span><span class="va">ARPM</span><span class="op">$</span><span class="va">upper</span>, phases<span class="op">=</span><span class="va">ARPM</span><span class="op">$</span><span class="va">phase</span>, control<span class="op">=</span><span class="va">control</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Using optimization method 'LBFGSB3'.</span></span>
-<span><span class="co">#&gt; Elapsed time: 31.60s</span></span>
+<span><span class="co">#&gt; Elapsed time: 36.10s</span></span>
 <span><span class="co">#&gt; Function value: -182467</span></span>
 <span><span class="co">#&gt; Parameter values: 0.378 -0.16 -0.188 -0.183 -0.181 -0.201 -0.162 -0.145 -0.144 -0.129 -0.124 -0.145 -0.145 -0.144 -0.122 -0.145 -0.154 -0.156 -0.174 -0.164 -0.254 -0.26 -0.276 -0.286 -0.276 -0.235 -0.217 -0.19 -0.188 -0.18 -0.246 -0.254 -0.27 -0.222 -0.269 -0.264 -0.324 -0.331 -0.337 -0.337 -0.337 -0.337 -0.335 -0.329 -0.325 -0.342 -0.342 -0.342 -0.248 -0.236 -0.219 -0.213 -0.215 -0.203 -0.216 -0.194 -0.193 -0.14 -0.165 -0.152 -0.15 -0.149 -0.146 -0.146 -0.146 -0.149 -0.164 -0.101 -0.399 -0.26 -0.296 -0.304 -0.278 -0.294 -0.315 -0.291 -0.312 -0.384 -0.328 -0.34 -0.341 -0.296 -0.327 -0.283 -0.284 -0.28 -0.3 -0.224 -0.253 -0.284 -0.319 -0.293 -0.337 -0.338 -0.337 -0.291 -0.331 -0.125 -0.0377 -0.195 -0.157</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -558,9 +558,9 @@ compare the performance of three BFGS type algorithms:</p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">ARPM</span>, <span class="va">lbfgsb1</span>, <span class="va">lbfgsb2</span>, <span class="va">lbfgsb3</span>, show_par <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span></span>
 <span><span class="co">#&gt;           method elapsed   value   fn   gr alpha   beta  gamma1</span></span>
 <span><span class="co">#&gt; ARPM        data      NA -186178   NA   NA 0.400 -0.400 -0.1253</span></span>
-<span><span class="co">#&gt; lbfgsb1 L-BFGS-B    58.3 -186093 2082 2082 0.430 -0.415 -0.1085</span></span>
-<span><span class="co">#&gt; lbfgsb2   Rvmmin    13.0 -186095 2701  425 0.397 -0.415 -0.0755</span></span>
-<span><span class="co">#&gt; lbfgsb3  LBFGSB3    31.6 -182467 1131 1131 0.378 -0.160 -0.1883</span></span></code></pre></div>
+<span><span class="co">#&gt; lbfgsb1 L-BFGS-B    90.0 -186093 2082 2082 0.430 -0.415 -0.1085</span></span>
+<span><span class="co">#&gt; lbfgsb2   Rvmmin    20.0 -186095 2701  425 0.397 -0.415 -0.0755</span></span>
+<span><span class="co">#&gt; lbfgsb3  LBFGSB3    36.1 -182467 1131 1131 0.378 -0.160 -0.1883</span></span></code></pre></div>
 <p>In this case, the best solution was found using the ‘Rvmmin’
 algorithm, which was also the faster (12.2s). Now, we can try to carry
 out the parameter estimation in two phases:</p>
@@ -574,13 +574,13 @@ out the parameter estimation in two phases:</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; - Phase 1: 2 of 107 parameters active.</span></span>
 <span><span class="co">#&gt;  Using optimization method 'L-BFGS-B'.</span></span>
-<span><span class="co">#&gt;  Phase 1 finished (0.12s)</span></span>
+<span><span class="co">#&gt;  Phase 1 finished (0.08s)</span></span>
 <span><span class="co">#&gt;  Function value: -169005</span></span>
 <span><span class="co">#&gt;  Parameter values: 0.292 -0.295</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; - Phase 2: 101 of 107 parameters active.</span></span>
 <span><span class="co">#&gt;  Using optimization method 'L-BFGS-B'.</span></span>
-<span><span class="co">#&gt;  Phase 2 finished (56.53s)</span></span>
+<span><span class="co">#&gt;  Phase 2 finished (1m 17.5s)</span></span>
 <span><span class="co">#&gt;  Function value: -186095</span></span>
 <span><span class="co">#&gt;  Parameter values: 0.402 -0.414 -0.0807 0.13 0.256 -0.282 0.0487 0.0714 0.0787 0.462 0.226 -0.051 -0.0995 0.15 0.303 0.0746 -0.0727 0.126 -0.0115 0.398 -0.185 0.0649 -0.21 -0.226 0.0837 -0.0368 -0.15 0.32 0.029 0.295 -0.184 -0.0241 -0.296 0.28 -0.166 0.319 -0.212 0.000427 -0.505 -0.0438 -0.0344 -0.275 -0.0804 -0.139 -0.302 0.091 -0.161 -0.0019 0.134 -0.0566 0.0311 0.19 0.303 -0.0796 -0.347 0.116 -0.109 0.0654 0.11 0.0279 0.125 -0.0395 0.321 0.212 0.159 0.192 0.0779 -0.118 -0.0954 -0.133 -0.256 0.107 -0.0206 0.0175 -0.206 -0.0245 -0.14 -0.158 -0.202 0.00014 0.0158 -0.185 -0.0462 -0.07 -0.158 -0.11 -0.00274 -0.134 0.205 -0.174 -0.21 0.182 -0.252 -0.324 -0.0247 -0.16 0.0434 0.0196 0.224 0.0019 0.4</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -590,13 +590,13 @@ out the parameter estimation in two phases:</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; - Phase 1: 2 of 107 parameters active.</span></span>
 <span><span class="co">#&gt;  Using optimization method 'Rvmmin'.</span></span>
-<span><span class="co">#&gt;  Phase 1 finished (0.02s)</span></span>
+<span><span class="co">#&gt;  Phase 1 finished (0.04s)</span></span>
 <span><span class="co">#&gt;  Function value: -169005</span></span>
 <span><span class="co">#&gt;  Parameter values: 0.292 -0.295</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; - Phase 2: 101 of 107 parameters active.</span></span>
 <span><span class="co">#&gt;  Using optimization method 'Rvmmin'.</span></span>
-<span><span class="co">#&gt;  Phase 2 finished (10.91s)</span></span>
+<span><span class="co">#&gt;  Phase 2 finished (16.12s)</span></span>
 <span><span class="co">#&gt;  Function value: -186095</span></span>
 <span><span class="co">#&gt;  Parameter values: 0.396 -0.415 -0.0743 0.136 0.262 -0.274 0.0536 0.0769 0.0863 0.468 0.232 -0.0446 -0.0934 0.156 0.309 0.0806 -0.0666 0.133 -0.0072 0.406 -0.179 0.0713 -0.204 -0.22 0.0907 -0.0319 -0.143 0.327 0.0345 0.302 -0.177 -0.018 -0.29 0.285 -0.16 0.324 -0.208 0.0101 -0.499 -0.0388 -0.0289 -0.268 -0.0741 -0.134 -0.293 0.0936 -0.152 0.00322 0.139 -0.049 0.0369 0.196 0.308 -0.074 -0.338 0.119 -0.1 0.0704 0.115 0.0355 0.13 -0.0313 0.326 0.219 0.166 0.198 0.0839 -0.111 -0.0894 -0.127 -0.249 0.112 -0.0137 0.0224 -0.2 -0.019 -0.133 -0.152 -0.194 0.00318 0.0207 -0.178 -0.041 -0.0644 -0.15 -0.104 0.00367 -0.129 0.21 -0.165 -0.204 0.188 -0.247 -0.324 0.000263 -0.167 0.0532 0.0194 0.239 -0.00296 0.41</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -606,13 +606,13 @@ out the parameter estimation in two phases:</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; - Phase 1: 2 of 107 parameters active.</span></span>
 <span><span class="co">#&gt;  Using optimization method 'LBFGSB3'.</span></span>
-<span><span class="co">#&gt;  Phase 1 finished (24.06s)</span></span>
+<span><span class="co">#&gt;  Phase 1 finished (37.43s)</span></span>
 <span><span class="co">#&gt;  Function value: -169005</span></span>
 <span><span class="co">#&gt;  Parameter values: 0.295 -0.298</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; - Phase 2: 101 of 107 parameters active.</span></span>
 <span><span class="co">#&gt;  Using optimization method 'LBFGSB3'.</span></span>
-<span><span class="co">#&gt;  Phase 2 finished (39.31s)</span></span>
+<span><span class="co">#&gt;  Phase 2 finished (1m 1.5s)</span></span>
 <span><span class="co">#&gt;  Function value: -185064</span></span>
 <span><span class="co">#&gt;  Parameter values: 0.304 -0.307 0.0233 0.0429 0.0495 0.0137 0.0515 0.0838 0.109 0.108 0.11 0.0873 0.0845 0.0942 0.1 0.0798 0.0588 0.0735 0.0701 0.0779 -0.0545 -0.0593 -0.0548 -0.0543 -0.0455 -0.0321 0.00338 0.0661 0.05 0.07 0.000428 -0.0352 -0.0667 -0.0251 -0.0384 -0.0379 -0.112 -0.114 -0.116 -0.116 -0.115 -0.115 -0.114 -0.127 -0.111 -0.109 -0.101 -0.0863 -0.0276 -0.0152 0.0156 0.0474 0.0354 0.044 0.00469 0.0399 0.0138 0.045 0.0565 0.0666 0.0677 0.0677 0.0677 0.0677 0.0677 0.0677 0.0562 0.00464 -0.0632 -0.0827 -0.0873 0.109 -0.114 -0.0975 -0.118 -0.103 -0.156 -0.104 -0.128 -0.106 -0.101 -0.0944 -0.0855 -0.0806 -0.0918 -0.0728 -0.0384 -0.0839 -0.0173 -0.0522 -0.102 -0.0172 -0.161 -0.185 -0.0937 -0.076 -0.0238 -0.0193 0.0545 0.00427 0.198</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -621,12 +621,12 @@ out the parameter estimation in two phases:</p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">ARPM</span>, <span class="va">lbfgsb1</span>, <span class="va">lbfgsb1p</span>, <span class="va">lbfgsb2</span>, <span class="va">lbfgsb2p</span>, <span class="va">lbfgsb3</span>, <span class="va">lbfgsb3p</span>, show_par <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span></span>
 <span><span class="co">#&gt;            method elapsed   value   fn   gr alpha   beta  gamma1</span></span>
 <span><span class="co">#&gt; ARPM         data      NA -186178   NA   NA 0.400 -0.400 -0.1253</span></span>
-<span><span class="co">#&gt; lbfgsb1  L-BFGS-B    58.3 -186093 2082 2082 0.430 -0.415 -0.1085</span></span>
-<span><span class="co">#&gt; lbfgsb1p L-BFGS-B    56.6 -186095 1998 1998 0.402 -0.414 -0.0807</span></span>
-<span><span class="co">#&gt; lbfgsb2    Rvmmin    13.0 -186095 2701  425 0.397 -0.415 -0.0755</span></span>
-<span><span class="co">#&gt; lbfgsb2p   Rvmmin    10.9 -186095 2080  329 0.396 -0.415 -0.0743</span></span>
-<span><span class="co">#&gt; lbfgsb3   LBFGSB3    31.6 -182467 1131 1131 0.378 -0.160 -0.1883</span></span>
-<span><span class="co">#&gt; lbfgsb3p  LBFGSB3    63.4 -185064 1389 1389 0.304 -0.307  0.0233</span></span></code></pre></div>
+<span><span class="co">#&gt; lbfgsb1  L-BFGS-B    90.0 -186093 2082 2082 0.430 -0.415 -0.1085</span></span>
+<span><span class="co">#&gt; lbfgsb1p L-BFGS-B    77.6 -186095 1998 1998 0.402 -0.414 -0.0807</span></span>
+<span><span class="co">#&gt; lbfgsb2    Rvmmin    20.0 -186095 2701  425 0.397 -0.415 -0.0755</span></span>
+<span><span class="co">#&gt; lbfgsb2p   Rvmmin    16.2 -186095 2080  329 0.396 -0.415 -0.0743</span></span>
+<span><span class="co">#&gt; lbfgsb3   LBFGSB3    36.1 -182467 1131 1131 0.378 -0.160 -0.1883</span></span>
+<span><span class="co">#&gt; lbfgsb3p  LBFGSB3    98.9 -185064 1389 1389 0.304 -0.307  0.0233</span></span></code></pre></div>
 <p>For all the algorithms, we can see and improvement in the solution
 found and even a speed up in the time needed for the optimization for
 the first two methods (‘L-BFGS-B’, ‘Rvmmin’). Finally, we can try to
@@ -639,13 +639,13 @@ better initial starting point for the final search.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; - Phase 1: 2 of 107 parameters active.</span></span>
 <span><span class="co">#&gt;  Using optimization method 'hjn'.</span></span>
-<span><span class="co">#&gt;  Phase 1 finished (1.03s)</span></span>
+<span><span class="co">#&gt;  Phase 1 finished (1.87s)</span></span>
 <span><span class="co">#&gt;  Function value: -169005</span></span>
 <span><span class="co">#&gt;  Parameter values: 0.294 -0.298</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; - Phase 2: 101 of 107 parameters active.</span></span>
 <span><span class="co">#&gt;  Using optimization method 'Rvmmin'.</span></span>
-<span><span class="co">#&gt;  Phase 2 finished (17.77s)</span></span>
+<span><span class="co">#&gt;  Phase 2 finished (29.21s)</span></span>
 <span><span class="co">#&gt;  Function value: -186095</span></span>
 <span><span class="co">#&gt;  Parameter values: 0.396 -0.415 -0.0739 0.136 0.262 -0.274 0.054 0.0773 0.0866 0.469 0.232 -0.0443 -0.093 0.156 0.309 0.081 -0.0663 0.133 -0.00675 0.406 -0.179 0.0717 -0.204 -0.22 0.0911 -0.0316 -0.143 0.327 0.0348 0.302 -0.177 -0.0177 -0.289 0.286 -0.159 0.325 -0.208 0.0106 -0.499 -0.0385 -0.0285 -0.268 -0.0737 -0.134 -0.293 0.0938 -0.153 0.00605 0.138 -0.0487 0.0374 0.196 0.308 -0.0736 -0.337 0.119 -0.0999 0.0708 0.116 0.036 0.13 -0.0312 0.326 0.219 0.166 0.198 0.0843 -0.111 -0.089 -0.127 -0.249 0.113 -0.0129 0.0226 -0.199 -0.0183 -0.132 -0.152 -0.192 -0.000484 0.0229 -0.177 -0.0406 -0.064 -0.15 -0.104 0.00688 -0.13 0.21 -0.165 -0.204 0.188 -0.246 -0.324 0.00128 -0.167 0.0528 0.0208 0.24 -0.00361 0.411</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -655,13 +655,13 @@ better initial starting point for the final search.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; - Phase 1: 2 of 107 parameters active.</span></span>
 <span><span class="co">#&gt;  Using optimization method 'Nelder-Mead'.</span></span>
-<span><span class="co">#&gt;  Phase 1 finished (0.00s)</span></span>
+<span><span class="co">#&gt;  Phase 1 finished (0.01s)</span></span>
 <span><span class="co">#&gt;  Function value: -124445</span></span>
 <span><span class="co">#&gt;  Parameter values: 0.308 -0.358</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; - Phase 2: 101 of 107 parameters active.</span></span>
 <span><span class="co">#&gt;  Using optimization method 'Rvmmin'.</span></span>
-<span><span class="co">#&gt;  Phase 2 finished (20.78s)</span></span>
+<span><span class="co">#&gt;  Phase 2 finished (33.78s)</span></span>
 <span><span class="co">#&gt;  Function value: -186095</span></span>
 <span><span class="co">#&gt;  Parameter values: 0.396 -0.415 -0.074 0.136 0.262 -0.274 0.0539 0.0772 0.0866 0.468 0.232 -0.0444 -0.0931 0.156 0.309 0.0809 -0.0663 0.133 -0.00686 0.406 -0.179 0.0716 -0.204 -0.22 0.0909 -0.0316 -0.143 0.327 0.0348 0.302 -0.177 -0.0178 -0.289 0.286 -0.159 0.324 -0.208 0.0105 -0.499 -0.0386 -0.0287 -0.268 -0.0738 -0.134 -0.293 0.0939 -0.152 0.0051 0.138 -0.0488 0.0372 0.196 0.308 -0.0737 -0.337 0.119 -0.0999 0.0706 0.116 0.0359 0.13 -0.031 0.326 0.219 0.166 0.198 0.0842 -0.111 -0.0891 -0.127 -0.249 0.113 -0.0132 0.0226 -0.199 -0.0186 -0.132 -0.152 -0.192 -0.00097 0.0229 -0.177 -0.0407 -0.0642 -0.15 -0.104 0.00515 -0.129 0.21 -0.165 -0.204 0.188 -0.246 -0.324 0.000538 -0.167 0.0529 0.0204 0.238 -8.15e-05 0.409</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -671,13 +671,13 @@ better initial starting point for the final search.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; - Phase 1: 2 of 107 parameters active.</span></span>
 <span><span class="co">#&gt;  Using optimization method 'CG'.</span></span>
-<span><span class="co">#&gt;  Phase 1 finished (0.01s)</span></span>
+<span><span class="co">#&gt;  Phase 1 finished (0.02s)</span></span>
 <span><span class="co">#&gt;  Function value: -1824.73</span></span>
 <span><span class="co">#&gt;  Parameter values: 2.33e+03 2.36e+03</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; - Phase 2: 101 of 107 parameters active.</span></span>
 <span><span class="co">#&gt;  Using optimization method 'Rvmmin'.</span></span>
-<span><span class="co">#&gt;  Phase 2 finished (6.25s)</span></span>
+<span><span class="co">#&gt;  Phase 2 finished (9.82s)</span></span>
 <span><span class="co">#&gt;  Function value: -186095</span></span>
 <span><span class="co">#&gt;  Parameter values: 0.396 -0.415 -0.0746 0.136 0.262 -0.275 0.0533 0.0765 0.086 0.468 0.232 -0.045 -0.0937 0.156 0.309 0.0803 -0.0669 0.132 -0.0076 0.406 -0.18 0.071 -0.204 -0.22 0.0903 -0.0322 -0.144 0.327 0.0341 0.302 -0.178 -0.0184 -0.29 0.285 -0.16 0.324 -0.208 0.00983 -0.5 -0.0391 -0.0293 -0.269 -0.0744 -0.134 -0.294 0.0933 -0.153 0.00378 0.138 -0.0493 0.0366 0.195 0.308 -0.0743 -0.338 0.118 -0.1 0.07 0.115 0.0352 0.13 -0.0316 0.325 0.218 0.165 0.198 0.0836 -0.112 -0.0897 -0.127 -0.249 0.112 -0.014 0.022 -0.2 -0.0196 -0.133 -0.153 -0.194 0.0032 0.0203 -0.178 -0.0414 -0.0648 -0.15 -0.102 -0.000385 -0.128 0.21 -0.166 -0.205 0.188 -0.246 -0.321 -0.0101 -0.164 0.0538 0.0198 0.239 -0.00341 0.41</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -686,11 +686,11 @@ better initial starting point for the final search.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">ARPM</span>, <span class="va">lbfgsb2</span>, <span class="va">lbfgsb2p</span>, <span class="va">mix1</span>, <span class="va">mix2</span>, <span class="va">mix3</span>, show_par <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span></span>
 <span><span class="co">#&gt;          method elapsed   value   fn  gr alpha   beta  gamma1</span></span>
 <span><span class="co">#&gt; ARPM       data      NA -186178   NA  NA 0.400 -0.400 -0.1253</span></span>
-<span><span class="co">#&gt; lbfgsb2  Rvmmin   13.03 -186095 2701 425 0.397 -0.415 -0.0755</span></span>
-<span><span class="co">#&gt; lbfgsb2p Rvmmin   10.94 -186095 2080 329 0.396 -0.415 -0.0743</span></span>
-<span><span class="co">#&gt; mix1     Rvmmin   18.80 -186095 4011 590 0.396 -0.415 -0.0739</span></span>
-<span><span class="co">#&gt; mix2     Rvmmin   20.79 -186095 4011 693 0.396 -0.415 -0.0740</span></span>
-<span><span class="co">#&gt; mix3     Rvmmin    6.26 -186095  729 212 0.396 -0.415 -0.0746</span></span></code></pre></div>
+<span><span class="co">#&gt; lbfgsb2  Rvmmin   19.96 -186095 2701 425 0.397 -0.415 -0.0755</span></span>
+<span><span class="co">#&gt; lbfgsb2p Rvmmin   16.16 -186095 2080 329 0.396 -0.415 -0.0743</span></span>
+<span><span class="co">#&gt; mix1     Rvmmin   31.09 -186095 4011 590 0.396 -0.415 -0.0739</span></span>
+<span><span class="co">#&gt; mix2     Rvmmin   33.79 -186095 4011 693 0.396 -0.415 -0.0740</span></span>
+<span><span class="co">#&gt; mix3     Rvmmin    9.85 -186095  729 212 0.396 -0.415 -0.0746</span></span></code></pre></div>
 <p>Here, we can see that every combination find essentially the same
 solution, but the combination using the ‘CG’ (conjugated gradient) first
 required less function and gradient evaluations, being faster.</p>

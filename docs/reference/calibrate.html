@@ -19,7 +19,7 @@ calibration of a model, by minimizing the error function fn associated to it."><
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">calibrar</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.0.9021</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.0</span>
       </span>
     </div>
 
@@ -192,18 +192,18 @@ exploite the additional information provided by a vectorial output from <code>fn
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">calibrate</span><span class="op">(</span>par<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fl">5</span><span class="op">)</span>, fn<span class="op">=</span><span class="va">sphereN</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Using optimization method 'Rvmmin'.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Elapsed time: 0.01s</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Function value: 0.013758</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Parameter values: 0 0 0 0 0</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Function value: 0.00272986</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Parameter values: 2.62e-05 9.95e-06 2.26e-05 -2.52e-06 2.52e-05</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Status: Rvmminu appears to have converged</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Optimization using 'Rvmmin' algorithm.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Function value: 0.013758 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Function value: 0.002729857 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Status: Rvmminu appears to have converged </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Parameters:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0 0 0 0 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1]  2.615355e-05  9.950590e-06  2.261864e-05 -2.522393e-06  2.519202e-05</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Computation:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> function gradient </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       31        1 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      166        5 </span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span><span class="fu">calibrate</span><span class="op">(</span>par<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fl">5</span><span class="op">)</span>, fn<span class="op">=</span><span class="va">sphereN</span>, replicates<span class="op">=</span><span class="fl">3</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">calibrate</span><span class="op">(</span>par<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">5</span><span class="op">)</span>, fn<span class="op">=</span><span class="va">sphereN</span>, replicates<span class="op">=</span><span class="fl">3</span>, lower<span class="op">=</span><span class="op">-</span><span class="fl">5</span>, upper<span class="op">=</span><span class="fl">5</span><span class="op">)</span></span></span>
