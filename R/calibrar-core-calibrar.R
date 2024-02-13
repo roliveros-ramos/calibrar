@@ -104,7 +104,7 @@
   
   if(all(method %in% multiMethods)) {
     # only run it if not provided in fn
-    if(is.null(control$nvar)) control$nvar = length(fn1(par, ...))
+    if(is.null(control$nvar)) control$nvar = length(fn1(par))
   }
   
   # here, make methods explicit (one by one)
