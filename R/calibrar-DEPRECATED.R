@@ -24,8 +24,6 @@ NULL
 #' @return A list with the observed data needed for a calibration, to be used 
 #' in combination with the \code{\link{createObjectiveFunction}}.
 #' @author Ricardo Oliveros-Ramos
-#' @seealso \code{\link{createObjectiveFunction}}, \code{\link{getCalibrationInfo}}.
-#' 
 #' @name getObservedData-defunct
 #' @seealso \code{\link{calibrar-deprecated}}
 #' @keywords internal
@@ -76,8 +74,6 @@ getObservedData = function(info, path, data.folder="data", ...) {
 #' model, to be used with the \code{\link{createObjectiveFunction}} 
 #' and \code{\link{getObservedData}}.
 #' @author Ricardo Oliveros-Ramos
-#' @seealso \code{\link{createObjectiveFunction}}, \code{\link{getObservedData}}.
-#' 
 #' @name getCalibrationInfo-defunct
 #' @seealso \code{\link{calibrar-deprecated}}
 #' @keywords internal
@@ -147,8 +143,6 @@ getCalibrationInfo = function(path, file="calibrationInfo.csv", stringsAsFactors
 #' @return A function, integrating the simulation of the model and the 
 #' comparison with observed data. 
 #' @author Ricardo Oliveros-Ramos
-#' @seealso \code{\link{getObservedData}}, \code{\link{getCalibrationInfo}}.
-#' 
 #' @name createObjectiveFunction-defunct
 #' @seealso \code{\link{calibrar-deprecated}}
 #' @keywords internal
