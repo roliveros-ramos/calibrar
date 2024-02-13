@@ -326,8 +326,9 @@ format_difftime = function(x, y, ..., value=FALSE) {
   
   isRestartMethod = method %in% c("AHR-ES", "Rvmmin")
   
-  if(!is.null(con$restart.file) & !isRestartMethod)
-    stop(sprintf("Restart functionality is not yet provided for method '%s'.", method))
+  if(!is.null(con$restart.file) & !all(isRestartMethod))
+    stop(sprintf("Restart functionality is not yet provided for method '%s'.", 
+                 method[!isRestartMethod]))
   
   if(!is.list(con$gradient)) 
     stop("Control argument 'gradient' must be a list with the control options for numerical gradient computation.")
@@ -404,7 +405,7 @@ format_difftime = function(x, y, ..., value=FALSE) {
   # for methods that do not use derivatives and no parallel implementation is 
   # available, return 1.
   deriv_free_methods = c("Nelder-Mead", "Brent", "hjn", "bobyqa", 
-                         "CMA-ES", "genSA", "DE", "soma", "genoud", "PSO", 
+                         "CMA-ES", "genSA", "DE", "soma", "PSO", 
                          "mads", "hjk", "hjkb", "nmk", "nmkb")
   
   if(method %in% deriv_free_methods) {
