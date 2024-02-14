@@ -128,6 +128,45 @@ the demo files.</p></dd>
 <dd><p>NA, set for compatibility with summary methods.</p></dd>
 
 </dl></div>
+    <div id="details">
+    <h2>Details</h2>
+    <p>Current implemented models are:</p><dl><dt>PoissonMixedModel</dt>
+<dd><p>Poisson Autoregressive Mixed model for the dynamics 
+of a population in different sites:
+$$log(\mu_{i, t+1}) = log(\mu_{i, t}) + \alpha + \beta X_{i, t} + \gamma_t$$
+where \(\mu_{i, t}\) is the size of the population in site \(i\) at year \(t\), 
+\(X_{i, t}\) is the value of an environmental variable in site \(i\) at year \(t\). 
+The parameters to estimate were \(\alpha\), \(\beta\), and \(\gamma_t\), the 
+random effects for each year, \(\gamma_t \sim N(0,\sigma^2)\), and the initial 
+population at each site \(\mu_{i, 0}\). We assumed that the observations 
+\(N_{i,t}\) follow a Poisson distribution with mean \(\mu_{i, t}\).</p></dd>
+
+<dt>PredatorPrey</dt>
+<dd><p>Lotka Volterra Predator-Prey model. The model is defined 
+by a system of ordinary differential equations for the abundance of prey $N$ and predator $P$:
+$$\frac{dN}{dt} = rN(1-N/K)-\alpha NP$$
+$$\frac{dP}{dt} = -lP + \gamma\alpha NP$$
+The parameters to estimate are the prey’s growth rate \(r\), the predator’s 
+mortality rate \(l\), the carrying capacity of the prey \(K\) and \(\alpha\) 
+and \(\gamma\) for the predation interaction. Uses <code>deSolve</code> package 
+for numerical solution of the ODE system.</p></dd>
+
+<dt>SIR</dt>
+<dd><p>Susceptible-Infected-Recovered epidemiological model. 
+The model is defined by a system of ordinary differential equations for the 
+number of susceptible $S$, infected $I$ and recovered $R$ individuals:
+$$\frac{dS}{dt} = -\beta S I/N$$
+$$\frac{dI}{dt} = \beta S I/N -\gamma I$$
+$$\frac{dR}{dt} = \gamma I$$
+The parameters to estimate are the  average number of contacts per person per 
+time \(\beta\) and the instant probability of an infectious individual 
+recovering \(\gamma\). Uses <code>deSolve</code> package for numerical solution of the ODE system.</p></dd>
+
+<dt>IBMLotkaVolterra</dt>
+<dd><p>Stochastic Individual Based Model for Lotka-Volterra model. Uses <code>ibm</code> package for the simulation.</p></dd>
+
+
+</dl></div>
     <div id="references">
     <h2>References</h2>
     <p>Oliveros-Ramos and Shin (2014)</p>
