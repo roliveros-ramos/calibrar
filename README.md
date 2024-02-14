@@ -40,7 +40,7 @@ install.packages("calibrar")
 install.packages("calibrar", repo="https://osmose-model.github.io/drat/")
 
 # Or the development version from GitHub:
-# install.packages("pak")
+# install.packages("remotes")
 remotes::install_github("roliveros-ramos/calibrar")
 ```
 
