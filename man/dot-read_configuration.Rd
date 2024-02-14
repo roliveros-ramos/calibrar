@@ -15,9 +15,9 @@
 \arguments{
 \item{file}{File to read the configuration}
 
-\item{recursive}{Should 'osmose.configuration' keys be read as additional configuration files? Default is TRUE.}
+\item{recursive}{Should 'conf.key' keys be read as additional configuration files? Default is TRUE.}
 
-\item{keep.names}{Should names be kept as they are? By default, are converted to lower case, as is expected in OSMOSE.}
+\item{keep.names}{Should names be kept as they are? By default, are converted to lower case.}
 
 \item{conf.key}{String indicating the leading key to find an additional configuration file.}
 
