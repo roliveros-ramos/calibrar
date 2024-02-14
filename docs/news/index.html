@@ -67,20 +67,21 @@
 <h2 class="page-header" data-toc-text="0.9" id="calibrar-09">calibrar 0.9<a class="anchor" aria-label="anchor" href="#calibrar-09"></a></h2>
 <ul><li><p>new <code><a href="../reference/optim2.html">optim2()</a></code> equivalent to <code><a href="https://rdrr.io/r/stats/optim.html" class="external-link">stats::optim()</a></code> but with parallel computation of numerical gradients.</p></li>
 <li><p>new <code><a href="../reference/optimh.html">optimh()</a></code> wrapping heuristic methods with the same syntax of <code><a href="https://rdrr.io/r/stats/optim.html" class="external-link">stats::optim()</a></code>.</p></li>
-<li><p>the calibrate function implements the restart functionality for the <code>Rvmmin</code> method too, useful for the optimization of deterministic functions with long runtime.</p></li>
-<li><p>Automatic support to optimize functions produced with the TMB package.</p></li>
+<li><p>the <code><a href="../reference/calibrate.html">calibrate()</a></code> function implements the restart functionality for the <code>Rvmmin</code> method too, useful for the optimization of deterministic functions with long runtime.</p></li>
 <li><p>Improved methods for visualization of results.</p></li>
-<li><p>All methods in <code><a href="../reference/calibrate.html">calibrate()</a></code> can use functions reading and writing from the disk.</p></li>
+<li><p>All optimization methods available in <code><a href="../reference/calibrate.html">calibrate()</a></code> can use functions reading and writing from the disk.</p></li>
 <li><p>Function<code><a href="../reference/calibrate.html">calibrate()</a></code> can use a different method for each estimation phase.</p></li>
+<li><p><code><a href="../reference/calibrate.html">calibrate()</a></code> is a generic now.</p></li>
 <li>
-<p>automatic stopping criteria for the AHR-ES method:</p>
+<p>Automatic stopping criteria for the AHR-ES method:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>    <span class="sc">-</span> <span class="dv">0</span><span class="sc">:</span> maxit<span class="sc">/</span>maxgen only</span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>    <span class="sc">-</span> <span class="dv">1</span><span class="sc">:</span> <span class="dv">1</span> OR max step reduction</span>
 <span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>    <span class="sc">-</span> <span class="dv">2</span><span class="sc">:</span> relative tolerance on <span class="fu">value</span> (smoothing <span class="cf">for</span> AHR<span class="sc">-</span>ES)</span>
 <span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>    <span class="sc">-</span> <span class="dv">3</span><span class="sc">:</span> maximum number of generations without improvement of <span class="st">`</span><span class="at">reltol</span><span class="st">`</span>.</span></code></pre></div>
 </li>
 <li><p>Automatic testing using <code>testthat</code> package.</p></li>
-<li><p>‘calibrate’ function is a generic now.</p></li>
+<li><p>Automatic support to optimize functions produced with the <code>TMB</code> package, via a method for <code><a href="../reference/calibrate.html">calibrate()</a></code>.</p></li>
+<li><p><code><a href="../reference/calibrar-defunct.html">getCalibrationInfo()</a></code>, <code>createObjectiveFuction()</code> and <code><a href="../reference/calibrar-defunct.html">getObservedData()</a></code> are defunct now.</p></li>
 </ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.3" id="calibrar-03">calibrar 0.3<a class="anchor" aria-label="anchor" href="#calibrar-03"></a></h2>
@@ -89,7 +90,7 @@
 <li>replicates argument for stochastic functions</li>
 <li>several minor bugs fixed</li>
 <li>
-<code><a href="../reference/calibrar-defunct.html">getCalibrationInfo()</a></code>, <code>createObjectiveFuction()</code> and <code>getObserved()</code> data are replaced and deprecated and replaced by <code><a href="../reference/calibration_setup.html">calibration_setup()</a></code>, <code><a href="../reference/calibration_objFn.html">calibration_objFn()</a></code> and <code><a href="../reference/calibration_data.html">calibration_data()</a></code>.</li>
+<code><a href="../reference/calibrar-defunct.html">getCalibrationInfo()</a></code>, <code>createObjectiveFuction()</code> and <code><a href="../reference/calibrar-defunct.html">getObservedData()</a></code> are deprecated and replaced by <code><a href="../reference/calibration_setup.html">calibration_setup()</a></code>, <code><a href="../reference/calibration_objFn.html">calibration_objFn()</a></code> and <code><a href="../reference/calibration_data.html">calibration_data()</a></code>.</li>
 <li>
 <code><a href="../reference/spline_par.html">spline_par()</a></code> function to simplify the estimation of smooth time-varying parameters.</li>
 </ul></div>

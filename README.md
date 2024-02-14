@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# calibrar <a href="https://roliveros-ramos.github.io/calibrar/"><img src="man/figures/logo_small.png" align="right" height="138" /></a>
+# calibrar <a href="https://roliveros-ramos.github.io/calibrar/"><img src="man/figures/logo_small.png" align="right" height="124" /></a>
 
 <!-- badges: start -->
 
