@@ -98,6 +98,8 @@
                   path = main.folder,
                   par=par_real, bguess=guess, pop=opop), constants, parInfo)
   
+  output$value = NA
+  
   return(output)
   
 }
@@ -112,11 +114,12 @@
 .get_guess_LV = function(N, P, NP, PN) {
   dN = diff(N)
   dP = diff(P)
-  N = head(N, -1) # + 0.5*dN
-  P = head(P, -1) # + 0.5*dP
   
   N2 = head(N, -1) + 0.5*dN
   P2 = head(P, -1) + 0.5*dP
+  
+  N = head(N, -1) # + 0.5*dN
+  P = head(P, -1) # + 0.5*dP
   
   dNr = dN/N
   dPr = dP/P
