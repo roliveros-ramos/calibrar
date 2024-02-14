@@ -196,8 +196,8 @@ print.calibrar.demo = function(x, ...) {
 #' 
 #' @param file File to read the configuration
 #'
-#' @param recursive Should 'osmose.configuration' keys be read as additional configuration files? Default is TRUE.
-#' @param keep.names Should names be kept as they are? By default, are converted to lower case, as is expected in OSMOSE.
+#' @param recursive Should 'conf.key' keys be read as additional configuration files? Default is TRUE.
+#' @param keep.names Should names be kept as they are? By default, are converted to lower case.
 #' @param conf.key String indicating the leading key to find an additional configuration file.
 #' @param ... Additional arguments, not currently in use.
 #'
