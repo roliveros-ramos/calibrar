@@ -1,6 +1,8 @@
 library(testthat)
 library(calibrar)
 
+message("\nTests for calibrate() -------- \n")
+
 tfn = function(x) sum(x^2) + 10
 tgr = function(x) 2*x
 foreach::registerDoSEQ()
@@ -78,5 +80,21 @@ test_that(sprintf("calibrate - algorithm test: %s + %s", alg0, alg1), {
                                control=list(master=file.path(tmp, "master"),
                                             run=file.path(tmp, "run", "mix", "test1")))))
   })
+  
+test_that("high trace and methods", {
+  expect_no_error(
+    suppressMessages(opt <- calibrate(par=rep(0.5, 3), fn = sphereN,
+                               lower=rep(-10, 3), upper=rep(10, 3),
+                               method="AHR-ES", 
+                               control=list(REPORT=1, trace=4))))
+  expect_no_error(opt)
+  expect_no_error(coef(opt))
+  expect_no_error(summ <- summary(opt))
+  expect_no_error(summ)
+  expect_no_error(plot(opt))
+  expect_no_error(dim(opt))
+})
+
+
   
 unlink(file.path(tmp, "run"), recursive = TRUE)
