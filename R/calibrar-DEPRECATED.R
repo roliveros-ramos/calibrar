@@ -38,24 +38,24 @@ getObservedData = function(info, path, data.folder="data", ...) {
   
   .Defunct("calibration_data", package="calibrar")
   
-  observed  = list()
-  variables = info$variable
-  
-  useData = as.logical(info$useData)
-  
-  message("Creating observed data list for calibration...","\n")
-  
-  for(iVar in seq_len(nrow(info))) {
-    
-    message(paste0("Variable: ", variables[iVar], "\n"))
-    varPath         = file.path(path, data.folder, paste0(variables[iVar],".csv"))
-    observed[[iVar]] = if(useData[iVar]) .read.csv3(varPath, ...) else NA
-    
-  }
-  
-  names(observed) = variables
-  
-  return(observed)
+  # observed  = list()
+  # variables = info$variable
+  # 
+  # useData = as.logical(info$useData)
+  # 
+  # message("Creating observed data list for calibration...","\n")
+  # 
+  # for(iVar in seq_len(nrow(info))) {
+  #   
+  #   message(paste0("Variable: ", variables[iVar], "\n"))
+  #   varPath         = file.path(path, data.folder, paste0(variables[iVar],".csv"))
+  #   observed[[iVar]] = if(useData[iVar]) .read.csv3(varPath, ...) else NA
+  #   
+  # }
+  # 
+  # names(observed) = variables
+  # 
+  # return(observed)
   
 }
 
