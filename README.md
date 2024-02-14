@@ -5,7 +5,7 @@
 
 <!-- badges: start -->
 
-[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/calibrar)](http://cran.r-project.org/package=calibrar)
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/calibrar)](https://CRAN.R-project.org/package=calibrar)
 ![GitHub R package
 version](https://img.shields.io/github/r-package/v/roliveros-ramos/calibrar?label=GitHub)
 [![R-CMD-check](https://github.com/roliveros-ramos/calibrar/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/roliveros-ramos/calibrar/actions/workflows/R-CMD-check.yaml)
@@ -13,8 +13,8 @@ version](https://img.shields.io/github/r-package/v/roliveros-ramos/calibrar?labe
 issues](https://img.shields.io/github/issues/roliveros-ramos/calibrar)](https://github.com/roliveros-ramos/calibrar/issues)
 [![OpenSSF Best
 Practices](https://www.bestpractices.dev/projects/2132/badge)](https://www.bestpractices.dev/projects/2132)
-[![](http://cranlogs.r-pkg.org/badges/calibrar)](http://cran.rstudio.com/web/packages/calibrar/index.html)
-[![codecov](https://codecov.io/gh/roliveros-ramos/calibrar/graph/badge.svg?token=HELOL3WS4G)](https://codecov.io/gh/roliveros-ramos/calibrar)
+[![](http://cranlogs.r-pkg.org/badges/calibrar)](https://CRAN.R-project.org/package=calibrar)
+[![codecov](https://codecov.io/gh/roliveros-ramos/calibrar/graph/badge.svg?token=HELOL3WS4G)](https://app.codecov.io/gh/roliveros-ramos/calibrar)
 <!-- badges: end -->
 
 ## Overview
