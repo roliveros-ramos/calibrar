@@ -17,20 +17,35 @@ Practices](https://www.bestpractices.dev/projects/2132/badge)](https://www.bestp
 [![codecov](https://codecov.io/gh/roliveros-ramos/calibrar/graph/badge.svg?token=HELOL3WS4G)](https://app.codecov.io/gh/roliveros-ramos/calibrar)
 <!-- badges: end -->
 
-## Overview
+### Automated Parameter Estimation for Complex Models
 
-This package allows the parameter estimation (i.e. calibration) of
-complex models, including stochastic ones. It implements generic
-functions that can be used for fitting any type of models, especially
-those with non-differentiable objective functions, with the same syntax
-as base::optim. It supports multiple phases estimation (sequential
-parameter masking), constrained optimization (bounding box restrictions)
-and automatic parallel computation of numerical gradients. Some common
-maximum likelihood estimation methods and automated construction of the
-objective function from simulated model outputs is provided.  
+This R package, calibrar, has been designed for the parameter estimation
+(or calibration) of a wide range of ecological models, including complex
+and stochastic models. The package combines various optimization
+functionalities in a single interface, enabling the implementation of
+the latest advancements in complex model calibration. The package
+provides support for multiple phases and box constrained optimisation
+with the possibility of using several algorithms available in R. In
+particular, by using a “black-box” approach, the package allows the
+calibration of models implemented in any programming language. It
+provides a generic interface with models and allows the construction of
+the objective function, within R, without requiring any changes in the
+models’ code. Parallel support for computationally intensive models is
+also provided, and can be used with high performance computing systems
+in a simple manner, including the capability to restart an unfinished
+optimisation for models with a long runtime.
+
+It implements generic functions that can be used for fitting any type of
+models, especially those with non-differentiable objective functions,
+with the same syntax as base::optim. It supports multiple phases
+estimation (sequential parameter masking), constrained optimization
+(bounding box restrictions) and automatic parallel computation of
+numerical gradients. Some common maximum likelihood estimation methods
+and automated construction of the objective function from simulated
+model outputs is provided.  
 See <https://roliveros-ramos.github.io/calibrar/> for more details.
 
-## Installation
+### Installation
 
 ``` r
 # The easiest way to get calibrar is to install it from CRAN:
@@ -44,7 +59,7 @@ install.packages("calibrar", repo="https://osmose-model.github.io/drat/")
 remotes::install_github("roliveros-ramos/calibrar")
 ```
 
-## Usage
+### Usage
 
 For a quick introduction, check the worked the examples available from
 the package:
@@ -58,7 +73,7 @@ For a more detailed explanation of the package philosophy, you can read
 the pre-print [calibrar: an R package for fitting complex ecological
 models](https://arxiv.org/abs/1603.03141).
 
-## Contributions
+### Contributions
 
 If you find any bug, have questions about the documentation or requests
 for enhancements, please [open an
