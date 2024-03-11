@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">calibrar</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.0.9000</span>
       </span>
     </div>
 
@@ -74,10 +74,10 @@
 <li><p><code><a href="../reference/calibrate.html">calibrate()</a></code> is a generic now.</p></li>
 <li>
 <p>Automatic stopping criteria for the AHR-ES method:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>    <span class="sc">-</span> <span class="dv">0</span><span class="sc">:</span> maxit<span class="sc">/</span>maxgen only</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="sc">-</span> <span class="dv">1</span><span class="sc">:</span> <span class="dv">1</span> OR max step reduction</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="sc">-</span> <span class="dv">2</span><span class="sc">:</span> relative tolerance on <span class="fu">value</span> (smoothing <span class="cf">for</span> AHR<span class="sc">-</span>ES)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="sc">-</span> <span class="dv">3</span><span class="sc">:</span> maximum number of generations without improvement of <span class="st">`</span><span class="at">reltol</span><span class="st">`</span>.</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>    <span class="sc">-</span> <span class="dv">0</span><span class="sc">:</span> maxit<span class="sc">/</span>maxgen only</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>    <span class="sc">-</span> <span class="dv">1</span><span class="sc">:</span> <span class="dv">1</span> OR max step reduction</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>    <span class="sc">-</span> <span class="dv">2</span><span class="sc">:</span> relative tolerance on <span class="fu">value</span> (smoothing <span class="cf">for</span> AHR<span class="sc">-</span>ES)</span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>    <span class="sc">-</span> <span class="dv">3</span><span class="sc">:</span> maximum number of generations without improvement of <span class="st">`</span><span class="at">reltol</span><span class="st">`</span>.</span></code></pre></div>
 </li>
 <li><p>Automatic testing using <code>testthat</code> package.</p></li>
 <li><p>Automatic support to optimize functions produced with the <code>TMB</code> package, via a method for <code><a href="../reference/calibrate.html">calibrate()</a></code>.</p></li>
