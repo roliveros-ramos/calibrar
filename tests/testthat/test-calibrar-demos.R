@@ -1,6 +1,6 @@
 
-# models = c("PoissonMixedModel", "PredatorPrey", "SIR", "IBMLotkaVolterra")
-models = c("PoissonMixedModel", "PredatorPrey", "SIR")
+models = c("PoissonMixedModel", "PredatorPrey", "SIR", "IBMLotkaVolterra")
+# models = c("PoissonMixedModel", "PredatorPrey", "SIR")
 
 tmp = tempdir(check = TRUE)
 dir.create(file.path(tmp, "demo"), recursive = TRUE)
