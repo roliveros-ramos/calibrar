@@ -393,6 +393,10 @@ Rvmminb = function(par, fn, gr = NULL, lower = NULL,
               
     .createRestartFile(opt=opt, trace=trace, control=ctrl, method="Rvvmin") # (opt, control)
         
+    if(control$verbose & opt$gen%%control$REPORT==0) {
+      .messageByGen(opt=opt, trace=trace, method="Rvvmin")
+    }
+    
   }  # end main loop  (while keepgoing)
   
   msg = "Rvmminb appears to have converged"
