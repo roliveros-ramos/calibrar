@@ -26,7 +26,7 @@ gradient.default = function(fn, x, method=NULL, control=list(), parallel=FALSE, 
 
   use_disk = ifelse(!is.null(attr(fn, "..i")), TRUE, FALSE) 
   
-  if(is.null(method)) method = "richardson"
+  if(is.null(method)) method = "forward"
     
     df = switch(method,
                 central    = .grad_central(fn, x, control=control, parallel=parallel, use_disk=use_disk, ...),
