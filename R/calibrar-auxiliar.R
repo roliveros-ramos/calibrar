@@ -210,12 +210,12 @@ print.calibrar.demo = function(x, ...) {
     return(NULL)
   }
   
-  .guessSeparator = function(Line){
+  .guessSeparator = function(Line, nocolon=FALSE) {
     SEPARATORS = c(equal = "=", semicolon = ";",
                    coma = ",", colon = ":", tab = "\t")
+    if(isTRUE(nocolon)) SEPARATORS = SEPARATORS[-4]
     guess = which.min(nchar(lapply(str_split(Line,SEPARATORS), "[", i = 1)))
     separator = SEPARATORS[guess]
-    
     return(separator)
   }
   
@@ -228,7 +228,7 @@ print.calibrar.demo = function(x, ...) {
     start = str_locate(x, pattern=KeySeparator)[1,1]
     if(is.na(start)) return(NULL)
     values = stringr::str_sub(x, start+1, nchar(x))
-    valueseparator = .guessSeparator(values)
+    valueseparator = .guessSeparator(values, nocolon=TRUE)
     values = stringr::str_trim(str_split(values, valueseparator)[[1]])
     values = values[nchar(values)!=0]
     values = .guessType(values)
