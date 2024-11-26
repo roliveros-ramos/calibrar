@@ -13,7 +13,6 @@
 #' @description Automated Calibration for Complex Models
 #' @name calibrar-package
 #' @aliases calibrar-package calibrar
-#' @docType package
 #' @author Ricardo Oliveros-Ramos Maintainer: Ricardo Oliveros-Ramos
 #' <ricardo.oliveros@@gmail.com>
 #' @references calibrar: an R package for the calibration of ecological models (Oliveros-Ramos and Shin 2014)
@@ -51,7 +50,7 @@
 #' ahr = calibrate(par=demo$guess, fn=obj, lower=demo$lower, upper=demo$upper, control=control)
 #' summary(ahr)
 #' } 
-NULL
+"_PACKAGE"
 
 # calibrate ---------------------------------------------------------------
 

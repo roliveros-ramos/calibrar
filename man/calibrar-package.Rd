@@ -55,6 +55,14 @@ summary(ahr)
 \references{
 calibrar: an R package for the calibration of ecological models (Oliveros-Ramos and Shin 2014)
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://roliveros-ramos.github.io/calibrar/}
+  \item Report bugs at \url{https://github.com/roliveros-ramos/calibrar/issues}
+}
+
+}
 \author{
 Ricardo Oliveros-Ramos Maintainer: Ricardo Oliveros-Ramos
 <ricardo.oliveros@gmail.com>

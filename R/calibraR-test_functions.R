@@ -4,6 +4,7 @@
 # method for summary and print
 # f() print the minimum
 
+#' @export
 summary.calibrar.function = function(object, ...) {
   return(invisible())
 }
