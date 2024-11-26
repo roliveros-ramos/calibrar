@@ -479,6 +479,10 @@
 .check_control_ahres = function(control, default) {
   
   popOpt = default$popsize
+  if(is.null(control$maxit) & !is.null(control$maxgen)) {
+    control$maxit = control$maxgen
+    control$maxgen = NULL
+  }
   control = check_control(control=control, default=default, minimal=FALSE, verbose=FALSE)
   # update population size and selection rate
   if(control$popsize < popOpt) {
