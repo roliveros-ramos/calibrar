@@ -244,9 +244,8 @@ print.calibrar.demo = function(x, ...) {
   .addPath = function(x, path, force=FALSE) {
     if(is.null(x)) return(x)
     if(!is.character(x)) return(x)
-    # if(!is.null(attr(x, "path"))) 
-    # path = file.path(attr(x, "path"), path)
-    if(file.exists(file.path(path, x)) | isTRUE(force)) 
+    if(length(x) != 1) return(x)
+    if(file.exists(file.path(path, x)) || isTRUE(force)) 
       attr(x, "path") = normalizePath(path, winslash = "/", mustWork = FALSE)
     return(x)
   }
