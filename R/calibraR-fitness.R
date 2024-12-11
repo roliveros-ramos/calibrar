@@ -22,11 +22,13 @@ fitness = objFn
 # Provided ----------------------------------------------------------------
 
 pois = function(obs, sim, ...) {
+  if(all(!is.finite(sim))) return(Inf)
   nlogLike = -sum(obs*log(sim) - sim, na.rm=TRUE)
   return(nlogLike)
 }
 
 normp = function(obs, sim, ...) {
+  if(all(!is.finite(sim))) return(Inf)
   penalty = sum((sim)^2, na.rm=TRUE)
   return(penalty)
 }
@@ -34,12 +36,21 @@ normp = function(obs, sim, ...) {
 re = normp
 
 penalty = function(obs, sim, n=100, ...) {
+  if(all(!is.finite(sim))) return(Inf)
+  # assumes a fixed sample size of 'n'
+  penalty = n*mean((sim)^2, na.rm=TRUE)
+  return(penalty)
+}
+
+penalty2 = function(obs, sim, n=100, ...) {
+  if(all(!is.finite(sim))) return(Inf)
   # assumes a fixed sample size of 'n'
   penalty = n*mean((sim)^2, na.rm=TRUE)
   return(penalty)
 }
 
 norm2 = function(obs, sim, ...) {
+  if(all(!is.finite(sim))) return(Inf)
   nlogLike = sum((obs-sim)^2, na.rm=TRUE)
   return(nlogLike)
 }
@@ -84,6 +95,7 @@ lnorm4b  = function(obs, sim, tiny = 1e-2, b=1, c=2, ...) {
 }
 
 rangeq = function(obs, sim, b=1, c=2, dump=TRUE) {
+  if(all(!is.finite(sim))) return(Inf)
   ratio = obs/sim
   ratio[is.nan(ratio)] = NA
   n = sum(!is.na(ratio))
@@ -98,6 +110,8 @@ rangeq = function(obs, sim, b=1, c=2, dump=TRUE) {
 }
 
 multinom = function(sim, obs, size=20, tiny=1e-3) {
+  
+  if(all(!is.finite(sim))) return(Inf)
   
   A = ncol(sim) # number of classes
   
