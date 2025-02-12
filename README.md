@@ -70,8 +70,8 @@ vignette("calibrar")
 ```
 
 For a more detailed explanation of the package philosophy, you can read
-the pre-print [calibrar: an R package for fitting complex ecological
-models](https://arxiv.org/abs/1603.03141).
+the article [calibrar: an R package for fitting complex ecological
+models](https://doi.org/10.1111/2041-210X.14452).
 
 ### Contributions
 
