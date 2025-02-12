@@ -21,6 +21,7 @@ knitr::opts_chunk$set(
 [![GitHub issues](https://img.shields.io/github/issues/roliveros-ramos/calibrar)](https://github.com/roliveros-ramos/calibrar/issues)
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/2132/badge)](https://www.bestpractices.dev/projects/2132)
 [![](http://cranlogs.r-pkg.org/badges/calibrar)](https://CRAN.R-project.org/package=calibrar)
+[![](http://cranlogs.r-pkg.org/badges/grand-total/calibrar)](https://CRAN.R-project.org/package=calibrar)
 [![codecov](https://codecov.io/gh/roliveros-ramos/calibrar/graph/badge.svg?token=HELOL3WS4G)](https://app.codecov.io/gh/roliveros-ramos/calibrar)
 <!-- badges: end -->
 
@@ -56,7 +57,7 @@ library(calibrar)
 vignette("calibrar")
 ```
 
-For a more detailed explanation of the package philosophy, you can read the pre-print [calibrar: an R package for fitting complex ecological models][publication].
+For a more detailed explanation of the package philosophy, you can read the article [calibrar: an R package for fitting complex ecological models][publication].
 
 ### Contributions
 
