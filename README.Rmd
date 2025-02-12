@@ -66,5 +66,5 @@ Contributions are accepted as pull requests.
 Please note that the calibrar package is released with a [Contributor Code of Conduct](https://www.contributor-covenant.org/version/2/1/code_of_conduct/). By contributing to this project, you agree to abide by its terms. 
 
 
-[publication]: https://arxiv.org/abs/1603.03141
+[publication]: https://doi.org/10.1111/2041-210X.14452
 [issues]: https://github.com/roliveros-ramos/calibrar/issues
