@@ -41,3 +41,5 @@ vignettes/*Demo/
 # personal files
 TO_DO.txt
 temp/*
+/doc/
+/Meta/

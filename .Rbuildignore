@@ -21,3 +21,5 @@ vignettes/.*cache/
 vignettes/.*Demo/
 vignettes/v.*.Rmd
 vignettes/.*_cache/
+^doc$
+^Meta$
