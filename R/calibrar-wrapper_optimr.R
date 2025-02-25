@@ -50,7 +50,7 @@
   con = list(maxit = 500 + 2L*npar, maxfeval = 3000 + 10L*npar, maximize = FALSE, 
              trace = 0, eps = 1e-07, dowarn = TRUE, acctol = 1e-04, 
              stepredn = 0.2, reltest = 100, stopbadupdate = TRUE, 
-             checkgrad=FALSE, restart.file=NULL, REPORT=1L)
+             checkgrad=FALSE, restart.file=NULL, REPORT=1L, verbose=FALSE)
   
   control = check_control(control=control, default=con)
   
@@ -112,15 +112,14 @@
   
   npar = length(par)
   # defaults for Rvmmin (taken from optimx::hjn)
-  con = list(trace=0, stepsize=1, stepredn=0.1, maxfeval=2000*npar,
-             eps = 1e-07)
+  con = list(trace=0, maxfeval=2000*npar, maximize = FALSE, stepsize=1, stepredn=0.1, 
+             eps = 1e-07, reltest=100, restart.file=NULL, REPORT=1L, verbose=FALSE)
   
   control = check_control(control=control, default=con)
   
-  output = suppressWarnings(optimx::hjn(par=par, fn=fn, lower=lower, 
+  output = suppressWarnings(hjn(par=par, fn=fn, lower=lower, 
                                         upper=upper, control=control))
   
-  output$message = NA
   # let's ensure there's always the hessian component listed.
   if(is.null(output$hessian)) output$hessian = NULL
   

@@ -89,7 +89,7 @@ Rvmminb = function(par, fn, gr = NULL, lower = NULL,
   maxfeval = 3000 + 10L * n
   ctrl = list(maxit = maxit, maxfeval = maxfeval, maximize = FALSE, 
                trace = 0, eps = 1e-07, dowarn = TRUE, acctol = 0.0001, stepredn=0.2,
-               reltest=100.0, stopbadupdate = TRUE, restart.file=NULL, REPORT=1L)
+               reltest=100.0, stopbadupdate = TRUE, restart.file=NULL, REPORT=1L, verbose=FALSE)
   namc = names(control)
   missnm = paste(namc[!(namc %in% names(ctrl))], collapse=", ")
   if (!all(namc %in% names(ctrl))) 
@@ -192,7 +192,7 @@ Rvmminb = function(par, fn, gr = NULL, lower = NULL,
   }
   
   gnorm = sqrt(sum(g*g)) ## JN180414 
-  if (gnorm < (1 + abs(fmin))*eps*eps ) {
+  if (gnorm < (1 + abs(fmin))*eps*eps) {
     keepgoing = FALSE
     conv = 2
   }
@@ -393,7 +393,7 @@ Rvmminb = function(par, fn, gr = NULL, lower = NULL,
               
     .createRestartFile(opt=opt, trace=trace, control=ctrl, method="Rvvmin") # (opt, control)
         
-    if(control$verbose & opt$gen%%control$REPORT==0) {
+    if(ctrl$verbose & opt$gen%%ctrl$REPORT==0) {
       .messageByGen(opt=opt, trace=trace, method="Rvvmin")
     }
     
