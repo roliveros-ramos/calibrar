@@ -84,7 +84,7 @@ copy_master_folder = function(control, n=NULL) {
   if(!dir.exists(control$master)) stop("The 'master' directory does not exist.") 
   xfiles = dir(path=control$master)
   from   = file.path(control$master, xfiles)
-  file.copy(from=from, to=newDir, recursive=TRUE, overwrite = FALSE) # why?
+  file.copy(from=from, to=newDir, recursive=TRUE, overwrite = TRUE)
   return(invisible(newDir))
 }
 
