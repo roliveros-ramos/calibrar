@@ -30,7 +30,7 @@ algorithms = c("L-BFGS-B", "nlminb", "Rcgmin", "Rvmmin", "Nelder-Mead",
                "hjn", "spg", "LBFGSB3", "CMA-ES", "genSA", "DE", "soma", "genoud", 
                "PSO", "hybridPSO", "mads", "hjkb", "nmkb", "bobyqa", "AHR-ES")
 
-# algorithms = algorithms[6]
+# algorithms = algorithms[4]
 
 for(alg in algorithms) {
   
@@ -54,6 +54,7 @@ for(alg in algorithms) {
                                  method=alg, phases = c(1,1,1,2,1))))
   })
   
+  # ommiting some test due to speed
   if(!(alg %in% c("hybridPSO", "DE"))) {
     dir.create(file.path(tmp, "run", alg, "test2"), recursive = TRUE)
     test_that(sprintf("calibrate - algorithm test (parallel): '%s'.", alg), {
