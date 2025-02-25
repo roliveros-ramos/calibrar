@@ -324,7 +324,7 @@ format_difftime = function(x, y, ..., value=FALSE) {
   
   con[controlUser] = control
   
-  isRestartMethod = method %in% c("AHR-ES", "Rvmmin")
+  isRestartMethod = method %in% c("AHR-ES", "Rvmmin", "hjn")
   
   if(!is.null(con$restart.file) & !all(isRestartMethod))
     stop(sprintf("Restart functionality is not yet provided for method '%s'.", 
