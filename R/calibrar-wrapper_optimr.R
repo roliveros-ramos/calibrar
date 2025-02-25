@@ -7,7 +7,7 @@
   npar = length(par)
   # defaults for Rcgmin (taken from Rcgmin::Rcgmin)
   con = list(maxit = 500, maximize = FALSE, trace = 0, eps = 1e-07, 
-               dowarn = TRUE, tol = 0, checkgrad=FALSE)
+               dowarn = TRUE, tol = 0, checkgrad=FALSE, verbose=FALSE)
   
   control = check_control(control=control, default=con)
   
@@ -51,6 +51,7 @@
              trace = 0, eps = 1e-07, dowarn = TRUE, acctol = 1e-04, 
              stepredn = 0.2, reltest = 100, stopbadupdate = TRUE, 
              checkgrad=FALSE, restart.file=NULL, REPORT=1L, verbose=FALSE)
+  
   
   control = check_control(control=control, default=con)
   
