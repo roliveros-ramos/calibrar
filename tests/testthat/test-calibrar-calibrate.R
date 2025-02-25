@@ -1,7 +1,7 @@
 library(testthat)
 library(calibrar)
 
-message("\nTests for calibrate() -------- \n")
+message(" \n\nTests for calibrate() --------")
 
 tfn = function(x) sum(x^2) + 10
 tgr = function(x) 2*x
@@ -30,14 +30,14 @@ algorithms = c("L-BFGS-B", "nlminb", "Rcgmin", "Rvmmin", "Nelder-Mead",
                "hjn", "spg", "LBFGSB3", "CMA-ES", "genSA", "DE", "soma", "genoud", 
                "PSO", "hybridPSO", "mads", "hjkb", "nmkb", "bobyqa", "AHR-ES")
 
-# algorithms = algorithms[4]
+# algorithms = algorithms[3]
 
 for(alg in algorithms) {
   
   dir.create(file.path(tmp, "run", alg), recursive = TRUE)
   
   dir.create(file.path(tmp, "run", alg, "test1"), recursive = TRUE)
-  message(alg, " - ", date())
+  message("\n",alg, " - ", date())
   test_that(sprintf("calibrate - algorithm test: '%s'.", alg), {
     expect_no_error(
       suppressMessages(calibrate(par=rep(0.5, 5), fn = tfn,
@@ -72,7 +72,7 @@ for(alg in algorithms) {
 alg0 = "AHR-ES"
 alg1 = "Rvmmin"
 dir.create(file.path(tmp, "run", "mix", "test1"), recursive = TRUE)
-message("mix", " - ", date())
+message("\nmix", " - ", date())
 test_that(sprintf("calibrate - algorithm test: %s + %s", alg0, alg1), {
   expect_no_error(
     suppressMessages(calibrate(par=rep(0.5, 5), fn = tfn2,
@@ -96,6 +96,4 @@ test_that("high trace and methods", {
   expect_no_error(dim(opt))
 })
 
-
-  
 unlink(file.path(tmp, "run"), recursive = TRUE)
