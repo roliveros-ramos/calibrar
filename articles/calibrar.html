@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">calibrar</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.0.9004</span>
       </span>
     </div>
 
@@ -94,7 +94,7 @@ package</h1>
                         <h4 data-toc-skip class="author">Ricardo
 Oliveros-Ramos</h4>
             
-            <h4 data-toc-skip class="date">2024-10-23</h4>
+            <h4 data-toc-skip class="date">2025-02-25</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/roliveros-ramos/calibrar/blob/master/vignettes/calibrar.Rmd" class="external-link"><code>vignettes/calibrar.Rmd</code></a></small>
       <div class="hidden name"><code>calibrar.Rmd</code></div>
@@ -325,10 +325,10 @@ original function using the <code>control</code> argument.</p>
 <span><span class="fu"><a href="../reference/optimh.html">optimh</a></span><span class="op">(</span>par<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">5</span><span class="op">)</span>, fn<span class="op">=</span><span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">x</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>, method<span class="op">=</span><span class="st">"CMA-ES"</span>,</span>
 <span>       control<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>maxit<span class="op">=</span><span class="fl">200</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $par</span></span>
-<span><span class="co">#&gt; [1] -2.758168e-10 -6.857257e-11 -2.479183e-10 -2.076112e-10  7.940231e-10</span></span>
+<span><span class="co">#&gt; [1] -2.601340e-10 -4.546773e-10  4.311060e-10  4.155006e-11  2.101339e-10</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $value</span></span>
-<span><span class="co">#&gt; [1] 8.158157e-19</span></span>
+<span><span class="co">#&gt; [1] 5.061362e-19</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $counts</span></span>
 <span><span class="co">#&gt; function gradient </span></span>
@@ -567,19 +567,19 @@ iterations to 1000 to speed up the execution of the vignette.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; - Phase 1: 2 of 5 parameters active.</span></span>
 <span><span class="co">#&gt;  Using optimization method 'AHR-ES'.</span></span>
-<span><span class="co">#&gt;  Phase 1 finished (1.10s)</span></span>
+<span><span class="co">#&gt;  Phase 1 finished (1.05s)</span></span>
 <span><span class="co">#&gt;  Function value: 12.9126</span></span>
 <span><span class="co">#&gt;  Parameter values: -0.324 0.12</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; - Phase 2: 4 of 5 parameters active.</span></span>
 <span><span class="co">#&gt;  Using optimization method 'AHR-ES'.</span></span>
-<span><span class="co">#&gt;  Phase 2 finished (1.22s)</span></span>
+<span><span class="co">#&gt;  Phase 2 finished (1.16s)</span></span>
 <span><span class="co">#&gt;  Function value: 10.1169</span></span>
 <span><span class="co">#&gt;  Parameter values: 0.0695 0.112 0.151 -0.0849</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; - Phase 3: 5 of 5 parameters active.</span></span>
 <span><span class="co">#&gt;  Using optimization method 'AHR-ES'.</span></span>
-<span><span class="co">#&gt;  Phase 3 finished (1.25s)</span></span>
+<span><span class="co">#&gt;  Phase 3 finished (1.17s)</span></span>
 <span><span class="co">#&gt;  Function value: 0.0534613</span></span>
 <span><span class="co">#&gt;  Parameter values: -0.00843 0.0767 0.0606 0.0265 0.0048</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -602,19 +602,19 @@ length equal to the number of phases:</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; - Phase 1: 2 of 5 parameters active.</span></span>
 <span><span class="co">#&gt;  Using optimization method 'AHR-ES'.</span></span>
-<span><span class="co">#&gt;  Phase 1 finished (0.91s)</span></span>
+<span><span class="co">#&gt;  Phase 1 finished (0.87s)</span></span>
 <span><span class="co">#&gt;  Function value: 13.3163</span></span>
 <span><span class="co">#&gt;  Parameter values: -0.346 -0.101</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; - Phase 2: 4 of 5 parameters active.</span></span>
 <span><span class="co">#&gt;  Using optimization method 'AHR-ES'.</span></span>
-<span><span class="co">#&gt;  Phase 2 finished (1.00s)</span></span>
+<span><span class="co">#&gt;  Phase 2 finished (0.93s)</span></span>
 <span><span class="co">#&gt;  Function value: 9.8584</span></span>
 <span><span class="co">#&gt;  Parameter values: 0.217 -0.335 0.24 0.101</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; - Phase 3: 5 of 5 parameters active.</span></span>
 <span><span class="co">#&gt;  Using optimization method 'AHR-ES'.</span></span>
-<span><span class="co">#&gt;  Phase 3 finished (1.46s)</span></span>
+<span><span class="co">#&gt;  Phase 3 finished (1.39s)</span></span>
 <span><span class="co">#&gt;  Function value: 0.0412229</span></span>
 <span><span class="co">#&gt;  Parameter values: 0.0282 0.00574 -0.0127 -0.0375 -0.0192</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -639,13 +639,13 @@ length equal to the number of phases:</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; - Phase 1: 2 of 5 parameters active.</span></span>
 <span><span class="co">#&gt;  Using optimization method 'AHR-ES'.</span></span>
-<span><span class="co">#&gt;  Phase 1 finished (1.13s)</span></span>
+<span><span class="co">#&gt;  Phase 1 finished (1.11s)</span></span>
 <span><span class="co">#&gt;  Function value: 13.1182</span></span>
 <span><span class="co">#&gt;  Parameter values: 0.0558 0.181</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; - Phase 2: 4 of 5 parameters active.</span></span>
 <span><span class="co">#&gt;  Using optimization method 'AHR-ES'.</span></span>
-<span><span class="co">#&gt;  Phase 2 finished (2.18s)</span></span>
+<span><span class="co">#&gt;  Phase 2 finished (2.09s)</span></span>
 <span><span class="co">#&gt;  Function value: 8.96767</span></span>
 <span><span class="co">#&gt;  Parameter values: -0.0167 0.164 -0.14 0.0335</span></span>
 <span><span class="co">#&gt; </span></span>
