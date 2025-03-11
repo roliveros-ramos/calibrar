@@ -1,129 +1,42 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>/404.html</loc>
-  </url>
-  <url>
-    <loc>/articles/01-introduction.html</loc>
-  </url>
-  <url>
-    <loc>/articles/02-parameter_estimation.html</loc>
-  </url>
-  <url>
-    <loc>/articles/03-parameter_estimation_ODE.html</loc>
-  </url>
-  <url>
-    <loc>/articles/04-parameter_estimation_stochastic.html</loc>
-  </url>
-  <url>
-    <loc>/articles/05-using_with_TMB.html</loc>
-  </url>
-  <url>
-    <loc>/articles/calibrar.html</loc>
-  </url>
-  <url>
-    <loc>/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>/articles/introduction.html</loc>
-  </url>
-  <url>
-    <loc>/articles/v01-introduction.html</loc>
-  </url>
-  <url>
-    <loc>/articles/v02-parameter_estimation.html</loc>
-  </url>
-  <url>
-    <loc>/articles/v03-parameter_estimation_ODE.html</loc>
-  </url>
-  <url>
-    <loc>/articles/v04-parameter_estimation_stochastic.html</loc>
-  </url>
-  <url>
-    <loc>/articles/v05-using_with_TMB.html</loc>
-  </url>
-  <url>
-    <loc>/authors.html</loc>
-  </url>
-  <url>
-    <loc>/index.html</loc>
-  </url>
-  <url>
-    <loc>/news/index.html</loc>
-  </url>
-  <url>
-    <loc>/reference/ahres.html</loc>
-  </url>
-  <url>
-    <loc>/reference/calibrar-defunct.html</loc>
-  </url>
-  <url>
-    <loc>/reference/calibrar-package.html</loc>
-  </url>
-  <url>
-    <loc>/reference/calibrar_demo.html</loc>
-  </url>
-  <url>
-    <loc>/reference/calibrate.html</loc>
-  </url>
-  <url>
-    <loc>/reference/calibration_data.html</loc>
-  </url>
-  <url>
-    <loc>/reference/calibration_objFn.html</loc>
-  </url>
-  <url>
-    <loc>/reference/calibration_setup.html</loc>
-  </url>
-  <url>
-    <loc>/reference/createObjectiveFunction-defunct.html</loc>
-  </url>
-  <url>
-    <loc>/reference/createObjectiveFunction.html</loc>
-  </url>
-  <url>
-    <loc>/reference/dot-get_command_argument.html</loc>
-  </url>
-  <url>
-    <loc>/reference/dot-read_configuration.html</loc>
-  </url>
-  <url>
-    <loc>/reference/gaussian_kernel.html</loc>
-  </url>
-  <url>
-    <loc>/reference/getCalibrationInfo-defunct.html</loc>
-  </url>
-  <url>
-    <loc>/reference/getCalibrationInfo.html</loc>
-  </url>
-  <url>
-    <loc>/reference/getObservedData-defunct.html</loc>
-  </url>
-  <url>
-    <loc>/reference/getObservedData.html</loc>
-  </url>
-  <url>
-    <loc>/reference/gradient.html</loc>
-  </url>
-  <url>
-    <loc>/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>/reference/objFn.html</loc>
-  </url>
-  <url>
-    <loc>/reference/optim2.html</loc>
-  </url>
-  <url>
-    <loc>/reference/optimh.html</loc>
-  </url>
-  <url>
-    <loc>/reference/sphereN.html</loc>
-  </url>
-  <url>
-    <loc>/reference/spline_par.html</loc>
-  </url>
-  <url>
-    <loc>/reference/summary.calibrar.results.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>https://roliveros-ramos.github.io/calibrar/404.html</loc></url>
+<url><loc>https://roliveros-ramos.github.io/calibrar/articles/01-introduction.html</loc></url>
+<url><loc>https://roliveros-ramos.github.io/calibrar/articles/02-parameter_estimation.html</loc></url>
+<url><loc>https://roliveros-ramos.github.io/calibrar/articles/03-parameter_estimation_ODE.html</loc></url>
+<url><loc>https://roliveros-ramos.github.io/calibrar/articles/04-parameter_estimation_stochastic.html</loc></url>
+<url><loc>https://roliveros-ramos.github.io/calibrar/articles/05-using_with_TMB.html</loc></url>
+<url><loc>https://roliveros-ramos.github.io/calibrar/articles/calibrar.html</loc></url>
+<url><loc>https://roliveros-ramos.github.io/calibrar/articles/index.html</loc></url>
+<url><loc>https://roliveros-ramos.github.io/calibrar/articles/introduction.html</loc></url>
+<url><loc>https://roliveros-ramos.github.io/calibrar/articles/v01-introduction.html</loc></url>
+<url><loc>https://roliveros-ramos.github.io/calibrar/articles/v02-parameter_estimation.html</loc></url>
+<url><loc>https://roliveros-ramos.github.io/calibrar/articles/v03-parameter_estimation_ODE.html</loc></url>
+<url><loc>https://roliveros-ramos.github.io/calibrar/articles/v04-parameter_estimation_stochastic.html</loc></url>
+<url><loc>https://roliveros-ramos.github.io/calibrar/articles/v05-using_with_TMB.html</loc></url>
+<url><loc>https://roliveros-ramos.github.io/calibrar/authors.html</loc></url>
+<url><loc>https://roliveros-ramos.github.io/calibrar/index.html</loc></url>
+<url><loc>https://roliveros-ramos.github.io/calibrar/news/index.html</loc></url>
+<url><loc>https://roliveros-ramos.github.io/calibrar/reference/ahres.html</loc></url>
+<url><loc>https://roliveros-ramos.github.io/calibrar/reference/calibrar-defunct.html</loc></url>
+<url><loc>https://roliveros-ramos.github.io/calibrar/reference/calibrar-package.html</loc></url>
+<url><loc>https://roliveros-ramos.github.io/calibrar/reference/calibrar_demo.html</loc></url>
+<url><loc>https://roliveros-ramos.github.io/calibrar/reference/calibrate.html</loc></url>
+<url><loc>https://roliveros-ramos.github.io/calibrar/reference/calibration_data.html</loc></url>
+<url><loc>https://roliveros-ramos.github.io/calibrar/reference/calibration_objFn.html</loc></url>
+<url><loc>https://roliveros-ramos.github.io/calibrar/reference/calibration_setup.html</loc></url>
+<url><loc>https://roliveros-ramos.github.io/calibrar/reference/createObjectiveFunction-defunct.html</loc></url>
+<url><loc>https://roliveros-ramos.github.io/calibrar/reference/dot-get_command_argument.html</loc></url>
+<url><loc>https://roliveros-ramos.github.io/calibrar/reference/dot-read_configuration.html</loc></url>
+<url><loc>https://roliveros-ramos.github.io/calibrar/reference/gaussian_kernel.html</loc></url>
+<url><loc>https://roliveros-ramos.github.io/calibrar/reference/getCalibrationInfo-defunct.html</loc></url>
+<url><loc>https://roliveros-ramos.github.io/calibrar/reference/getObservedData-defunct.html</loc></url>
+<url><loc>https://roliveros-ramos.github.io/calibrar/reference/gradient.html</loc></url>
+<url><loc>https://roliveros-ramos.github.io/calibrar/reference/index.html</loc></url>
+<url><loc>https://roliveros-ramos.github.io/calibrar/reference/objFn.html</loc></url>
+<url><loc>https://roliveros-ramos.github.io/calibrar/reference/optim2.html</loc></url>
+<url><loc>https://roliveros-ramos.github.io/calibrar/reference/optimh.html</loc></url>
+<url><loc>https://roliveros-ramos.github.io/calibrar/reference/sphereN.html</loc></url>
+<url><loc>https://roliveros-ramos.github.io/calibrar/reference/spline_par.html</loc></url>
+<url><loc>https://roliveros-ramos.github.io/calibrar/reference/summary.calibrar.results.html</loc></url>
 </urlset>
+

@@ -1,3 +1,7 @@
+url: https://roliveros-ramos.github.io/calibrar/
+template:
+  bootstrap: 5
+  math-rendering: katex
 reference:
 - title: Main functions
   desc: >

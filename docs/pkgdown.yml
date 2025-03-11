@@ -1,9 +1,11 @@
-pandoc: 3.1.11.1
-pkgdown: 2.0.7
+pandoc: '3.2'
+pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
   calibrar: calibrar.html
   v02-parameter_estimation: v02-parameter_estimation.html
   v03-parameter_estimation_ODE: v03-parameter_estimation_ODE.html
-last_built: 2024-03-11T21:59Z
-
+last_built: 2025-02-26T00:18Z
+urls:
+  reference: https://roliveros-ramos.github.io/calibrar/reference
+  article: https://roliveros-ramos.github.io/calibrar/articles
