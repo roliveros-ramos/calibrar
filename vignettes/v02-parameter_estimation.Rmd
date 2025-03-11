@@ -151,6 +151,8 @@ observed = run_model(par=real, T=T, catch=catch)
 ```
 
 ```{r logistic4, fig.asp=0.66, fig.width=6}
+#| fig.alt: >
+#|   Simulation of the logistic models with the assumed parameters.
 par(mfrow=c(2,1), mar=c(3,3,1,1), oma=c(1,1,1,1))
 plot(observed$biomass, type="l", lwd=2, ylab="biomass", xlab="", las=1, ylim=c(0, 1.2*max(observed$biomass)))
 mtext("BIOMASS", 3, adj=0.01, line = 0, font=2)
@@ -206,6 +208,8 @@ sim5 = run_model(par=coef(opt5), T=T, catch=catch)
 And plot some of the best results obtained (L-BFGS-B 3.0, CG and AHR-ES):
 
 ```{r, fig.asp=0.66, fig.width=6}
+#| fig.alt: >
+#|   Plot of best results after parameter optimisation. 
 par(mar=c(3,4,1,1))
 plot(observed$biomass, type="n", ylab="BIOMASS", xlab="", las=1, ylim=c(0, 1.2*max(observed$biomass)))
 lines(sim0$biomass, col=1, lwd=2)

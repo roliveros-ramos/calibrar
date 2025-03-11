@@ -107,6 +107,9 @@ nm.pred      = predict(nm)
 and plot the results.
 
 ```{r, fig.asp=0.66, fig.width=8}
+#| fig.alt: >
+#|   Results of the calibration using the "L-BFGS-B", "AHR-ES" and
+#|   "Nelder-Mead" methods.
 methods = c("data", "L-BFGS-B", "AHR-ES", "Nelder-Mead")
 par(mfrow=c(1,2), mar=c(4,4,1,1),
     oma=c(1,1,1,1))
