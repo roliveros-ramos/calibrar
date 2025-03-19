@@ -19,16 +19,9 @@ objFn = function(obs, sim, FUN, ...) {
 #' @rdname objFn 
 fitness = objFn
 
-# Provided ----------------------------------------------------------------
-
-pois = function(obs, sim, ...) {
-  if(all(!is.finite(sim))) return(Inf)
-  nlogLike = -sum(obs*log(sim) - sim, na.rm=TRUE)
-  return(nlogLike)
-}
+# Penalties ---------------------------------------------------------------
 
 normp = function(obs, sim, ...) {
-  if(all(!is.finite(sim))) return(Inf)
   penalty = sum((sim)^2, na.rm=TRUE)
   return(penalty)
 }
@@ -36,27 +29,31 @@ normp = function(obs, sim, ...) {
 re = normp
 
 penalty = function(obs, sim, n=100, ...) {
-  if(all(!is.finite(sim))) return(Inf)
   # assumes a fixed sample size of 'n'
   penalty = n*mean((sim)^2, na.rm=TRUE)
   return(penalty)
 }
 
-penalty2 = function(obs, sim, n=100, ...) {
-  if(all(!is.finite(sim))) return(Inf)
-  # assumes a fixed sample size of 'n'
-  penalty = n*mean((sim)^2, na.rm=TRUE)
-  return(penalty)
+# identical to penalty, used for testing.
+penalty2 = penalty
+
+
+# Likelihoods -------------------------------------------------------------
+
+pois = function(obs, sim, ...) {
+  if(all(is.na(obs))) stop("All observed values are NA.")
+  nlogLike = -sum(obs*log(sim) - sim, na.rm=TRUE)
+  return(nlogLike)
 }
 
 norm2 = function(obs, sim, ...) {
-  if(all(!is.finite(sim))) return(Inf)
+  if(all(is.na(obs))) stop("All observed values are NA.")
   nlogLike = sum((obs-sim)^2, na.rm=TRUE)
   return(nlogLike)
 }
 
 lnorm2 = function(obs, sim, tiny=1e-2, ...) {
-  if(all(!is.finite(sim))) return(Inf)
+  if(all(is.na(obs))) stop("All observed values are NA.")
   obs = log(obs + tiny)
   sim = log(sim + tiny)
   nlogLike = sum((obs-sim)^2, na.rm=TRUE)
@@ -64,7 +61,7 @@ lnorm2 = function(obs, sim, tiny=1e-2, ...) {
 }
 
 lnorm3  = function(obs, sim, tiny = 1e-2, ...) {
-  if(all(!is.finite(sim))) return(Inf)
+  if(all(is.na(obs))) stop("All observed values are NA.")
   ratio = obs/sim
   ratio[is.nan(ratio)] = NA
   q = mean(ratio, na.rm=TRUE)
@@ -75,7 +72,7 @@ lnorm3  = function(obs, sim, tiny = 1e-2, ...) {
 }
 
 lnorm4  = function(obs, sim, tiny = 1e-2, b=1, c=2, ...) {
-  if(all(!is.finite(sim))) return(Inf)
+  if(all(is.na(obs))) stop("All observed values are NA.")
   penq = rangeq(obs=obs, sim=sim, b=b, c=c, dump=TRUE)
   q = attr(penq, "q")
   obs = log(obs+tiny) 
@@ -85,7 +82,7 @@ lnorm4  = function(obs, sim, tiny = 1e-2, b=1, c=2, ...) {
 }
 
 lnorm4b  = function(obs, sim, tiny = 1e-2, b=1, c=2, ...) {
-  if(all(!is.finite(sim))) return(Inf)
+  if(all(is.na(obs))) stop("All observed values are NA.")
   penq = rangeq(obs=obs, sim=sim, b=b, c=c, dump=FALSE)
   q = attr(penq, "q")
   obs = log(obs+tiny) 
@@ -95,7 +92,7 @@ lnorm4b  = function(obs, sim, tiny = 1e-2, b=1, c=2, ...) {
 }
 
 rangeq = function(obs, sim, b=1, c=2, dump=TRUE) {
-  if(all(!is.finite(sim))) return(Inf)
+  if(all(is.na(obs))) stop("All observed values are NA.")
   ratio = obs/sim
   ratio[is.nan(ratio)] = NA
   n = sum(!is.na(ratio))
@@ -111,7 +108,7 @@ rangeq = function(obs, sim, b=1, c=2, dump=TRUE) {
 
 multinom = function(sim, obs, size=20, tiny=1e-3) {
   
-  if(all(!is.finite(sim))) return(Inf)
+  if(all(is.na(obs))) stop("All observed values are NA.")
   
   A = ncol(sim) # number of classes
   
