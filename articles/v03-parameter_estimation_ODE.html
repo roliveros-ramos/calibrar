@@ -27,7 +27,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">calibrar</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.0.9005</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.0.9006</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -68,7 +68,7 @@
                         <h4 data-toc-skip class="author">Ricardo
 Oliveros-Ramos</h4>
             
-            <h4 data-toc-skip class="date">2025-03-19</h4>
+            <h4 data-toc-skip class="date">2025-03-20</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/roliveros-ramos/calibrar/blob/master/vignettes/v03-parameter_estimation_ODE.Rmd" class="external-link"><code>vignettes/v03-parameter_estimation_ODE.Rmd</code></a></small>
       <div class="d-none name"><code>v03-parameter_estimation_ODE.Rmd</code></div>
@@ -235,7 +235,7 @@ created when calling the demo.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lbfgsb1</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">LV</span><span class="op">$</span><span class="va">guess</span>, fn<span class="op">=</span><span class="va">obj</span>, method<span class="op">=</span><span class="st">'L-BFGS-B'</span>, lower<span class="op">=</span><span class="va">LV</span><span class="op">$</span><span class="va">lower</span>, upper<span class="op">=</span><span class="va">LV</span><span class="op">$</span><span class="va">upper</span>, phases<span class="op">=</span><span class="va">LV</span><span class="op">$</span><span class="va">phase</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Using optimization method 'L-BFGS-B'.</span></span></code></pre>
-<pre><code><span><span class="co">## Elapsed time: 3.52s</span></span>
+<pre><code><span><span class="co">## Elapsed time: 3.65s</span></span>
 <span><span class="co">## Function value: 5.60589e-07</span></span>
 <span><span class="co">## Parameter values: 0.5 0.2 100 0.1 0.1</span></span>
 <span><span class="co">## </span></span>
@@ -243,7 +243,7 @@ created when calling the demo.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lbfgsb2</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">LV</span><span class="op">$</span><span class="va">guess</span>, fn<span class="op">=</span><span class="va">obj</span>, method<span class="op">=</span><span class="st">"Rvmmin"</span>, lower<span class="op">=</span><span class="va">LV</span><span class="op">$</span><span class="va">lower</span>, upper<span class="op">=</span><span class="va">LV</span><span class="op">$</span><span class="va">upper</span>, phases<span class="op">=</span><span class="va">LV</span><span class="op">$</span><span class="va">phase</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Using optimization method 'Rvmmin'.</span></span></code></pre>
-<pre><code><span><span class="co">## Elapsed time: 3.91s</span></span>
+<pre><code><span><span class="co">## Elapsed time: 4.07s</span></span>
 <span><span class="co">## Function value: 5.60575e-07</span></span>
 <span><span class="co">## Parameter values: 0.5 0.2 100 0.1 0.1</span></span>
 <span><span class="co">## </span></span>
@@ -251,7 +251,7 @@ created when calling the demo.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ahr</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">LV</span><span class="op">$</span><span class="va">guess</span>, fn<span class="op">=</span><span class="va">obj</span>, method<span class="op">=</span><span class="st">'AHR-ES'</span>, lower<span class="op">=</span><span class="va">LV</span><span class="op">$</span><span class="va">lower</span>, upper<span class="op">=</span><span class="va">LV</span><span class="op">$</span><span class="va">upper</span>, phases<span class="op">=</span><span class="va">LV</span><span class="op">$</span><span class="va">phase</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Using optimization method 'AHR-ES'.</span></span></code></pre>
-<pre><code><span><span class="co">## Elapsed time: 3m 51.0s</span></span>
+<pre><code><span><span class="co">## Elapsed time: 3m 50.5s</span></span>
 <span><span class="co">## Function value: 5.60575e-07</span></span>
 <span><span class="co">## Parameter values: 0.5 0.2 100 0.1 0.1</span></span>
 <span><span class="co">## </span></span>
@@ -259,7 +259,7 @@ created when calling the demo.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">nm</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">LV</span><span class="op">$</span><span class="va">guess</span>, fn<span class="op">=</span><span class="va">obj</span>, method<span class="op">=</span><span class="st">"Nelder-Mead"</span>, phases<span class="op">=</span><span class="va">LV</span><span class="op">$</span><span class="va">phase</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Using optimization method 'Nelder-Mead'.</span></span></code></pre>
-<pre><code><span><span class="co">## Elapsed time: 57.45s</span></span>
+<pre><code><span><span class="co">## Elapsed time: 56.66s</span></span>
 <span><span class="co">## Function value: 1.41517</span></span>
 <span><span class="co">## Parameter values: 0.45 0.275 66.2 0.0788 0.183</span></span>
 <span><span class="co">## </span></span>
@@ -269,10 +269,10 @@ created when calling the demo.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">LV</span>, <span class="va">lbfgsb1</span>, <span class="va">lbfgsb2</span>, <span class="va">ahr</span>, <span class="va">nm</span>, show_par <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##              method elapsed    value    fn gr    r     l     K  alpha gamma</span></span>
 <span><span class="co">## LV             data      NA 4.96e-07    NA NA 0.50 0.200 100.0 0.1000 0.100</span></span>
-<span><span class="co">## lbfgsb1    L-BFGS-B    3.52 5.61e-07    84 84 0.50 0.200 100.0 0.1000 0.100</span></span>
-<span><span class="co">## lbfgsb2      Rvmmin    3.91 5.61e-07   184 81 0.50 0.200 100.0 0.1000 0.100</span></span>
-<span><span class="co">## ahr          AHR-ES  231.03 5.61e-07 39272  0 0.50 0.200 100.0 0.1000 0.100</span></span>
-<span><span class="co">## nm      Nelder-Mead   57.45 1.42e+00   502 NA 0.45 0.275  66.2 0.0788 0.183</span></span></code></pre>
+<span><span class="co">## lbfgsb1    L-BFGS-B    3.65 5.61e-07    84 84 0.50 0.200 100.0 0.1000 0.100</span></span>
+<span><span class="co">## lbfgsb2      Rvmmin    4.07 5.61e-07   184 81 0.50 0.200 100.0 0.1000 0.100</span></span>
+<span><span class="co">## ahr          AHR-ES  230.54 5.61e-07 39272  0 0.50 0.200 100.0 0.1000 0.100</span></span>
+<span><span class="co">## nm      Nelder-Mead   56.66 1.42e+00   502 NA 0.45 0.275  66.2 0.0788 0.183</span></span></code></pre>
 <p>When a function is created with the <code><a href="../reference/calibration_objFn.html">calibration_objFn()</a></code>
 it gains a <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> method, that can be used to simulate
 the model with the estimated set of parameters.</p>
@@ -434,7 +434,7 @@ parameters of the model:</p>
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lbfgsb3</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">SIR</span><span class="op">$</span><span class="va">guess</span>, fn<span class="op">=</span><span class="va">obj</span>, method<span class="op">=</span><span class="st">'LBFGSB3'</span>, lower<span class="op">=</span><span class="va">SIR</span><span class="op">$</span><span class="va">lower</span>, upper<span class="op">=</span><span class="va">SIR</span><span class="op">$</span><span class="va">upper</span>, phases<span class="op">=</span><span class="va">SIR</span><span class="op">$</span><span class="va">phase</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Using optimization method 'LBFGSB3'.</span></span></code></pre>
-<pre><code><span><span class="co">## Elapsed time: 1.35s</span></span>
+<pre><code><span><span class="co">## Elapsed time: 1.38s</span></span>
 <span><span class="co">## Function value: 7.57138e-13</span></span>
 <span><span class="co">## Parameter values: 0.4 0.2</span></span>
 <span><span class="co">## </span></span>
@@ -450,7 +450,7 @@ parameters of the model:</p>
 <div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ahr</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">SIR</span><span class="op">$</span><span class="va">guess</span>, fn<span class="op">=</span><span class="va">obj</span>, method<span class="op">=</span><span class="st">'AHR-ES'</span>, lower<span class="op">=</span><span class="va">SIR</span><span class="op">$</span><span class="va">lower</span>, upper<span class="op">=</span><span class="va">SIR</span><span class="op">$</span><span class="va">upper</span>, phases<span class="op">=</span><span class="va">SIR</span><span class="op">$</span><span class="va">phase</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Using optimization method 'AHR-ES'.</span></span></code></pre>
-<pre><code><span><span class="co">## Elapsed time: 32.86s</span></span>
+<pre><code><span><span class="co">## Elapsed time: 33.21s</span></span>
 <span><span class="co">## Function value: 9.63009e-22</span></span>
 <span><span class="co">## Parameter values: 0.4 0.2</span></span>
 <span><span class="co">## </span></span>
@@ -458,7 +458,7 @@ parameters of the model:</p>
 <div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cg</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">SIR</span><span class="op">$</span><span class="va">guess</span>, fn<span class="op">=</span><span class="va">obj</span>, method<span class="op">=</span><span class="st">'Rcgmin'</span>, phases<span class="op">=</span><span class="va">SIR</span><span class="op">$</span><span class="va">phase</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Using optimization method 'Rcgmin'.</span></span></code></pre>
-<pre><code><span><span class="co">## Elapsed time: 2m 39.1s</span></span>
+<pre><code><span><span class="co">## Elapsed time: 2m 42.1s</span></span>
 <span><span class="co">## Function value: 1.51603e-14</span></span>
 <span><span class="co">## Parameter values: 0.4 0.2</span></span>
 <span><span class="co">## </span></span>
@@ -466,7 +466,7 @@ parameters of the model:</p>
 <div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">nm</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">SIR</span><span class="op">$</span><span class="va">guess</span>, fn<span class="op">=</span><span class="va">obj</span>, method<span class="op">=</span><span class="st">'Nelder-Mead'</span>, phases<span class="op">=</span><span class="va">SIR</span><span class="op">$</span><span class="va">phase</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Using optimization method 'Nelder-Mead'.</span></span></code></pre>
-<pre><code><span><span class="co">## Elapsed time: 0.35s</span></span>
+<pre><code><span><span class="co">## Elapsed time: 0.36s</span></span>
 <span><span class="co">## Function value: 2.5122e-05</span></span>
 <span><span class="co">## Parameter values: 0.4 0.2</span></span>
 <span><span class="co">## </span></span>
@@ -476,11 +476,11 @@ parameters of the model:</p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">SIR</span>, <span class="va">lbfgsb2</span>, <span class="va">lbfgsb3</span>, <span class="va">ahr</span>, <span class="va">cg</span>, <span class="va">nm</span>, show_par <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##              method elapsed    value   fn gr beta gamma</span></span>
 <span><span class="co">## SIR            data      NA 4.69e-28   NA NA  0.4   0.2</span></span>
-<span><span class="co">## lbfgsb2      Rvmmin   0.388 7.57e-13   25 16  0.4   0.2</span></span>
-<span><span class="co">## lbfgsb3     LBFGSB3   1.355 7.57e-13   24 24  0.4   0.2</span></span>
-<span><span class="co">## ahr          AHR-ES  32.865 9.63e-22 6186  0  0.4   0.2</span></span>
-<span><span class="co">## cg           Rcgmin 159.128 1.52e-14   69 26  0.4   0.2</span></span>
-<span><span class="co">## nm      Nelder-Mead   0.353 2.51e-05   73 NA  0.4   0.2</span></span></code></pre>
+<span><span class="co">## lbfgsb2      Rvmmin   0.392 7.57e-13   25 16  0.4   0.2</span></span>
+<span><span class="co">## lbfgsb3     LBFGSB3   1.384 7.57e-13   24 24  0.4   0.2</span></span>
+<span><span class="co">## ahr          AHR-ES  33.214 9.63e-22 6186  0  0.4   0.2</span></span>
+<span><span class="co">## cg           Rcgmin 162.104 1.52e-14   69 26  0.4   0.2</span></span>
+<span><span class="co">## nm      Nelder-Mead   0.365 2.51e-05   73 NA  0.4   0.2</span></span></code></pre>
 <p>In this example, the algorithms ‘Rvmmin’, ‘AHR-ES’, ‘Rcgmin’ and
 ‘Nelder-Mead’ are able to estimate the original parameters, but the
 ‘LBFGSB3’ fails.</p>
