@@ -149,7 +149,7 @@ print.ahres.result = function(x, short=FALSE, ...) {
   
   cat("\nFunction value:", x$value, "\n")
   if(!isTRUE(short)) {
-    cat(sprintf("Parameters (%d of %d parameters active).\n",
+    cat(sprintf("Parameters (%d out of %d parameters are currently active).\n",
                 length(x$active.par), length(x$par)))
     print(x=x$par, ...)    
     if(!isTRUE(x$active.flag)) cat("* Parameters not calibrated.\n")

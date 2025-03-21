@@ -230,7 +230,7 @@ calibrate.default = function(par, fn, gr = NULL, ..., method = NULL,
     
     active = (phases <= phase) # NAs are corrected in .calibrar 
     
-    msg2 = sprintf("\n- Phase %d: %d of %d parameters active.", 
+    msg2 = sprintf("\n- Phase %d: %d out of %d parameters are currently active.", 
                    phase, sum(active, na.rm=TRUE), npar)
     msg3 = sprintf("\tStarted at %s.\n", date())
     if(nphases > 1) message(msg2)
