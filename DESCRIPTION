@@ -1,5 +1,5 @@
 Package: calibrar
-Version: 0.9.0.9006
+Version: 0.9.0.9007
 Authors@R: c(person("Ricardo", "Oliveros-Ramos", email="ricardo.oliveros@gmail.com", role=c("aut", "cre")))
 Title: Automated Parameter Estimation for Complex Models
 Description: General optimisation and specific tools for the parameter estimation 
@@ -45,3 +45,4 @@ BugReports: https://github.com/roliveros-ramos/calibrar/issues
 ByteCompile: TRUE
 RoxygenNote: 7.3.2
 Config/testthat/edition: 3
+Config/Needs/website: rmarkdown
