@@ -147,9 +147,12 @@ calibrate.default = function(par, fn, gr = NULL, ..., method = NULL,
     
   }
   
-  if(inherits(fn, "objFn")) control$aggFn = attr(fn, "aggFn")
-  fnx = attr(fn, "fn")
-  if(!is.null(fnx)) fnx = match.fun(fnx)
+  fnx = NULL
+  if(inherits(fn, "objFn")) {
+    control$aggFn = attr(fn, "aggFn")
+    fnx = attr(fn, "fn")
+    if(!is.null(fnx)) fnx = match.fun(fnx)
+  }
 
   # if 'gr' is a character, assume it specify the type of numerical approximation
   if(!is.null(gr) & is.character(gr)) {
@@ -254,21 +257,21 @@ calibrate.default = function(par, fn, gr = NULL, ..., method = NULL,
     par = temp$par #update parameter guess
     control = .updateControl(control=control, opt=temp, method=method)  # update CVs? 
     
-    if(!is.null(control$restart) & !is.null(fnx)) {
+    if(!is.null(control$restart.file) & !is.null(fnx)) {
       
       wd = getwd()
       .setWorkDir(control$run, i=0)
       xpar = relist(flesh = par, skeleton = skeleton)
-      ifile = sprintf(".%s-phase%d.par", control$restart, phase)
+      ifile = sprintf(".%s-phase%d.par", control$restart.file, phase)
       saveRDS(xpar, file=ifile)
       partial = try(fnx(xpar))
       setwd(wd)
       if(!inherits(partial, "try-error")) {
-        ifile = sprintf("%s-phase%d.simulated", control$restart, phase)
+        ifile = sprintf("%s-phase%d.simulated", control$restart.file, phase)
         saveRDS(partial, file=ifile)
       }
       
-    }
+    } 
     
     xmsg = temp$message
     if(is.null(xmsg)) xmsg = NA
