@@ -316,7 +316,7 @@ format_difftime = function(x, y, ..., value=FALSE) {
   fn = match.fun(fn)
 
   con = list(ncores=parallel::detectCores(), 
-             nvar=NULL, run=NULL, master=NULL, stochastic=FALSE, verbose=FALSE, restart.file=NULL,
+             nvar=NULL, run=NULL, master=NULL, stochastic=FALSE, verbose=FALSE, 
              gradient = list(), gr.method="forward", REPORT=10L, restart.file=NULL)
   
   controlDef  = names(con)       # default options
