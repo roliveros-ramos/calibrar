@@ -111,8 +111,10 @@
       
       if(control$trace>2) {
         
-        if(is.null(trace$fitness)) 
+        if(is.null(trace$fitness)) {
           trace$fitness = matrix(NA, nrow=control$maxgen, ncol=ncol(opt$fitness))
+          colnames(trace$fitness) = names(opt$weights)
+        } 
         
         if(nrow(trace$fitness) < control$maxgen) {
           .nt = nrow(trace$fitness)
