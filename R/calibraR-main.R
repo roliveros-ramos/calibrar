@@ -260,10 +260,10 @@ calibrate.default = function(par, fn, gr = NULL, ..., method = NULL,
     if(!is.null(control$restart.file) & !is.null(fnx)) {
       
       wd = getwd()
-      .setWorkDir(control$run, i=0)
       xpar = relist(flesh = par, skeleton = skeleton)
       ifile = sprintf(".%s-phase%d.par", control$restart.file, phase)
       saveRDS(xpar, file=ifile)
+      .setWorkDir(control$run, i=0)
       partial = try(fnx(xpar))
       setwd(wd)
       if(!inherits(partial, "try-error")) {
