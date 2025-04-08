@@ -5,7 +5,7 @@ articles:
   calibrar: calibrar.html
   v02-parameter_estimation: v02-parameter_estimation.html
   v03-parameter_estimation_ODE: v03-parameter_estimation_ODE.html
-last_built: 2025-04-08T03:50Z
+last_built: 2025-04-08T18:05Z
 urls:
   reference: https://roliveros-ramos.github.io/calibrar/reference
   article: https://roliveros-ramos.github.io/calibrar/articles
