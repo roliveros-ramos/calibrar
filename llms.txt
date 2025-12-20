@@ -1,0 +1,156 @@
+# calibrar
+
+### Automated Parameter Estimation for Complex Models
+
+This R package, calibrar, has been designed for the parameter estimation
+(or calibration) of a wide range of ecological models, including complex
+and stochastic models. The package combines various optimization
+functionalities in a single interface, enabling the implementation of
+the latest advancements in complex model calibration. The package
+provides support for multiple phases and box constrained optimisation
+with the possibility of using several algorithms available in R. In
+particular, by using a “black-box” approach, the package allows the
+calibration of models implemented in any programming language. It
+provides a generic interface with models and allows the construction of
+the objective function, within R, without requiring any changes in the
+models’ code. Parallel support for computationally intensive models is
+also provided, and can be used with high performance computing systems
+in a simple manner, including the capability to restart an unfinished
+optimisation for models with a long runtime.
+
+It implements generic functions that can be used for fitting any type of
+models, especially those with non-differentiable objective functions,
+with the same syntax as base::optim. It supports multiple phases
+estimation (sequential parameter masking), constrained optimization
+(bounding box restrictions) and automatic parallel computation of
+numerical gradients. Some common maximum likelihood estimation methods
+and automated construction of the objective function from simulated
+model outputs is provided.  
+See <https://roliveros-ramos.github.io/calibrar/> for more details.
+
+### Installation
+
+``` r
+# The easiest way to get calibrar is to install it from CRAN:
+install.packages("calibrar")
+
+# Alternatively, install the stable development version from OSMOSE drat repository:
+install.packages("calibrar", repo="https://osmose-model.github.io/drat/")
+
+# Or the development version from GitHub:
+# install.packages("remotes")
+remotes::install_github("roliveros-ramos/calibrar")
+```
+
+### Usage
+
+For a quick introduction, check the worked the examples available from
+the package:
+
+``` r
+library(calibrar)
+vignette("calibrar")
+```
+
+For a more detailed explanation of the package philosophy, you can read
+the article [calibrar: an R package for fitting complex ecological
+models](https://doi.org/10.1111/2041-210X.14452).
+
+### Contributions
+
+If you find any bug, have questions about the documentation or requests
+for enhancements, please [open an
+issue](https://github.com/roliveros-ramos/calibrar/issues).
+
+Contributions are accepted as pull requests. Please note that the
+calibrar package is released with a [Contributor Code of
+Conduct](https://www.contributor-covenant.org/version/2/1/code_of_conduct/).
+By contributing to this project, you agree to abide by its terms.
+
+# Package index
+
+## Main functions
+
+Functions for general purpose optimization, with support for parallel
+computation of derivatives.
+
+- [`calibrate()`](https://roliveros-ramos.github.io/calibrar/reference/calibrate.md)
+  : Sequential parameter estimation for the calibration of complex
+  models
+- [`optim2()`](https://roliveros-ramos.github.io/calibrar/reference/optim2.md)
+  : General-purpose optimization with parallel numerical gradient
+  computation
+- [`optimh()`](https://roliveros-ramos.github.io/calibrar/reference/optimh.md)
+  : General-purpose optimization using heuristic algorithms
+- [`ahres()`](https://roliveros-ramos.github.io/calibrar/reference/ahres.md)
+  : Adaptative Hierarchical Recombination Evolutionary Strategy (AHR-ES)
+  for derivative-free and black-box optimization
+- [`gradient()`](https://roliveros-ramos.github.io/calibrar/reference/gradient.md)
+  : Numerical computation of the gradient, with parallel capabilities
+- [`calibrar-package`](https://roliveros-ramos.github.io/calibrar/reference/calibrar-package.md)
+  [`calibrar`](https://roliveros-ramos.github.io/calibrar/reference/calibrar-package.md)
+  : Automated Calibration for Complex Models
+
+## Setting up a calibration
+
+Functions to easily setup a new calibration for a complex model, from an
+R function running the model.
+
+- [`calibration_data()`](https://roliveros-ramos.github.io/calibrar/reference/calibration_data.md)
+  : Get observed data for the calibration of a model
+
+- [`calibration_objFn()`](https://roliveros-ramos.github.io/calibrar/reference/calibration_objFn.md)
+  : Create an objective function to be used with optimization routines
+
+- [`calibration_setup()`](https://roliveros-ramos.github.io/calibrar/reference/calibration_setup.md)
+  :
+
+  Get information to run a calibration using the `calibrar` package.
+
+- [`objFn()`](https://roliveros-ramos.github.io/calibrar/reference/objFn.md)
+  [`fitness()`](https://roliveros-ramos.github.io/calibrar/reference/objFn.md)
+  : Calcuted error measure between observed and simulated data
+
+- [`calibrar_demo()`](https://roliveros-ramos.github.io/calibrar/reference/calibrar_demo.md)
+  : Demos for the calibrar package
+
+## Parameter modelling
+
+Functions to easily parametrize a model.
+
+- [`gaussian_kernel()`](https://roliveros-ramos.github.io/calibrar/reference/gaussian_kernel.md)
+  : Calculate a discretization of the 2D Gaussian Kernel
+- [`spline_par()`](https://roliveros-ramos.github.io/calibrar/reference/spline_par.md)
+  : Predict time-varying parameters using splines.
+
+## Test optimization functions
+
+- [`sphereN()`](https://roliveros-ramos.github.io/calibrar/reference/SphereN.md)
+  : Sphere function with random noise
+
+## Auxiliar functions
+
+- [`.get_command_argument()`](https://roliveros-ramos.github.io/calibrar/reference/dot-get_command_argument.md)
+  : Get an specific argument from the command line
+- [`.read_configuration()`](https://roliveros-ramos.github.io/calibrar/reference/dot-read_configuration.md)
+  : Read a configuration file.
+
+## Defunct functions
+
+- [`getObservedData()`](https://roliveros-ramos.github.io/calibrar/reference/calibrar-defunct.md)
+  [`getCalibrationInfo()`](https://roliveros-ramos.github.io/calibrar/reference/calibrar-defunct.md)
+  [`createObjectiveFunction()`](https://roliveros-ramos.github.io/calibrar/reference/calibrar-defunct.md)
+  :
+
+  Defunct functions in package calibrar.
+
+# Articles
+
+### All vignettes
+
+- [Getting started with the \`calibrar\`
+  package](https://roliveros-ramos.github.io/calibrar/articles/calibrar.md):
+- [Using the \`calibrate()\` function for parameter
+  estimation](https://roliveros-ramos.github.io/calibrar/articles/v02-parameter_estimation.md):
+- [Parameter estimation for ODE
+  systems](https://roliveros-ramos.github.io/calibrar/articles/v03-parameter_estimation_ODE.md):
