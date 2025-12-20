@@ -139,7 +139,7 @@ lbfgsb1 = calibrate(par=LV$guess, fn=obj, method='L-BFGS-B', lower=LV$lower, upp
 
     ## Using optimization method 'L-BFGS-B'.
 
-    ## Elapsed time: 2.47s
+    ## Elapsed time: 2.34s
     ## Function value: 5.60587e-07
     ## Parameter values: 0.5 0.2 100 0.1 0.1
     ## 
@@ -151,7 +151,7 @@ lbfgsb2 = calibrate(par=LV$guess, fn=obj, method="Rvmmin", lower=LV$lower, upper
 
     ## Using optimization method 'Rvmmin'.
 
-    ## Elapsed time: 3.19s
+    ## Elapsed time: 2.69s
     ## Function value: 5.60575e-07
     ## Parameter values: 0.5 0.2 100 0.1 0.1
     ## 
@@ -163,7 +163,7 @@ ahr = calibrate(par=LV$guess, fn=obj, method='AHR-ES', lower=LV$lower, upper=LV$
 
     ## Using optimization method 'AHR-ES'.
 
-    ## Elapsed time: 2m 56.3s
+    ## Elapsed time: 2m 46.3s
     ## Function value: 5.60575e-07
     ## Parameter values: 0.5 0.2 100 0.1 0.1
     ## 
@@ -175,7 +175,7 @@ nm = calibrate(par=LV$guess, fn=obj, method="Nelder-Mead", phases=LV$phase)
 
     ## Using optimization method 'Nelder-Mead'.
 
-    ## Elapsed time: 44.19s
+    ## Elapsed time: 41.50s
     ## Function value: 1.41517
     ## Parameter values: 0.45 0.275 66.2 0.0788 0.183
     ## 
@@ -189,10 +189,10 @@ summary(LV, lbfgsb1, lbfgsb2, ahr, nm, show_par = 1:5)
 
     ##              method elapsed    value    fn gr    r     l     K  alpha gamma
     ## LV             data      NA 4.96e-07    NA NA 0.50 0.200 100.0 0.1000 0.100
-    ## lbfgsb1    L-BFGS-B    2.47 5.61e-07    74 74 0.50 0.200 100.0 0.1000 0.100
-    ## lbfgsb2      Rvmmin    3.19 5.61e-07   132 83 0.50 0.200 100.0 0.1000 0.100
-    ## ahr          AHR-ES  176.33 5.61e-07 39272  0 0.50 0.200 100.0 0.1000 0.100
-    ## nm      Nelder-Mead   44.19 1.42e+00   502 NA 0.45 0.275  66.2 0.0788 0.183
+    ## lbfgsb1    L-BFGS-B    2.35 5.61e-07    74 74 0.50 0.200 100.0 0.1000 0.100
+    ## lbfgsb2      Rvmmin    2.70 5.61e-07   132 83 0.50 0.200 100.0 0.1000 0.100
+    ## ahr          AHR-ES  166.31 5.61e-07 39272  0 0.50 0.200 100.0 0.1000 0.100
+    ## nm      Nelder-Mead   41.51 1.42e+00   502 NA 0.45 0.275  66.2 0.0788 0.183
 
 When a function is created with the
 [`calibration_objFn()`](https://roliveros-ramos.github.io/calibrar/reference/calibration_objFn.md)
@@ -334,7 +334,7 @@ lbfgsb3 = calibrate(par=SIR$guess, fn=obj, method='LBFGSB3', lower=SIR$lower, up
 
     ## Using optimization method 'LBFGSB3'.
 
-    ## Elapsed time: 1.15s
+    ## Elapsed time: 1.03s
     ## Function value: 7.57138e-13
     ## Parameter values: 0.4 0.2
     ## 
@@ -346,7 +346,7 @@ lbfgsb2 = calibrate(par=SIR$guess, fn=obj, method='Rvmmin', lower=SIR$lower, upp
 
     ## Using optimization method 'Rvmmin'.
 
-    ## Elapsed time: 0.30s
+    ## Elapsed time: 0.28s
     ## Function value: 7.56969e-13
     ## Parameter values: 0.4 0.2
     ## 
@@ -358,7 +358,7 @@ ahr = calibrate(par=SIR$guess, fn=obj, method='AHR-ES', lower=SIR$lower, upper=S
 
     ## Using optimization method 'AHR-ES'.
 
-    ## Elapsed time: 26.05s
+    ## Elapsed time: 24.40s
     ## Function value: 9.62938e-22
     ## Parameter values: 0.4 0.2
     ## 
@@ -370,7 +370,7 @@ cg = calibrate(par=SIR$guess, fn=obj, method='Rcgmin', phases=SIR$phase)
 
     ## Using optimization method 'Rcgmin'.
 
-    ## Elapsed time: 2m 11.2s
+    ## Elapsed time: 2m 5.1s
     ## Function value: 1.42228e-14
     ## Parameter values: 0.4 0.2
     ## 
@@ -382,7 +382,7 @@ nm = calibrate(par=SIR$guess, fn=obj, method='Nelder-Mead', phases=SIR$phase)
 
     ## Using optimization method 'Nelder-Mead'.
 
-    ## Elapsed time: 0.28s
+    ## Elapsed time: 0.27s
     ## Function value: 2.5122e-05
     ## Parameter values: 0.4 0.2
     ## 
@@ -396,11 +396,11 @@ summary(SIR, lbfgsb2, lbfgsb3, ahr, cg, nm, show_par = 1:2)
 
     ##              method elapsed    value   fn gr beta gamma
     ## SIR            data      NA 4.45e-28   NA NA  0.4   0.2
-    ## lbfgsb2      Rvmmin   0.303 7.57e-13   24 16  0.4   0.2
-    ## lbfgsb3     LBFGSB3   1.151 7.57e-13   24 24  0.4   0.2
-    ## ahr          AHR-ES  26.050 9.63e-22 6186  0  0.4   0.2
-    ## cg           Rcgmin 131.205 1.42e-14   69 26  0.4   0.2
-    ## nm      Nelder-Mead   0.285 2.51e-05   73 NA  0.4   0.2
+    ## lbfgsb2      Rvmmin   0.281 7.57e-13   24 16  0.4   0.2
+    ## lbfgsb3     LBFGSB3   1.034 7.57e-13   24 24  0.4   0.2
+    ## ahr          AHR-ES  24.403 9.63e-22 6186  0  0.4   0.2
+    ## cg           Rcgmin 125.071 1.42e-14   69 26  0.4   0.2
+    ## nm      Nelder-Mead   0.269 2.51e-05   73 NA  0.4   0.2
 
 In this example, the algorithms ‘Rvmmin’, ‘AHR-ES’, ‘Rcgmin’ and
 ‘Nelder-Mead’ are able to estimate the original parameters, but the

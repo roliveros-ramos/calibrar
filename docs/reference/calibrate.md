@@ -130,7 +130,7 @@ Ricardo Oliveros-Ramos
 ``` r
 calibrate(par=rep(NA, 5), fn=sphereN)
 #> Using optimization method 'Rvmmin'.
-#> Elapsed time: 0.05s
+#> Elapsed time: 0.06s
 #> Function value: 0.0101459
 #> Parameter values: 3.93e-05 -2.87e-05 -8.6e-05 -1.04e-05 5.31e-05
 #> 
