@@ -43,6 +43,6 @@ VignetteBuilder: knitr
 URL: https://roliveros-ramos.github.io/calibrar/
 BugReports: https://github.com/roliveros-ramos/calibrar/issues
 ByteCompile: TRUE
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Config/testthat/edition: 3
 Config/Needs/website: rmarkdown

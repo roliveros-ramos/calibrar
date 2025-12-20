@@ -1,11 +1,15 @@
-pandoc: '3.2'
-pkgdown: 2.1.1
+pandoc: 3.6.3
+pkgdown: 2.2.0
 pkgdown_sha: ~
 articles:
   calibrar: calibrar.html
   v02-parameter_estimation: v02-parameter_estimation.html
   v03-parameter_estimation_ODE: v03-parameter_estimation_ODE.html
-last_built: 2025-02-26T00:18Z
+  articles/v04-parameter_estimation_stochastic: v04-parameter_estimation_stochastic.html
+  articles/v05-setting_up_a_calibration: v05-setting_up_a_calibration.html
+  articles/v06-setting_up_an_osmose_calibration: v06-setting_up_an_osmose_calibration.html
+  articles/v07-using_with_TMB: v07-using_with_TMB.html
+last_built: 2025-12-20T00:25Z
 urls:
   reference: https://roliveros-ramos.github.io/calibrar/reference
   article: https://roliveros-ramos.github.io/calibrar/articles
