@@ -100,7 +100,8 @@
 #' @export
 calibrate = function(par, fn, gr, ..., method, lower, upper, phases, control, 
                      hessian, replicates, parallel) {
-  UseMethod("calibrate", fn)
+  obj = if (!missing(fn)) fn else par
+  UseMethod("calibrate", obj)
 }
 
 #' @export
