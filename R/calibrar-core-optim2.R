@@ -9,6 +9,12 @@
   active = unlist(active)
   
   npar = length(par)
+  nm = .printSeq(npar, preffix="par")
+  
+  # check active parameters
+  active = .checkActive(active=active, npar=npar)
+  isActive = which(active)
+  activeFlag = isTRUE(all(active))
   
   # par can be re-scaled
   parscale = .checkParscale(control=control, npar=npar)
@@ -25,16 +31,14 @@
   # Checking active par and bounds
   active     = .checkActive(active=active, npar=npar)
   bounds     = .checkBounds(lower=lower, upper=upper, npar=npar)
+  
   # update to active parameters only
-  guess   = .checkOpt(par=par, lower=bounds$lower, upper=bounds$upper)
-  par     = guess
-  lower   = bounds$lower
-  upper   = bounds$upper
+  guess  = .checkOpt(par=par, lower=bounds$lower, upper=bounds$upper)
+  par    = guess[isActive]
+  lower  = bounds$lower[isActive]
+  upper  = bounds$upper[isActive]
   
-  isActive = which(active)
-  activeFlag = isTRUE(all(active))
-  
-  if(is.null(names(par))) names(par) = .printSeq(npar, preffix="par")
+  if(is.null(names(par))) names(par) = nm[isActive]
   
   # closure for function evaluation
   fn = match.fun(fn)
@@ -96,7 +100,7 @@
   paropt[isActive] = output$par
   paropt = paropt*parscale
 
-  if(is.null(names(paropt))) names(paropt) = .printSeq(npar, preffix="par")
+  if(is.null(names(paropt))) names(paropt) = nm
   paropt = relist(paropt, skeleton)
   class(paropt) = setdiff(class(paropt), "relistable")
   

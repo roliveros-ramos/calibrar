@@ -31,9 +31,7 @@
   par    = guess[isActive]
   lower  = lower[isActive]
   upper  = upper[isActive]
-  
-  npar = length(par)
-  
+
   force(replicates)
   
   # closure for function evaluation
