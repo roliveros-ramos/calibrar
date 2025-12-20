@@ -93,7 +93,7 @@ So now we can proceed with the optimization:
 start = list(intercept=0, slope=rep(0, N))
 bfgs = calibrate(par=start, fn=obj, x=x, y=y)
 #> Using optimization method 'Rvmmin'.
-#> Elapsed time: 0.16s
+#> Elapsed time: 0.15s
 #> Function value: 5.28185e-14
 #> Parameter values: 3.14 1 2 3 4 5 6 7
 #> 
@@ -122,28 +122,28 @@ And repeat the exercise with several optimization algorithms:
 set.seed(880820) # for reproducibility
 cg = calibrate(par=start, fn=obj, x=x, y=y, method='CG')
 #> Using optimization method 'CG'.
-#> Elapsed time: 0.57s
+#> Elapsed time: 0.56s
 #> Function value: 3.37729e-13
 #> Parameter values: 3.14 1 2 3 4 5 6 7
 #> 
 #> Status: -
 nm = calibrate(par=start, fn=obj, x=x, y=y, method='nmkb', lower=lower, upper=upper)
 #> Using optimization method 'nmkb'.
-#> Elapsed time: 0.33s
+#> Elapsed time: 0.32s
 #> Function value: 5.28315e-07
 #> Parameter values: 3.14 1 2 3 4 5 6 7
 #> 
 #> Status: -
 ahres = calibrate(par=start, fn=obj, x=x, y=y, method='AHR-ES')
 #> Using optimization method 'AHR-ES'.
-#> Elapsed time: 2.13s
+#> Elapsed time: 1.98s
 #> Function value: 2.66292e-18
 #> Parameter values: 3.14 1 2 3 4 5 6 7
 #> 
 #> Status: Stopping criteria reached in 234 generations.
 hjn = calibrate(par=start, fn=obj, x=x, y=y, method='hjn', lower=lower, upper=upper)
 #> Using optimization method 'hjn'.
-#> Elapsed time: 0.56s
+#> Elapsed time: 0.52s
 #> Function value: 2.15391e-13
 #> Parameter values: 3.14 1 2 3 4 5 6 7
 #> 
@@ -266,28 +266,28 @@ opt1 = calibrate(par=start, fn = objfn, method='Rvmmin', T=T, catch=catch, obser
 #> Status: Rvmminu appears to have converged
 opt2 = calibrate(par=start, fn = objfn, method='CG', T=T, catch=catch, observed=observed)
 #> Using optimization method 'CG'.
-#> Elapsed time: 0.11s
+#> Elapsed time: 0.10s
 #> Function value: 150931
 #> Parameter values: 0.402 1.18e+03 600
 #> 
 #> Status: -
 opt3 = calibrate(par=start, fn = objfn, method='AHR-ES', T=T, catch=catch, observed=observed)
 #> Using optimization method 'AHR-ES'.
-#> Elapsed time: 2.19s
+#> Elapsed time: 2.13s
 #> Function value: 6.77545e-17
 #> Parameter values: 0.5 1e+03 600
 #> 
 #> Status: Stopping criteria reached in 1590 generations.
 opt4 = calibrate(par=start, fn = objfn, method='CMA-ES', T=T, catch=catch, observed=observed)
 #> Using optimization method 'CMA-ES'.
-#> Elapsed time: 0.19s
+#> Elapsed time: 0.18s
 #> Function value: 0.914125
 #> Parameter values: 0.5 1e+03 600
 #> 
 #> Status: Covariance matrix 'C' is numerically not positive definite.
 opt5 = calibrate(par=start, fn = objfn, method='hjn', T=T, catch=catch, observed=observed)
 #> Using optimization method 'hjn'.
-#> Elapsed time: 0.57s
+#> Elapsed time: 0.54s
 #> Function value: 990.8
 #> Parameter values: 0.509 988 602
 #> 
@@ -307,13 +307,13 @@ used to compare all the optimization results:
 ``` r
 summary(opt0, opt1, opt2, opt3, opt4, opt5, opt6)
 #>           method elapsed    value    fn  gr     r    K  B0
-#> opt0     LBFGSB3  0.0168 1.51e+05    18  18 0.402 1181 600
-#> opt1      Rvmmin  0.0146 1.38e+07   108   6 2.900 1145 482
-#> opt2          CG  0.1063 1.51e+05   691 101 0.402 1181 600
-#> opt3      AHR-ES  2.1923 6.78e-17 11130   0 0.500 1000 600
-#> opt4      CMA-ES  0.1928 9.14e-01  1540  NA 0.500 1000 600
-#> opt5         hjn  0.5683 9.91e+02  6000  NA 0.509  988 602
-#> opt6 Nelder-Mead  0.0218 7.76e-02   221  NA 0.500 1000 600
+#> opt0     LBFGSB3  0.0161 1.51e+05    18  18 0.402 1181 600
+#> opt1      Rvmmin  0.0139 1.38e+07   108   6 2.900 1145 482
+#> opt2          CG  0.1035 1.51e+05   691 101 0.402 1181 600
+#> opt3      AHR-ES  2.1296 6.78e-17 11130   0 0.500 1000 600
+#> opt4      CMA-ES  0.1838 9.14e-01  1540  NA 0.500 1000 600
+#> opt5         hjn  0.5382 9.91e+02  6000  NA 0.509  988 602
+#> opt6 Nelder-Mead  0.0208 7.76e-02   221  NA 0.500 1000 600
 ```
 
 For a better comparison, we can simulate the results for all the
@@ -505,14 +505,14 @@ coef(ARPM)
 ``` r
 lbfgsb1 = calibrate(par=ARPM$guess, fn=obj, method='L-BFGS-B', lower=ARPM$lower, upper=ARPM$upper, phases=ARPM$phase, control=control)
 #> Using optimization method 'L-BFGS-B'.
-#> Elapsed time: 1m 39.8s
+#> Elapsed time: 1m 36.2s
 #> Function value: -186095
 #> Parameter values: 0.404 -0.415 -0.0827 0.128 0.254 -0.282 0.045 0.068 0.078 0.46 0.224 -0.0531 -0.102 0.148 0.301 0.0717 -0.0746 0.125 -0.0164 0.398 -0.188 0.0637 -0.213 -0.229 0.0825 -0.0407 -0.151 0.319 0.0263 0.294 -0.186 -0.0261 -0.297 0.276 -0.168 0.315 -0.216 -4.36e-05 -0.506 -0.0471 -0.0376 -0.276 -0.0826 -0.142 -0.304 0.0866 -0.162 -0.00317 0.131 -0.0579 0.0298 0.187 0.299 -0.0816 -0.347 0.112 -0.111 0.0628 0.107 0.0259 0.123 -0.0401 0.318 0.21 0.157 0.19 0.0758 -0.12 -0.0982 -0.136 -0.257 0.104 -0.0217 0.014 -0.207 -0.0266 -0.141 -0.159 -0.203 -0.00508 0.0131 -0.188 -0.048 -0.0728 -0.159 -0.112 -0.00272 -0.146 0.21 -0.177 -0.219 0.191 -0.259 -0.334 -0.0106 -0.174 0.0483 0.00983 0.235 -0.0243 0.414
 #> 
 #> Status: CONVERGENCE: REL_REDUCTION_OF_F <= FACTR*EPSMCH
 lbfgsb2 = calibrate(par=ARPM$guess, fn=obj, method='Rvmmin', lower=ARPM$lower, upper=ARPM$upper, phases=ARPM$phase, control=control)
 #> Using optimization method 'Rvmmin'.
-#> Elapsed time: 35.74s
+#> Elapsed time: 34.67s
 #> Function value: -186095
 #> Parameter values: 0.397 -0.415 -0.0756 0.135 0.261 -0.276 0.0523 0.0756 0.0849 0.467 0.231 -0.0461 -0.0946 0.155 0.308 0.0792 -0.0679 0.131 -0.00869 0.405 -0.181 0.07 -0.205 -0.221 0.0894 -0.0333 -0.145 0.326 0.0332 0.301 -0.179 -0.0194 -0.291 0.284 -0.161 0.323 -0.209 0.00854 -0.5 -0.0402 -0.0303 -0.27 -0.0754 -0.135 -0.295 0.0925 -0.152 -0.00192 0.139 -0.0502 0.0356 0.194 0.307 -0.0754 -0.339 0.117 -0.102 0.0691 0.114 0.034 0.129 -0.0328 0.325 0.217 0.164 0.197 0.0826 -0.113 -0.0907 -0.128 -0.25 0.111 -0.0151 0.0209 -0.201 -0.0207 -0.134 -0.154 -0.194 0.000292 0.0197 -0.179 -0.0424 -0.0658 -0.151 -0.103 -0.00237 -0.129 0.209 -0.167 -0.206 0.187 -0.247 -0.321 -0.012 -0.164 0.0532 0.018 0.24 -0.00799 0.41
 #> 
@@ -521,7 +521,7 @@ lbfgsb3 = calibrate(par=ARPM$guess, fn=obj, method='LBFGSB3', lower=ARPM$lower, 
 #> Using optimization method 'LBFGSB3'.
 #>  Positive dir derivative in projection 
 #>  Using the backtracking step
-#> Elapsed time: 58.80s
+#> Elapsed time: 57.45s
 #> Function value: -186093
 #> Parameter values: 0.423 -0.415 -0.104 0.111 0.234 -0.303 0.0217 0.055 0.0675 0.44 0.203 -0.0732 -0.122 0.125 0.283 0.0572 -0.0945 0.109 -0.0361 0.382 -0.209 0.0423 -0.229 -0.249 0.0676 -0.0613 -0.174 0.309 -8.38e-05 0.28 -0.209 -0.0429 -0.326 0.264 -0.194 0.306 -0.241 -0.0119 -0.528 -0.0706 -0.0538 -0.296 -0.107 -0.158 -0.328 0.0917 -0.193 -0.0269 0.119 -0.0802 0.0183 0.168 0.282 -0.0984 -0.381 0.109 -0.144 0.046 0.0918 0.00202 0.112 -0.0693 0.307 0.192 0.145 0.169 0.0532 -0.136 -0.119 -0.154 -0.277 0.0881 -0.0462 0.00337 -0.231 -0.0444 -0.165 -0.173 -0.226 -0.0178 -0.00252 -0.223 -0.0665 -0.0912 -0.184 -0.13 -0.0129 -0.168 0.211 -0.214 -0.254 0.193 -0.282 -0.355 -0.02 -0.183 0.0314 -0.00983 0.208 -0.0465 0.414
 #> 
@@ -532,9 +532,9 @@ lbfgsb3 = calibrate(par=ARPM$guess, fn=obj, method='LBFGSB3', lower=ARPM$lower, 
 summary(ARPM, lbfgsb1, lbfgsb2, lbfgsb3, show_par = 1:3)
 #>           method elapsed   value   fn   gr alpha   beta  gamma1
 #> ARPM        data      NA -186178   NA   NA 0.400 -0.400 -0.1253
-#> lbfgsb1 L-BFGS-B    99.8 -186095 2933 2933 0.404 -0.415 -0.0827
-#> lbfgsb2   Rvmmin    35.7 -186095 4011  637 0.397 -0.415 -0.0756
-#> lbfgsb3  LBFGSB3    58.8 -186093 1735 1735 0.423 -0.415 -0.1037
+#> lbfgsb1 L-BFGS-B    96.2 -186095 2933 2933 0.404 -0.415 -0.0827
+#> lbfgsb2   Rvmmin    34.7 -186095 4011  637 0.397 -0.415 -0.0756
+#> lbfgsb3  LBFGSB3    57.4 -186093 1735 1735 0.423 -0.415 -0.1037
 ```
 
 In this case, the best solution was found using the ‘Rvmmin’ algorithm,
@@ -560,7 +560,7 @@ lbfgsb1p = calibrate(par=ARPM$guess, fn=obj, method='L-BFGS-B', lower=ARPM$lower
 #> 
 #> - Phase 2: 101 out of 107 parameters are currently active.
 #>  Using optimization method 'L-BFGS-B'.
-#>  Phase 2 finished (1m 31.2s)
+#>  Phase 2 finished (1m 27.5s)
 #>  Function value: -186095
 #>  Parameter values: 0.4 -0.415 -0.078 0.133 0.258 -0.278 0.05 0.0733 0.0823 0.464 0.228 -0.0482 -0.0968 0.152 0.305 0.0767 -0.0702 0.129 -0.011 0.402 -0.183 0.0679 -0.208 -0.224 0.087 -0.0356 -0.147 0.323 0.0307 0.298 -0.181 -0.0216 -0.293 0.282 -0.163 0.32 -0.212 0.0064 -0.503 -0.0426 -0.0328 -0.272 -0.078 -0.137 -0.298 0.0917 -0.157 3.16e-05 0.136 -0.0533 0.0337 0.192 0.304 -0.0771 -0.342 0.117 -0.105 0.0674 0.112 0.0311 0.127 -0.0357 0.323 0.215 0.162 0.194 0.0803 -0.115 -0.0931 -0.131 -0.253 0.109 -0.0176 0.0188 -0.203 -0.0225 -0.137 -0.155 -0.198 -0.00116 0.0183 -0.182 -0.044 -0.0676 -0.154 -0.108 0.0013 -0.133 0.207 -0.17 -0.207 0.185 -0.25 -0.322 -0.0193 -0.16 0.0463 0.0206 0.228 -6.59e-05 0.403
 #> 
@@ -576,7 +576,7 @@ lbfgsb2p = calibrate(par=ARPM$guess, fn=obj, method='Rvmmin', lower=ARPM$lower, 
 #> 
 #> - Phase 2: 101 out of 107 parameters are currently active.
 #>  Using optimization method 'Rvmmin'.
-#>  Phase 2 finished (23.60s)
+#>  Phase 2 finished (22.77s)
 #>  Function value: -186095
 #>  Parameter values: 0.396 -0.415 -0.0745 0.136 0.262 -0.275 0.0534 0.0766 0.086 0.468 0.232 -0.0449 -0.0937 0.156 0.309 0.0803 -0.0669 0.132 -0.00748 0.406 -0.18 0.071 -0.204 -0.22 0.0903 -0.0322 -0.144 0.327 0.0341 0.302 -0.178 -0.0183 -0.29 0.285 -0.16 0.324 -0.208 0.00981 -0.499 -0.0392 -0.0292 -0.269 -0.0744 -0.134 -0.294 0.0933 -0.153 0.0039 0.138 -0.0494 0.0369 0.195 0.308 -0.0742 -0.338 0.118 -0.1 0.0701 0.115 0.0354 0.13 -0.0315 0.325 0.218 0.165 0.198 0.0836 -0.112 -0.0896 -0.127 -0.249 0.112 -0.0137 0.0219 -0.2 -0.0195 -0.133 -0.152 -0.194 0.00193 0.021 -0.178 -0.0414 -0.0647 -0.15 -0.102 -0.000635 -0.128 0.21 -0.166 -0.205 0.188 -0.246 -0.321 -0.0105 -0.164 0.0537 0.0197 0.239 -0.00219 0.409
 #> 
@@ -598,7 +598,7 @@ lbfgsb3p = calibrate(par=ARPM$guess, fn=obj, method='LBFGSB3', lower=ARPM$lower,
 #>  Using the backtracking step 
 #>  Positive dir derivative in projection 
 #>  Using the backtracking step
-#>  Phase 2 finished (1m 4.7s)
+#>  Phase 2 finished (1m 3.0s)
 #>  Function value: -186095
 #>  Parameter values: 0.401 -0.415 -0.079 0.13 0.256 -0.279 0.0473 0.071 0.0825 0.463 0.227 -0.0499 -0.0995 0.151 0.304 0.0751 -0.0724 0.127 -0.0126 0.402 -0.185 0.0663 -0.209 -0.225 0.0858 -0.0375 -0.148 0.321 0.0295 0.297 -0.182 -0.0234 -0.295 0.28 -0.163 0.318 -0.215 0.00718 -0.505 -0.0468 -0.0326 -0.273 -0.0779 -0.14 -0.303 0.0963 -0.163 -0.00418 0.14 -0.0564 0.0306 0.191 0.306 -0.0797 -0.348 0.122 -0.11 0.0641 0.112 0.0302 0.128 -0.041 0.323 0.212 0.161 0.193 0.0788 -0.117 -0.0957 -0.131 -0.257 0.11 -0.0212 0.0199 -0.208 -0.0215 -0.14 -0.156 -0.202 -0.000204 0.0161 -0.185 -0.0462 -0.0672 -0.155 -0.11 -0.00264 -0.131 0.203 -0.177 -0.206 0.181 -0.244 -0.322 -0.0296 -0.156 0.0412 0.0192 0.22 0.0108 0.394
 #> 
@@ -609,12 +609,12 @@ lbfgsb3p = calibrate(par=ARPM$guess, fn=obj, method='LBFGSB3', lower=ARPM$lower,
 summary(ARPM, lbfgsb1, lbfgsb1p, lbfgsb2, lbfgsb2p, lbfgsb3, lbfgsb3p, show_par = 1:3)
 #>            method elapsed   value   fn   gr alpha   beta  gamma1
 #> ARPM         data      NA -186178   NA   NA 0.400 -0.400 -0.1253
-#> lbfgsb1  L-BFGS-B    99.8 -186095 2933 2933 0.404 -0.415 -0.0827
-#> lbfgsb1p L-BFGS-B    91.3 -186095 2695 2695 0.400 -0.415 -0.0780
-#> lbfgsb2    Rvmmin    35.7 -186095 4011  637 0.397 -0.415 -0.0756
-#> lbfgsb2p   Rvmmin    23.6 -186095 2650  427 0.396 -0.415 -0.0745
-#> lbfgsb3   LBFGSB3    58.8 -186093 1735 1735 0.423 -0.415 -0.1037
-#> lbfgsb3p  LBFGSB3    64.8 -186095 1964 1964 0.401 -0.415 -0.0790
+#> lbfgsb1  L-BFGS-B    96.2 -186095 2933 2933 0.404 -0.415 -0.0827
+#> lbfgsb1p L-BFGS-B    87.6 -186095 2695 2695 0.400 -0.415 -0.0780
+#> lbfgsb2    Rvmmin    34.7 -186095 4011  637 0.397 -0.415 -0.0756
+#> lbfgsb2p   Rvmmin    22.8 -186095 2650  427 0.396 -0.415 -0.0745
+#> lbfgsb3   LBFGSB3    57.4 -186093 1735 1735 0.423 -0.415 -0.1037
+#> lbfgsb3p  LBFGSB3    63.1 -186095 1964 1964 0.401 -0.415 -0.0790
 ```
 
 For all the algorithms, we can see and improvement in the solution found
@@ -630,13 +630,13 @@ mix1 = calibrate(par=ARPM$guess, fn=obj, method=c('hjn', 'Rvmmin'), lower=ARPM$l
 #> 
 #> - Phase 1: 2 out of 107 parameters are currently active.
 #>  Using optimization method 'hjn'.
-#>  Phase 1 finished (1.31s)
+#>  Phase 1 finished (1.26s)
 #>  Function value: -169005
 #>  Parameter values: 0.294 -0.298
 #> 
 #> - Phase 2: 101 out of 107 parameters are currently active.
 #>  Using optimization method 'Rvmmin'.
-#>  Phase 2 finished (33.81s)
+#>  Phase 2 finished (33.22s)
 #>  Function value: -186095
 #>  Parameter values: 0.397 -0.415 -0.0756 0.135 0.261 -0.276 0.0523 0.0757 0.085 0.467 0.231 -0.0459 -0.0946 0.155 0.308 0.0793 -0.0678 0.131 -0.0087 0.405 -0.181 0.0701 -0.205 -0.221 0.0894 -0.0333 -0.145 0.326 0.0331 0.301 -0.179 -0.0194 -0.291 0.284 -0.161 0.323 -0.209 0.00865 -0.5 -0.0401 -0.0303 -0.27 -0.0754 -0.135 -0.295 0.0923 -0.153 0.000349 0.139 -0.0503 0.0357 0.194 0.307 -0.0753 -0.339 0.117 -0.101 0.069 0.114 0.0343 0.129 -0.033 0.325 0.217 0.164 0.197 0.0826 -0.113 -0.0907 -0.128 -0.25 0.111 -0.015 0.0208 -0.201 -0.0205 -0.134 -0.154 -0.195 0.00193 0.0189 -0.178 -0.0424 -0.0657 -0.151 -0.103 -0.00121 -0.129 0.209 -0.167 -0.205 0.187 -0.247 -0.321 -0.0125 -0.164 0.0532 0.0177 0.24 -0.00831 0.411
 #> 
@@ -652,7 +652,7 @@ mix2 = calibrate(par=ARPM$guess, fn=obj, method=c('Nelder-Mead', 'Rvmmin'), lowe
 #> 
 #> - Phase 2: 101 out of 107 parameters are currently active.
 #>  Using optimization method 'Rvmmin'.
-#>  Phase 2 finished (7.99s)
+#>  Phase 2 finished (7.73s)
 #>  Function value: -186095
 #>  Parameter values: 0.399 -0.415 -0.0775 0.133 0.258 -0.277 0.0504 0.0735 0.083 0.465 0.229 -0.0479 -0.0964 0.153 0.306 0.0775 -0.0697 0.129 -0.0104 0.403 -0.182 0.0681 -0.207 -0.223 0.0874 -0.0351 -0.146 0.324 0.03 0.3 -0.18 -0.0213 -0.293 0.282 -0.163 0.321 -0.211 0.00609 -0.502 -0.0418 -0.0322 -0.271 -0.0771 -0.137 -0.296 0.0894 -0.156 0.00341 0.135 -0.0515 0.0305 0.194 0.306 -0.0774 -0.341 0.116 -0.103 0.0671 0.114 0.0282 0.129 -0.0344 0.323 0.215 0.162 0.195 0.0804 -0.114 -0.0933 -0.13 -0.251 0.109 -0.0147 0.0147 -0.2 -0.023 -0.136 -0.155 -0.194 0.00448 -2.57e-05 -0.173 -0.0452 -0.0652 -0.153 -0.105 -0.00109 -0.135 0.208 -0.167 -0.208 0.186 -0.249 -0.324 -0.0105 -0.166 0.0554 0.00559 0.24 -0.00624 0.41
 #> 
@@ -668,7 +668,7 @@ mix3 = calibrate(par=ARPM$guess, fn=obj, method=c('CG', 'Rvmmin'), lower=ARPM$lo
 #> 
 #> - Phase 2: 101 out of 107 parameters are currently active.
 #>  Using optimization method 'Rvmmin'.
-#>  Phase 2 finished (56.89s)
+#>  Phase 2 finished (55.75s)
 #>  Function value: -186095
 #>  Parameter values: 0.397 -0.415 -0.0756 0.135 0.261 -0.276 0.0523 0.0756 0.085 0.467 0.231 -0.0461 -0.0946 0.155 0.308 0.0793 -0.0679 0.131 -0.00868 0.405 -0.181 0.07 -0.205 -0.221 0.0894 -0.0333 -0.145 0.326 0.0331 0.301 -0.179 -0.0195 -0.291 0.284 -0.161 0.323 -0.209 0.00867 -0.5 -0.0402 -0.0304 -0.27 -0.0755 -0.135 -0.295 0.0924 -0.153 0.000323 0.138 -0.0502 0.0355 0.194 0.307 -0.0753 -0.339 0.117 -0.101 0.069 0.114 0.034 0.129 -0.0329 0.325 0.217 0.164 0.197 0.0826 -0.113 -0.0907 -0.128 -0.25 0.111 -0.0153 0.021 -0.201 -0.0206 -0.134 -0.153 -0.194 0.000435 0.0196 -0.179 -0.0424 -0.0658 -0.151 -0.103 -0.0018 -0.129 0.209 -0.167 -0.206 0.187 -0.247 -0.321 -0.013 -0.164 0.0534 0.0176 0.24 -0.00723 0.41
 #> 
@@ -679,11 +679,11 @@ mix3 = calibrate(par=ARPM$guess, fn=obj, method=c('CG', 'Rvmmin'), lower=ARPM$lo
 summary(ARPM, lbfgsb2, lbfgsb2p, mix1, mix2, mix3, show_par = 1:3)
 #>          method elapsed   value   fn   gr alpha   beta  gamma1
 #> ARPM       data      NA -186178   NA   NA 0.400 -0.400 -0.1253
-#> lbfgsb2  Rvmmin    35.7 -186095 4011  637 0.397 -0.415 -0.0756
-#> lbfgsb2p Rvmmin    23.6 -186095 2650  427 0.396 -0.415 -0.0745
-#> mix1     Rvmmin    35.1 -186095 2498  635 0.397 -0.415 -0.0756
-#> mix2     Rvmmin     8.0 -186095  410  149 0.399 -0.415 -0.0775
-#> mix3     Rvmmin    56.9 -186095 4011 1070 0.397 -0.415 -0.0756
+#> lbfgsb2  Rvmmin   34.67 -186095 4011  637 0.397 -0.415 -0.0756
+#> lbfgsb2p Rvmmin   22.81 -186095 2650  427 0.396 -0.415 -0.0745
+#> mix1     Rvmmin   34.49 -186095 2498  635 0.397 -0.415 -0.0756
+#> mix2     Rvmmin    7.74 -186095  410  149 0.399 -0.415 -0.0775
+#> mix3     Rvmmin   55.78 -186095 4011 1070 0.397 -0.415 -0.0756
 ```
 
 Here, we can see that every combination find essentially the same

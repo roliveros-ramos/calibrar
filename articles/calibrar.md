@@ -517,19 +517,19 @@ calibrate(par=c(1,2,3,NA,5), fn=sphereN,
 #> 
 #> - Phase 1: 2 out of 5 parameters are currently active.
 #>  Using optimization method 'AHR-ES'.
-#>  Phase 1 finished (1.09s)
+#>  Phase 1 finished (1.06s)
 #>  Function value: 12.9126
 #>  Parameter values: -0.324 0.12
 #> 
 #> - Phase 2: 4 out of 5 parameters are currently active.
 #>  Using optimization method 'AHR-ES'.
-#>  Phase 2 finished (1.21s)
+#>  Phase 2 finished (1.18s)
 #>  Function value: 10.1169
 #>  Parameter values: 0.0695 0.112 0.151 -0.0849
 #> 
 #> - Phase 3: 5 out of 5 parameters are currently active.
 #>  Using optimization method 'AHR-ES'.
-#>  Phase 3 finished (1.22s)
+#>  Phase 3 finished (1.20s)
 #>  Function value: 0.0534613
 #>  Parameter values: -0.00843 0.0767 0.0606 0.0265 0.0048
 #> 
@@ -555,19 +555,19 @@ calibrate(par=c(1,2,3,NA,5), fn=sphereN,
 #> 
 #> - Phase 1: 2 out of 5 parameters are currently active.
 #>  Using optimization method 'AHR-ES'.
-#>  Phase 1 finished (0.91s)
+#>  Phase 1 finished (0.90s)
 #>  Function value: 13.3163
 #>  Parameter values: -0.346 -0.101
 #> 
 #> - Phase 2: 4 out of 5 parameters are currently active.
 #>  Using optimization method 'AHR-ES'.
-#>  Phase 2 finished (0.98s)
+#>  Phase 2 finished (0.96s)
 #>  Function value: 9.8584
 #>  Parameter values: 0.217 -0.335 0.24 0.101
 #> 
 #> - Phase 3: 5 out of 5 parameters are currently active.
 #>  Using optimization method 'AHR-ES'.
-#>  Phase 3 finished (1.46s)
+#>  Phase 3 finished (1.42s)
 #>  Function value: 0.0412229
 #>  Parameter values: 0.0282 0.00574 -0.0127 -0.0375 -0.0192
 #> 
@@ -592,13 +592,13 @@ calibrate(par=list(par1=c(1,2,3), par2=NA, par3=5), fn=sphereN,
 #> 
 #> - Phase 1: 2 out of 5 parameters are currently active.
 #>  Using optimization method 'AHR-ES'.
-#>  Phase 1 finished (1.28s)
+#>  Phase 1 finished (1.25s)
 #>  Function value: 13.1182
 #>  Parameter values: 0.0558 0.181
 #> 
 #> - Phase 2: 4 out of 5 parameters are currently active.
 #>  Using optimization method 'AHR-ES'.
-#>  Phase 2 finished (2.96s)
+#>  Phase 2 finished (2.87s)
 #>  Function value: 8.96767
 #>  Parameter values: -0.0167 0.164 -0.14 0.0335
 #> 
