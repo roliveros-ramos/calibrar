@@ -21,15 +21,67 @@ knitr::opts_chunk$set(
 
 ## Introduction
 
-This package allows the parameter estimation (i.e. calibration) of complex models, including stochastic ones. It implements generic functions that can be used for fitting any type of models, especially those with non-differentiable objective functions, with the same syntax as `base::optim`. It supports multiple phases estimation (sequential parameter masking), constrained optimization (bounding box restrictions) and automatic parallel computation of numerical gradients. Some common maximum likelihood estimation methods and automated construction of the objective function from simulated model outputs is provided.
+`calibrar` provides general-purpose optimisation tools in R, with an `optim()`-compatible
+interface and additional functionality that is particularly useful when objective functions are
+computationally expensive. Although the package was originally developed for parameter
+estimation (calibration) of complex ecological and simulation models, its core optimisation
+functions can be used to minimise any user-defined objective function.
+
+The package exposes three complementary entry points:
+
+- `optim2()`: an extension of `stats::optim()` with a curated set of optimisers and additional
+  features such as parameter masking (`active`), optional parallel finite-difference gradients,
+  and support for structured (list-based) parameters.
+- `optimh()`: a unified interface to a broad collection of heuristic optimisation methods, with
+  standardised argument naming.
+- `calibrate()`: a higher-level workflow for sequential (multi-phase) calibration, where
+  parameter masking can be progressively relaxed across phases, optionally with replicates for
+  stochastic models.
+
+In addition, `calibrar` includes helper tools to build objective functions from simulated
+outputs and observational data. These are optional: advanced users can supply objective
+functions directly to `optim2()`, `optimh()` or `calibrate()`.
 
 ## Basic usage
 
-This vignette covers the basic usage of the package, introducing the functions `optim2()`, `optimh()` and `calibrate()`.
+This vignette introduces three front ends. Choose the one that matches your task:
 
-### optim2()
+- General optimisation with an `optim()`-like interface (plus masking / parallel finite differences /
+  list parameters): use `optim2()`.
+- Heuristic optimisation across many algorithms with standardised argument naming: use `optimh()`.
+- Sequential (multi-phase) calibration for complex or stochastic models, with progressive
+  parameter unmasking: use `calibrate()`.
 
-As the name sugests, `optim2()` is intended to extend the functionality of `stats::optim()` and it uses the same arguments (with some additions):
+### optim2(): general-purpose optimisation (an extension of `stats::optim()`)
+
+`optim2()` uses the same calling convention as `stats::optim()` for the common case of a flat numeric parameter vector:
+
+```{r, echo=TRUE, results='markup'}
+library(calibrar)
+
+f <- function(x) sum(x^2)
+
+o1 <- stats::optim(par = rep(1, 5), fn = f)
+o2 <- optim2(par = rep(1, 5), fn = f)
+
+o1$value; o2$value
+o1$par;   o2$par
+```
+
+The results are identical, as here `optim2()` acts just as a wrapper for `stats::optim()`. In addition, `optim2()` can work with structured (list-based) parameters, which can simplify objective functions for complex models:
+
+```{r, echo=TRUE, results='markup'}
+par0 <- list(curve = list(a = 1, b = 0.5), offset = 0)
+
+fn <- function(par) {
+(par$curve$a - 2)^2 + (par$curve$b - 1)^2 + (par$offset - 0.1)^2
+}
+
+out <- optim2(par = par0, fn = fn)
+out$par
+```
+
+The main arguments of `optim2()` are:
 
 ```{r, echo=TRUE, eval=FALSE, results='markup'}
 optim2(
@@ -50,18 +102,7 @@ optim2(
 
 The first difference is the possible values for the `method` argument. In addition to the first six methods, also available in `optim()`, `optim2()` gives access to `stats::nlm()` and `stats::nlminb()` but with the same syntax as `optim()` to make them easy to use. In addition, three methods from the `optimr` package (`Rcgmin`, `Rvmmin`, `hjn`), the L-BFGS-B v3 implemented in the `bfgsb3c` package and the `AHR-ES` (Adaptative Hierarchical Recombination Evolutionary Strategy) implemented in this package.
 
-In the next example, we compare the outputs of `optim()` and `optim2()`:
-
-```{r, echo=TRUE, results='markup'}
-library(calibrar)
-optim(par=rep(1, 5), fn=function(x) sum(x^2))
-```
-
-```{r, echo=TRUE, results='markup'}
-optim2(par=rep(1, 5), fn=function(x) sum(x^2))
-```
-
-The results are identical, as here `optim2()` acts just as a wrapper for `optim()`. Now, we can run the same example with two other methods:
+We can run the same previous example with two other methods not available to `optim()`:
 
 ```{r, echo=TRUE, results='markup'}
 optim2(par=rep(1, 5), fn=function(x) sum(x^2), method="nlm")
@@ -72,7 +113,7 @@ set.seed(880820) # for reproducibility
 optim2(par=rep(1, 5), fn=function(x) sum(x^2), method="AHR-ES")
 ```
 
-The second difference is the new argument `active`, which is a vector indicating if a parameters will be optimized (i.e. active) or fixed to a constant value during the optimization process. In the next example, we will fix the third and fourth parameters to its initial values:
+The second difference is the new argument `active`, which is a vector indicating if a parameter will be optimized (i.e. active) or fixed to a constant value during the optimization process. In the next example, we will fix the third and fourth parameters to its initial values:
 
 ```{r, echo=TRUE, results='markup'}
 optim2(par=rep(1, 5), fn=function(x) sum(x^2), 
@@ -81,7 +122,7 @@ optim2(par=rep(1, 5), fn=function(x) sum(x^2),
 
 As we can see, in the final solution, the `par` value keep the values at 1, the initial value provided. All the numerical gradients computed internally have also 'masked' this parameters and the derivatives are not computed for them to speed up computation time.
 
-Finally, the third difference is the new argument `parallel`, that active the parallel computation of the numerical gradient, when `gr` is not supplied:
+Finally, the third difference is the new argument `parallel`, that activates the parallel computation of the numerical gradient, when `gr` is not supplied:
 
 ```{r, echo=TRUE, results='markup'}
 optim2(par=rep(1, 5), fn=function(x) sum(x^2), parallel=TRUE)
