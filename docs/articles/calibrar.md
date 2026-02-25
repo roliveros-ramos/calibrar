@@ -2,32 +2,108 @@
 
 ## Introduction
 
-This package allows the parameter estimation (i.e. calibration) of
-complex models, including stochastic ones. It implements generic
-functions that can be used for fitting any type of models, especially
-those with non-differentiable objective functions, with the same syntax
-as `base::optim`. It supports multiple phases estimation (sequential
-parameter masking), constrained optimization (bounding box restrictions)
-and automatic parallel computation of numerical gradients. Some common
-maximum likelihood estimation methods and automated construction of the
-objective function from simulated model outputs is provided.
+`calibrar` provides general-purpose optimisation tools in R, with an
+[`optim()`](https://rdrr.io/r/stats/optim.html)-compatible interface and
+additional functionality that is particularly useful when objective
+functions are computationally expensive. Although the package was
+originally developed for parameter estimation (calibration) of complex
+ecological and simulation models, its core optimisation functions can be
+used to minimise any user-defined objective function.
+
+The package exposes three complementary entry points:
+
+- [`optim2()`](https://roliveros-ramos.github.io/calibrar/reference/optim2.md):
+  an extension of [`stats::optim()`](https://rdrr.io/r/stats/optim.html)
+  with a curated set of optimisers and additional features such as
+  parameter masking (`active`), optional parallel finite-difference
+  gradients, and support for structured (list-based) parameters.
+- [`optimh()`](https://roliveros-ramos.github.io/calibrar/reference/optimh.md):
+  a unified interface to a broad collection of heuristic optimisation
+  methods, with standardised argument naming.
+- [`calibrate()`](https://roliveros-ramos.github.io/calibrar/reference/calibrate.md):
+  a higher-level workflow for sequential (multi-phase) calibration,
+  where parameter masking can be progressively relaxed across phases,
+  optionally with replicates for stochastic models.
+
+In addition, `calibrar` includes helper tools to build objective
+functions from simulated outputs and observational data. These are
+optional: advanced users can supply objective functions directly to
+[`optim2()`](https://roliveros-ramos.github.io/calibrar/reference/optim2.md),
+[`optimh()`](https://roliveros-ramos.github.io/calibrar/reference/optimh.md)
+or
+[`calibrate()`](https://roliveros-ramos.github.io/calibrar/reference/calibrate.md).
 
 ## Basic usage
 
-This vignette covers the basic usage of the package, introducing the
-functions
-[`optim2()`](https://roliveros-ramos.github.io/calibrar/reference/optim2.md),
-[`optimh()`](https://roliveros-ramos.github.io/calibrar/reference/optimh.md)
-and
-[`calibrate()`](https://roliveros-ramos.github.io/calibrar/reference/calibrate.md).
+This vignette introduces three front ends. Choose the one that matches
+your task:
 
-### optim2()
+- General optimisation with an
+  [`optim()`](https://rdrr.io/r/stats/optim.html)-like interface (plus
+  masking / parallel finite differences / list parameters): use
+  [`optim2()`](https://roliveros-ramos.github.io/calibrar/reference/optim2.md).
+- Heuristic optimisation across many algorithms with standardised
+  argument naming: use
+  [`optimh()`](https://roliveros-ramos.github.io/calibrar/reference/optimh.md).
+- Sequential (multi-phase) calibration for complex or stochastic models,
+  with progressive parameter unmasking: use
+  [`calibrate()`](https://roliveros-ramos.github.io/calibrar/reference/calibrate.md).
 
-As the name sugests,
+### optim2(): general-purpose optimisation (an extension of `stats::optim()`)
+
 [`optim2()`](https://roliveros-ramos.github.io/calibrar/reference/optim2.md)
-is intended to extend the functionality of
-[`stats::optim()`](https://rdrr.io/r/stats/optim.html) and it uses the
-same arguments (with some additions):
+uses the same calling convention as
+[`stats::optim()`](https://rdrr.io/r/stats/optim.html) for the common
+case of a flat numeric parameter vector:
+
+``` r
+library(calibrar)
+
+f <- function(x) sum(x^2)
+
+o1 <- stats::optim(par = rep(1, 5), fn = f)
+o2 <- optim2(par = rep(1, 5), fn = f)
+
+o1$value; o2$value
+#> [1] 1.639553e-07
+#> [1] 1.639553e-07
+o1$par;   o2$par
+#> [1] -1.931714e-04 -3.044063e-04 -1.744066e-04  1.940552e-05  5.641574e-05
+#> [1] -1.931714e-04 -3.044063e-04 -1.744066e-04  1.940552e-05  5.641574e-05
+```
+
+The results are identical, as here
+[`optim2()`](https://roliveros-ramos.github.io/calibrar/reference/optim2.md)
+acts just as a wrapper for
+[`stats::optim()`](https://rdrr.io/r/stats/optim.html). In addition,
+[`optim2()`](https://roliveros-ramos.github.io/calibrar/reference/optim2.md)
+can work with structured (list-based) parameters, which can simplify
+objective functions for complex models:
+
+``` r
+par0 <- list(curve = list(a = 1, b = 0.5), offset = 0)
+
+fn <- function(par) {
+(par$curve$a - 2)^2 + (par$curve$b - 1)^2 + (par$offset - 0.1)^2
+}
+
+out <- optim2(par = par0, fn = fn)
+out$par
+#> $curve
+#> $curve$a
+#> [1] 2.000081
+#> 
+#> $curve$b
+#> [1] 1.00002
+#> 
+#> 
+#> $offset
+#> [1] 0.100108
+```
+
+The main arguments of
+[`optim2()`](https://roliveros-ramos.github.io/calibrar/reference/optim2.md)
+are:
 
 ``` r
 optim2(
@@ -58,54 +134,8 @@ them easy to use. In addition, three methods from the `optimr` package
 `bfgsb3c` package and the `AHR-ES` (Adaptative Hierarchical
 Recombination Evolutionary Strategy) implemented in this package.
 
-In the next example, we compare the outputs of
-[`optim()`](https://rdrr.io/r/stats/optim.html) and
-[`optim2()`](https://roliveros-ramos.github.io/calibrar/reference/optim2.md):
-
-``` r
-library(calibrar)
-optim(par=rep(1, 5), fn=function(x) sum(x^2))
-#> $par
-#> [1] -1.931714e-04 -3.044063e-04 -1.744066e-04  1.940552e-05  5.641574e-05
-#> 
-#> $value
-#> [1] 1.639553e-07
-#> 
-#> $counts
-#> function gradient 
-#>      456       NA 
-#> 
-#> $convergence
-#> [1] 0
-#> 
-#> $message
-#> NULL
-```
-
-``` r
-optim2(par=rep(1, 5), fn=function(x) sum(x^2))
-#> $par
-#> [1] -1.931714e-04 -3.044063e-04 -1.744066e-04  1.940552e-05  5.641574e-05
-#> 
-#> $value
-#> [1] 1.639553e-07
-#> 
-#> $counts
-#> function gradient 
-#>      456       NA 
-#> 
-#> $convergence
-#> [1] 0
-#> 
-#> $message
-#> NULL
-```
-
-The results are identical, as here
-[`optim2()`](https://roliveros-ramos.github.io/calibrar/reference/optim2.md)
-acts just as a wrapper for
-[`optim()`](https://rdrr.io/r/stats/optim.html). Now, we can run the
-same example with two other methods:
+We can run the same previous example with two other methods not
+available to [`optim()`](https://rdrr.io/r/stats/optim.html):
 
 ``` r
 optim2(par=rep(1, 5), fn=function(x) sum(x^2), method="nlm")
@@ -150,7 +180,7 @@ optim2(par=rep(1, 5), fn=function(x) sum(x^2), method="AHR-ES")
 ```
 
 The second difference is the new argument `active`, which is a vector
-indicating if a parameters will be optimized (i.e. active) or fixed to a
+indicating if a parameter will be optimized (i.e. active) or fixed to a
 constant value during the optimization process. In the next example, we
 will fix the third and fourth parameters to its initial values:
 
@@ -180,8 +210,8 @@ internally have also ‘masked’ this parameters and the derivatives are
 not computed for them to speed up computation time.
 
 Finally, the third difference is the new argument `parallel`, that
-active the parallel computation of the numerical gradient, when `gr` is
-not supplied:
+activates the parallel computation of the numerical gradient, when `gr`
+is not supplied:
 
 ``` r
 optim2(par=rep(1, 5), fn=function(x) sum(x^2), parallel=TRUE)
@@ -517,19 +547,19 @@ calibrate(par=c(1,2,3,NA,5), fn=sphereN,
 #> 
 #> - Phase 1: 2 out of 5 parameters are currently active.
 #>  Using optimization method 'AHR-ES'.
-#>  Phase 1 finished (0.86s)
+#>  Phase 1 finished (0.87s)
 #>  Function value: 12.9126
 #>  Parameter values: -0.324 0.12
 #> 
 #> - Phase 2: 4 out of 5 parameters are currently active.
 #>  Using optimization method 'AHR-ES'.
-#>  Phase 2 finished (0.93s)
+#>  Phase 2 finished (0.94s)
 #>  Function value: 10.1169
 #>  Parameter values: 0.0695 0.112 0.151 -0.0849
 #> 
 #> - Phase 3: 5 out of 5 parameters are currently active.
 #>  Using optimization method 'AHR-ES'.
-#>  Phase 3 finished (0.91s)
+#>  Phase 3 finished (0.95s)
 #>  Function value: 0.0534613
 #>  Parameter values: -0.00843 0.0767 0.0606 0.0265 0.0048
 #> 
@@ -555,19 +585,19 @@ calibrate(par=c(1,2,3,NA,5), fn=sphereN,
 #> 
 #> - Phase 1: 2 out of 5 parameters are currently active.
 #>  Using optimization method 'AHR-ES'.
-#>  Phase 1 finished (0.67s)
+#>  Phase 1 finished (0.70s)
 #>  Function value: 13.3163
 #>  Parameter values: -0.346 -0.101
 #> 
 #> - Phase 2: 4 out of 5 parameters are currently active.
 #>  Using optimization method 'AHR-ES'.
-#>  Phase 2 finished (0.72s)
+#>  Phase 2 finished (0.74s)
 #>  Function value: 9.8584
 #>  Parameter values: 0.217 -0.335 0.24 0.101
 #> 
 #> - Phase 3: 5 out of 5 parameters are currently active.
 #>  Using optimization method 'AHR-ES'.
-#>  Phase 3 finished (1.22s)
+#>  Phase 3 finished (1.15s)
 #>  Function value: 0.0412229
 #>  Parameter values: 0.0282 0.00574 -0.0127 -0.0375 -0.0192
 #> 
@@ -592,13 +622,13 @@ calibrate(par=list(par1=c(1,2,3), par2=NA, par3=5), fn=sphereN,
 #> 
 #> - Phase 1: 2 out of 5 parameters are currently active.
 #>  Using optimization method 'AHR-ES'.
-#>  Phase 1 finished (0.98s)
+#>  Phase 1 finished (0.97s)
 #>  Function value: 13.1182
 #>  Parameter values: 0.0558 0.181
 #> 
 #> - Phase 2: 4 out of 5 parameters are currently active.
 #>  Using optimization method 'AHR-ES'.
-#>  Phase 2 finished (2.43s)
+#>  Phase 2 finished (2.28s)
 #>  Function value: 8.96767
 #>  Parameter values: -0.0167 0.164 -0.14 0.0335
 #> 

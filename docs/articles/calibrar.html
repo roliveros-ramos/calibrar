@@ -40,10 +40,22 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/v02-parameter_estimation.html">Using the `calibrate()` function for parameter estimation</a></li>
-    <li><a class="dropdown-item" href="../articles/v03-parameter_estimation_ODE.html">Parameter estimation for ODE systems</a></li>
+<li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Optimisation</h6></li>
+    <li><a class="dropdown-item" href="../articles/v02-optim2.html">General optimisation with optim2()</a></li>
+    <li><a class="dropdown-item" href="../articles/v03-optimh.html">Heuristic optimisation with optimh()</a></li>
+    <li><a class="dropdown-item" href="../articles/v04-optim-recipes.html">Optimisation recipes and diagnostics (optim2 and optimh)</a></li>
+    <li><a class="dropdown-item" href="../articles/v05-parallel-optimisation.html">Parallel computing for optimisation in calibrar</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Model calibration</h6></li>
+    <li><a class="dropdown-item" href="../articles/v06-sequential-calibration.html">Sequential calibration with calibrate()</a></li>
+    <li><a class="dropdown-item" href="../articles/v07-parameter_estimation.html">Using the `calibrate()` function for parameter estimation</a></li>
+    <li><a class="dropdown-item" href="../articles/v08-parameter_estimation_ODE.html">Parameter estimation for ODE systems</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item" href="../articles/index.html">More articles...</a></li>
   </ul>
 </li>
+<li class="nav-item"><a class="nav-link" href="../internal/tutorials.html">Tutorials</a></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
@@ -67,7 +79,7 @@
                         <h4 data-toc-skip class="author">Ricardo
 Oliveros-Ramos</h4>
             
-            <h4 data-toc-skip class="date">2025-12-20</h4>
+            <h4 data-toc-skip class="date">2025-12-22</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/roliveros-ramos/calibrar/blob/HEAD/vignettes/calibrar.Rmd" class="external-link"><code>vignettes/calibrar.Rmd</code></a></small>
       <div class="d-none name"><code>calibrar.Rmd</code></div>
@@ -78,30 +90,97 @@ Oliveros-Ramos</h4>
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p>This package allows the parameter estimation (i.e. calibration) of
-complex models, including stochastic ones. It implements generic
-functions that can be used for fitting any type of models, especially
-those with non-differentiable objective functions, with the same syntax
-as <code>base::optim</code>. It supports multiple phases estimation
-(sequential parameter masking), constrained optimization (bounding box
-restrictions) and automatic parallel computation of numerical gradients.
-Some common maximum likelihood estimation methods and automated
-construction of the objective function from simulated model outputs is
-provided.</p>
+<p><code>calibrar</code> provides general-purpose optimisation tools in
+R, with an <code><a href="https://rdrr.io/r/stats/optim.html" class="external-link">optim()</a></code>-compatible interface and additional
+functionality that is particularly useful when objective functions are
+computationally expensive. Although the package was originally developed
+for parameter estimation (calibration) of complex ecological and
+simulation models, its core optimisation functions can be used to
+minimise any user-defined objective function.</p>
+<p>The package exposes three complementary entry points:</p>
+<ul>
+<li>
+<code><a href="../reference/optim2.html">optim2()</a></code>: an extension of <code><a href="https://rdrr.io/r/stats/optim.html" class="external-link">stats::optim()</a></code>
+with a curated set of optimisers and additional features such as
+parameter masking (<code>active</code>), optional parallel
+finite-difference gradients, and support for structured (list-based)
+parameters.</li>
+<li>
+<code><a href="../reference/optimh.html">optimh()</a></code>: a unified interface to a broad collection of
+heuristic optimisation methods, with standardised argument naming.</li>
+<li>
+<code><a href="../reference/calibrate.html">calibrate()</a></code>: a higher-level workflow for sequential
+(multi-phase) calibration, where parameter masking can be progressively
+relaxed across phases, optionally with replicates for stochastic
+models.</li>
+</ul>
+<p>In addition, <code>calibrar</code> includes helper tools to build
+objective functions from simulated outputs and observational data. These
+are optional: advanced users can supply objective functions directly to
+<code><a href="../reference/optim2.html">optim2()</a></code>, <code><a href="../reference/optimh.html">optimh()</a></code> or
+<code><a href="../reference/calibrate.html">calibrate()</a></code>.</p>
 </div>
 <div class="section level2">
 <h2 id="basic-usage">Basic usage<a class="anchor" aria-label="anchor" href="#basic-usage"></a>
 </h2>
-<p>This vignette covers the basic usage of the package, introducing the
-functions <code><a href="../reference/optim2.html">optim2()</a></code>, <code><a href="../reference/optimh.html">optimh()</a></code> and
-<code><a href="../reference/calibrate.html">calibrate()</a></code>.</p>
+<p>This vignette introduces three front ends. Choose the one that
+matches your task:</p>
+<ul>
+<li>General optimisation with an <code><a href="https://rdrr.io/r/stats/optim.html" class="external-link">optim()</a></code>-like interface
+(plus masking / parallel finite differences / list parameters): use
+<code><a href="../reference/optim2.html">optim2()</a></code>.</li>
+<li>Heuristic optimisation across many algorithms with standardised
+argument naming: use <code><a href="../reference/optimh.html">optimh()</a></code>.</li>
+<li>Sequential (multi-phase) calibration for complex or stochastic
+models, with progressive parameter unmasking: use
+<code><a href="../reference/calibrate.html">calibrate()</a></code>.</li>
+</ul>
 <div class="section level3">
-<h3 id="optim2">optim2()<a class="anchor" aria-label="anchor" href="#optim2"></a>
+<h3 id="optim2-general-purpose-optimisation-an-extension-of-statsoptim">optim2(): general-purpose optimisation (an extension of
+<code>stats::optim()</code>)<a class="anchor" aria-label="anchor" href="#optim2-general-purpose-optimisation-an-extension-of-statsoptim"></a>
 </h3>
-<p>As the name sugests, <code><a href="../reference/optim2.html">optim2()</a></code> is intended to extend the
-functionality of <code><a href="https://rdrr.io/r/stats/optim.html" class="external-link">stats::optim()</a></code> and it uses the same
-arguments (with some additions):</p>
+<p><code><a href="../reference/optim2.html">optim2()</a></code> uses the same calling convention as
+<code><a href="https://rdrr.io/r/stats/optim.html" class="external-link">stats::optim()</a></code> for the common case of a flat numeric
+parameter vector:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://roliveros-ramos.github.io/calibrar/">calibrar</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">x</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">o1</span> <span class="op">&lt;-</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/optim.html" class="external-link">optim</a></span><span class="op">(</span>par <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">5</span><span class="op">)</span>, fn <span class="op">=</span> <span class="va">f</span><span class="op">)</span></span>
+<span><span class="va">o2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/optim2.html">optim2</a></span><span class="op">(</span>par <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">5</span><span class="op">)</span>, fn <span class="op">=</span> <span class="va">f</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">o1</span><span class="op">$</span><span class="va">value</span>; <span class="va">o2</span><span class="op">$</span><span class="va">value</span></span>
+<span><span class="co">#&gt; [1] 1.639553e-07</span></span>
+<span><span class="co">#&gt; [1] 1.639553e-07</span></span>
+<span><span class="va">o1</span><span class="op">$</span><span class="va">par</span>;   <span class="va">o2</span><span class="op">$</span><span class="va">par</span></span>
+<span><span class="co">#&gt; [1] -1.931714e-04 -3.044063e-04 -1.744066e-04  1.940552e-05  5.641574e-05</span></span>
+<span><span class="co">#&gt; [1] -1.931714e-04 -3.044063e-04 -1.744066e-04  1.940552e-05  5.641574e-05</span></span></code></pre></div>
+<p>The results are identical, as here <code><a href="../reference/optim2.html">optim2()</a></code> acts just as
+a wrapper for <code><a href="https://rdrr.io/r/stats/optim.html" class="external-link">stats::optim()</a></code>. In addition,
+<code><a href="../reference/optim2.html">optim2()</a></code> can work with structured (list-based) parameters,
+which can simplify objective functions for complex models:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">par0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>curve <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>a <span class="op">=</span> <span class="fl">1</span>, b <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span>, offset <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">fn</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">par</span><span class="op">)</span> <span class="op">{</span></span>
+<span><span class="op">(</span><span class="va">par</span><span class="op">$</span><span class="va">curve</span><span class="op">$</span><span class="va">a</span> <span class="op">-</span> <span class="fl">2</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="op">(</span><span class="va">par</span><span class="op">$</span><span class="va">curve</span><span class="op">$</span><span class="va">b</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="op">(</span><span class="va">par</span><span class="op">$</span><span class="va">offset</span> <span class="op">-</span> <span class="fl">0.1</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/optim2.html">optim2</a></span><span class="op">(</span>par <span class="op">=</span> <span class="va">par0</span>, fn <span class="op">=</span> <span class="va">fn</span><span class="op">)</span></span>
+<span><span class="va">out</span><span class="op">$</span><span class="va">par</span></span>
+<span><span class="co">#&gt; $curve</span></span>
+<span><span class="co">#&gt; $curve$a</span></span>
+<span><span class="co">#&gt; [1] 2.000081</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $curve$b</span></span>
+<span><span class="co">#&gt; [1] 1.00002</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $offset</span></span>
+<span><span class="co">#&gt; [1] 0.100108</span></span></code></pre></div>
+<p>The main arguments of <code><a href="../reference/optim2.html">optim2()</a></code> are:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/optim2.html">optim2</a></span><span class="op">(</span></span>
 <span>  <span class="va">par</span>,</span>
 <span>  <span class="va">fn</span>,</span>
@@ -126,46 +205,8 @@ addition, three methods from the <code>optimr</code> package
 L-BFGS-B v3 implemented in the <code>bfgsb3c</code> package and the
 <code>AHR-ES</code> (Adaptative Hierarchical Recombination Evolutionary
 Strategy) implemented in this package.</p>
-<p>In the next example, we compare the outputs of <code><a href="https://rdrr.io/r/stats/optim.html" class="external-link">optim()</a></code>
-and <code><a href="../reference/optim2.html">optim2()</a></code>:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://roliveros-ramos.github.io/calibrar/">calibrar</a></span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/stats/optim.html" class="external-link">optim</a></span><span class="op">(</span>par<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">5</span><span class="op">)</span>, fn<span class="op">=</span><span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">x</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; $par</span></span>
-<span><span class="co">#&gt; [1] -1.931714e-04 -3.044063e-04 -1.744066e-04  1.940552e-05  5.641574e-05</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $value</span></span>
-<span><span class="co">#&gt; [1] 1.639553e-07</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $counts</span></span>
-<span><span class="co">#&gt; function gradient </span></span>
-<span><span class="co">#&gt;      456       NA </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $convergence</span></span>
-<span><span class="co">#&gt; [1] 0</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $message</span></span>
-<span><span class="co">#&gt; NULL</span></span></code></pre></div>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/optim2.html">optim2</a></span><span class="op">(</span>par<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">5</span><span class="op">)</span>, fn<span class="op">=</span><span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">x</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; $par</span></span>
-<span><span class="co">#&gt; [1] -1.931714e-04 -3.044063e-04 -1.744066e-04  1.940552e-05  5.641574e-05</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $value</span></span>
-<span><span class="co">#&gt; [1] 1.639553e-07</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $counts</span></span>
-<span><span class="co">#&gt; function gradient </span></span>
-<span><span class="co">#&gt;      456       NA </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $convergence</span></span>
-<span><span class="co">#&gt; [1] 0</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $message</span></span>
-<span><span class="co">#&gt; NULL</span></span></code></pre></div>
-<p>The results are identical, as here <code><a href="../reference/optim2.html">optim2()</a></code> acts just as
-a wrapper for <code><a href="https://rdrr.io/r/stats/optim.html" class="external-link">optim()</a></code>. Now, we can run the same example
-with two other methods:</p>
+<p>We can run the same previous example with two other methods not
+available to <code><a href="https://rdrr.io/r/stats/optim.html" class="external-link">optim()</a></code>:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/optim2.html">optim2</a></span><span class="op">(</span>par<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">5</span><span class="op">)</span>, fn<span class="op">=</span><span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">x</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>, method<span class="op">=</span><span class="st">"nlm"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $par</span></span>
@@ -205,9 +246,9 @@ with two other methods:</p>
 <span><span class="co">#&gt; $generations</span></span>
 <span><span class="co">#&gt; [1] 128</span></span></code></pre></div>
 <p>The second difference is the new argument <code>active</code>, which
-is a vector indicating if a parameters will be optimized (i.e. active)
-or fixed to a constant value during the optimization process. In the
-next example, we will fix the third and fourth parameters to its initial
+is a vector indicating if a parameter will be optimized (i.e. active) or
+fixed to a constant value during the optimization process. In the next
+example, we will fix the third and fourth parameters to its initial
 values:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/optim2.html">optim2</a></span><span class="op">(</span>par<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">5</span><span class="op">)</span>, fn<span class="op">=</span><span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">x</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>, </span>
@@ -232,7 +273,7 @@ the values at 1, the initial value provided. All the numerical gradients
 computed internally have also ‘masked’ this parameters and the
 derivatives are not computed for them to speed up computation time.</p>
 <p>Finally, the third difference is the new argument
-<code>parallel</code>, that active the parallel computation of the
+<code>parallel</code>, that activates the parallel computation of the
 numerical gradient, when <code>gr</code> is not supplied:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/optim2.html">optim2</a></span><span class="op">(</span>par<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">5</span><span class="op">)</span>, fn<span class="op">=</span><span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">x</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>, parallel<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
@@ -537,19 +578,19 @@ iterations to 1000 to speed up the execution of the vignette.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; - Phase 1: 2 out of 5 parameters are currently active.</span></span>
 <span><span class="co">#&gt;  Using optimization method 'AHR-ES'.</span></span>
-<span><span class="co">#&gt;  Phase 1 finished (0.86s)</span></span>
+<span><span class="co">#&gt;  Phase 1 finished (0.87s)</span></span>
 <span><span class="co">#&gt;  Function value: 12.9126</span></span>
 <span><span class="co">#&gt;  Parameter values: -0.324 0.12</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; - Phase 2: 4 out of 5 parameters are currently active.</span></span>
 <span><span class="co">#&gt;  Using optimization method 'AHR-ES'.</span></span>
-<span><span class="co">#&gt;  Phase 2 finished (0.93s)</span></span>
+<span><span class="co">#&gt;  Phase 2 finished (0.94s)</span></span>
 <span><span class="co">#&gt;  Function value: 10.1169</span></span>
 <span><span class="co">#&gt;  Parameter values: 0.0695 0.112 0.151 -0.0849</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; - Phase 3: 5 out of 5 parameters are currently active.</span></span>
 <span><span class="co">#&gt;  Using optimization method 'AHR-ES'.</span></span>
-<span><span class="co">#&gt;  Phase 3 finished (0.91s)</span></span>
+<span><span class="co">#&gt;  Phase 3 finished (0.95s)</span></span>
 <span><span class="co">#&gt;  Function value: 0.0534613</span></span>
 <span><span class="co">#&gt;  Parameter values: -0.00843 0.0767 0.0606 0.0265 0.0048</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -572,19 +613,19 @@ length equal to the number of phases:</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; - Phase 1: 2 out of 5 parameters are currently active.</span></span>
 <span><span class="co">#&gt;  Using optimization method 'AHR-ES'.</span></span>
-<span><span class="co">#&gt;  Phase 1 finished (0.67s)</span></span>
+<span><span class="co">#&gt;  Phase 1 finished (0.70s)</span></span>
 <span><span class="co">#&gt;  Function value: 13.3163</span></span>
 <span><span class="co">#&gt;  Parameter values: -0.346 -0.101</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; - Phase 2: 4 out of 5 parameters are currently active.</span></span>
 <span><span class="co">#&gt;  Using optimization method 'AHR-ES'.</span></span>
-<span><span class="co">#&gt;  Phase 2 finished (0.72s)</span></span>
+<span><span class="co">#&gt;  Phase 2 finished (0.74s)</span></span>
 <span><span class="co">#&gt;  Function value: 9.8584</span></span>
 <span><span class="co">#&gt;  Parameter values: 0.217 -0.335 0.24 0.101</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; - Phase 3: 5 out of 5 parameters are currently active.</span></span>
 <span><span class="co">#&gt;  Using optimization method 'AHR-ES'.</span></span>
-<span><span class="co">#&gt;  Phase 3 finished (1.22s)</span></span>
+<span><span class="co">#&gt;  Phase 3 finished (1.15s)</span></span>
 <span><span class="co">#&gt;  Function value: 0.0412229</span></span>
 <span><span class="co">#&gt;  Parameter values: 0.0282 0.00574 -0.0127 -0.0375 -0.0192</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -609,13 +650,13 @@ length equal to the number of phases:</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; - Phase 1: 2 out of 5 parameters are currently active.</span></span>
 <span><span class="co">#&gt;  Using optimization method 'AHR-ES'.</span></span>
-<span><span class="co">#&gt;  Phase 1 finished (0.98s)</span></span>
+<span><span class="co">#&gt;  Phase 1 finished (0.97s)</span></span>
 <span><span class="co">#&gt;  Function value: 13.1182</span></span>
 <span><span class="co">#&gt;  Parameter values: 0.0558 0.181</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; - Phase 2: 4 out of 5 parameters are currently active.</span></span>
 <span><span class="co">#&gt;  Using optimization method 'AHR-ES'.</span></span>
-<span><span class="co">#&gt;  Phase 2 finished (2.43s)</span></span>
+<span><span class="co">#&gt;  Phase 2 finished (2.28s)</span></span>
 <span><span class="co">#&gt;  Function value: 8.96767</span></span>
 <span><span class="co">#&gt;  Parameter values: -0.0167 0.164 -0.14 0.0335</span></span>
 <span><span class="co">#&gt; </span></span>

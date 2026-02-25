@@ -2,15 +2,83 @@ url: https://roliveros-ramos.github.io/calibrar/
 template:
   bootstrap: 5
   math-rendering: katex
+  light-switch: true
+  bootswatch: cosmo
+  theme: github-light
+  theme-dark: github-dark
+  bslib:
+    primary: "#1f4e79"
+navbar:
+  structure:
+    left: [intro, reference, articles, tutorials, news]
+    right: [search, github, rg, lightswitch]
+  components:
+    tutorials:
+      text: Tutorials
+      href: articles/internal/tutorials.html
+    rg:
+      icon: fa-brands fa-researchgate
+      href: https://www.researchgate.net/profile/Ricardo-Oliveros-Ramos
+      aria-label: ResearchGate
+# Organise vignettes (Articles) and control their order/grouping.
+# Note: the vignette named like the package (e.g., vignettes/calibrar.Rmd)
+# automatically becomes the top-level "Get started" link and does not appear
+# in the Articles drop-down. :contentReference[oaicite:1]{index=1}
+articles:
+- title: General-purpose optimisation
+  navbar: Optimisation
+  desc: >
+    General-purpose optimisation interfaces: optim()-style optimisation with extensions (optim2),
+    and heuristic optimisation with standardised arguments (optimh).
+  contents:
+  # Add these when the corresponding vignette .Rmd files exist:
+   - v02-optim2
+   - v03-optimh
+   - v04-optim-recipes
+   - v05-parallel-optimisation
+
+- title: Model calibration
+  navbar: Parameter estimation and model calibration
+  desc: >
+    Parameter estimation examples and workflows based on calibrate(), including deterministic
+    and ODE-based models.
+  contents:
+  - articles/v06-sequential-calibration
+  - articles/v07-parameter_estimation
+  - articles/v08-parameter_estimation_ODE
+  # Planned:
+  # - v09-parameter_estimation_stochastic
+  # - v10-setting_up_a_calibration
+  # - v11-using_with_TMB
+
+- title: Model-specific workflows
+  desc: >
+    Examples tailored to specific modelling platforms.
+  contents:
+  # Planned:
+   - articles/v12-setting_up_an_osmose_calibration
+
+#- title: JSS paper
+#  navbar: JSS
+#  desc: >
+#    Companion vignette corresponding to the Journal of Statistical Software article on optim2().
+#  contents:
+#  # Add when the paper vignette exists:
+#  # - jss-optim2
+- title: internal
+  contents:
+  # Planned:
+   - internal/tutorials
+
 reference:
 - title: Main functions
   desc: >
     Functions for general purpose optimization, 
     with support for parallel computation of derivatives.
 - contents:
-  - calibrate
   - optim2
   - optimh
+  - calibrate
   - ahres 
   - gradient
   - calibrar-package
@@ -40,3 +108,4 @@ reference:
   - getObservedData
   - getCalibrationInfo
   - createObjectiveFunction
+

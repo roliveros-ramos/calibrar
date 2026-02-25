@@ -3,9 +3,16 @@ pkgdown: 2.2.0
 pkgdown_sha: ~
 articles:
   calibrar: calibrar.html
-  v02-parameter_estimation: v02-parameter_estimation.html
-  v03-parameter_estimation_ODE: v03-parameter_estimation_ODE.html
-last_built: 2025-12-20T02:09Z
+  internal/tutorials: internal/tutorials.html
+  v02-optim2: v02-optim2.html
+  v03-optimh: v03-optimh.html
+  v04-optim-recipes: v04-optim-recipes.html
+  v05-parallel-optimisation: v05-parallel-optimisation.html
+  articles/v06-sequential-calibration: v06-sequential-calibration.html
+  articles/v07-parameter_estimation: v07-parameter_estimation.html
+  articles/v08-parameter_estimation_ODE: v08-parameter_estimation_ODE.html
+  articles/v12-setting_up_an_osmose_calibration: v12-setting_up_an_osmose_calibration.html
+last_built: 2025-12-22T23:54Z
 urls:
   reference: https://roliveros-ramos.github.io/calibrar/reference
   article: https://roliveros-ramos.github.io/calibrar/articles

@@ -5,14 +5,14 @@
 Functions for general purpose optimization, with support for parallel
 computation of derivatives.
 
-- [`calibrate()`](https://roliveros-ramos.github.io/calibrar/reference/calibrate.md)
-  : Sequential parameter estimation for the calibration of complex
-  models
 - [`optim2()`](https://roliveros-ramos.github.io/calibrar/reference/optim2.md)
   : General-purpose optimization with parallel numerical gradient
   computation
 - [`optimh()`](https://roliveros-ramos.github.io/calibrar/reference/optimh.md)
   : General-purpose optimization using heuristic algorithms
+- [`calibrate()`](https://roliveros-ramos.github.io/calibrar/reference/calibrate.md)
+  : Sequential parameter estimation for the calibration of complex
+  models
 - [`ahres()`](https://roliveros-ramos.github.io/calibrar/reference/ahres.md)
   : Adaptative Hierarchical Recombination Evolutionary Strategy (AHR-ES)
   for derivative-free and black-box optimization
