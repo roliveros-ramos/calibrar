@@ -7,6 +7,7 @@ NEWS.md
 docs
 pkgdown
 sandbox
+tutorials
 ^\.github$
 ^\.git$
 ^README.Rmd
@@ -24,3 +25,4 @@ vignettes/.*_cache/
 ^doc$
 ^Meta$
 ^vignettes/articles$
+^vignettes/internal$
