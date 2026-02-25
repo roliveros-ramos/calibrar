@@ -19,44 +19,55 @@ ahres(
 )
 }
 \arguments{
-\item{par}{A numeric vector or list. The length of the par argument defines the 
-number of parameters to be estimated (i.e. the dimension of the problem).}
+\item{par}{A numeric vector or list. The length of \code{par} defines the number of
+parameters to be estimated (i.e., the dimension of the problem).}
 
-\item{fn}{The function to be minimized.}
+\item{fn}{The objective function to be minimised. It should accept a parameter vector
+(or list, depending on the wrapper) as first argument and return either a scalar value
+(single-objective) or a numeric vector (multi-objective).}
 
-\item{gr}{A function computing the gradient of \code{fn}. If NULL, a numerical approximation
-of the gradient is used. It can be also a character specifying the method for the computation
-of the numerical gradient: 'central', 'forward' (the default), 'backward' or 'richardson'.}
+\item{gr}{A function computing the gradient of \code{fn}. If \code{NULL}, a numerical
+approximation is used. Alternatively, a character string can specify the numerical
+gradient scheme: \code{"central"}, \code{"forward"} (default), \code{"backward"}, or
+\code{"richardson"}.}
 
-\item{...}{Additional parameters to be passed to \code{fn}.}
+\item{...}{Additional arguments passed to \code{fn} and \code{gr}.}
 
-\item{lower}{Lower threshold value(s) for parameters. One value or a vector 
-of the same length as par. If one value is provided, it is used for all 
-parameters. \code{NA} means \code{-Inf}. By default \code{-Inf} is used (unconstrained).}
+\item{lower}{Lower bounds for parameters. One value or a vector of the same length as
+\code{par}. \code{NA} is treated as \code{-Inf}. Default is unconstrained.}
 
-\item{upper}{Upper threshold value(s) for parameters. One value or a vector 
-of the same length as par. If one value is provided, it is used for all 
-parameters. \code{NA} means \code{Inf}. By default \code{Inf} is used (unconstrained).}
+\item{upper}{Upper bounds for parameters. One value or a vector of the same length as
+\code{par}. \code{NA} is treated as \code{Inf}. Default is unconstrained.}
 
-\item{active}{Boolean vector of the same length as par, indicating if the 
-parameter is used in the optimization (TRUE) or hold at a fixed value (FALSE).}
+\item{active}{Boolean vector of the same length as \code{par}, indicating if the
+parameter is used in the optimisation (\code{TRUE}) or held at a fixed value (\code{FALSE}).}
 
-\item{control}{Parameter for the control of the algorithm itself, see details.}
+\item{control}{A list of control options. Common options include \code{ncores},
+\code{run}, \code{master}, \code{verbose}, \code{REPORT}, \code{restart.file},
+\code{gradient}, and \code{gr.method}. Additional solver-specific options may be passed
+through to the underlying optimiser.}
 
 \item{hessian}{Logical. Should a numerically differentiated Hessian matrix be returned?
 Currently not implemented.}
 
-\item{parallel}{Logical. Use parallel computation numerical of gradient?}
+\item{parallel}{Logical. Enable parallel computation (e.g., for replicated evaluations
+and/or numerical gradients) using up to \code{control$ncores} cores.}
 }
 \value{
 A list with components:
 \describe{
 \item{par}{The best set of parameters found.}
-\item{value}{The value of fn corresponding to par.}
-\item{counts}{A two-element integer vector giving the number of calls to fn and gr respectively. This excludes those calls needed to compute the Hessian, if requested, and any calls to fn to compute a finite-difference approximation to the gradient.}
-\item{convergence}{An integer code. 0 indicates successful completion. }
-\item{message}{A character string giving any additional information returned by the optimizer, or NULL.}
-\item{hessian}{Only if argument hessian is true. A symmetric matrix giving an estimate of the Hessian at the solution found. Note that this is the Hessian of the unconstrained problem even if the box constraints are active.}
+\item{value}{The value of \code{fn} corresponding to \code{par}.}
+\item{counts}{A two-element integer vector giving the number of calls to \code{fn} and
+\code{gr} respectively. This excludes those calls needed to compute the Hessian, if
+requested, and any calls to \code{fn} to compute a finite-difference approximation to the
+gradient.}
+\item{convergence}{An integer code. \code{0} indicates successful completion.}
+\item{message}{A character string giving any additional information returned by the
+optimizer, or \code{NULL}.}
+\item{hessian}{Only if argument \code{hessian} is \code{TRUE}. A symmetric matrix giving an
+estimate of the Hessian at the solution found. Note that this is the Hessian of the
+unconstrained problem even if the box constraints are active.}
 }
 }
 \description{

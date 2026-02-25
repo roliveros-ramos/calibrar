@@ -36,54 +36,128 @@ calibrate(
 )
 }
 \arguments{
-\item{par}{A numeric vector or list. The length of the par argument defines the 
-number of parameters to be estimated (i.e. the dimension of the problem).}
+\item{par}{A numeric vector or list. The length of \code{par} defines the number of
+parameters to be estimated (i.e., the dimension of the problem).}
 
-\item{fn}{The function to be minimized.}
+\item{fn}{The objective function to be minimised. It should accept a parameter vector
+(or list, depending on the wrapper) as first argument and return either a scalar value
+(single-objective) or a numeric vector (multi-objective).}
 
-\item{gr}{A function computing the gradient of \code{fn}. If NULL, a numerical approximation
-of the gradient is used. It can be also a character specifying the method for the computation
-of the numerical gradient: 'central', 'forward' (the default), 'backward' or 'richardson'.}
+\item{gr}{A function computing the gradient of \code{fn}. If \code{NULL}, a numerical
+approximation is used. Alternatively, a character string can specify the numerical
+gradient scheme: \code{"central"}, \code{"forward"} (default), \code{"backward"}, or
+\code{"richardson"}.}
 
-\item{\dots}{Additional parameters to be passed to \code{fn}.}
+\item{...}{Additional arguments passed to \code{fn} and \code{gr}.}
 
-\item{method}{The optimization method to be used. The default method
-is the AHR-ES (Adaptative Hierarchical Recombination Evolutionary Strategy, 
-Oliveros-Ramos & Shin, 2016). See details for the methods available.}
+\item{method}{Optimisation method(s) to be used. Can be a single method name or a
+vector of method names (e.g., one per phase). If \code{NULL}, a default is chosen based
+on \code{replicates} (see Details).}
 
-\item{lower}{Lower threshold value(s) for parameters. One value or a vector 
-of the same length as par. If one value is provided, it is used for all 
-parameters. \code{NA} means \code{-Inf}. By default \code{-Inf} is used (unconstrained).}
+\item{lower}{Lower bounds for parameters. One value or a vector of the same length as
+\code{par}. \code{NA} is treated as \code{-Inf}. Default is unconstrained.}
 
-\item{upper}{Upper threshold value(s) for parameters. One value or a vector 
-of the same length as par. If one value is provided, it is used for all 
-parameters. \code{NA} means \code{Inf}. By default \code{Inf} is used (unconstrained).}
+\item{upper}{Upper bounds for parameters. One value or a vector of the same length as
+\code{par}. \code{NA} is treated as \code{Inf}. Default is unconstrained.}
 
-\item{phases}{An optional vector of the same length as \code{par}, 
-indicating the phase at which each parameter becomes active. If omitted, 
-default value is 1 for all parameters, performing a single optimization.}
+\item{phases}{Optional integer vector of the same length as \code{par}, indicating the
+phase at which each parameter becomes active. If omitted, all parameters are active in
+a single phase.}
 
-\item{control}{Parameter for the control of the algorithm itself, see details.}
+\item{control}{A list of control options. Common options include \code{ncores},
+\code{run}, \code{master}, \code{verbose}, \code{REPORT}, \code{restart.file},
+\code{gradient}, and \code{gr.method}. Additional solver-specific options may be passed
+through to the underlying optimiser.}
 
 \item{hessian}{Logical. Should a numerically differentiated Hessian matrix be returned?
 Currently not implemented.}
 
-\item{replicates}{The number of replicates for the evaluation of \code{fn}.
-The default value is 1. A value greater than 1 is only useful for stochastic
-functions.}
+\item{replicates}{Integer or integer vector controlling the number of replicate
+evaluations of \code{fn} per phase. The default is \code{1} (deterministic objective).}
 
-\item{parallel}{Logical. Use parallel computation numerical of gradient?}
+\item{parallel}{Logical. Enable parallel computation (e.g., for replicated evaluations
+and/or numerical gradients) using up to \code{control$ncores} cores.}
+}
+\value{
+An object of class \code{"calibrar.results"} with components:
+\describe{
+\item{par}{Best parameter values found (returned with the same structure as input \code{par}).}
+\item{value}{Objective value at \code{par}.}
+\item{counts}{Number of calls to \code{fn} and \code{gr} (where applicable).}
+\item{convergence}{Convergence code returned by the underlying optimiser.}
+\item{message}{Additional information returned by the optimiser, if any.}
+\item{method}{The optimisation method used in the final phase.}
+\item{fn}{The objective function.}
+\item{active}{Logical vector indicating which parameters were active (estimated).}
+\item{elapsed}{Elapsed time for the full calibration run.}
+\item{trace}{Tracing information and per-phase outputs (when available).}
+}
 }
 \description{
-This function performs the optimization of a function, possibly 
-in sequential phases of increasing complexity, and it is designed for the 
-calibration of a model, by minimizing the error function \code{fn} associated to it.
+\code{calibrate()} minimises an objective function \code{fn} for the calibration of
+complex (possibly expensive and stochastic) models. It supports sequential calibration
+in multiple phases (progressively activating parameters), replicated evaluations for
+stochastic objectives, restartable runs, and parallel execution patterns for
+computationally intensive models.
 }
 \details{
-In the control list, \code{aggFn} is a function to aggregate \code{fn} to 
-a scalar value if the returned value is a vector. Some optimization algorithm can 
-exploite the additional information provided by a vectorial output from \code{fn}.
+\strong{Sequential phases.} When \code{phases} is provided, parameters are activated
+progressively across phases. In phase \eqn{k}, parameters with \code{phases <= k} are
+active and estimated, while all others are held fixed. If \code{phases} is omitted, all
+parameters are estimated in a single phase.
+
+\strong{Replicated evaluations.} The argument \code{replicates} controls the number of
+replicate evaluations of \code{fn} per phase. It can be a single integer (applied to all
+phases) or a vector of length equal to the number of phases. Replication is useful for
+stochastic models to reduce Monte Carlo noise and/or to target robust parameter sets.
+
+\strong{Default method selection.} If \code{method} is not provided, \code{calibrate()}
+defaults to \code{"Rvmmin"} when \code{all(replicates == 1)} (deterministic objective),
+and to \code{"AHR-ES"} otherwise (replicated/stochastic objective).
+
+\strong{Multi-objective outputs.} The objective function \code{fn} may return a scalar
+(single-objective) or a numeric vector of objective components (multi-objective).
+Multi-objective optimisation is currently supported only by methods in
+\code{multiMethods} (e.g., \code{"AHR-ES"}). For single-objective methods, \code{fn} must be
+scalar; alternatively, objective components can be aggregated into a scalar by defining
+an aggregated objective in \code{calibration_objFn(aggregate = TRUE)}.
+
+\strong{Aggregation.} When \code{fn} is created via \code{calibration_objFn()}, metadata
+such as the number of components (\code{nvar}) and component weights (\code{weights}) can
+be stored as attributes. If \code{aggregate = TRUE}, \code{fn} is scalar and can be used
+with any method. If \code{aggregate = FALSE} (vector output), only multi-objective methods
+can use it directly.
+
+\strong{Parallel execution and run directories.} If \code{parallel = TRUE},
+\code{calibrate()} may distribute replicate evaluations and/or finite-difference
+gradient computations across multiple cores. The number of cores is controlled by
+\code{control$ncores}. For file-based or externally executed models, \code{control$master}
+and \code{control$run} can be used to manage a master/template directory and per-run
+working directories (created if needed).
+
+\strong{Restart.} Partial results can be written and used to resume a calibration via
+\code{control$restart.file}. Restart functionality is currently available only for
+\code{"AHR-ES"}, \code{"Rvmmin"}, and \code{"hjn"}.
 }
+\section{Choosing an optimisation method}{
+
+For smooth deterministic objectives, gradient-based methods such as \code{"Rvmmin"},
+\code{"L-BFGS-B"}, \code{"LBFGSB3"}, or \code{"nlminb"} are often efficient (with box
+constraints when needed). For noisy or stochastic objectives (typically when
+\code{replicates > 1}), heuristic/global methods such as \code{"AHR-ES"} are generally
+more appropriate. Not all methods are directly comparable (local vs.\ global,
+deterministic vs.\ stochastic, scalar vs.\ vector-valued objectives); method choice
+should reflect the structure of \code{fn} and the presence of constraints.
+}
+
+\section{Notes}{
+
+\code{"SANN"} is included for compatibility with \code{stats::optim()}, but it is highly
+sensitive to tuning and often performs poorly on continuous problems under default
+settings. For stochastic objectives, \code{"AHR-ES"} is the intended default within
+\code{calibrate()}.
+}
+
 \examples{
 calibrate(par=rep(NA, 5), fn=sphereN)
 \dontrun{
@@ -92,8 +166,12 @@ calibrate(par=rep(0.5, 5), fn=sphereN, replicates=3, lower=-5, upper=5)
 calibrate(par=rep(0.5, 5), fn=sphereN, replicates=3, lower=-5, upper=5, phases=c(1,1,1,2,3))
 calibrate(par=rep(0.5, 5), fn=sphereN, replicates=c(1,1,4), lower=-5, upper=5, phases=c(1,1,1,2,3))
 }
+
 }
 \seealso{
+\code{\link{calibration_setup}}, \code{\link{calibration_data}},
+\code{\link{calibration_objFn}}
+
 Other optimisers: 
 \code{\link{ahres}()},
 \code{\link{optim2}()},
