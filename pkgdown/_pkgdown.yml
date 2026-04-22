@@ -55,8 +55,11 @@ articles:
   desc: >
     Examples tailored to specific modelling platforms.
   contents:
-  # Planned:
    - articles/v12-setting_up_an_osmose_calibration
+  # - articles/v13-using_calibrar_for_atlantis_calibration
+  # Planned:
+  # - articles/v14-setting_up_an_xxx_calibration
+  # - articles/v15-setting_up_an_xxx_calibration
 
 #- title: JSS paper
 #  navbar: JSS

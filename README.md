@@ -5,17 +5,20 @@
 
 <!-- badges: start -->
 
+[![R-CMD-check](https://github.com/roliveros-ramos/calibrar/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/roliveros-ramos/calibrar/actions/workflows/R-CMD-check.yaml)
+[![lifecycle](https://img.shields.io/badge/Lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/calibrar)](https://CRAN.R-project.org/package=calibrar)
-[![Total_downloads](http://cranlogs.r-pkg.org/badges/grand-total/calibrar)](https://CRAN.R-project.org/package=calibrar)
 ![GitHub R package
 version](https://img.shields.io/github/r-package/v/roliveros-ramos/calibrar?label=GitHub)
-[![R-CMD-check](https://github.com/roliveros-ramos/calibrar/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/roliveros-ramos/calibrar/actions/workflows/R-CMD-check.yaml)
 [![GitHub
 issues](https://img.shields.io/github/issues/roliveros-ramos/calibrar)](https://github.com/roliveros-ramos/calibrar/issues)
 [![OpenSSF Best
 Practices](https://www.bestpractices.dev/projects/2132/badge)](https://www.bestpractices.dev/projects/2132)
+[![](http://cranlogs.r-pkg.org/badges/calibrar)](https://CRAN.R-project.org/package=calibrar)
+[![](http://cranlogs.r-pkg.org/badges/grand-total/calibrar)](https://CRAN.R-project.org/package=calibrar)
 [![codecov](https://codecov.io/gh/roliveros-ramos/calibrar/graph/badge.svg?token=HELOL3WS4G)](https://app.codecov.io/gh/roliveros-ramos/calibrar)
-[![Monthly_downloads](http://cranlogs.r-pkg.org/badges/calibrar)](https://CRAN.R-project.org/package=calibrar)
+[![publication](https://img.shields.io/badge/calibrar_(MEE)-10.1111%2F2041--210X.14452-purple?logo=doi&logoColor=white)](https://doi.org/10.1111/2041-210X.14452)
+[![publication](https://img.shields.io/badge/optim2_(arXiv)-10.1111/2041--210X.14452-purple?logo=doi&logoColor=white)](https://doi.org/10.1111/2041-210X.14452)
 <!-- badges: end -->
 
 ### Automated Parameter Estimation for Complex Models

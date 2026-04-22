@@ -1,6 +1,10 @@
 Package: calibrar
-Version: 0.9.0.9010
-Authors@R: c(person("Ricardo", "Oliveros-Ramos", email="ricardo.oliveros@gmail.com", role=c("aut", "cre")))
+Version: 0.9.0.9011
+Authors@R: 
+    person("Ricardo", "Oliveros-Ramos",
+           email = "ricardo.oliveros@gmail.com",
+           role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-8069-2101"))
 Title: Automated Parameter Estimation for Complex Models
 Description: General optimisation and specific tools for the parameter estimation 
   (i.e. calibration) of complex models, including stochastic ones. It implements 
