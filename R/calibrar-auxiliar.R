@@ -317,7 +317,10 @@ print.calibrar.demo = function(x, ...) {
   if(is.null(x)) return(x)
   if(!is.character(x)) return(x)
   if(length(x) != 1) return(x)
-  if(file.exists(file.path(path, x)) || isTRUE(force)) 
+  xind0 = file.exists(file.path(path, x)) 
+  xind1 = any(file.exists(dir(path=file.path(path, dirname(x)), 
+                              pattern=sprintf("^%s\\.", basename(x)), full.names=TRUE)))
+  if(xind0 || xind1 || isTRUE(force)) 
     attr(x, "path") = normalizePath(path, winslash = "/", mustWork = FALSE)
   return(x)
 }
