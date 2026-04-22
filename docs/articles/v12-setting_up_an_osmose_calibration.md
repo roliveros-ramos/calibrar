@@ -1977,6 +1977,8 @@ the scheduler script should remain a lightweight execution wrapper,
 while the calibration logic itself stays inside the prepared workspace
 and the `.calibration.R` launcher.
 
+## 16 References
+
 Oliveros-Ramos, Ricardo, Philippe Verley, Vincent Echevin, and Yunne-Jai
 Shin. 2017. ‘A Sequential Approach to Calibrate Ecosystem Models with
 Multiple Time Series Data’. *Progress in Oceanography* 151: 227–44.
