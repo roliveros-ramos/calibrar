@@ -38,5 +38,5 @@ Ricardo Oliveros–Ramos
 
 ``` r
 sphereN(rep(0, 10))
-#> [1] 0.07204325
+#> [1] 0.03885167
 ```

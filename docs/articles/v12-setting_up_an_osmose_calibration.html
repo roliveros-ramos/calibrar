@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Setting up an OSMOSE model calibration on high-performance computing (HPC) systems using the calibrar package • calibrar</title>
+<title>Preparing and running OSMOSE calibrations with calibrar • calibrar</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
 <link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
 <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
@@ -16,7 +16,10 @@
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Setting up an OSMOSE model calibration on high-performance computing (HPC) systems using the calibrar package">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><script src="v12-setting_up_an_osmose_calibration_files/libs/clipboard/clipboard.min.js"></script><script src="v12-setting_up_an_osmose_calibration_files/libs/quarto-html/popper.min.js"></script><script src="v12-setting_up_an_osmose_calibration_files/libs/quarto-html/tippy.umd.min.js"></script><script src="v12-setting_up_an_osmose_calibration_files/libs/quarto-html/anchor.min.js"></script><link href="v12-setting_up_an_osmose_calibration_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="v12-setting_up_an_osmose_calibration_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Preparing and running OSMOSE calibrations with calibrar">
+<meta property="og:image" content="https://roliveros-ramos.github.io/calibrar/logo.png">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -26,7 +29,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">calibrar</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.0.9010</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.0.9011</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -63,7 +66,7 @@
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/roliveros-ramos/calibrar/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://www.researchgate.net/profile/Ricardo-Oliveros-Ramos" aria-label="ResearchGate"><span class="fa fa-researchgate"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://www.researchgate.net/profile/Ricardo-Oliveros-Ramos" aria-label="ResearchGate"><span class="fa fa-brands fa-researchgate"></span></a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-lightswitch" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-label="Light switch"><span class="fa fa-sun"></span></button>
   <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-lightswitch">
@@ -77,103 +80,1147 @@
 
 
   </div>
-</nav><div class="container template-article">
-
-
-
-
+</nav><div class="container template-quarto">
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="../logo.png" class="logo" alt=""><h1>Setting up an OSMOSE model calibration on high-performance computing (HPC) systems using the calibrar package</h1>
-                        <h4 data-toc-skip class="author">Ricardo
-Oliveros-Ramos</h4>
-            
-            <h4 data-toc-skip class="date">2025-12-23</h4>
-      
-      <small class="dont-index">Source: <a href="https://github.com/roliveros-ramos/calibrar/blob/HEAD/vignettes/articles/v12-setting_up_an_osmose_calibration.Rmd" class="external-link"><code>vignettes/articles/v12-setting_up_an_osmose_calibration.Rmd</code></a></small>
-      <div class="d-none name"><code>v12-setting_up_an_osmose_calibration.Rmd</code></div>
+      <img src="../logo.png" class="logo" alt=""><h1>Preparing and running OSMOSE calibrations with calibrar</h1>
+
+      <p class="author">Ricardo Oliveros-Ramos</p>
+      <p class="date">2026-04-23</p>
+
+      <small class="dont-index">Source: <a href="https://github.com/roliveros-ramos/calibrar/blob/HEAD/vignettes/articles/v12-setting_up_an_osmose_calibration.qmd" class="external-link"><code>vignettes/articles/v12-setting_up_an_osmose_calibration.qmd</code></a></small>
+      <div class="d-none name"><code></code></div>
     </div>
 
-    
-    
-<p>Vignettes are long form documentation commonly included in packages.
-Because they are part of the distribution of the package, they need to
-be as compact as possible. The <code>html_vignette</code> output type
-provides a custom style sheet (and tweaks some options) to ensure that
-the resulting html is as small as possible. The
-<code>html_vignette</code> format:</p>
+
+
+
+
+
+    <section class="level2" data-number="1"><h2 data-number="1" class="anchored" id="introduction-and-overview-of-osmose-calibration">
+<span class="header-section-number">1</span> Introduction and overview of OSMOSE calibration<a class="anchor" aria-label="anchor" href="#introduction-and-overview-of-osmose-calibration"></a>
+</h2>
+<p>This vignette explains how the <code>osmose</code> package adapts the generic <code>calibrar</code> workflow to a complex, stochastic, disk-based model such as OSMOSE. It focuses on the calibration workspace created by the <code><a href="https://rdrr.io/pkg/osmose/man/osmose_calibration_setup.html" class="external-link">osmose_calibration_setup()</a></code> function, why that workspace has the structure it does, and how it supports testing, parallel execution, restart capability, and multi-phase optimisation.</p>
+<p>The examples below are illustrative. They are intended to explain the workflow and the role of the main files, not to provide a fully runnable end-to-end example inside the <code>calibrar</code> package.</p>
+<div>
+<blockquote>
+<p><strong>What is OSMOSE?</strong></p>
+<p>OSMOSE (Object‑oriented Simulator of Marine Ecosystems) is a spatially explicit, multi‑species, individual‑based model that simulates the life history of fish (growth, reproduction, mortality, movement) and their interactions through size‑based opportunistic predation. It is a typical example of a complex, stochastic, disk‑based model that requires careful calibration against multiple data sources.</p>
+</blockquote>
+</div>
+<p>The <code>calibrar</code> package provides a generic way to fit complex models to data without rewriting the model in R. For simple examples, the full workflow can often be assembled directly in memory. For a complex simulator such as OSMOSE, the same logic usually needs a prepared workspace on disk, with model configuration files, calibration files, data templates, helper scripts, and a stable execution directory.</p>
+<p>This vignette explains that prepared workflow. Its purpose is to show how the generic <code>calibrar</code> pattern is implemented for OSMOSE through <code><a href="https://rdrr.io/pkg/osmose/man/osmose_calibration_setup.html" class="external-link">osmose_calibration_setup()</a></code>, and to make the logic of the resulting calibration folder easier to understand for users who need to inspect, edit, test, and run it. Although the example is OSMOSE-specific, the underlying architecture is relevant to other complex models that are controlled from R but executed through model-specific files and wrappers.</p>
+<section class="level3" data-number="1.1"><h3 data-number="1.1" class="anchored" id="what-an-osmose-calibration-aims-to-achieve">
+<span class="header-section-number">1.1</span> What an OSMOSE calibration aims to achieve<a class="anchor" aria-label="anchor" href="#what-an-osmose-calibration-aims-to-achieve"></a>
+</h3>
+<p>At the most general level, an OSMOSE calibration aims to estimate uncertain model parameters so that the OSMOSE core simulator reproduces the main observed features of the system being modelled. In <code>calibrar</code> terms, this is still the same basic inverse problem introduced in the other vignettes: define a <code>run_model()</code> function, organise the observed data, specify how each target contributes to the objective function, and then optimise the chosen parameters.</p>
+<p>For OSMOSE, the uncertain quantities are usually drawn from several parameter families rather than from a single tuning coefficient. These often include parameters related to the initial state of focal populations, fishing-related parameters, early life-stage mortality, and selected trophic or accessibility parameters. Here, “accessibility” refers to parameters controlling how available prey groups are to predators, and “selectivity” refers to how fishing mortality changes with size or age. The calibration therefore combines biological, fishery, and interaction parameters in a constrained and usually multi-phase search.</p>
+<p>The model is confronted with several classes of observational targets. In the workflows discussed here, the main targets are typically biomass or abundance indices, catches or landings, and composition data such as catch-at-length. These data-fitting components may be combined with penalty or regularisation terms that do not read any external data file but still contribute to the objective function. This distinction becomes important later when interpreting the <code>calibration_settings.csv</code> file.</p>
+<p>Throughout this vignette we focus on the default (<code>type = "simple"</code>) workflow created by <code><a href="https://rdrr.io/pkg/osmose/man/osmose_calibration_setup.html" class="external-link">osmose_calibration_setup()</a></code>. This keeps the exposition concrete while still illustrating the full logic of a <code>calibrar</code>-based calibration for a complex model. In broad terms, the simple workflow is designed around:</p>
 <ul>
-<li>Never uses retina figures</li>
-<li>Has a smaller default figure size</li>
-<li>Uses a custom CSS stylesheet instead of the default Twitter
-Bootstrap style</li>
+<li>a selected set of OSMOSE calibration parameters, typically including initial biomass, fishing-related parameters, larval mortality components, and accessibility parameters;</li>
+<li>a selected set of observed targets, typically including biomass indices, catch or landings, and catch-at-length data; and</li>
+<li>a corresponding objective function that combines data-fitting terms and internally generated penalties.</li>
 </ul>
-<div class="section level2">
-<h2 id="using-the-osmose-observation-module">Using the OSMOSE observation module<a class="anchor" aria-label="anchor" href="#using-the-osmose-observation-module"></a>
+<p>Other OSMOSE calibration templates may also be available depending on the package version and modelling context. Those are better documented in OSMOSE-specific documentation. Here, the aim is not to catalogue all OSMOSE workflows, but to use one representative workflow to explain how a complex-model calibration is prepared and run through <code>calibrar</code>.</p>
+</section></section><section class="level2" data-number="2"><h2 data-number="2" class="anchored" id="adapting-the-generic-calibrar-workflow-to-osmose-the-role-of-osmose_calibration_setup">
+<span class="header-section-number">2</span> Adapting the generic <code>calibrar</code> workflow to OSMOSE: the role of <code>osmose_calibration_setup()</code>
+<a class="anchor" aria-label="anchor" href="#adapting-the-generic-calibrar-workflow-to-osmose-the-role-of-osmose_calibration_setup"></a>
 </h2>
-<div class="section level3">
-<h3 id="surveys">Surveys<a class="anchor" aria-label="anchor" href="#surveys"></a>
+<section class="level3" data-number="2.1"><h3 data-number="2.1" class="anchored" id="the-generic-calibrar-pattern">
+<span class="header-section-number">2.1</span> The generic <code>calibrar</code> pattern<a class="anchor" aria-label="anchor" href="#the-generic-calibrar-pattern"></a>
 </h3>
-</div>
-<div class="section level3">
-<h3 id="post-processing-osmose-outputs">Post-processing OSMOSE outputs<a class="anchor" aria-label="anchor" href="#post-processing-osmose-outputs"></a>
+<p>At a conceptual level, the workflow used by <code>calibrar</code> is simple. A model-specific function, usually called <code>run_model()</code>, receives a set of parameter values, runs the model, and returns the simulated quantities that will be confronted with data. These simulated outputs are then matched to a corresponding set of observed data. A calibration settings table specifies how each model output contributes to the objective function, for example through a log-normal likelihood, a multinomial likelihood, or a penalty term. From these elements, <code><a href="../reference/calibration_objFn.html">calibration_objFn()</a></code> builds the objective function, and <code><a href="../reference/calibrate.html">calibrate()</a></code> searches for the parameter values that minimise it.</p>
+<p>This separation is one of the main strengths of <code>calibrar</code>. The optimiser does not need to know how the model is internally implemented. It only needs a function that can evaluate the model for a given set of parameters and return the outputs required for calibration. In earlier <code>calibrar</code> vignettes, this structure is often illustrated with <code><a href="../reference/calibrar_demo.html">calibrar_demo()</a></code>, which prepares the necessary objects in a compact and pedagogical way. For OSMOSE, the same logic applies, but the implementation needs more infrastructure.</p>
+</section><section class="level3" data-number="2.2"><h3 data-number="2.2" class="anchored" id="why-complex-models-need-a-prepared-workflow">
+<span class="header-section-number">2.2</span> Why complex models need a prepared workflow<a class="anchor" aria-label="anchor" href="#why-complex-models-need-a-prepared-workflow"></a>
 </h3>
-</div>
-</div>
-<div class="section level2">
-<h2 id="using-the-osmose_calibration_setup-function">Using the <code>osmose_calibration_setup()</code> function<a class="anchor" aria-label="anchor" href="#using-the-osmose_calibration_setup-function"></a>
-</h2>
-</div>
-<div class="section level2">
-<h2 id="filling-the-data-templates">Filling the data templates<a class="anchor" aria-label="anchor" href="#filling-the-data-templates"></a>
-</h2>
-</div>
-<div class="section level2">
-<h2 id="the-osmose_calibration_setup-again-with-data">The <code>osmose_calibration_setup()</code> again, with data<a class="anchor" aria-label="anchor" href="#the-osmose_calibration_setup-again-with-data"></a>
-</h2>
-</div>
-<div class="section level2">
-<h2 id="editing-the-calibration_settings-csv-file">Editing the <code>calibration_settings.csv</code> file<a class="anchor" aria-label="anchor" href="#editing-the-calibration_settings-csv-file"></a>
-</h2>
-</div>
-<div class="section level2">
-<h2 id="editing-the-parameter-configuration-files">Editing the parameter configuration files<a class="anchor" aria-label="anchor" href="#editing-the-parameter-configuration-files"></a>
-</h2>
-<div class="section level3">
-<h3 id="the-parameter-guess-file-parguess-csv">The parameter guess file (<code>parguess.csv</code>)<a class="anchor" aria-label="anchor" href="#the-parameter-guess-file-parguess-csv"></a>
+<p>For complex models, the generic pattern above is usually not enough on its own. Several practical complications arise.</p>
+<p>First, the model may be implemented outside R. OSMOSE is run through the OSMOSE core simulator, so the calibration cannot rely on an in-memory R function alone. Parameters must be written in a format the simulator can read, the simulator must be launched, and the resulting outputs must then be read back into R.</p>
+<p>Second, model execution may depend on a set of auxiliary files rather than on a single function call. A calibration therefore needs a stable directory structure in which parameter files, configuration files, output settings, temporary run folders, and simulated outputs all appear in predictable places.</p>
+<p>Third, objective-function evaluations can be computationally expensive. A single calibration may require many thousands of model runs, and each of these runs may take long enough that parallel execution and restart capability become essential rather than optional.</p>
+<p>Fourth, calibration parameters are not always represented in the same way as model parameters. For optimisation, it is often useful to work on transformed scales, to impose box constraints, and to activate parameters progressively through multiple phases. This introduces an additional calibration layer between the optimiser and the model itself.</p>
+<p>For these reasons, a complex-model calibration often needs a prepared workflow rather than a loose collection of scripts. The purpose of the preparation step is to turn the conceptual ingredients expected by <code>calibrar</code> into a reproducible and testable calibration workspace.</p>
+</section><section class="level3" data-number="2.3"><h3 data-number="2.3" class="anchored" id="what-the-osmose-package-adds">
+<span class="header-section-number">2.3</span> What the <code>osmose</code> package adds<a class="anchor" aria-label="anchor" href="#what-the-osmose-package-adds"></a>
 </h3>
-</div>
-<div class="section level3">
-<h3 id="the-parameter-bounds-files-parmin-csv-and-parmax-csv">The parameter bounds files (<code>parmin.csv</code> and
-<code>parmax.csv</code>)<a class="anchor" aria-label="anchor" href="#the-parameter-bounds-files-parmin-csv-and-parmax-csv"></a>
+<p>The <code>osmose</code> package provides this prepared workflow through <code><a href="https://rdrr.io/pkg/osmose/man/osmose_calibration_setup.html" class="external-link">osmose_calibration_setup()</a></code>. In practical terms, this function plays for OSMOSE a role analogous to the one played by <code><a href="../reference/calibrar_demo.html">calibrar_demo()</a></code> in simpler examples, but with two important differences.</p>
+<p>First, it is model-specific. It knows how to identify common OSMOSE calibration parameters, how to write OSMOSE parameter files, how to prepare the directory used by the OSMOSE core simulator, and how to generate templates for the observed data expected by the default OSMOSE calibration workflow.</p>
+<p>Second, it works on disk rather than only in memory. Instead of returning a small list of objects ready to use in the current R session, it creates a structured calibration directory containing the files needed to test, run, and monitor a calibration. This includes parameter files, calibration settings, helper scripts, and a <code>master/</code> directory from which the OSMOSE core simulator can be executed.</p>
+<p>Seen from the point of view of <code>calibrar</code>, <code><a href="https://rdrr.io/pkg/osmose/man/osmose_calibration_setup.html" class="external-link">osmose_calibration_setup()</a></code> is therefore not an alternative to the generic workflow. Rather, it is an OSMOSE-specific implementation of that workflow. It translates the generic concepts implemented in <code>calibrar</code> into a concrete file-based workflow suited to a complex stochastic ecosystem model.</p>
+</section><section class="level3" data-number="2.4"><h3 data-number="2.4" class="anchored" id="the-role-of-osmose_calibration_setup">
+<span class="header-section-number">2.4</span> The role of <code>osmose_calibration_setup()</code>
+<a class="anchor" aria-label="anchor" href="#the-role-of-osmose_calibration_setup"></a>
 </h3>
+<p>The central role of <code><a href="https://rdrr.io/pkg/osmose/man/osmose_calibration_setup.html" class="external-link">osmose_calibration_setup()</a></code> is to prepare the calibration workspace before any optimisation is launched. It does not run the calibration itself. Instead, it assembles the pieces that the calibration will later need.</p>
+<p>At a conceptual level, the function performs four main tasks.</p>
+<p>First, it defines the calibration parameter layer. This includes identifying which OSMOSE parameters belong to the default calibration workflow, creating initial values for them, generating lower and upper bounds, and assigning calibration phases. These are written to the parameter files used later by <code>calibrar</code>.</p>
+<p>Second, it defines the observation layer. It runs OSMOSE once with the prepared configuration, extracts the simulated outputs used by the workflow, and uses their structure to generate templates for the corresponding observed data. This is important because the observed data are expected to match the simulated outputs in names, dimensions, and aggregation level.</p>
+<p>Third, it prepares the execution layer. The function creates the <code>master/</code> directory used by the OSMOSE core simulator, writes the calibration-specific OSMOSE configuration files, and copies the helper scripts that link OSMOSE to <code>calibrar</code>. These include the default <code>run_model.R</code> wrapper and the calibration launcher scripts.</p>
+<p>Fourth, it performs technical checks. The setup process is designed to fail early if the model cannot be run with the prepared files or if the expected calibration outputs cannot be produced. This is a major practical advantage, because it allows users to detect technical problems before they start a potentially long calibration.</p>
+<p>For OSMOSE users, understanding these roles helps explain why <code><a href="https://rdrr.io/pkg/osmose/man/osmose_calibration_setup.html" class="external-link">osmose_calibration_setup()</a></code> creates so many files. The function is not merely writing defaults. It is formalising the contract between the OSMOSE core simulator and the generic optimisation machinery provided by <code>calibrar</code>.</p>
+<section class="level4" data-number="2.4.1"><h4 data-number="2.4.1" class="anchored" id="first-setup-pass-creating-the-calibration-workspace">
+<span class="header-section-number">2.4.1</span> First setup pass: creating the calibration workspace<a class="anchor" aria-label="anchor" href="#first-setup-pass-creating-the-calibration-workspace"></a>
+</h4>
+<p>A typical first call to <code><a href="https://rdrr.io/pkg/osmose/man/osmose_calibration_setup.html" class="external-link">osmose_calibration_setup()</a></code> looks like this:</p>
+<div class="code-copy-outer-scaffold">
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">calibration_path</span> <span class="op">=</span> <span class="fu">osmose_calibration_setup</span><span class="op">(</span></span>
+<span>  input <span class="op">=</span> <span class="va">config_file</span>,</span>
+<span>  osmose <span class="op">=</span> <span class="va">path_to_jar_file</span>,</span>
+<span>  type <span class="op">=</span> <span class="st">"simple"</span>,</span>
+<span>  name <span class="op">=</span> <span class="st">"my_calibration"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
 </div>
-<div class="section level3">
-<h3 id="the-parameter-phase-file-parphase-csv">The parameter phase file (<code>parphase.csv</code>)<a class="anchor" aria-label="anchor" href="#the-parameter-phase-file-parphase-csv"></a>
+<p>In this vignette we restrict attention to <code>type = "simple"</code>, which is the most appropriate entry point for explaining the workflow. The first setup pass should be understood mainly as a workspace-construction step. It creates the calibration directory, prepares the parameter files, writes the helper scripts, generates templates for the expected observed data, and runs the technical checks needed to confirm that the workflow is internally consistent.</p>
+<p>This separation is useful in practice. The first pass answers the question “can this calibration workflow run at all?”. The second pass, described later, answers the question “do the observed data fit this prepared workflow?”. Keeping these two steps apart makes early failures easier to diagnose and keeps the structure of the calibration directory easier to understand.</p>
+<div>
+<blockquote>
+<p><strong>Why two passes?</strong></p>
+<ul>
+<li>
+<strong>First pass</strong> → answers “Can the workflow run at all?” (tests infrastructure)</li>
+<li>
+<strong>Second pass</strong> → answers “Do the observed data fit the workflow?”</li>
+</ul>
+</blockquote>
+</div>
+</section></section></section><section class="level2" data-number="3"><h2 data-number="3" class="anchored" id="understanding-the-calibration-directory">
+<span class="header-section-number">3</span> Understanding the calibration directory<a class="anchor" aria-label="anchor" href="#understanding-the-calibration-directory"></a>
+</h2>
+<p>After the first setup pass, the calibration workflow becomes visible as a structured directory on disk. This directory should not be interpreted as a miscellaneous collection of files. It is the concrete implementation of the workflow contract between <code>calibrar</code>, the OSMOSE helper scripts, and the OSMOSE core simulator.</p>
+<p>For a simple model example in <code>calibrar</code>, the key ingredients of a calibration may exist directly in the current R session as objects such as <code>observed</code>, <code>setup</code>, <code>par</code>, <code>lower</code>, <code>upper</code>, and <code>phase</code>. In the OSMOSE workflow, the same conceptual ingredients are prepared as files and helper objects inside a dedicated calibration directory. This is what allows the workflow to remain stable across repeated runs, different machines, and long HPC jobs.</p>
+<p>A typical calibration directory may look like this:</p>
+<pre class="text"><code>calibration/
+├── .calibrarrc
+├── .calibrartest
+├── .calibration.R
+├── .simulated.rds
+├── observed.rds
+├── calibration_MPI.pbs
+├── calibration_OMP.pbs
+├── calibration_OMP.slurm
+├── calibration_sequentiel.pbs
+├── calibration_sequentiel.slurm
+├── osmose-calibration_settings.csv
+├── osmose-parguess.osm
+├── osmose-parmax.osm
+├── osmose-parmin.osm
+├── osmose-parphase.osm
+├── run_model.R
+└── master/
+    ├── calibration_parameters.osm
+    └── osmose-calibration.osm</code></pre>
+<section class="level3" data-number="3.1"><h3 data-number="3.1" class="anchored" id="main-files-created-by-setup">
+<span class="header-section-number">3.1</span> Main files created by setup<a class="anchor" aria-label="anchor" href="#main-files-created-by-setup"></a>
 </h3>
-</div>
-</div>
-<div class="section level2">
-<h2 id="running-the-osmose_calibration_test">Running the <code>osmose_calibration_test()</code><a class="anchor" aria-label="anchor" href="#running-the-osmose_calibration_test"></a>
+<p>The files created by <code><a href="https://rdrr.io/pkg/osmose/man/osmose_calibration_setup.html" class="external-link">osmose_calibration_setup()</a></code> can be grouped according to their role in the workflow.</p>
+<p>A first group consists of the optimisation control files. The hidden files <code>.calibration.R</code>, <code>.calibrarrc</code>, and <code>.calibrartest</code> form the main bridge to <code>calibrar</code>. The file <code>.calibration.R</code> contains the launch logic for the calibration itself. The file <code>.calibrarrc</code> stores the main optimisation control options, such as the optimisation method, report frequency, stopping criteria, and phase-specific tolerances. The file <code>.calibrartest</code> is a lighter control file used for short test runs. Together, these files define how the optimisation is launched and controlled once the workspace has been prepared.</p>
+<p>A second group consists of the calibration parameter files. These are the files ending in <code>-parguess.osm</code>, <code>-parmin.osm</code>, <code>-parmax.osm</code>, and <code>-parphase.osm</code>. They contain, respectively, the initial parameter values, the lower bounds, the upper bounds, and the calibration phases for the optimisation parameters. These files define the parameter layer used by <code>calibrar</code>; they are not simply another copy of the model configuration.</p>
+<p>A third group consists of the objective-function input files. The file <code>osmose-calibration_settings.csv</code> defines which outputs contribute to the objective function and how they are treated. The file <code>observed.rds</code> stores the observed data after they have been read and reorganised into the structure expected by the workflow. The hidden file <code>.simulated.rds</code> stores a reference simulated output produced during setup. It is mainly used for compatibility checks, helping verify that observed and simulated data have matching names and dimensions before the calibration is launched.</p>
+<p>A fourth group consists of the model-wrapper and launch files. The most important of these is <code>run_model.R</code>, which implements the OSMOSE-specific <code>run_model()</code> function used by the objective function. In addition, setup may create scheduler scripts such as <code>calibration_OMP.pbs</code>, <code>calibration_MPI.pbs</code>, or corresponding Slurm launch scripts, depending on the intended execution environment.</p>
+<p>For practical work, it is useful to remember that these files belong to different conceptual layers. The parameter files define what is estimated. The settings file defines how the fit is measured. The observed-data object stores the external information that will be confronted with the model. The wrapper and launch files define how model evaluations are actually run under optimiser control.</p>
+</section><section class="level3" data-number="3.2"><h3 data-number="3.2" class="anchored" id="the-master-directory">
+<span class="header-section-number">3.2</span> The <code>master/</code> directory<a class="anchor" aria-label="anchor" href="#the-master-directory"></a>
+</h3>
+<p>The <code>master/</code> directory is the execution anchor for the OSMOSE core simulator. It contains the calibration-specific OSMOSE configuration used for model runs, including the calibration parameter file written at each evaluation and the main OSMOSE calibration configuration.</p>
+<p>This separation between the calibration directory and the <code>master/</code> directory is important. The calibration directory is the overall workspace. The <code>master/</code> directory is the reference run directory from which the OSMOSE core simulator can be executed. In the language of <code>calibrar</code>, this corresponds naturally to the distinction between a <code>master</code> directory, which provides the baseline run context, and the temporary run directories that may later be created when evaluating different parameter combinations in parallel, using <code>master</code> as a template.</p>
+<p>In other words, the calibration workspace is not only a place to store optimisation settings. It also contains an executable model environment. This is one of the main reasons the workflow must be prepared on disk rather than assembled only as in-memory R objects.</p>
+</section><section class="level3" data-number="3.3"><h3 data-number="3.3" class="anchored" id="the-data_templates-directory">
+<span class="header-section-number">3.3</span> The <code>data_templates/</code> directory<a class="anchor" aria-label="anchor" href="#the-data_templates-directory"></a>
+</h3>
+<p>The <code>data_templates/</code> directory belongs to the observation layer of the workflow. It is created from the structure of the simulated outputs produced during setup. Its purpose is to show the user exactly what observed data the current workflow expects.</p>
+<p>This directory is especially useful because it makes the expected correspondence between simulated and observed data explicit. Instead of asking the user to guess the file names, frequencies, dimensions, or aggregation levels required by the calibration, setup produces file templates that already match the current OSMOSE configuration and output settings.</p>
+<p>These templates should therefore be interpreted as a formal interface between model outputs and observed data. They are not generic CSV examples. They are generated from the actual structure of the current calibration workflow and the exact format and structure needs to be preserved.</p>
+</section></section><section class="level2" data-number="4"><h2 data-number="4" class="anchored" id="preparing-connecting-and-finalising-observed-data">
+<span class="header-section-number">4</span> Preparing, connecting, and finalising observed data<a class="anchor" aria-label="anchor" href="#preparing-connecting-and-finalising-observed-data"></a>
 </h2>
+<p>The next stage of the workflow concerns the observed-data layer. Once setup has created the expected templates, the user must decide which observed datasets will actually be used for the calibration and provide them in the expected structure.</p>
+<section class="level3" data-number="4.1"><h3 data-number="4.1" class="anchored" id="how-templates-are-generated">
+<span class="header-section-number">4.1</span> How templates are generated<a class="anchor" aria-label="anchor" href="#how-templates-are-generated"></a>
+</h3>
+<p>The templates created by <code><a href="https://rdrr.io/pkg/osmose/man/osmose_calibration_setup.html" class="external-link">osmose_calibration_setup()</a></code> are derived from a test simulation run and from the current OSMOSE configuration. Their structure therefore depends on the outputs activated in the model, the output frequency, and the species or fisheries represented in the configuration.</p>
+<p>For the <code>simple</code> workflow, the default templates typically correspond to a subset of commonly used time-series calibration targets, such as biomass indices, catch or landings, and catch-at-length compositions. The exact list depends on what the model is currently configured to produce and how these outputs are organised by the helper functions.</p>
+<p>This is an important conceptual point. In the workflow implemented here, observed data are not defined independently of the model outputs. Instead, the expected observed-data structure is generated from the simulated outputs, and the user is then asked to provide matching datasets. This greatly reduces ambiguity in the construction of the objective function.</p>
+</section><section class="level3" data-number="4.2"><h3 data-number="4.2" class="anchored" id="which-files-the-user-is-expected-to-fill">
+<span class="header-section-number">4.2</span> Which files the user is expected to fill<a class="anchor" aria-label="anchor" href="#which-files-the-user-is-expected-to-fill"></a>
+</h3>
+<p>The templates in <code>data_templates/</code> indicate the files that the current workflow expects the user to populate with observed data. In a typical <code>simple</code> workflow, these may include one or more biomass index files, a catch or landings file, and one catch-at-length file per species for which composition data are intended to be used.</p>
+<p>The key requirement is not the specific file names themselves, but the consistency between the file structure and the simulated outputs. The observed data should match the expected variable names, time indexing, and dimensions implied by the templates. Changing this structure manually is usually a bad idea, because later compatibility checks rely on the expected layout.</p>
+<p>In practice, many users will prefer to copy the <code>data_templates/</code> directory to a separate working location before inserting the real data. This is often the safest approach, because it preserves the original templates while allowing the user to organise and edit the actual datasets elsewhere.</p>
+</section><section class="level3" data-number="4.3"><h3 data-number="4.3" class="anchored" id="when-data-files-should-be-removed-rather-than-filled">
+<span class="header-section-number">4.3</span> When data files should be removed rather than filled<a class="anchor" aria-label="anchor" href="#when-data-files-should-be-removed-rather-than-filled"></a>
+</h3>
+<p>Not every simulated output necessarily has an observational counterpart. In some cases, the workflow may generate a template because the corresponding model output is available, but the user may not have a usable observed dataset for that target.</p>
+<p>In this case, the correct action is usually not to invent a placeholder dataset, but to remove the file from the observed-data folder and switch off the corresponding target in <code>osmose-calibration_settings.csv</code>. This distinction is important because the presence of a template reflects what the model can produce, not what the user must necessarily include in the calibration.</p>
+<p>This is one of the reasons the calibration settings file is so central. The templates expose the possible observation targets, while <code>osmose-calibration_settings.csv</code> records which of these targets are actually active in the objective function.</p>
+</section><section class="level3" data-number="4.4"><h3 data-number="4.4" class="anchored" id="finalising-the-workspace-with-observed-data">
+<span class="header-section-number">4.4</span> Finalising the workspace with observed data<a class="anchor" aria-label="anchor" href="#finalising-the-workspace-with-observed-data"></a>
+</h3>
+<p>Once the user has prepared the observed-data files, a second call to <code><a href="https://rdrr.io/pkg/osmose/man/osmose_calibration_setup.html" class="external-link">osmose_calibration_setup()</a></code> is used to finalise the workspace and connect it to the real data location.</p>
+<div class="code-copy-outer-scaffold">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">calibration_path</span> <span class="op">=</span> <span class="fu">osmose_calibration_setup</span><span class="op">(</span></span>
+<span>  input <span class="op">=</span> <span class="va">config_file</span>,</span>
+<span>  osmose <span class="op">=</span> <span class="va">path_to_jar_file</span>,</span>
+<span>  type <span class="op">=</span> <span class="st">"simple"</span>,</span>
+<span>  name <span class="op">=</span> <span class="st">"my_calibration"</span>,</span>
+<span>  data_path <span class="op">=</span> <span class="st">"real_data"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
 </div>
-<div class="section level2">
-<h2 id="launching-a-calibration-in-a-hpc-system">Launching a calibration in a HPC system<a class="anchor" aria-label="anchor" href="#launching-a-calibration-in-a-hpc-system"></a>
+<p>The purpose of this second setup pass is different from that of the first one. The first pass mainly constructs and tests the calibration workspace. The second pass links that workspace to the observed data, reads these data into the internal structure expected by the calibration, stores them as <code>observed.rds</code>, and reruns the compatibility checks between observed and simulated outputs.</p>
+<p>This two-stage logic is particularly useful for complex models. It allows users to separate problems caused by technical workflow issues from problems caused by the observed data themselves. If the first setup pass fails, the issue is usually in the model configuration, the execution environment, or the workspace definition. If the first pass succeeds but the second fails, the issue is more likely to lie in the correspondence between the observed data and the simulated outputs.</p>
+<p>This also explains why rerunning setup is not redundant. The second pass is part of the normal workflow. It is the stage at which the prepared workspace becomes a calibration-ready workspace.</p>
+</section></section><section class="level2" data-number="5"><h2 data-number="5" class="anchored" id="understanding-the-calibration_settings-csv-file">
+<span class="header-section-number">5</span> Understanding the <code>calibration_settings.csv</code> file<a class="anchor" aria-label="anchor" href="#understanding-the-calibration_settings-csv-file"></a>
 </h2>
+<p>Among all files created during setup, the <code>calibration_settings.csv</code> file is one of the most important to inspect before a first calibration. It defines how the simulated outputs returned by <code>run_model()</code> are translated into objective-function components.</p>
+<section class="level3" data-number="5.1"><h3 data-number="5.1" class="anchored" id="why-this-file-is-central">
+<span class="header-section-number">5.1</span> Why this file is central<a class="anchor" aria-label="anchor" href="#why-this-file-is-central"></a>
+</h3>
+<p>At the conceptual level, this file is the specification of the objective-function layer. Each row represents one calibration target or one objective-function component. The file records which simulated variable is concerned, how it should be compared with observed data, whether it is active in the calibration, where the data file is located, and which additional identifiers or options are associated with it.</p>
+<p>For simple examples in <code>calibrar</code>, the same information may be prepared directly as an in-memory data frame passed to <code><a href="../reference/calibration_setup.html">calibration_setup()</a></code>. In the OSMOSE workflow, this information is materialised as a file because it is part of the persistent calibration workspace and is expected to be inspected and edited by the user.</p>
+</section><section class="level3" data-number="5.2"><h3 data-number="5.2" class="anchored" id="key-columns">
+<span class="header-section-number">5.2</span> Key columns<a class="anchor" aria-label="anchor" href="#key-columns"></a>
+</h3>
+<p>A few columns are conceptually central.</p>
+<p>The <code>variable</code> column identifies the simulated output returned by <code>run_model()</code>.</p>
+<p>The <code>type</code> column specifies the objective-function component used for that variable, for example a log-normal likelihood, a multinomial likelihood, or a penalty-like function.</p>
+<p>The <code>calibrate</code> column indicates whether the corresponding target is active in the calibration.</p>
+<p>The <code>cv</code> column records the assumed observation uncertainty or confidence level associated with the target, expressed as a coefficient of variation.</p>
+<p>The <code>use_data</code> column indicates whether the target actually reads observed data from disk. If it does, the <code>file</code> column specifies where those data are stored.</p>
+<p>A small illustrative example is shown below.</p>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table caption-top">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 10%">
+<col style="width: 12%">
+<col style="width: 5%">
+<col style="width: 11%">
+<col style="width: 14%">
+<col style="width: 12%">
+</colgroup>
+<thead><tr class="header">
+<th style="text-align: left;">variable</th>
+<th style="text-align: left;">type</th>
+<th style="text-align: center;">calibrate</th>
+<th style="text-align: right;">cv</th>
+<th style="text-align: center;">use_data</th>
+<th style="text-align: left;">file</th>
+<th style="text-align: left;">varid</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">biomass.anchoveta</td>
+<td style="text-align: left;">lnorm2</td>
+<td style="text-align: center;">TRUE</td>
+<td style="text-align: right;">0.25</td>
+<td style="text-align: center;">TRUE</td>
+<td style="text-align: left;">bio_idx.csv</td>
+<td style="text-align: left;">anchoveta</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">yield.anchoveta</td>
+<td style="text-align: left;">lnorm2</td>
+<td style="text-align: center;">TRUE</td>
+<td style="text-align: right;">0.05</td>
+<td style="text-align: center;">TRUE</td>
+<td style="text-align: left;">yield.csv</td>
+<td style="text-align: left;">anchoveta</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">catchatlength.anchoveta</td>
+<td style="text-align: left;">multinom</td>
+<td style="text-align: center;">TRUE</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: center;">TRUE</td>
+<td style="text-align: left;">cal_anch.csv</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">biomass.sardina</td>
+<td style="text-align: left;">lnorm2</td>
+<td style="text-align: center;">TRUE</td>
+<td style="text-align: right;">0.25</td>
+<td style="text-align: center;">TRUE</td>
+<td style="text-align: left;">bio_idx.csv</td>
+<td style="text-align: left;">sardina</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">yield.sardina</td>
+<td style="text-align: left;">lnorm2</td>
+<td style="text-align: center;">TRUE</td>
+<td style="text-align: right;">0.05</td>
+<td style="text-align: center;">TRUE</td>
+<td style="text-align: left;">yield.csv</td>
+<td style="text-align: left;">sardina</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">biomass.euphausids</td>
+<td style="text-align: left;">lnorm2</td>
+<td style="text-align: center;">TRUE</td>
+<td style="text-align: right;">0.25</td>
+<td style="text-align: center;">TRUE</td>
+<td style="text-align: left;">bio_idx.csv</td>
+<td style="text-align: left;">euphausids</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">yield.euphausids</td>
+<td style="text-align: left;">lnorm2</td>
+<td style="text-align: center;">FALSE</td>
+<td style="text-align: right;">0.05</td>
+<td style="text-align: center;">TRUE</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">euphausids</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">penalty.growth.vonbertalanffy</td>
+<td style="text-align: left;">normp</td>
+<td style="text-align: center;">TRUE</td>
+<td style="text-align: right;">0.10</td>
+<td style="text-align: center;">FALSE</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
 </div>
-<div class="section level2">
-<h2 id="optimisation-options--calibrarrc">Optimisation options (<code>.calibrarrc</code>)<a class="anchor" aria-label="anchor" href="#optimisation-options--calibrarrc"></a>
+</div>
+<p>This example illustrates several common situations in an OSMOSE calibration. The rows for <code>anchoveta</code> show a harvested species contributing three different target types: a biomass index, a yield series, and catch-at-length data. The rows for <code>sardina</code> show another harvested species for which only biomass and yield are included here. The <code>euphausids</code> rows illustrate a species that is represented in the model but not harvested in the calibration setup: its biomass index is still used, but <code>yield.euphausids</code> is excluded from the calibration by setting <code>calibrate = FALSE</code>. Finally, <code>penalty.growth.vonbertalanffy</code> illustrates a penalty term rather than a direct observational target: it contributes to the objective function, but does not read an external data file, so <code>use_data = FALSE</code>.</p>
+<p>The precise variable names depend on the prepared workflow, but the logic is always the same: identify the target, choose how it contributes to the objective function, decide whether it is active, and indicate whether observed data are read from disk. The settings table is therefore not just a list of files, but the place where the user defines which simulated outputs are confronted with observations, which are excluded, and which enter the calibration as penalty terms.</p>
+</section><section class="level3" data-number="5.3"><h3 data-number="5.3" class="anchored" id="calibrate-versus-use_data">
+<span class="header-section-number">5.3</span> <code>calibrate</code> versus <code>use_data</code>
+<a class="anchor" aria-label="anchor" href="#calibrate-versus-use_data"></a>
+</h3>
+<p>One of the most important distinctions in this file is the difference between <code>calibrate</code> and <code>use_data</code>.</p>
+<div>
+<blockquote>
+<p><strong><code>calibrate</code> vs <code>use_data</code></strong></p>
+<ul>
+<li>
+<code>calibrate = FALSE</code> → the objective function <strong>ignores</strong> this component entirely.</li>
+<li>
+<code>use_data = FALSE</code> → the component is <strong>active</strong> but does not read observed data (e.g., a penalty term).</li>
+</ul>
+</blockquote>
+</div>
+<p>Setting <code>calibrate = FALSE</code> excludes the corresponding component from the calibration. The objective function will ignore it.</p>
+<p>By contrast, <code>use_data</code> answers a different question: does this component read observed data from disk? If <code>use_data = TRUE</code>, the workflow expects a data file and will compare the simulated output with the corresponding observed values. If <code>use_data = FALSE</code>, the observed input is effectively <code>NULL</code>, and the objective-function component is expected to operate as a penalty or auxiliary term based only on the simulated values. Setting <code>use_data = FALSE</code> when a data component is calibrated and requires data will throw an error.</p>
+</section><section class="level3" data-number="5.4"><h3 data-number="5.4" class="anchored" id="typical-edits-before-a-first-calibration">
+<span class="header-section-number">5.4</span> Typical edits before a first calibration<a class="anchor" aria-label="anchor" href="#typical-edits-before-a-first-calibration"></a>
+</h3>
+<p>Before launching a first calibration, users should usually inspect this file carefully.</p>
+<p>A common first task is to switch off targets for which no suitable observed dataset is available. If a generated template has no observational counterpart, the corresponding row should usually be deactivated and the unused file removed from the observed-data folder. This will allow to get an error if the variable is accidentaly left active.</p>
+<p>A second common task is to review the <code>cv</code> values. These values reflect how much confidence is placed in the different datasets and therefore how strongly they influence the overall fit.</p>
+<p>A third task is to check that each active target points to the intended file and that the list of active targets is consistent with the contents of the observed-data folder.</p>
+</section></section><section class="level2" data-number="6"><h2 data-number="6" class="anchored" id="practical-checklist-before-first-launch">
+<span class="header-section-number">6</span> Practical checklist before first launch<a class="anchor" aria-label="anchor" href="#practical-checklist-before-first-launch"></a>
 </h2>
+<p>Once the workspace has been finalised, a short practical review is usually worthwhile before starting any serious optimisation.</p>
+<ul>
+<li>Inspect <code>osmose-calibration_settings.csv</code> and confirm that only the intended targets remain active.</li>
+<li>Inspect <code>parguess</code>, <code>parmin</code>, <code>parmax</code>, and especially <code>parphase</code>.</li>
+<li>Run <code><a href="https://rdrr.io/pkg/osmose/man/osmose_calibration_test.html" class="external-link">osmose_calibration_test()</a></code> on the prepared directory.</li>
+</ul>
+<p>These steps are intended to confirm that the calibration workflow, the data, and the optimisation settings are all coherent. If all the tests implemented in osmose_calibration_test() are passed, you are ready to run the calibration.</p>
+<div>
+<blockquote>
+<p><strong>Ready to launch the calibration</strong></p>
+<p>Passing all the tests in osmose_calibration_test() is the green light to deploy the calibration in production on your local HPC system. At that point, the prepared workflow, the observed data, and the optimisation settings have all passed the main consistency checks expected before launching a full run.</p>
+</blockquote>
 </div>
-<div class="section level2">
-<h2 id="monitoring-the-progress-with-osmose_calibration_check">Monitoring the progress with
-<code>osmose_calibration_check()</code><a class="anchor" aria-label="anchor" href="#monitoring-the-progress-with-osmose_calibration_check"></a>
+</section><section class="level2" data-number="7"><h2 data-number="7" class="anchored" id="understanding-the-parameter-configuration-files">
+<span class="header-section-number">7</span> Understanding the parameter configuration files<a class="anchor" aria-label="anchor" href="#understanding-the-parameter-configuration-files"></a>
 </h2>
+<p>The calibration workspace created by <code><a href="https://rdrr.io/pkg/osmose/man/osmose_calibration_setup.html" class="external-link">osmose_calibration_setup()</a></code> includes a set of files that define the optimisation parameters: initial values, lower and upper bounds, and calibration phases. In the OSMOSE workflow these files are written as <code>.osm</code> configuration files rather than as plain vectors or data frames, because they must remain consistent with the parameter conventions used by the model and by the helper scripts.</p>
+<p>Conceptually, these files define the parameter layer of the calibration. They specify which quantities are estimated, how they enter the optimisation, and how they are activated over successive phases.</p>
+<section class="level3" data-number="7.1"><h3 data-number="7.1" class="anchored" id="initial-values-parguess">
+<span class="header-section-number">7.1</span> Initial values: <code>parguess</code>
+<a class="anchor" aria-label="anchor" href="#initial-values-parguess"></a>
+</h3>
+<p>The <code>parguess</code> file provides the starting values used by the optimisation algorithm. These are values to start the optimisation, not necessarily a direct copy of the values found in the original model configuration.</p>
+</section><section class="level3" data-number="7.2"><h3 data-number="7.2" class="anchored" id="bounds-parmin-and-parmax">
+<span class="header-section-number">7.2</span> Bounds: <code>parmin</code> and <code>parmax</code>
+<a class="anchor" aria-label="anchor" href="#bounds-parmin-and-parmax"></a>
+</h3>
+<p>The <code>parmin</code> and <code>parmax</code> files define the lower and upper bounds used for box-constrained optimisation. For complex models, these bounds are often part of the regularisation strategy and should be checked as carefully as the initial values.</p>
+</section><section class="level3" data-number="7.3"><h3 data-number="7.3" class="anchored" id="phases-parphase">
+<span class="header-section-number">7.3</span> Phases: <code>parphase</code>
+<a class="anchor" aria-label="anchor" href="#phases-parphase"></a>
+</h3>
+<p>The <code>parphase</code> file defines the phase at which each parameter becomes active in the optimisation. This is one of the most important files to inspect before launching a long calibration.</p>
+<p>A small illustrative example makes the distinction clearer:</p>
+<pre class="text"><code><span><span class="co"># parguess.osm</span></span>
+<span><span class="va">population.initialization.log10.biomass.sp0</span> <span class="op">=</span> <span class="fl">5.20</span></span>
+<span><span class="va">fisheries.log.rate.base.fsh1</span> <span class="op">=</span> <span class="op">-</span><span class="fl">1.35</span></span>
+<span><span class="va">osmose.user.selectivity.delta75.fsh1</span> <span class="op">=</span> <span class="fl">3.00</span></span>
+<span></span>
+<span><span class="co"># parphase.osm</span></span>
+<span><span class="va">population.initialization.log10.biomass.sp0</span> <span class="op">=</span> <span class="fl">1</span></span>
+<span><span class="va">fisheries.log.rate.base.fsh1</span> <span class="op">=</span> <span class="fl">2</span></span>
+<span><span class="va">osmose.user.selectivity.delta75.fsh1</span> <span class="op">=</span> <span class="fl">5</span></span></code></pre>
+<p>In this example, the three parameters are all present in the calibration, but they do not become active at the same time. The biomass parameter is estimated from phase 1, the fishery-rate parameter from phase 2, and the selectivity helper parameter only from phase 5.</p>
+<p>Strategies for defining calibration phases in OSMOSE are described in <span class="citation" data-cites="OliverosRamos2017Sequential">Oliveros-Ramos et al. (<a href="#ref-OliverosRamos2017Sequential" role="doc-biblioref">2017</a>)</span>, which presents the use of a sequential estimation strategy for a complex OSMOSE application fitted to multiple time series. That paper provides a practical example of how parameters can be activated progressively across phases, rather than estimated all at once, in order to stabilise the optimisation and improve the behaviour of the calibration. Readers interested in the rationale behind phase design, and in concrete examples of how different parameter groups can be introduced step by step, are encouraged to consult that study.</p>
+</section><section class="level3" data-number="7.4"><h3 data-number="7.4" class="anchored" id="osmose-specific-helper-logic-behind-these-files">
+<span class="header-section-number">7.4</span> OSMOSE-specific helper logic behind these files<a class="anchor" aria-label="anchor" href="#osmose-specific-helper-logic-behind-these-files"></a>
+</h3>
+<p>The purpose of <code><a href="https://rdrr.io/pkg/osmose/man/osmose_calibration_setup.html" class="external-link">osmose_calibration_setup()</a></code> is not only to write these files, but also to translate the OSMOSE configuration into a calibration representation suited to <code>calibrar</code>. In the current <code>simple</code> workflow, this may involve quantities such as initial biomass, fishing mortality-related parameters, larval mortality components, accessibility parameters, and selectivity terms. Other calibration workflows are currently implemented in <code><a href="https://rdrr.io/pkg/osmose/man/osmose_calibration_setup.html" class="external-link">osmose_calibration_setup()</a></code> and are described in the OSMOSE documentation, but they implement the same workflow described here.</p>
+<p>This translation layer is one of the main reasons the OSMOSE workflow deserves its own helper infrastructure. Without it, users would need to assemble the parameter vector, bounds, and phase structure manually, and also ensure that they remain consistent with the corresponding model-scale parameters.</p>
+</section></section><section class="level2" data-number="8"><h2 data-number="8" class="anchored" id="the-role-of-run_model-r">
+<span class="header-section-number">8</span> The role of <code>run_model.R</code>
+<a class="anchor" aria-label="anchor" href="#the-role-of-run_model-r"></a>
+</h2>
+<p>A central concept in <code>calibrar</code> is the <code>run_model()</code> function. This function is the bridge between the optimiser and the model. It receives a set of parameter values, runs the model, and returns the simulated outputs to be confronted with observed data.</p>
+<p>In the OSMOSE workflow, this bridge is implemented through the <code>run_model.R</code> file copied into the calibration directory.</p>
+<section class="level3" data-number="8.1"><h3 data-number="8.1" class="anchored" id="what-run_model-does-in-this-workflow">
+<span class="header-section-number">8.1</span> What <code>run_model()</code> does in this workflow<a class="anchor" aria-label="anchor" href="#what-run_model-does-in-this-workflow"></a>
+</h3>
+<p>In conceptual terms, the OSMOSE <code>run_model()</code> wrapper is the model-side bridge between <code>calibrar</code> and the OSMOSE core simulator. It receives one candidate calibration parameter set from the optimiser, translates that proposal into a runnable OSMOSE configuration, executes the simulation, and returns the calibration outputs in the structure expected by the objective function. A more detailed walkthrough of this implementation is provided in the appendix describing <code>run_model.R</code>.</p>
+<p>The function is called through a signature of the form:</p>
+<div class="code-copy-outer-scaffold">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">run_model</span><span class="op">(</span><span class="va">par</span>, <span class="va">conf</span>, <span class="va">osmose</span>, is_a_test<span class="op">=</span><span class="cn">FALSE</span>, version<span class="op">=</span><span class="st">"4.3.3"</span>,</span>
+<span>                     options<span class="op">=</span><span class="st">"-Xmx3g -Xms1g"</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
 </div>
-  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+<p>Here, <code>par</code> is the candidate calibration parameter set proposed by the optimiser, <code>conf</code> is the prepared OSMOSE calibration configuration, and <code>osmose</code> is the path to the OSMOSE executable. The remaining arguments control how the wrapper is run, for example in test mode or under a specific OSMOSE version and Java configuration.</p>
+<p>The logic of the wrapper can be summarised in four main steps.</p>
+<p>First, it receives the calibration parameters proposed by the optimiser.</p>
+<p>Second, it reconstructs the model-level OSMOSE parameters required for the simulation. This may include back-transforming optimisation parameters, expanding grouped parameter representations into species-level values, rebuilding time-varying larval mortality series, reconstructing fishery selectivity terms, and writing the resulting parameter set into the <code>calibration_parameters.osm</code> file read by the OSMOSE core simulator.</p>
+<p>Third, it launches the OSMOSE simulation in the prepared run directory.</p>
+<p>Fourth, it reads and post-processes the simulator outputs so that the result is a named list of calibration variables with the structure expected by the objective function, including both direct observational targets and any penalty-related components returned by the workflow.</p>
+<p>A minimal schematic representation looks like this:</p>
+<div class="code-copy-outer-scaffold">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">run_model</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">par</span>, <span class="va">conf</span>, <span class="va">osmose</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="co">## 1. reconstruct simulator-level parameters from calibration parameters</span></span>
+<span>  <span class="va">sim_par</span> <span class="op">=</span> <span class="fu">reconstruct_osmose_parameters</span><span class="op">(</span><span class="va">par</span>, <span class="va">conf</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="co">## 2. write the runnable OSMOSE parameter file</span></span>
+<span>  <span class="fu">write_osmose</span><span class="op">(</span><span class="va">sim_par</span>, file <span class="op">=</span> <span class="st">"calibration_parameters.osm"</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="co">## 3. run the OSMOSE core simulator</span></span>
+<span>  <span class="fu">run_osmose</span><span class="op">(</span>input <span class="op">=</span> <span class="st">"osmose-calibration.osm"</span>, osmose <span class="op">=</span> <span class="va">osmose</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="co">## 4. read the simulator outputs</span></span>
+<span>  <span class="va">output</span> <span class="op">=</span> <span class="fu">read_osmose</span><span class="op">(</span>path <span class="op">=</span> <span class="st">"output"</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="co">## 5. reduce raw outputs to calibration variables</span></span>
+<span>  <span class="va">cal_output</span> <span class="op">=</span> <span class="fu">osmose_calibration_outputs</span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="co">## 6. return the named list used by the objective function</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">cal_output</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
+</div>
+<p>The real OSMOSE wrapper includes additional steps, such as reconstruction of grouped parameters, rebuilding of larval mortality and selectivity terms, retry logic, and the addition of penalty-related outputs; these are described in the appendix on <code>run_model.R</code>.</p>
+<p>The exact variable names and contents of <code>cal_output</code> depend on the prepared workflow, but the important point is that <code>run_model()</code> returns a named list whose structure matches the rows defined in <code>osmose-calibration_settings.csv</code>. This is what allows <code><a href="../reference/calibration_objFn.html">calibration_objFn()</a></code> to compare simulated and observed quantities in a standard way, even though the simulator itself is external to R.</p>
+</section><section class="level3" data-number="8.2"><h3 data-number="8.2" class="anchored" id="when-users-may-need-to-edit-it">
+<span class="header-section-number">8.2</span> When users may need to edit it<a class="anchor" aria-label="anchor" href="#when-users-may-need-to-edit-it"></a>
+</h3>
+<p>In most cases, the default <code>run_model.R</code> file should be sufficient. The helper workflow is designed so that the standard script already performs the parameter reconstruction, simulator launch, and output extraction needed by the pre-packed OSMOSE calibration workflow.</p>
+<p>When modifications are needed, they should normally be limited to the explicit user-edit block left in the script. Typical reasons include adding extra derived outputs, modifying how a simulated quantity is aggregated before comparison with observed data, or introducing an application-specific parameter transformation not covered by the default helpers.</p>
+<p>For readers who want a fuller explanation of how the wrapper is structured internally, including parameter reconstruction, writing of <code>calibration_parameters.osm</code>, retry logic, and the construction of the returned output object, see the dedicated appendix on <code>run_model.R</code>.</p>
+</section><section class="level3" data-number="8.3"><h3 data-number="8.3" class="anchored" id="what-is-osmose-specific-here">
+<span class="header-section-number">8.3</span> What is OSMOSE-specific here<a class="anchor" aria-label="anchor" href="#what-is-osmose-specific-here"></a>
+</h3>
+<p>The generic pattern is the same for any complex model linked to <code>calibrar</code>: receive parameters, run the model, and return a structured list of outputs. What is specific to OSMOSE is how this is achieved. The script must write parameters in OSMOSE format, launch the OSMOSE core simulator in the correct workspace, and interpret OSMOSE outputs into calibration variables such as biomass indices, catch-related quantities, composition data, and penalty terms.</p>
+</section></section><section class="level2" data-number="9"><h2 data-number="9" class="anchored" id="running-pre-calibration-tests">
+<span class="header-section-number">9</span> Running pre-calibration tests<a class="anchor" aria-label="anchor" href="#running-pre-calibration-tests"></a>
+</h2>
+<p>Before launching a full calibration, the prepared workspace should be tested formally. In the OSMOSE workflow, this is done with <code><a href="https://rdrr.io/pkg/osmose/man/osmose_calibration_test.html" class="external-link">osmose_calibration_test()</a></code>.</p>
+<div class="code-copy-outer-scaffold">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">osmose_calibration_test</span><span class="op">(</span>path <span class="op">=</span> <span class="va">calibration_path</span><span class="op">)</span></span></code></pre></div>
+<button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
+</div>
+<p>These tests should be treated as part of the normal workflow rather than as optional convenience checks.</p>
+<section class="level3" data-number="9.1"><h3 data-number="9.1" class="anchored" id="testing-the-prepared-workspace">
+<span class="header-section-number">9.1</span> Testing the prepared workspace<a class="anchor" aria-label="anchor" href="#testing-the-prepared-workspace"></a>
+</h3>
+<p>At a practical level, the test function uses the prepared calibration directory, the saved simulated outputs, the observed data, the calibration settings, and the helper scripts to verify that the different layers of the workflow are compatible.</p>
+</section><section class="level3" data-number="9.2"><h3 data-number="9.2" class="anchored" id="what-is-being-tested">
+<span class="header-section-number">9.2</span> What is being tested<a class="anchor" aria-label="anchor" href="#what-is-being-tested"></a>
+</h3>
+<p>The first type of check concerns compatibility between simulated and observed outputs. The workflow verifies that the variables expected by the calibration have matching names and dimensions, taking into account whether a given objective-function component actually reads observed data.</p>
+<p>The second type of check concerns construction of the objective function itself. A calibration-ready workspace should be able to create the objective function from the current setup, observed data, and model wrapper without error.</p>
+<p>The third type of check concerns execution mode. The helper workflow can test the calibration path in sequential mode and, if requested, in parallel mode as well.</p>
+<div>
+<blockquote>
+<p><strong>Troubleshooting common early failures</strong></p>
+<p>The most common early problem is a mismatch between the structure of the simulated outputs and the structure of the observed data. In practice, this usually means that an active target in <code>osmose-calibration_settings.csv</code> points to a file whose dimensions, names, or aggregation level do not match what <code>run_model()</code> returns.</p>
+<p>When this happens, the most useful checks are: inspect <code>osmose-calibration_settings.csv</code>, compare <code>observed.rds</code> with <code>.simulated.rds</code>, and confirm that the active data files follow the template structure.</p>
+</blockquote>
+</div>
+</section></section><section class="level2" data-number="10"><h2 data-number="10" class="anchored" id="running-calibrations-on-hpc-systems">
+<span class="header-section-number">10</span> Running calibrations on HPC systems<a class="anchor" aria-label="anchor" href="#running-calibrations-on-hpc-systems"></a>
+</h2>
+<p>For many complex models, calibration quickly becomes too demanding for routine execution in a single local R session. This is especially true when the model is stochastic, runs slowly, writes inputs and outputs to disk, or requires many objective-function evaluations. OSMOSE is exactly the kind of model for which HPC execution is often the normal mode rather than a special case.</p>
+<section class="level3" data-number="10.1"><h3 data-number="10.1" class="anchored" id="why-hpc-matters-for-complex-model-calibration">
+<span class="header-section-number">10.1</span> Why HPC matters for complex model calibration<a class="anchor" aria-label="anchor" href="#why-hpc-matters-for-complex-model-calibration"></a>
+</h3>
+<p>A calibration does not run the model once. It runs the model repeatedly, often hundreds or thousands of times, under different parameter combinations. When each model evaluation requires writing parameter files, launching an external simulator, reading outputs back into R, and sometimes using internal model parallelisation, the total computational cost becomes substantial.</p>
+<p>This is where the design of <code>calibrar</code> becomes particularly useful. The optimisation remains generic, but the execution environment can be configured outside the objective function. In practice, this means that the same conceptual workflow can be used in a local multicore session or on an HPC cluster managed by a scheduler.</p>
+<p>For readers who want more implementation detail, the appendices provide two complementary views of this process. One appendix explains how the hidden <code>.calibration.R</code> launcher reconstructs the prepared calibration problem and turns it into a final call to <code><a href="../reference/calibrate.html">calibrate()</a></code>. A second appendix shows example PBS and Slurm submission scripts that wrap this launcher for two common scheduler environments.</p>
+</section><section class="level3" data-number="10.2"><h3 data-number="10.2" class="anchored" id="launching-the-calibration-script">
+<span class="header-section-number">10.2</span> Launching the calibration script<a class="anchor" aria-label="anchor" href="#launching-the-calibration-script"></a>
+</h3>
+<p>At the simplest level, the prepared calibration workspace can be launched by executing the calibration script directly:</p>
+<div class="code-copy-outer-scaffold">
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">Rscript</span> .calibration.R <span class="op">&gt;&gt;</span><span class="kw">&amp;</span> <span class="ex">calibration.log</span></span></code></pre></div>
+<button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
+</div>
+<p>This command is mainly useful to illustrate the logic of the workflow. The real work is done by the hidden calibration script, which reads the prepared files, reconstructs the calibration objects, builds the objective function, configures execution control, and finally launches <code><a href="../reference/calibrate.html">calibrate()</a></code>. Readers interested in that implementation logic can refer to the appendix describing <code>.calibration.R</code>.</p>
+</section><section class="level3" data-number="10.3"><h3 data-number="10.3" class="anchored" id="using-scheduler-scripts">
+<span class="header-section-number">10.3</span> Using scheduler scripts<a class="anchor" aria-label="anchor" href="#using-scheduler-scripts"></a>
+</h3>
+<p>In practice, long OSMOSE calibrations will often be launched through scheduler scripts rather than by calling <code>.calibration.R</code> manually.</p>
+<div class="code-copy-outer-scaffold">
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># PBS</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="ex">qsub</span> calibration_OMP.pbs</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Slurm</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="ex">sbatch</span> calibration_OMP.slurm</span></code></pre></div>
+<button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
+</div>
+<p>These scripts are part of the helper infrastructure copied by <code><a href="https://rdrr.io/pkg/osmose/man/osmose_calibration_setup.html" class="external-link">osmose_calibration_setup()</a></code>. They provide lightweight scheduler wrappers around the same calibration launcher. Their role is to request resources from the scheduler, move to the calibration directory, set the execution environment, and call <code>.calibration.R</code> with the appropriate options.</p>
+<p>The exact directives are system-specific, but the conceptual pattern is general. The calibration directory already contains the optimiser-facing files and model-wrapper logic; the scheduler script only needs to provide the platform-specific submission layer. Readers who want concrete examples can refer to the appendix showing PBS and Slurm launch scripts.</p>
+</section><section class="level3" data-number="10.4"><h3 data-number="10.4" class="anchored" id="parallelisation-and-restart-capability">
+<span class="header-section-number">10.4</span> Parallelisation and restart capability<a class="anchor" aria-label="anchor" href="#parallelisation-and-restart-capability"></a>
+</h3>
+<p>One of the strengths of the <code>calibrar</code> approach is that parallel execution does not need to be hard-coded into the model itself. Instead, the optimisation workflow can evaluate parameter combinations in parallel while keeping the model-side interface based on <code>run_model()</code>. For disk-based models, this requires careful workspace organisation, because concurrent evaluations must run in separate directories while still having access to the baseline model files. The OSMOSE helper workflow addresses this by preparing a workspace that is already structured for repeated and potentially parallel runs.</p>
+<p>Restart capability is equally important, but it only becomes active when the calibration control file requests restart output. In practice, this means that the <code>.calibrarrc</code> file must define a restart frequency through options such as the reporting interval, so that intermediate optimisation states are written to disk during the run. Once this is configured, the launch script standardises the restart-file basename and passes it to <code><a href="../reference/calibrate.html">calibrate()</a></code> through the <code>control</code> argument. From that point onward, the optimisation can save intermediate restart objects while it is running.</p>
+<p>This matters because long calibrations may be interrupted by wall-time limits, queue policies, or technical failures. If restart saving has been activated in the control settings, a partially completed run can be resumed from the latest saved state rather than starting again from the initial parameter values. In other words, restart capability is not automatic merely because the workflow uses <code>calibrar</code>; it becomes operational because the prepared OSMOSE launcher combines a structured workspace, an explicit restart-file name, and control settings that instruct the optimiser to save intermediate states.</p>
+<p>For OSMOSE users, this makes long calibrations much more practical under real HPC constraints. For non-OSMOSE users, it highlights a more general lesson: restart behaviour should be treated as part of the execution design of a complex-model calibration workflow, not as an optional afterthought.</p>
+</section></section><section class="level2" data-number="11"><h2 data-number="11" class="anchored" id="controlling-monitoring-and-resuming-the-calibration">
+<span class="header-section-number">11</span> Controlling, monitoring, and resuming the calibration<a class="anchor" aria-label="anchor" href="#controlling-monitoring-and-resuming-the-calibration"></a>
+</h2>
+<section class="level3" data-number="11.1"><h3 data-number="11.1" class="anchored" id="optimisation-control-with--calibrarrc">
+<span class="header-section-number">11.1</span> Optimisation control with <code>.calibrarrc</code>
+<a class="anchor" aria-label="anchor" href="#optimisation-control-with--calibrarrc"></a>
+</h3>
+<p>The <code>.calibrarrc</code> file should be understood as the optimisation control layer of the workflow. Whereas <code>osmose-calibration_settings.csv</code> defines the objective-function components and the parameter files define the search space, <code>.calibrarrc</code> defines how the optimisation itself is run.</p>
+<section class="level4" data-number="11.1.1"><h4 data-number="11.1.1" class="anchored" id="main-control-elements">
+<span class="header-section-number">11.1.1</span> Main control elements<a class="anchor" aria-label="anchor" href="#main-control-elements"></a>
+</h4>
+<p>The exact contents depend on the current helper script, but conceptually this file controls the optimisation method, stopping criteria, report frequency, and phase-specific relative tolerances.</p>
+<p>A schematic example might look like this:</p>
+<pre class="text"><code>method = "AHR-ES"
+maxit = 200
+REPORT = 10
+reltol = 0.01, 0.005, 0.002, 0.001</code></pre>
+<p>The meaning of these settings is straightforward: they define the optimisation method, how long each phase may run, how often progress is reported and saved, including for restart purposes, and how tightly each phase is expected to converge.</p>
+<p>Changing the optimisation method is usually done here. For example, moving from a stochastic global search to a local derivative-based method is not a change to <code>run_model()</code> or to the data layer; it is a change to the optimisation control layer.</p>
+</section><section class="level4" data-number="11.1.2"><h4 data-number="11.1.2" class="anchored" id="why-this-file-matters-for-a-first-calibration">
+<span class="header-section-number">11.1.2</span> Why this file matters for a first calibration<a class="anchor" aria-label="anchor" href="#why-this-file-matters-for-a-first-calibration"></a>
+</h4>
+<p>For a first calibration, the default values provided in <code>.calibrarrc</code> are usually reasonable as an initial starting point. They allow the prepared workflow to be launched without requiring the user to design an optimisation strategy from scratch.</p>
+<p>However, users should not assume that these defaults are optimal. In many applications, the calibration can be made more efficient or more robust by adjusting the control settings once the basic workflow has been validated. This may involve changing the optimisation method, modifying the stopping criteria, or refining the phase-specific tolerances to better suit the behaviour of the model and the scale of the problem.</p>
+<p>This is also why <code>.calibrarrc</code> belongs in the vignette. It is not an incidental helper file. It is the most visible and editable representation of the optimisation strategy adopted by the prepared workflow.</p>
+</section></section><section class="level3" data-number="11.2"><h3 data-number="11.2" class="anchored" id="monitoring-restarting-and-checking-results">
+<span class="header-section-number">11.2</span> Monitoring, restarting, and checking results<a class="anchor" aria-label="anchor" href="#monitoring-restarting-and-checking-results"></a>
+</h3>
+<p>Once a calibration has been launched, the workflow becomes mainly operational. Even so, it is useful to keep a clear conceptual picture of what should be monitored and how results are re-entered into the analysis workflow.</p>
+<section class="level4" data-number="11.2.1"><h4 data-number="11.2.1" class="anchored" id="monitoring-the-run">
+<span class="header-section-number">11.2.1</span> Monitoring the run<a class="anchor" aria-label="anchor" href="#monitoring-the-run"></a>
+</h4>
+<p>In practice, the first level of monitoring is usually the log output and the presence of intermediate restart files. These indicate whether the optimisation is progressing, whether phases are advancing, and whether the model is running stably under the current configuration.</p>
+<p>For long jobs on HPC systems, routine monitoring is part of normal calibration management. It is often more useful to check whether the workflow is behaving coherently than to focus immediately on the numerical value of the objective function alone.</p>
+</section><section class="level4" data-number="11.2.2"><h4 data-number="11.2.2" class="anchored" id="reading-calibration-outputs">
+<span class="header-section-number">11.2.2</span> Reading calibration outputs<a class="anchor" aria-label="anchor" href="#reading-calibration-outputs"></a>
+</h4>
+<p>Once a run has produced results, the OSMOSE helper workflow provides a way to read them back into an object suited to inspection.</p>
+<div class="code-copy-outer-scaffold">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">calibration</span> <span class="op">=</span> <span class="fu">osmose_calibration_check</span><span class="op">(</span>input<span class="op">=</span><span class="va">config_file</span>, name<span class="op">=</span><span class="st">"my_calibration"</span><span class="op">)</span></span></code></pre></div>
+<button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
+</div>
+<p>The <code><a href="https://rdrr.io/pkg/osmose/man/osmose_calibration_check.html" class="external-link">osmose_calibration_check()</a></code> function returns an object gathering the calibration results, including the best parameter values recovered from the run, the observed data and calibration settings associated with the workspace, and a set of OSMOSE outputs generated from the updated model run.</p>
+<p>This step closes the loop between the prepared calibration workspace and the post-run interpretation of results. It allows the user to inspect the best parameter values together with the observed data, settings, and selected outputs associated with the run.</p>
+</section><section class="level4" data-number="11.2.3"><h4 data-number="11.2.3" class="anchored" id="what-to-inspect-first">
+<span class="header-section-number">11.2.3</span> What to inspect first<a class="anchor" aria-label="anchor" href="#what-to-inspect-first"></a>
+</h4>
+<p>The first things to inspect are usually the active targets, the parameter traces or phase structure, and the best parameter values returned by the calibration. These help answer the most immediate questions: which parts of the objective function were actually active, which parameters were estimated, and whether the resulting solution is plausible.</p>
+<p>It is then useful to check whether the fitted outputs are coherent with the intended data sources and aggregation levels. A numerically successful optimisation is not necessarily a scientifically coherent calibration if the wrong targets were activated or if the data-model correspondence was poorly defined.</p>
+</section></section></section><section class="level2" data-number="12"><h2 data-number="12" class="anchored" id="what-transfers-to-other-complex-models">
+<span class="header-section-number">12</span> What transfers to other complex models<a class="anchor" aria-label="anchor" href="#what-transfers-to-other-complex-models"></a>
+</h2>
+<p>Although this vignette is centred on OSMOSE, much of the workflow is generic to the way <code>calibrar</code> can be used with complex black-box models.</p>
+<section class="level3" data-number="12.1"><h3 data-number="12.1" class="anchored" id="elements-that-are-generic-to-calibrar">
+<span class="header-section-number">12.1</span> Elements that are generic to <code>calibrar</code>
+<a class="anchor" aria-label="anchor" href="#elements-that-are-generic-to-calibrar"></a>
+</h3>
+<p>Several elements of the workflow transfer almost directly to any other complex model linked to <code>calibrar</code>. In all cases, a model-specific <code>run_model()</code> function is needed to receive candidate parameter values, execute the simulator, and return the outputs that will be confronted with data. The observed data must then be organised so that their structure matches the simulated outputs returned by this wrapper. A calibration settings table is also required to define how each output contributes to the objective function. In addition, the optimisation itself needs initial parameter values, lower and upper bounds, and, when a sequential strategy is used, calibration phases. Finally, for long-running problems, practical use often depends on the availability of parallel and restart infrastructure, so that repeated model evaluations can be managed efficiently and interrupted runs can be resumed.</p>
+</section><section class="level3" data-number="12.2"><h3 data-number="12.2" class="anchored" id="elements-that-are-specific-to-osmose">
+<span class="header-section-number">12.2</span> Elements that are specific to OSMOSE<a class="anchor" aria-label="anchor" href="#elements-that-are-specific-to-osmose"></a>
+</h3>
+<p>This vignette has focused on the conceptual logic of using <code>calibrar</code> with OSMOSE through the prepared helper workflow implemented in the <code>osmose</code> package. Its main purpose is to explain why the workspace has the structure it does and how that structure supports testing, optimisation, parallel execution, and restart capability.</p>
+<p>What is specific to OSMOSE is the way these generic ingredients are implemented. The calibration-parameter structure depends on OSMOSE concepts and configuration conventions. The helper scripts copied by <code><a href="https://rdrr.io/pkg/osmose/man/osmose_calibration_setup.html" class="external-link">osmose_calibration_setup()</a></code> are written specifically for the OSMOSE workflow. The expected directory layout and file names follow the logic of the OSMOSE core simulator and its outputs. Likewise, the post-processing that transforms model outputs into calibration variables is tailored to OSMOSE outputs and to the helper choices implemented in the osmose package.</p>
+<p>This distinction is useful because it shows how to think about adaptation to other models. The generic <code>calibrar</code> pattern remains the same, but the model-specific preparation layer must be redesigned for each modelling framework.</p>
+</section></section><section class="level2" data-number="13"><h2 data-number="13" class="anchored" id="appendix-running-a-calibration-using-the--calibration-r-script-">
+<span class="header-section-number">13</span> Appendix: Running a calibration using the <code>.calibration.R</code> script.<a class="anchor" aria-label="anchor" href="#appendix-running-a-calibration-using-the--calibration-r-script-"></a>
+</h2>
+<p>The script <code>.calibration.R</code> is the executable bridge between the prepared calibration directory and the final call to <code><a href="../reference/calibrate.html">calibrate()</a></code>. In the main text, the calibration workflow is described conceptually in terms of parameter files, observed data, optimisation control, and the <code>run_model()</code> wrapper. This appendix explains how those pieces are assembled in practice by the launch script.</p>
+<p>This appendix has a double purpose. For OSMOSE users, it provides a more detailed reference for understanding what happens when the calibration is launched from the prepared workspace. For modellers working with other complex simulators, it also illustrates a general implementation pattern: a scheduler-aware R script that reconstructs a calibration problem from files, creates an objective function, configures parallel execution, and then delegates the optimisation itself to <code><a href="../reference/calibrate.html">calibrate()</a></code>.</p>
+<p>At a high level, the script performs the following operations: it reads command-line arguments and scheduler information; it loads the calibration control file and prepares a run directory; it reconstructs the calibration inputs from the prepared workspace; it builds the objective function with <code><a href="../reference/calibration_objFn.html">calibration_objFn()</a></code>; it configures parallel execution and restart behaviour; and it finally calls <code><a href="../reference/calibrate.html">calibrate()</a></code> with the prepared objects. In other words, the script translates a calibration directory on disk into the standard <code>calibrar</code> call pattern:</p>
+<div class="code-copy-outer-scaffold">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span></span>
+<span>  par <span class="op">=</span> <span class="va">...</span>,</span>
+<span>  fn <span class="op">=</span> <span class="va">...</span>,</span>
+<span>  lower <span class="op">=</span> <span class="va">...</span>,</span>
+<span>  upper <span class="op">=</span> <span class="va">...</span>,</span>
+<span>  phases <span class="op">=</span> <span class="va">...</span>,</span>
+<span>  control <span class="op">=</span> <span class="va">...</span>,</span>
+<span>  parallel <span class="op">=</span> <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
+</div>
+<p>The apparent simplicity of that final call hides most of the technical work needed by a complex, file-based simulator such as OSMOSE.</p>
+<p>The script begins by establishing the runtime context. It reads command-line arguments, loads the required packages, and detects the execution environment.</p>
+<div class="code-copy-outer-scaffold">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw">if</span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/exists.html" class="external-link">exists</a></span><span class="op">(</span><span class="st">".args"</span>, mode <span class="op">=</span> <span class="st">"character"</span><span class="op">)</span><span class="op">)</span> <span class="va">.args</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/commandArgs.html" class="external-link">commandArgs</a></span><span class="op">(</span>trailingOnly<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://roliveros-ramos.github.io/calibrar/">"calibrar"</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="http://www.osmose-model.org/" class="external-link">"osmose"</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">nodefile</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"PBS_NODEFILE"</span><span class="op">)</span></span>
+<span><span class="va">nodes</span> <span class="op">=</span> <span class="kw">if</span><span class="op">(</span><span class="va">nodefile</span><span class="op">==</span><span class="st">""</span><span class="op">)</span> <span class="st">"localhost"</span> <span class="kw">else</span> <span class="fu"><a href="https://rdrr.io/r/base/readLines.html" class="external-link">readLines</a></span><span class="op">(</span><span class="va">nodefile</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">control_file</span>   <span class="op">=</span> <span class="fu"><a href="../reference/dot-get_command_argument.html">.get_command_argument</a></span><span class="op">(</span><span class="va">.args</span>, <span class="st">"calibration.control"</span>, default<span class="op">=</span><span class="st">".calibrarrc"</span><span class="op">)</span></span>
+<span><span class="va">is_a_test</span>      <span class="op">=</span> <span class="fu"><a href="../reference/dot-get_command_argument.html">.get_command_argument</a></span><span class="op">(</span><span class="va">.args</span>, <span class="st">"test"</span><span class="op">)</span></span>
+<span><span class="va">run_model_file</span> <span class="op">=</span> <span class="fu"><a href="../reference/dot-get_command_argument.html">.get_command_argument</a></span><span class="op">(</span><span class="va">.args</span>, <span class="st">"run_model"</span>, default<span class="op">=</span><span class="st">"run_model.R"</span><span class="op">)</span></span>
+<span><span class="va">ncores</span>         <span class="op">=</span> <span class="fu"><a href="../reference/dot-get_command_argument.html">.get_command_argument</a></span><span class="op">(</span><span class="va">.args</span>, <span class="st">"ncores"</span>, default<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">nodes</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">OMP</span>            <span class="op">=</span> <span class="fu"><a href="../reference/dot-get_command_argument.html">.get_command_argument</a></span><span class="op">(</span><span class="va">.args</span>, <span class="st">"omp"</span><span class="op">)</span></span>
+<span><span class="va">nht</span>            <span class="op">=</span> <span class="fu"><a href="../reference/dot-get_command_argument.html">.get_command_argument</a></span><span class="op">(</span><span class="va">.args</span>, <span class="st">"nht"</span><span class="op">)</span></span>
+<span><span class="va">replicates</span>     <span class="op">=</span> <span class="fu"><a href="../reference/dot-get_command_argument.html">.get_command_argument</a></span><span class="op">(</span><span class="va">.args</span>, <span class="st">"replicates"</span>, default<span class="op">=</span><span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+<button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
+</div>
+<p>This first block makes the script usable both interactively and under a scheduler. If the script is launched through a PBS job, the node file is used to detect the available nodes. If not, it falls back to a local default. It also translates external execution options into explicit R objects. Rather than hard-coding execution mode, the script makes parallel mode, test mode, run-model file, and calibration control file configurable from the command line. This is good practice for complex model workflows because the same prepared workspace may need to be launched in different ways. It is also worth noting that scheduler-level information and optimiser-level information are still separate at this point. The number of cores requested from the scheduler, the use of OMP or MPI, and the use of hyper-threading are not yet the same thing as the number of workers eventually passed to <code>calibrar</code>. That translation happens later, but the raw information is collected here. For non-OSMOSE users, this is a transferable pattern: parse external arguments early, detect the execution environment, and avoid burying run-specific choices inside the source code.</p>
+<p>The next block loads the calibration control file, identifies the executable resources needed by the model, and prepares the run directory.</p>
+<div class="code-copy-outer-scaffold">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">control</span>  <span class="op">=</span> <span class="fu"><a href="../reference/dot-read_configuration.html">.read_configuration</a></span><span class="op">(</span><span class="va">control_file</span><span class="op">)</span></span>
+<span><span class="va">osmose</span>   <span class="op">=</span> <span class="st">".osmose.jar"</span></span>
+<span><span class="va">obs_file</span> <span class="op">=</span> <span class="st">"observed.rds"</span></span>
+<span></span>
+<span><span class="va">root</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/basename.html" class="external-link">basename</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/getwd.html" class="external-link">getwd</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">run_path</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"../.run_%s"</span>, <span class="va">root</span><span class="op">)</span></span>
+<span><span class="kw">if</span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.exists</a></span><span class="op">(</span><span class="va">run_path</span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="va">run_path</span><span class="op">)</span></span>
+<span><span class="kw">if</span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="va">osmose</span><span class="op">)</span><span class="op">)</span> <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="st">"OSMOSE executable '.osmose.jar' not found."</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">.cancopy</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.copy</a></span><span class="op">(</span>from<span class="op">=</span><span class="va">osmose</span>, to<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">run_path</span>, <span class="va">osmose</span><span class="op">)</span>, overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="kw">if</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Logic.html" class="external-link">isFALSE</a></span><span class="op">(</span><span class="va">.cancopy</span><span class="op">)</span><span class="op">)</span> <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="st">"Cannot copy OSMOSE executable."</span><span class="op">)</span></span></code></pre></div>
+<button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
+</div>
+<p>This block is important because <code>calibrar</code> does not need a run directory by itself. A simple in-memory model can often be calibrated with no file operations at all. The run directory exists because OSMOSE is a file-based simulator: each model evaluation needs input files on disk, an executable jar, and a place to write outputs. The <code>.calibrarrc</code> file is read here because it provides the main optimisation settings before the calibration objects are assembled. In a generic <code>calibrar</code> workflow, these settings could have been created directly as an R list. In the OSMOSE workflow, they are stored on disk so that the calibration can be launched consistently from scripts, scheduler jobs, or relaunches. The copy of <code>.osmose.jar</code> into the run directory is also part of that logic. The script is not only building an optimisation problem in R; it is preparing an executable model environment for repeated simulation calls. This separation between the calibration workspace and the actual run directory is essential whenever a model writes files during execution. For other models, the exact details will differ, but the pattern is the same: if the simulator depends on external binaries, configuration files, or fixed input resources, the launch script should standardise those resources before the optimiser starts evaluating parameter sets.</p>
+<p>The script then rebuilds the calibration problem in R from the files that were prepared earlier by <code><a href="https://rdrr.io/pkg/osmose/man/osmose_calibration_setup.html" class="external-link">osmose_calibration_setup()</a></code>.</p>
+<div class="code-copy-outer-scaffold">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">conf</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/osmose/man/read_osmose.html" class="external-link">read_osmose</a></span><span class="op">(</span>input <span class="op">=</span> <span class="st">"master/osmose-calibration.osm"</span><span class="op">)</span></span>
+<span><span class="va">model</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/osmose/man/get_par.html" class="external-link">get_par</a></span><span class="op">(</span><span class="va">conf</span>, <span class="st">"output.file.prefix"</span><span class="op">)</span></span>
+<span><span class="va">osm_ncpu</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/osmose/man/get_par.html" class="external-link">get_par</a></span><span class="op">(</span><span class="va">conf</span>, <span class="st">"simulation.ncpu"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/source.html" class="external-link">source</a></span><span class="op">(</span><span class="va">run_model_file</span>, local<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="kw">if</span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/exists.html" class="external-link">exists</a></span><span class="op">(</span><span class="st">"run_model"</span>, mode<span class="op">=</span><span class="st">"function"</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"We couldn't find the 'run_model' function in '%s'."</span>, <span class="va">run_model_file</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">setup</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibration_setup.html">calibration_setup</a></span><span class="op">(</span>file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"osmose-%s-calibration_settings.csv"</span>, <span class="va">model</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">par_guess</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/osmose/man/read_osmose.html" class="external-link">read_osmose</a></span><span class="op">(</span>input<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"osmose-%s-parguess.osm"</span>, <span class="va">model</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">par_min</span>   <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/osmose/man/read_osmose.html" class="external-link">read_osmose</a></span><span class="op">(</span>input<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"osmose-%s-parmin.osm"</span>, <span class="va">model</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">par_max</span>   <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/osmose/man/read_osmose.html" class="external-link">read_osmose</a></span><span class="op">(</span>input<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"osmose-%s-parmax.osm"</span>, <span class="va">model</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">par_phase</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/osmose/man/read_osmose.html" class="external-link">read_osmose</a></span><span class="op">(</span>input<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"osmose-%s-parphase.osm"</span>, <span class="va">model</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">observed</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="va">obs_file</span><span class="op">)</span></span></code></pre></div>
+<button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
+</div>
+<p>This is one of the most important parts of the script because it makes clear that the launch step is not constructing a calibration from scratch. All the core ingredients already exist in the prepared workspace: <code>run_model.R</code> provides the model-specific wrapper; <code>calibration_settings.csv</code> defines the objective-function components; <code>parguess</code>, <code>parmin</code>, <code>parmax</code>, and <code>parphase</code> define the optimisation parameter layer; <code>observed.rds</code> provides the observed data in the structure expected by the workflow; and <code>master/osmose-calibration.osm</code> provides the baseline OSMOSE calibration configuration. In a simpler <code>calibrar</code> example, these objects may be created directly in the global environment. Here they are reconstructed from files because the workflow must survive across sessions, machines, and scheduler jobs. The role of <code>source(run_model_file, local = TRUE)</code> is especially important. <code>calibrar</code> does not need to know anything about OSMOSE internally. It only needs a function called <code>run_model()</code> that accepts a parameter object and returns a named list of simulated outputs. That is the central abstraction of the black-box workflow. For non-OSMOSE users, this is probably the most transferable part of the script: a similar launch script for another model would also need to reconstruct one model-specific wrapper function, one objective-function settings table, one observed-data object, one set of starting values, bounds, and phases, and one baseline simulation context.</p>
+<p>Once the calibration objects have been reconstructed, the script turns them into the scalar objective function that the optimiser can minimise.</p>
+<div class="code-copy-outer-scaffold">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">osmose</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">".."</span>, <span class="va">osmose</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">objfn</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibration_objFn.html">calibration_objFn</a></span><span class="op">(</span></span>
+<span>  model <span class="op">=</span> <span class="va">run_model</span>,</span>
+<span>  setup <span class="op">=</span> <span class="va">setup</span>,</span>
+<span>  observed <span class="op">=</span> <span class="va">observed</span>,</span>
+<span>  conf <span class="op">=</span> <span class="va">conf</span>,</span>
+<span>  osmose <span class="op">=</span> <span class="va">osmose</span>,</span>
+<span>  is_a_test <span class="op">=</span> <span class="va">is_a_test</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
+</div>
+<p>This block is the core of the <code>calibrar</code> abstraction. At this point, the launch script already has a wrapper able to run the simulator, the observed data, and the calibration settings that describe how each output should be compared with its observed counterpart. The call to <code><a href="../reference/calibration_objFn.html">calibration_objFn()</a></code> combines these pieces into one function, <code>objfn</code>, which behaves like any other objective function accepted by <code><a href="../reference/calibrate.html">calibrate()</a></code>. In practical terms, every time the optimiser proposes a new parameter set, <code>objfn</code> will call <code>run_model()</code> with those parameters, obtain a structured list of simulated outputs, compare those outputs with the observed data using the rules defined in <code>setup</code>, and aggregate the partial contributions into a single scalar value. This is precisely what allows a complex file-based simulator to be treated as a black-box optimisation problem. In the OSMOSE case, the script also passes <code>conf</code>, <code>osmose</code>, and <code>is_a_test</code> as additional arguments needed by the wrapper. That is model-specific. The generic pattern is that any extra information required by the wrapper function can be passed at objective-function construction time. For modellers of other complex systems, this is where the main design decision appears. The launch script should not try to implement the likelihood directly. Instead, it should expose a model wrapper and a settings table, and let <code><a href="../reference/calibration_objFn.html">calibration_objFn()</a></code> assemble the comparison logic in a standard way whenever possible.</p>
+<p>Before launching the optimisation, the script adjusts some control values so that they are consistent with the prepared workspace.</p>
+<div class="code-copy-outer-scaffold">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw">if</span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">control</span><span class="op">$</span><span class="va">master</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="kw">if</span><span class="op">(</span><span class="va">control</span><span class="op">$</span><span class="va">master</span><span class="op">!=</span><span class="st">"master"</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="kw">if</span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">control</span><span class="op">$</span><span class="va">run</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="kw">if</span><span class="op">(</span><span class="va">control</span><span class="op">$</span><span class="va">run</span><span class="op">!=</span><span class="va">run_path</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="kw"><a href="https://rdrr.io/r/base/warning.html" class="external-link">warning</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">restart_file</span> <span class="op">=</span> <span class="kw">if</span><span class="op">(</span><span class="va">is_a_test</span><span class="op">)</span> <span class="st">"osmose-test"</span> <span class="kw">else</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"osmose-%s"</span>, <span class="va">model</span><span class="op">)</span></span>
+<span><span class="va">control</span><span class="op">$</span><span class="va">master</span> <span class="op">=</span> <span class="st">"master"</span></span>
+<span><span class="va">control</span><span class="op">$</span><span class="va">run</span> <span class="op">=</span> <span class="va">run_path</span></span>
+<span><span class="va">control</span><span class="op">$</span><span class="va">restart.file</span> <span class="op">=</span> <span class="va">restart_file</span></span></code></pre></div>
+<button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
+</div>
+<p>This block is easy to overlook, but it is one of the reasons the script is robust. The control file may contain values for <code>master</code> or <code>run</code>, but the OSMOSE helper workflow already imposes a strict directory contract. Rather than allowing those values to drift, the script checks them and then rewrites them explicitly. In effect, it says that this workflow always uses the local <code>master/</code> directory as the reference run context, and always uses the derived <code>.run_*</code> directory as the run workspace. The restart file name is also standardised here. This is important because long calibrations often need to be resumed after interruption. In a complex file-based model, restart behaviour is not a cosmetic convenience; it is part of the normal workflow. For non-OSMOSE users, the general lesson is that the launch script should be the place where generic optimiser controls are reconciled with model-specific workflow assumptions. If a model requires a fixed run layout, fixed auxiliary resources, or a standard naming scheme for restarts, this is the right layer to enforce it.</p>
+<p>The script then translates scheduler cores and OSMOSE internal parallelism into the number of workers that <code>calibrar</code> should actually use.</p>
+<div class="code-copy-outer-scaffold">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">eff_cores</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">floor</a></span><span class="op">(</span><span class="op">(</span><span class="va">ncores</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span><span class="op">/</span><span class="va">nht</span><span class="op">/</span><span class="va">osm_ncpu</span><span class="op">)</span></span>
+<span><span class="va">control</span><span class="op">$</span><span class="va">ncores</span> <span class="op">=</span> <span class="va">eff_cores</span></span></code></pre></div>
+<button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
+</div>
+<p>This line looks small, but it captures a real implementation issue in complex-model calibration. There are at least three distinct notions of parallelism in this workflow: the total number of scheduler cores available to the job, the number of threads or processes used internally by one OSMOSE simulation, and the number of parameter combinations that <code>calibrar</code> can evaluate concurrently. If those levels are confused, the calibration can oversubscribe the machine and perform poorly, or even fail. The script therefore computes an effective worker count by taking into account hyper-threading and the number of cores used internally by each OSMOSE run. For example, if a job has access to 64 cores and each OSMOSE simulation uses 4 cores internally, then <code>calibrar</code> can evaluate at most 16 parameter combinations simultaneously. This type of translation is not specific to OSMOSE. Any model with internal parallelism, expensive external binaries, or multiple nested levels of computation will require a similar reconciliation between scheduler resources and optimiser-level parallelism.</p>
+<p>Once the effective worker count is known, the script builds the parallel backend used by <code>calibrar</code>.</p>
+<div class="code-copy-outer-scaffold">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw">if</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Logic.html" class="external-link">isTRUE</a></span><span class="op">(</span><span class="va">parallel</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span></span>
+<span>  <span class="kw">if</span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/Logic.html" class="external-link">isTRUE</a></span><span class="op">(</span><span class="va">MPI</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="kw">if</span><span class="op">(</span><span class="op">!</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="st"><a href="https://github.com/RevolutionAnalytics/doparallel" class="external-link">"doParallel"</a></span><span class="op">)</span><span class="op">)</span> <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="st">"Package 'doParallel' not found"</span><span class="op">)</span></span>
+<span>    <span class="va">cl</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">makeCluster</a></span><span class="op">(</span><span class="va">control</span><span class="op">$</span><span class="va">ncores</span><span class="op">)</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/pkg/doParallel/man/registerDoParallel.html" class="external-link">registerDoParallel</a></span><span class="op">(</span><span class="va">cl</span><span class="op">)</span></span>
+<span>  <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span>    <span class="kw">if</span><span class="op">(</span><span class="op">!</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="st">"doSNOW"</span><span class="op">)</span><span class="op">)</span> <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="st">"Package 'doSNOW' not found"</span><span class="op">)</span></span>
+<span>    <span class="va">cl</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">makeCluster</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/pkg/doSNOW/man/registerDoSNOW.html" class="external-link">registerDoSNOW</a></span><span class="op">(</span><span class="va">cl</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span></span>
+<span>  <span class="va">e</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">new.env</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>  <span class="va">e</span><span class="op">$</span><span class="va">conf</span>      <span class="op">=</span> <span class="va">conf</span></span>
+<span>  <span class="va">e</span><span class="op">$</span><span class="va">is_a_test</span> <span class="op">=</span> <span class="va">is_a_test</span></span>
+<span>  <span class="va">e</span><span class="op">$</span><span class="va">osmose</span>    <span class="op">=</span> <span class="va">osmose</span></span>
+<span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/parallel/clusterApply.html" class="external-link">clusterExport</a></span><span class="op">(</span><span class="va">cl</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"conf"</span>, <span class="st">"is_a_test"</span>, <span class="st">"osmose"</span><span class="op">)</span>, envir <span class="op">=</span> <span class="va">e</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/parallel/clusterApply.html" class="external-link">clusterEvalQ</a></span><span class="op">(</span><span class="va">cl</span>, <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://roliveros-ramos.github.io/calibrar/">"calibrar"</a></span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/parallel/clusterApply.html" class="external-link">clusterEvalQ</a></span><span class="op">(</span><span class="va">cl</span>, <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="http://www.osmose-model.org/" class="external-link">"osmose"</a></span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
+</div>
+<p>This block makes the calibration executable in parallel. The key point is that parallelism is configured outside the objective function itself. This is consistent with the general design of <code>calibrar</code>: the optimiser can use a registered parallel backend, while the model-specific wrapper remains an ordinary R function. The script distinguishes between two execution modes: a local or shared-memory parallel mode using <code>doParallel</code>, and an MPI-oriented mode using <code>doSNOW</code>. That distinction is OSMOSE-specific only in practical terms. The transferable principle is that the launch script should take responsibility for configuring the backend appropriate to the platform, rather than embedding platform assumptions inside the objective function. The exports to the cluster are also important. Worker processes need access to the extra objects required by the wrapper and objective function. The launch script therefore exports <code>conf</code>, <code>is_a_test</code>, and <code>osmose</code>, and ensures that the required packages are loaded on each worker. For another model, the exported objects would differ, but the logic would be the same: create the cluster, register it, export the objects needed by the wrapper, and make sure workers can evaluate the objective function independently.</p>
+<p>After all the preparation steps, the script finally delegates the optimisation itself to <code>calibrar</code>.</p>
+<div class="code-copy-outer-scaffold">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">opt</span> <span class="op">=</span> <span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span><span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span></span>
+<span>  par <span class="op">=</span> <span class="va">par_guess</span>,</span>
+<span>  fn <span class="op">=</span> <span class="va">objfn</span>,</span>
+<span>  method <span class="op">=</span> <span class="va">method</span>,</span>
+<span>  lower <span class="op">=</span> <span class="va">par_min</span>,</span>
+<span>  upper <span class="op">=</span> <span class="va">par_max</span>,</span>
+<span>  phases <span class="op">=</span> <span class="va">par_phase</span>,</span>
+<span>  replicates <span class="op">=</span> <span class="va">replicates</span>,</span>
+<span>  control <span class="op">=</span> <span class="va">control</span>,</span>
+<span>  parallel <span class="op">=</span> <span class="va">parallel</span></span>
+<span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
+</div>
+<p>This is the endpoint of the script and, conceptually, the point toward which every previous block was working. By the time <code><a href="../reference/calibrate.html">calibrate()</a></code> is called, the starting values, bounds, and phases have been reconstructed from the calibration files; the objective function has been created from the wrapper, settings, and observed data; the run directory and executable resources have been prepared; the parallel backend has been configured; and restart behaviour and other controls have been standardised. At this point, the OSMOSE calibration has become a standard <code>calibrar</code> optimisation problem. This is precisely the value of the prepared workflow: the complexity of the simulator is absorbed upstream, so that the optimiser still sees the familiar interface of <code>par</code>, <code>fn</code>, <code>lower</code>, <code>upper</code>, <code>phases</code>, <code>control</code>, and <code>parallel</code>. For non-OSMOSE readers, this is the main design lesson of the appendix. A complex model does not need a special optimiser API. What it needs is a careful layer of preparation that translates model-specific resources into the generic inputs expected by the optimiser.</p>
+<p>The script ends with minimal failure handling and cluster cleanup.</p>
+<div class="code-copy-outer-scaffold">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw">if</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">inherits</a></span><span class="op">(</span><span class="va">opt</span>, <span class="st">"try-error"</span><span class="op">)</span><span class="op">)</span> </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"Error while running the calibration."</span><span class="op">)</span></span>
+<span></span>
+<span><span class="kw">if</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Logic.html" class="external-link">isTRUE</a></span><span class="op">(</span><span class="va">parallel</span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">stopCluster</a></span><span class="op">(</span><span class="va">cl</span><span class="op">)</span></span></code></pre></div>
+<button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
+</div>
+<p>The use of <code><a href="https://rdrr.io/r/base/try.html" class="external-link">try()</a></code> here is intentionally simple. The script reports that the calibration failed, but leaves the detailed diagnosis to the files produced during setup, testing, and model execution. This is reasonable in a workflow where failures can originate from many places: invalid parameter combinations, simulator crashes, inconsistent files, or platform issues. The cleanup step is more important than it may look. When calibrations are launched repeatedly on shared systems, stale clusters or unclosed worker processes can quickly become a practical problem. Stopping the cluster explicitly keeps the workflow predictable and reduces interference with later jobs.</p>
+<p>Although <code>.calibration.R</code> is specific to OSMOSE, the overall implementation pattern is generic. A similar launch script for another file-based simulator would typically need the same conceptual blocks: parse execution arguments and scheduler context; read a control file and prepare a run directory; source a model-specific <code>run_model()</code> wrapper; reconstruct the settings table, observed data, starting values, bounds, and phases; build the objective function with <code><a href="../reference/calibration_objFn.html">calibration_objFn()</a></code>; configure the parallel backend and restart behaviour; and call <code><a href="../reference/calibrate.html">calibrate()</a></code>. What will change from one model to another is not the overall architecture, but the model-specific details: how parameters are written to disk, how the simulator is launched, how outputs are read and transformed, what additional objects must be exported to the workers, and how internal model parallelism interacts with optimiser-level parallelism. This is why the OSMOSE helper workflow is useful as an example beyond OSMOSE itself. It shows that the main difficulty of calibrating a complex model is usually not the optimisation call itself. The main difficulty is designing a reproducible, scheduler-aware bridge between a model-specific execution environment and the generic optimiser interface.</p>
+<p>Seen from that perspective, the purpose of <code>.calibration.R</code> is not to implement an optimisation method. That work is delegated to <code>calibrar</code>. Its purpose is to assemble a standard optimisation problem from the prepared OSMOSE calibration workspace. It reconstructs the calibration objects from disk, turns the OSMOSE wrapper into an objective function, configures execution control, restart behaviour, and parallel evaluation, and finally passes the result to <code><a href="../reference/calibrate.html">calibrate()</a></code>. That is the main implementation idea to retain, both for OSMOSE users and for modellers adapting the same pattern to other complex models.</p>
+</section><section class="level2" data-number="14"><h2 data-number="14" class="anchored" id="appendix-how-run_model-r-turns-osmose-parameters-into-calibration-outputs">
+<span class="header-section-number">14</span> Appendix: How <code>run_model.R</code> turns OSMOSE parameters into calibration outputs<a class="anchor" aria-label="anchor" href="#appendix-how-run_model-r-turns-osmose-parameters-into-calibration-outputs"></a>
+</h2>
+<p>The purpose of <code>run_model.R</code> is to implement the model-side bridge between <code>calibrar</code> and the OSMOSE core simulator. Each time the optimiser evaluates a candidate parameter set, the objective function calls <code>run_model()</code>. The wrapper then reconstructs the OSMOSE parameters implied by that calibration point, writes a runnable parameter file, launches the simulator, reads the resulting outputs back into R, and returns a named list of calibration variables. For OSMOSE users, this appendix provides a more detailed reference for what happens during one model evaluation. For users of other complex simulators, it also illustrates a generic implementation pattern for a black-box <code>run_model()</code> wrapper.</p>
+<p>The <code>run_model()</code> wrapper is defined as a regular R function. Its main argument, <code>par</code>, is the candidate calibration parameter set proposed by the optimiser. The argument <code>conf</code> provides the prepared OSMOSE calibration configuration, which contains the information needed to interpret and reconstruct model parameters. The argument <code>osmose</code> gives the path to the OSMOSE executable used to run the simulator. The argument <code>is_a_test</code> indicates whether the wrapper is being called in test mode rather than as part of a full calibration run. The argument <code>version</code> specifies the OSMOSE version to use when running and reading the model. The argument <code>options</code> passes Java runtime options to the OSMOSE executable. Finally, <code>...</code> allows additional arguments to be forwarded if needed. Taken together, these arguments define the information required for the wrapper to evaluate one candidate parameter combination and return the structured list of calibration outputs expected by <code>calibrar</code>.</p>
+<div class="code-copy-outer-scaffold">
+<div class="sourceCode" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>run_model <span class="ot">=</span> <span class="cf">function</span>(par, conf, osmose, <span class="at">is_a_test=</span><span class="cn">FALSE</span>, <span class="at">version=</span><span class="st">"4.3.3"</span>,</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>                     <span class="at">options=</span><span class="st">"-Xmx3g -Xms1g"</span>, ...) {</span></code></pre></div>
+<button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
+</div>
+<p>The first part of the function establishes the objects that will be needed during the evaluation. It records timing information, extracts basic dimensions from the calibration configuration, and pulls out the parameter subsets that will later be used to define random-effect-like penalty components.</p>
+<div class="code-copy-outer-scaffold">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span>  <span class="va">.t0</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.time</a></span><span class="op">(</span><span class="op">)</span> <span class="co"># timing</span></span>
+<span>  <span class="va">nspp</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/osmose/man/get_par.html" class="external-link">get_species</a></span><span class="op">(</span><span class="va">conf</span>, type<span class="op">=</span><span class="st">"focal"</span>, code<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
+<span>  <span class="va">nfsh</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/osmose/man/get_par.html" class="external-link">get_fisheries</a></span><span class="op">(</span><span class="va">conf</span>, code<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
+<span>  <span class="va">ndtperyear</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/osmose/man/get_par.html" class="external-link">get_par</a></span><span class="op">(</span><span class="va">conf</span>, <span class="st">'simulation.time.ndtperyear'</span><span class="op">)</span></span>
+<span>  <span class="va">nyear</span>      <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/osmose/man/get_par.html" class="external-link">get_par</a></span><span class="op">(</span><span class="va">conf</span>, <span class="st">'simulation.time.nyear'</span><span class="op">)</span></span>
+<span>  <span class="va">ndt</span> <span class="op">=</span> <span class="va">nyear</span><span class="op">*</span><span class="va">ndtperyear</span></span>
+<span></span>
+<span>  <span class="co"># get deviates to compute random effects</span></span>
+<span>  <span class="va">larval_deviates</span>  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/osmose/man/get_par.html" class="external-link">get_par</a></span><span class="op">(</span><span class="va">par</span>, <span class="st">'osmose.user.larval.deviate.log'</span><span class="op">)</span></span>
+<span>  <span class="va">fishing_deviates</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/osmose/man/get_par.html" class="external-link">get_par</a></span><span class="op">(</span><span class="va">par</span>, <span class="st">'fisheries.rate.byperiod.log'</span><span class="op">)</span></span></code></pre></div>
+<button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
+</div>
+<p>At this stage, the function is not yet interacting with the simulator. It is still working entirely on the calibration-side representation of the problem. This is an important conceptual point. The object <code>par</code> received by <code>run_model()</code> is not simply a ready-to-run OSMOSE configuration. It is a calibration parameter object that may contain transformed parameters, grouped parameters, helper parameters, or penalty-related components. The wrapper therefore begins by identifying the pieces that will later need to be translated into simulator inputs or returned as auxiliary outputs.</p>
+<p>The next block performs the most important parameter reconstruction step: it expands grouped calibration parameters back into model-level OSMOSE parameters, reconstructs the interannual larval mortality trajectories from calibrated deviates, and rebuilds fishery selectivity terms that are represented more compactly during estimation.</p>
+<div class="code-copy-outer-scaffold">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span>  <span class="co"># recover parameters modelled by groups</span></span>
+<span>  <span class="va">random</span> <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  <span class="va">nms</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/osmose/man/get_par.html" class="external-link">get_par</a></span><span class="op">(</span><span class="va">conf</span>, <span class="st">"calibration.*.bygroup$"</span>, unlist<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
+<span>  <span class="kw">if</span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">nms</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">nms</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">nms</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">nms</span><span class="op">)</span><span class="op">]</span></span>
+<span>    <span class="kw">if</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">nms</span><span class="op">)</span><span class="op">&gt;</span><span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span>      <span class="va">nms</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span><span class="va">nms</span>, pattern<span class="op">=</span><span class="st">"^calibration."</span>, replacement<span class="op">=</span><span class="st">""</span><span class="op">)</span></span>
+<span>      <span class="va">nms</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span><span class="va">nms</span>, pattern<span class="op">=</span><span class="st">".bygroup$"</span>, replacement<span class="op">=</span><span class="st">""</span><span class="op">)</span></span>
+<span>      <span class="kw">for</span><span class="op">(</span><span class="va">nm</span> <span class="kw">in</span> <span class="va">nms</span><span class="op">)</span> <span class="op">{</span></span>
+<span>        <span class="va">par</span> <span class="op">=</span> <span class="fu">osmose</span><span class="fu">:::</span><span class="fu">get_osmose_parameter</span><span class="op">(</span>par<span class="op">=</span><span class="va">par</span>, conf<span class="op">=</span><span class="va">conf</span>, nm<span class="op">=</span><span class="va">nm</span><span class="op">)</span></span>
+<span>        <span class="va">irandom</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"random."</span>, <span class="va">nm</span><span class="op">)</span></span>
+<span>        <span class="va">random</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">random</span>, <span class="fu"><a href="https://rdrr.io/pkg/osmose/man/get_par.html" class="external-link">get_par</a></span><span class="op">(</span><span class="va">par</span>, <span class="va">irandom</span>, as.is<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
+<span>        <span class="va">par</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/osmose/man/get_par.html" class="external-link">get_par</a></span><span class="op">(</span><span class="va">par</span>, <span class="va">irandom</span>, invert <span class="op">=</span> <span class="cn">TRUE</span>, as.is<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
+<span>      <span class="op">}</span></span>
+<span>    <span class="op">}</span></span>
+<span>  <span class="op">}</span></span>
+<span></span>
+<span>  <span class="co"># create interannual variability in larval mortality</span></span>
+<span>  <span class="kw">for</span><span class="op">(</span><span class="va">isp</span> <span class="kw">in</span> <span class="va">nspp</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">nn</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">'mortality.additional.larva.rate.seasonality.sp%s'</span>, <span class="va">isp</span><span class="op">)</span></span>
+<span>    <span class="va">ldev</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/osmose/man/get_par.html" class="external-link">get_par</a></span><span class="op">(</span><span class="va">larval_deviates</span>, sp<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">isp</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="kw">if</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">ldev</span><span class="op">)</span><span class="op">)</span> <span class="kw">next</span></span>
+<span>    <span class="va">par</span><span class="op">[[</span><span class="va">nn</span><span class="op">]</span><span class="op">]</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="fu">calibrar</span><span class="fu">::</span><span class="fu"><a href="../reference/spline_par.html">spline_par</a></span><span class="op">(</span><span class="va">ldev</span>, n<span class="op">=</span><span class="va">ndt</span><span class="op">)</span><span class="op">$</span><span class="va">x</span><span class="op">)</span>  </span>
+<span>  <span class="op">}</span></span>
+<span></span>
+<span>  <span class="co"># fishing selectivity</span></span>
+<span>  <span class="va">d75</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/osmose/man/get_par.html" class="external-link">get_par</a></span><span class="op">(</span><span class="va">par</span>, <span class="st">"selectivity.delta75.fsh"</span><span class="op">)</span> <span class="co"># all of them</span></span>
+<span>  <span class="va">l50</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/osmose/man/get_par.html" class="external-link">get_par</a></span><span class="op">(</span><span class="va">par</span>, <span class="st">"selectivity.l50.fsh"</span><span class="op">)</span> <span class="co"># all of them</span></span>
+<span>  <span class="va">L50</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/osmose/man/get_par.html" class="external-link">get_par</a></span><span class="op">(</span><span class="va">conf</span>, <span class="st">"selectivity.l50.fsh"</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="kw">for</span><span class="op">(</span><span class="va">ifsh</span> <span class="kw">in</span> <span class="va">nfsh</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">nn</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">'fisheries.selectivity.l75.fsh%s'</span>, <span class="va">ifsh</span><span class="op">)</span></span>
+<span>    <span class="va">this.d75</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/osmose/man/get_par.html" class="external-link">get_par</a></span><span class="op">(</span><span class="va">d75</span>, fsh<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">ifsh</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="kw">if</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">this.d75</span><span class="op">)</span><span class="op">)</span> <span class="kw">next</span></span>
+<span>    <span class="va">this.l50</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/osmose/man/get_par.html" class="external-link">get_par</a></span><span class="op">(</span><span class="va">l50</span>, fsh<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">ifsh</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="kw">if</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">this.l50</span><span class="op">)</span><span class="op">)</span> <span class="va">this.l50</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/osmose/man/get_par.html" class="external-link">get_par</a></span><span class="op">(</span><span class="va">L50</span>, fsh<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">ifsh</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="va">par</span><span class="op">[[</span><span class="va">nn</span><span class="op">]</span><span class="op">]</span> <span class="op">=</span> <span class="va">this.l50</span> <span class="op">+</span> <span class="va">this.d75</span>    </span>
+<span>  <span class="op">}</span></span></code></pre></div>
+<button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
+</div>
+<p>This is where the difference between the calibration parameter layer and the simulator parameter layer becomes explicit. Some parameters are estimated in grouped form because that representation is more stable or more meaningful for optimisation, but OSMOSE ultimately needs species-specific parameters. The helper <code>get_osmose_parameter()</code> performs that expansion and also extracts associated random-effect quantities. Likewise, the calibrated larval mortality deviates are not themselves the final time series required by OSMOSE. They are interpolated with <code><a href="../reference/spline_par.html">spline_par()</a></code> and exponentiated to rebuild the full interannual seasonal trajectory expected by the simulator. Fishery selectivity is treated in a similar way: a more convenient calibration representation is converted back into the final <code>l75</code> values required at runtime. For non-OSMOSE users, this block illustrates a very general lesson: a good <code>run_model()</code> wrapper often has to reconcile two parameterisations, one designed for estimation and one designed for simulation.</p>
+<p>The script then exposes an explicit user-editable block.</p>
+<div class="code-copy-outer-scaffold">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span>  <span class="co">### BEGIN USER ADDED</span></span>
+<span></span>
+<span>  <span class="co">### END USER ADDED</span></span></code></pre></div>
+<button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
+</div>
+<p>This block is intentionally empty in the default helper workflow, but it is conceptually important. It acknowledges that some applications will need one last model-specific transformation that cannot be anticipated by the generic helpers. This is the natural place to add extra parameter reconstruction, derived inputs, or one-off adjustments needed by a particular calibration. That design is useful beyond OSMOSE. In many complex-model workflows, a wrapper becomes much more maintainable if it provides one clear extension point rather than requiring users to rewrite the whole launcher.</p>
+<p>Once the parameter object has been fully reconstructed, the wrapper converts it into a runnable OSMOSE input file.</p>
+<div class="code-copy-outer-scaffold">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span>  <span class="co"># remove all osmose.user parameters and clean-up</span></span>
+<span>  <span class="va">par</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/osmose/man/get_par.html" class="external-link">get_par</a></span><span class="op">(</span><span class="va">par</span>, <span class="st">"osmose.user"</span>, invert <span class="op">=</span> <span class="cn">TRUE</span>, as.is<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
+<span>  <span class="va">par</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/osmose/man/get_par.html" class="external-link">get_par</a></span><span class="op">(</span><span class="va">par</span>, linear<span class="op">=</span><span class="cn">TRUE</span>, as.is <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="co"># write parameters in linear scale.</span></span>
+<span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/osmose/man/write_osmose.html" class="external-link">write_osmose</a></span><span class="op">(</span><span class="va">par</span>, file<span class="op">=</span><span class="st">'calibration_parameters.osm'</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">larval_deviates</span><span class="op">)</span>  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"M.larva"</span>, <span class="fu"><a href="https://rdrr.io/pkg/osmose/man/get_par.html" class="external-link">get_species</a></span><span class="op">(</span><span class="va">conf</span>, nm<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">larval_deviates</span><span class="op">)</span><span class="op">)</span>, sep<span class="op">=</span><span class="st">"."</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">fishing_deviates</span><span class="op">)</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"F.byperiod"</span>, <span class="fu"><a href="https://rdrr.io/pkg/osmose/man/get_par.html" class="external-link">get_fisheries</a></span><span class="op">(</span><span class="va">conf</span>, nm<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">fishing_deviates</span><span class="op">)</span><span class="op">)</span>, sep<span class="op">=</span><span class="st">"."</span><span class="op">)</span></span></code></pre></div>
+<button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
+</div>
+<p>This block is the boundary between the optimiser-facing and simulator-facing sides of the workflow. Helper-only parameters stored under <code>osmose.user</code> are removed because they are useful during reconstruction but should not appear in the final runtime file. The remaining parameters are then converted back to the linear scale expected by OSMOSE and written to <code>calibration_parameters.osm</code>. Conceptually, this is the point where one candidate calibration proposal becomes a concrete simulator input. At the same time, the names of the larval and fishing deviates are standardised so that they can later be returned as additional components of the calibration output.</p>
+<p>The next stage is the actual execution of OSMOSE and the extraction of the calibration variables.</p>
+<div class="code-copy-outer-scaffold">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span>  <span class="co"># run osmose!</span></span>
+<span>  <span class="va">t0</span> <span class="op">=</span> <span class="va">t1</span> <span class="op">=</span> <span class="fl">0</span> <span class="co"># init times</span></span>
+<span>  <span class="kw">if</span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/Logic.html" class="external-link">isTRUE</a></span><span class="op">(</span><span class="va">is_a_test</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">t0</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/osmose/man/run_osmose.html" class="external-link">run_osmose</a></span><span class="op">(</span>input<span class="op">=</span><span class="st">'osmose-calibration.osm'</span>, output<span class="op">=</span><span class="st">'output'</span>, osmose<span class="op">=</span><span class="va">osmose</span>, </span>
+<span>               version <span class="op">=</span> <span class="va">version</span>, options<span class="op">=</span><span class="va">options</span>, verbose<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span><span class="op">$</span><span class="va">elapsed</span></span>
+<span>  <span class="op">}</span></span>
+<span></span>
+<span>  <span class="va">output</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/osmose/man/read_osmose.html" class="external-link">read_osmose</a></span><span class="op">(</span>path<span class="op">=</span><span class="st">'output'</span>, version<span class="op">=</span><span class="va">version</span>, null.on.error<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
+<span>  <span class="va">cal_output</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/osmose/man/osmose_calibration_outputs.html" class="external-link">osmose_calibration_outputs</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span>
+<span>  <span class="va">tr</span> <span class="op">=</span> <span class="va">output</span><span class="op">$</span><span class="va">elapsed</span></span></code></pre></div>
+<button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
+</div>
+<p>At this point, the wrapper is no longer transforming parameters; it is running the model. The call to <code><a href="https://rdrr.io/pkg/osmose/man/run_osmose.html" class="external-link">run_osmose()</a></code> launches the OSMOSE core simulator with the prepared calibration configuration and the just-written parameter file. The outputs are then read back into R with <code><a href="https://rdrr.io/pkg/osmose/man/read_osmose.html" class="external-link">read_osmose()</a></code>. Importantly, the wrapper still does not return raw simulator outputs. Instead, it reduces them to the smaller list of calibration-relevant variables with <code><a href="https://rdrr.io/pkg/osmose/man/osmose_calibration_outputs.html" class="external-link">osmose_calibration_outputs()</a></code>. This is another key architectural point. The optimiser does not need the full state of the simulator. It needs only those outputs that will be confronted with observations or used as penalty terms. The wrapper therefore acts as both launcher and reducer: it executes the model and then translates the result into the named calibration-output object expected by the objective function.</p>
+<p>The script also includes a simple retry mechanism and a controlled failure path.</p>
+<div class="code-copy-outer-scaffold">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span>  <span class="kw">if</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">cal_output</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="co"># sometimes, you get a 'no-write' error. Restarting the calibration usually fix the problem.</span></span>
+<span>    <span class="co"># several things can be the issue. Most times, you won't see the error again. </span></span>
+<span>    <span class="co"># Those are caused by the ghosts in the machine (DATARMOR). To please them, we will run the </span></span>
+<span>    <span class="co"># model again, and see.</span></span>
+<span>    <span class="kw">if</span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/Logic.html" class="external-link">isTRUE</a></span><span class="op">(</span><span class="va">is_a_test</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>      <span class="va">t1</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/osmose/man/run_osmose.html" class="external-link">run_osmose</a></span><span class="op">(</span>input<span class="op">=</span><span class="st">'osmose-calibration.osm'</span>, output<span class="op">=</span><span class="st">'output'</span>, osmose<span class="op">=</span><span class="va">osmose</span>,</span>
+<span>                 version <span class="op">=</span> <span class="va">version</span>, options<span class="op">=</span><span class="va">options</span>, verbose<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span><span class="op">$</span><span class="va">elapsed</span></span>
+<span>    <span class="op">}</span></span>
+<span></span>
+<span>    <span class="va">output</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/osmose/man/read_osmose.html" class="external-link">read_osmose</a></span><span class="op">(</span>path<span class="op">=</span><span class="st">'output'</span>, version<span class="op">=</span><span class="va">version</span>, null.on.error<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
+<span>    <span class="va">cal_output</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/osmose/man/osmose_calibration_outputs.html" class="external-link">osmose_calibration_outputs</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span>
+<span>    <span class="va">tr</span> <span class="op">=</span> <span class="va">tr</span> <span class="op">+</span> <span class="va">output</span><span class="op">$</span><span class="va">elapsed</span></span>
+<span>  <span class="op">}</span></span>
+<span></span>
+<span>  <span class="co"># if is still NULL, we will let calibrar to deal with it.</span></span>
+<span>  <span class="kw">if</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">cal_output</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"Something wrong happened while running 'run_model'. Returning NULL. Check the '.calibrar_dump' folder."</span><span class="op">)</span></span>
+<span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/invisible.html" class="external-link">invisible</a></span><span class="op">(</span><span class="va">cal_output</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span></code></pre></div>
+<button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
+</div>
+<p>This is a pragmatic piece of robustness logic. Long-running file-based simulators can fail occasionally for transient reasons, especially on shared or HPC systems. The wrapper therefore retries the OSMOSE run once if no valid calibration outputs are obtained on the first attempt. Only if the second attempt also fails does it return <code>NULL</code> and let <code>calibrar</code> handle the failed evaluation. This is a useful design pattern for other complex models as well: a wrapper should be robust enough to tolerate occasional execution problems, but should still fail cleanly when an evaluation cannot be recovered.</p>
+<p>Finally, the wrapper builds the returned object, records timing information, and exits.</p>
+<div class="code-copy-outer-scaffold">
+<div class="sourceCode" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>  <span class="co"># create final output list, including random effects</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  cal_output <span class="ot">=</span> <span class="fu">c</span>(cal_output, random, <span class="at">random=</span>larval_deviates, <span class="at">random=</span>fishing_deviates)</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># save timing information.</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>  osmose<span class="sc">:::</span><span class="fu">.timing</span>(<span class="at">.t0=</span>.t0, <span class="at">t0=</span>t0, <span class="at">t1=</span>t1, <span class="at">tr=</span>tr, <span class="at">file=</span><span class="st">"../timing.log"</span>)</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">invisible</span>(cal_output))</span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a><span class="er">}</span></span></code></pre></div>
+<button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
+</div>
+<p>The returned object is not only a collection of direct simulator outputs. It also includes the random-effect-like quantities associated with grouped parameters, as well as the larval and fishing deviates. This matters because the objective function may use such terms as penalties or regularisation components alongside direct observational targets. The wrapper therefore returns the full calibration-output object expected by the optimisation workflow, not just the variables that happen to be written by OSMOSE. The timing call serves a different purpose: it records how long the evaluation took, which is useful when calibrations are long and performance needs to be monitored across many model runs.</p>
+<p>Seen as a whole, <code>run_model.R</code> is not simply a launcher for OSMOSE. It is a translation layer between three different representations of one model evaluation: the calibration parameter set proposed by the optimiser, the runnable parameter file required by the OSMOSE core simulator, and the named calibration outputs expected by the objective function. That is the main implementation idea to retain, both for OSMOSE users and for modellers adapting the same pattern to other complex models. The parameter names, file formats, and helper functions will differ from one simulator to another, but the architecture remains the same: reconstruct model parameters, write runnable inputs, execute the simulator, read outputs, reduce them to calibration variables, and return a named list.</p>
+</section><section class="level2" data-number="15"><h2 data-number="15" class="anchored" id="appendix-example-scheduler-launch-scripts-for-osmose-calibration">
+<span class="header-section-number">15</span> Appendix: Example scheduler launch scripts for OSMOSE calibration<a class="anchor" aria-label="anchor" href="#appendix-example-scheduler-launch-scripts-for-osmose-calibration"></a>
+</h2>
+<p>The following launch scripts are included here as brief implementation examples. They show how the prepared calibration workspace can be submitted to two popular HPC workload managers: <a href="https://www.openpbs.org/" class="external-link">OpenPBS</a> and <a href="https://slurm.schedmd.com/overview.html" class="external-link">Slurm</a>. Their role is not to introduce these schedulers in detail, but to illustrate how the same calibration launcher can be wrapped for different execution environments.</p>
+<p>In both cases, the underlying logic is the same: move to the submission directory, expose the user R library path, optionally load the required software stack, and then launch <code>.calibration.R</code> in OMP mode with an explicit core count and log redirection. The main similarity between the two scripts is therefore conceptual rather than syntactic: both are thin scheduler wrappers around the same calibration launcher. The main differences are due to the scheduler interface itself and their specific directives. Additionally, the Slurm version creates a temporary <code>PBS_NODEFILE</code> so that the calibration script can reuse the same node-detection logic as with PBS. Aside from those scheduler-specific details, the scripts are intentionally very similar.</p>
+<p><strong>Example 1. PBS launcher for an OMP calibration run.</strong><br>
+This script illustrates a PBS submission wrapper. The PBS directives define the requested resources, the script changes to the submission directory, sets the user library path, loads the software modules, and finally launches <code>.calibration.R</code> with the requested core count.</p>
+<div class="code-copy-outer-scaffold">
+<div class="sourceCode" id="cb30"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/bin/csh</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="co">#PBS -N osmose_calibration</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="co">#PBS -q omp</span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="co">#PBS -l select=1:ncpus=56:mem=256g</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a><span class="co">#PBS -l walltime=240:00:00</span></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> /usr/share/Modules/3.2.10/init/csh</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a><span class="co"># change to work directory</span></span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> <span class="va">$PBS_O_WORKDIR</span></span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a><span class="co"># export R_LIBS with the desired version of osmose and calibrar</span></span>
+<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a><span class="ex">setenv</span> R_LIBS /home1/datawork/<span class="va">$USER</span>/libs/R/lib</span>
+<span id="cb30-17"><a href="#cb30-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-18"><a href="#cb30-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Load modules (if available, choose versions working in parallel)</span></span>
+<span id="cb30-19"><a href="#cb30-19" aria-hidden="true" tabindex="-1"></a><span class="ex">module</span> load R/3.6.3-intel-cc-17.0.2.174</span>
+<span id="cb30-20"><a href="#cb30-20" aria-hidden="true" tabindex="-1"></a><span class="ex">module</span> load java/openjdk-16.0.2</span>
+<span id="cb30-21"><a href="#cb30-21" aria-hidden="true" tabindex="-1"></a><span class="ex">module</span> load nco</span>
+<span id="cb30-22"><a href="#cb30-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-23"><a href="#cb30-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Load conda environment (if available)</span></span>
+<span id="cb30-24"><a href="#cb30-24" aria-hidden="true" tabindex="-1"></a><span class="co">#conda activate r4</span></span>
+<span id="cb30-25"><a href="#cb30-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-26"><a href="#cb30-26" aria-hidden="true" tabindex="-1"></a><span class="co"># Run R script in parallel mode</span></span>
+<span id="cb30-27"><a href="#cb30-27" aria-hidden="true" tabindex="-1"></a><span class="bu">time</span> Rscript .calibration.R <span class="at">--ncores</span><span class="op">=</span>56 <span class="at">--omp</span> <span class="at">--nht</span> <span class="op">&gt;&gt;</span><span class="kw">&amp;</span> <span class="ex">mycalibration.log</span></span></code></pre></div>
+<button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
+</div>
+<p><strong>Example 2. Slurm launcher for an OMP calibration run.</strong><br>
+This script illustrates the same workflow under Slurm. Its structure closely mirrors the PBS version, but uses Slurm directives and creates a <code>PBS_NODEFILE</code> from <code>srun hostname</code> so that the calibration launcher can keep the same environment-detection logic.</p>
+<div class="code-copy-outer-scaffold">
+<div class="sourceCode" id="cb31"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/bin/bash</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH --job-name=osmose_calibration</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH --partition=standard</span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH -c 61 </span></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH --mem=64G</span></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a><span class="co"># change to work directory</span></span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> <span class="va">$SLURM_SUBMIT_DIR</span></span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">PBS_NODEFILE</span><span class="op">=</span><span class="va">$(</span><span class="fu">mktemp</span><span class="va">)</span>  <span class="co"># Create a temporary file for the node list</span></span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a><span class="ex">scontrol</span> show hostnames <span class="va">$SLURM_JOB_NODELIST</span> <span class="op">&gt;</span> <span class="st">"</span><span class="va">$PBS_NODEFILE</span><span class="st">"</span></span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a><span class="co"># export R_LIBS with the desired version of osmose and calibrar</span></span>
+<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">R_LIBS</span><span class="op">=</span>/home/<span class="va">$USER</span>/R/x86_64-pc-linux-gnu-library/4.4</span>
+<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Load modules (if available, choose versions working in parallel)</span></span>
+<span id="cb31-17"><a href="#cb31-17" aria-hidden="true" tabindex="-1"></a><span class="co">#module load R</span></span>
+<span id="cb31-18"><a href="#cb31-18" aria-hidden="true" tabindex="-1"></a><span class="co">#module load java</span></span>
+<span id="cb31-19"><a href="#cb31-19" aria-hidden="true" tabindex="-1"></a><span class="co">#module load nco</span></span>
+<span id="cb31-20"><a href="#cb31-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-21"><a href="#cb31-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Load conda environment (if available)</span></span>
+<span id="cb31-22"><a href="#cb31-22" aria-hidden="true" tabindex="-1"></a><span class="co">#conda activate r4</span></span>
+<span id="cb31-23"><a href="#cb31-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-24"><a href="#cb31-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Run R script in parallel mode</span></span>
+<span id="cb31-25"><a href="#cb31-25" aria-hidden="true" tabindex="-1"></a><span class="bu">time</span> Rscript .calibration.R <span class="at">--ncores</span><span class="op">=</span>61 <span class="at">--omp</span> <span class="at">--nht</span> <span class="op">&amp;&gt;&gt;</span> mycalibration.log</span></code></pre></div>
+<button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button>
+</div>
+<p>These examples are meant for illustration only. In practice, users will usually need to adapt queue or partition names, memory and wall-time requests, module names, library paths, and possibly the number of requested cores to match their own platform. The important point is that the scheduler script should remain a lightweight execution wrapper, while the calibration logic itself stays inside the prepared workspace and the <code>.calibration.R</code> launcher.</p>
+<div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-OliverosRamos2017Sequential" class="csl-entry" role="listitem">
+Oliveros-Ramos, Ricardo, Philippe Verley, Vincent Echevin, and Yunne-Jai Shin. 2017. <span>‘A Sequential Approach to Calibrate Ecosystem Models with Multiple Time Series Data’</span>. <em>Progress in Oceanography</em> 151: 227–44. <a href="https://doi.org/10.1016/j.pocean.2017.01.002" class="external-link">https://doi.org/10.1016/j.pocean.2017.01.002</a>.
+</div>
+</div>
+</section><script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button,
+          { trigger: "manual",
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'light-border',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config);
+    }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script></main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
 </div>
-
 
 
     <footer><div class="pkgdown-footer-left">
@@ -181,7 +1228,7 @@ Bootstrap style</li>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.9000.</p>
 </div>
 
     </footer>

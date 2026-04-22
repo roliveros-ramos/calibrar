@@ -1,4 +1,4 @@
-pandoc: 3.6.3
+pandoc: 3.8.3
 pkgdown: 2.2.0
 pkgdown_sha: ~
 articles:
@@ -12,7 +12,7 @@ articles:
   articles/v07-parameter_estimation: v07-parameter_estimation.html
   articles/v08-parameter_estimation_ODE: v08-parameter_estimation_ODE.html
   articles/v12-setting_up_an_osmose_calibration: v12-setting_up_an_osmose_calibration.html
-last_built: 2025-12-22T23:54Z
+last_built: 2026-04-21T22:14Z
 urls:
   reference: https://roliveros-ramos.github.io/calibrar/reference
   article: https://roliveros-ramos.github.io/calibrar/articles

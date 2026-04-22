@@ -1,9 +1,11 @@
 # Sequential parameter estimation for the calibration of complex models
 
-This function performs the optimization of a function, possibly in
-sequential phases of increasing complexity, and it is designed for the
-calibration of a model, by minimizing the error function `fn` associated
-to it.
+`calibrate()` minimises an objective function `fn` for the calibration
+of complex (possibly expensive and stochastic) models. It supports
+sequential calibration in multiple phases (progressively activating
+parameters), replicated evaluations for stochastic objectives,
+restartable runs, and parallel execution patterns for computationally
+intensive models.
 
 ## Usage
 
@@ -44,54 +46,55 @@ calibrate(
 
 - par:
 
-  A numeric vector or list. The length of the par argument defines the
-  number of parameters to be estimated (i.e. the dimension of the
-  problem).
+  A numeric vector or list. The length of `par` defines the number of
+  parameters to be estimated (i.e., the dimension of the problem).
 
 - fn:
 
-  The function to be minimized.
+  The objective function to be minimised. It should accept a parameter
+  vector (or list, depending on the wrapper) as first argument and
+  return either a scalar value (single-objective) or a numeric vector
+  (multi-objective).
 
 - gr:
 
-  A function computing the gradient of `fn`. If NULL, a numerical
-  approximation of the gradient is used. It can be also a character
-  specifying the method for the computation of the numerical gradient:
-  'central', 'forward' (the default), 'backward' or 'richardson'.
+  A function computing the gradient of `fn`. If `NULL`, a numerical
+  approximation is used. Alternatively, a character string can specify
+  the numerical gradient scheme: `"central"`, `"forward"` (default),
+  `"backward"`, or `"richardson"`.
 
 - ...:
 
-  Additional parameters to be passed to `fn`.
+  Additional arguments passed to `fn` and `gr`.
 
 - method:
 
-  The optimization method to be used. The default method is the AHR-ES
-  (Adaptative Hierarchical Recombination Evolutionary Strategy,
-  Oliveros-Ramos & Shin, 2016). See details for the methods available.
+  Optimisation method(s) to be used. Can be a single method name or a
+  vector of method names (e.g., one per phase). If `NULL`, a default is
+  chosen based on `replicates` (see Details).
 
 - lower:
 
-  Lower threshold value(s) for parameters. One value or a vector of the
-  same length as par. If one value is provided, it is used for all
-  parameters. `NA` means `-Inf`. By default `-Inf` is used
-  (unconstrained).
+  Lower bounds for parameters. One value or a vector of the same length
+  as `par`. `NA` is treated as `-Inf`. Default is unconstrained.
 
 - upper:
 
-  Upper threshold value(s) for parameters. One value or a vector of the
-  same length as par. If one value is provided, it is used for all
-  parameters. `NA` means `Inf`. By default `Inf` is used
-  (unconstrained).
+  Upper bounds for parameters. One value or a vector of the same length
+  as `par`. `NA` is treated as `Inf`. Default is unconstrained.
 
 - phases:
 
-  An optional vector of the same length as `par`, indicating the phase
-  at which each parameter becomes active. If omitted, default value is 1
-  for all parameters, performing a single optimization.
+  Optional integer vector of the same length as `par`, indicating the
+  phase at which each parameter becomes active. If omitted, all
+  parameters are active in a single phase.
 
 - control:
 
-  Parameter for the control of the algorithm itself, see details.
+  A list of control options. Common options include `ncores`, `run`,
+  `master`, `verbose`, `REPORT`, `restart.file`, `gradient`, and
+  `gr.method`. Additional solver-specific options may be passed through
+  to the underlying optimiser.
 
 - hessian:
 
@@ -100,21 +103,129 @@ calibrate(
 
 - replicates:
 
-  The number of replicates for the evaluation of `fn`. The default value
-  is 1. A value greater than 1 is only useful for stochastic functions.
+  Integer or integer vector controlling the number of replicate
+  evaluations of `fn` per phase. The default is `1` (deterministic
+  objective).
 
 - parallel:
 
-  Logical. Use parallel computation numerical of gradient?
+  Logical. Enable parallel computation (e.g., for replicated evaluations
+  and/or numerical gradients) using up to `control$ncores` cores.
+
+## Value
+
+An object of class `"calibrar.results"` with components:
+
+- par:
+
+  Best parameter values found (returned with the same structure as input
+  `par`).
+
+- value:
+
+  Objective value at `par`.
+
+- counts:
+
+  Number of calls to `fn` and `gr` (where applicable).
+
+- convergence:
+
+  Convergence code returned by the underlying optimiser.
+
+- message:
+
+  Additional information returned by the optimiser, if any.
+
+- method:
+
+  The optimisation method used in the final phase.
+
+- fn:
+
+  The objective function.
+
+- active:
+
+  Logical vector indicating which parameters were active (estimated).
+
+- elapsed:
+
+  Elapsed time for the full calibration run.
+
+- trace:
+
+  Tracing information and per-phase outputs (when available).
 
 ## Details
 
-In the control list, `aggFn` is a function to aggregate `fn` to a scalar
-value if the returned value is a vector. Some optimization algorithm can
-exploite the additional information provided by a vectorial output from
-`fn`.
+**Sequential phases.** When `phases` is provided, parameters are
+activated progressively across phases. In phase \\k\\, parameters with
+`phases <= k` are active and estimated, while all others are held fixed.
+If `phases` is omitted, all parameters are estimated in a single phase.
+
+**Replicated evaluations.** The argument `replicates` controls the
+number of replicate evaluations of `fn` per phase. It can be a single
+integer (applied to all phases) or a vector of length equal to the
+number of phases. Replication is useful for stochastic models to reduce
+Monte Carlo noise and/or to target robust parameter sets.
+
+**Default method selection.** If `method` is not provided, `calibrate()`
+defaults to `"Rvmmin"` when `all(replicates == 1)` (deterministic
+objective), and to `"AHR-ES"` otherwise (replicated/stochastic
+objective).
+
+**Multi-objective outputs.** The objective function `fn` may return a
+scalar (single-objective) or a numeric vector of objective components
+(multi-objective). Multi-objective optimisation is currently supported
+only by methods in `multiMethods` (e.g., `"AHR-ES"`). For
+single-objective methods, `fn` must be scalar; alternatively, objective
+components can be aggregated into a scalar by defining an aggregated
+objective in `calibration_objFn(aggregate = TRUE)`.
+
+**Aggregation.** When `fn` is created via
+[`calibration_objFn()`](https://roliveros-ramos.github.io/calibrar/reference/calibration_objFn.md),
+metadata such as the number of components (`nvar`) and component weights
+(`weights`) can be stored as attributes. If `aggregate = TRUE`, `fn` is
+scalar and can be used with any method. If `aggregate = FALSE` (vector
+output), only multi-objective methods can use it directly.
+
+**Parallel execution and run directories.** If `parallel = TRUE`,
+`calibrate()` may distribute replicate evaluations and/or
+finite-difference gradient computations across multiple cores. The
+number of cores is controlled by `control$ncores`. For file-based or
+externally executed models, `control$master` and `control$run` can be
+used to manage a master/template directory and per-run working
+directories (created if needed).
+
+**Restart.** Partial results can be written and used to resume a
+calibration via `control$restart.file`. Restart functionality is
+currently available only for `"AHR-ES"`, `"Rvmmin"`, and `"hjn"`.
+
+## Choosing an optimisation method
+
+For smooth deterministic objectives, gradient-based methods such as
+`"Rvmmin"`, `"L-BFGS-B"`, `"LBFGSB3"`, or `"nlminb"` are often efficient
+(with box constraints when needed). For noisy or stochastic objectives
+(typically when `replicates > 1`), heuristic/global methods such as
+`"AHR-ES"` are generally more appropriate. Not all methods are directly
+comparable (local vs.\\ global, deterministic vs.\\ stochastic, scalar
+vs.\\ vector-valued objectives); method choice should reflect the
+structure of `fn` and the presence of constraints.
+
+## Notes
+
+`"SANN"` is included for compatibility with
+[`stats::optim()`](https://rdrr.io/r/stats/optim.html), but it is highly
+sensitive to tuning and often performs poorly on continuous problems
+under default settings. For stochastic objectives, `"AHR-ES"` is the
+intended default within `calibrate()`.
 
 ## See also
+
+[`calibration_setup`](https://roliveros-ramos.github.io/calibrar/reference/calibration_setup.md),
+[`calibration_data`](https://roliveros-ramos.github.io/calibrar/reference/calibration_data.md),
+[`calibration_objFn`](https://roliveros-ramos.github.io/calibrar/reference/calibration_objFn.md)
 
 Other optimisers:
 [`ahres()`](https://roliveros-ramos.github.io/calibrar/reference/ahres.md),
@@ -130,19 +241,19 @@ Ricardo Oliveros-Ramos
 ``` r
 calibrate(par=rep(NA, 5), fn=sphereN)
 #> Using optimization method 'Rvmmin'.
-#> Elapsed time: 0.04s
-#> Function value: 0.0101459
-#> Parameter values: 3.93e-05 -2.87e-05 -8.6e-05 -1.04e-05 5.31e-05
+#> Elapsed time: 0.00s
+#> Function value: 0.0258772
+#> Parameter values: -1e-04 -1.24e-06 -4.34e-05 3.22e-05 4.01e-05
 #> 
 #> Status: Rvmminu appears to have converged
 #> Optimization using 'Rvmmin' algorithm.
-#> Function value: 0.01014588 
+#> Function value: 0.02587717 
 #> Status: Rvmminu appears to have converged 
 #> Parameters:
-#> [1]  3.927977e-05 -2.873164e-05 -8.598253e-05 -1.039704e-05  5.314853e-05
+#> [1] -9.996345e-05 -1.240568e-06 -4.341452e-05  3.218151e-05  4.013083e-05
 #> Computation:
 #> function gradient 
-#>     1057       24 
+#>       54        2 
 if (FALSE) { # \dontrun{
 calibrate(par=rep(NA, 5), fn=sphereN, replicates=3)
 calibrate(par=rep(0.5, 5), fn=sphereN, replicates=3, lower=-5, upper=5)

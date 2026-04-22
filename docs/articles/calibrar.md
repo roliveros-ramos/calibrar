@@ -57,6 +57,7 @@ uses the same calling convention as
 case of a flat numeric parameter vector:
 
 ``` r
+
 library(calibrar)
 
 f <- function(x) sum(x^2)
@@ -81,6 +82,7 @@ can work with structured (list-based) parameters, which can simplify
 objective functions for complex models:
 
 ``` r
+
 par0 <- list(curve = list(a = 1, b = 0.5), offset = 0)
 
 fn <- function(par) {
@@ -106,6 +108,7 @@ The main arguments of
 are:
 
 ``` r
+
 optim2(
   par,
   fn,
@@ -138,6 +141,7 @@ We can run the same previous example with two other methods not
 available to [`optim()`](https://rdrr.io/r/stats/optim.html):
 
 ``` r
+
 optim2(par=rep(1, 5), fn=function(x) sum(x^2), method="nlm")
 #> $par
 #> [1] -2.500222e-13 -2.500222e-13 -2.500222e-13 -2.500222e-13 -2.500222e-13
@@ -157,6 +161,7 @@ optim2(par=rep(1, 5), fn=function(x) sum(x^2), method="nlm")
 ```
 
 ``` r
+
 set.seed(880820) # for reproducibility
 optim2(par=rep(1, 5), fn=function(x) sum(x^2), method="AHR-ES")
 #> $par
@@ -185,6 +190,7 @@ constant value during the optimization process. In the next example, we
 will fix the third and fourth parameters to its initial values:
 
 ``` r
+
 optim2(par=rep(1, 5), fn=function(x) sum(x^2), 
        active=c(TRUE, TRUE, FALSE, FALSE, TRUE))
 #> $par
@@ -214,6 +220,7 @@ activates the parallel computation of the numerical gradient, when `gr`
 is not supplied:
 
 ``` r
+
 optim2(par=rep(1, 5), fn=function(x) sum(x^2), parallel=TRUE)
 #> $par
 #> [1] -1.931714e-04 -3.044063e-04 -1.744066e-04  1.940552e-05  5.641574e-05
@@ -240,6 +247,7 @@ Additionally, the method for the computation of the numerical gradient
 can be chosen within the `control` list:
 
 ``` r
+
 optim2(par=rep(0.5, 5), fn=function(x) sum(2*x^(3.1*x)), control=list(gr.method="richardson"))
 optim2(par=rep(0.5, 5), fn=function(x) sum(2*x^(3.1*x)), control=list(gr.method="central"))
 optim2(par=rep(0.5, 5), fn=function(x) sum(2*x^(3.1*x)), control=list(gr.method="forward"))
@@ -261,6 +269,7 @@ convenient user interface. All specific arguments of this methods can be
 passed to the original function using the `control` argument.
 
 ``` r
+
 optimh(
   par,
   fn,
@@ -278,6 +287,7 @@ optimh(
 ```
 
 ``` r
+
 # Covariance Matrix Adaptation Evolutionary Strategy
 set.seed(880820) # for reproducibility
 optimh(par=rep(1, 5), fn=function(x) sum(x^2), method="CMA-ES",
@@ -300,6 +310,7 @@ optimh(par=rep(1, 5), fn=function(x) sum(x^2), method="CMA-ES",
 ```
 
 ``` r
+
 # Generalized Simulated Anneling
 set.seed(880820) # for reproducibility
 optimh(par=rep(1, 5), fn=function(x) sum(x^2), method="genSA", 
@@ -323,6 +334,7 @@ optimh(par=rep(1, 5), fn=function(x) sum(x^2), method="genSA",
 ```
 
 ``` r
+
 # Self-Organising Migrating Algorithm
 set.seed(880820) # for reproducibility
 optimh(par=rep(1, 5), fn=function(x) sum(x^2), method="soma",
@@ -364,6 +376,7 @@ the user previous to executed the optimization, as described in the
 following example:
 
 ``` r
+
 library(parallel)
 ncores = detectCores() - 1 # number of cores to be used
 cl = makeCluster(ncores)
@@ -384,6 +397,7 @@ meaning parameters can be un-masked (set active) progressively during
 sequential phases of the calibration process.
 
 ``` r
+
 calibrate(
   par,
   fn,
@@ -409,6 +423,7 @@ and
 performing a simple optimization:
 
 ``` r
+
 calibrate(par=c(1,2,3,NA,NA), fn=function(x) sum(x^2))
 #> Using optimization method 'Rvmmin'.
 #> Elapsed time: 0.00s
@@ -431,6 +446,7 @@ take `NA` as starting values for the optimization, to some or all of the
 parameters:
 
 ``` r
+
 calibrate(par=c(1,2,3,NA,5), fn=function(x) sum(x^2),
           lower=rep(-100, 5), upper=rep(100, 5))
 #> Using optimization method 'Rvmmin'.
@@ -456,6 +472,7 @@ parameter. The starting value of the optimization for each phase is
 updated with the best parameters found in the previous phase:
 
 ``` r
+
 calibrate(par=c(1,2,3,NA,5), fn=function(x) sum(x^2),
           lower=rep(-100, 5), upper=rep(100, 5),
           phases=c(1,2,3,2,1))
@@ -494,6 +511,7 @@ When a phase is set to a negative number, the parameter is fixed at its
 initial value during all the calibration and it is never optimized:
 
 ``` r
+
 calibrate(par=c(1,2,3,NA,5), fn=function(x) sum(x^2),
           lower=rep(-100, 5), upper=rep(100, 5),
           phases=c(1,2,-1,2,1))
@@ -540,6 +558,7 @@ for details). We will set the maximum number of iterations to 1000 to
 speed up the execution of the vignette.
 
 ``` r
+
 calibrate(par=c(1,2,3,NA,5), fn=sphereN,
           lower=rep(-100, 5), upper=rep(100, 5),
           phases=c(1,2,3,2,1), replicates=3, control=list(maxit=1000))
@@ -547,19 +566,19 @@ calibrate(par=c(1,2,3,NA,5), fn=sphereN,
 #> 
 #> - Phase 1: 2 out of 5 parameters are currently active.
 #>  Using optimization method 'AHR-ES'.
-#>  Phase 1 finished (0.87s)
+#>  Phase 1 finished (1.27s)
 #>  Function value: 12.9126
 #>  Parameter values: -0.324 0.12
 #> 
 #> - Phase 2: 4 out of 5 parameters are currently active.
 #>  Using optimization method 'AHR-ES'.
-#>  Phase 2 finished (0.94s)
+#>  Phase 2 finished (1.25s)
 #>  Function value: 10.1169
 #>  Parameter values: 0.0695 0.112 0.151 -0.0849
 #> 
 #> - Phase 3: 5 out of 5 parameters are currently active.
 #>  Using optimization method 'AHR-ES'.
-#>  Phase 3 finished (0.95s)
+#>  Phase 3 finished (1.37s)
 #>  Function value: 0.0534613
 #>  Parameter values: -0.00843 0.0767 0.0606 0.0265 0.0048
 #> 
@@ -578,6 +597,7 @@ The number of replicates can be one single value or a vector with the
 length equal to the number of phases:
 
 ``` r
+
 calibrate(par=c(1,2,3,NA,5), fn=sphereN,
           lower=rep(-100, 5), upper=rep(100, 5),
           phases=c(1,2,3,2,1), replicates=c(1,1,5), control=list(maxit=1000))
@@ -585,19 +605,19 @@ calibrate(par=c(1,2,3,NA,5), fn=sphereN,
 #> 
 #> - Phase 1: 2 out of 5 parameters are currently active.
 #>  Using optimization method 'AHR-ES'.
-#>  Phase 1 finished (0.70s)
+#>  Phase 1 finished (1.19s)
 #>  Function value: 13.3163
 #>  Parameter values: -0.346 -0.101
 #> 
 #> - Phase 2: 4 out of 5 parameters are currently active.
 #>  Using optimization method 'AHR-ES'.
-#>  Phase 2 finished (0.74s)
+#>  Phase 2 finished (1.28s)
 #>  Function value: 9.8584
 #>  Parameter values: 0.217 -0.335 0.24 0.101
 #> 
 #> - Phase 3: 5 out of 5 parameters are currently active.
 #>  Using optimization method 'AHR-ES'.
-#>  Phase 3 finished (1.15s)
+#>  Phase 3 finished (1.65s)
 #>  Function value: 0.0412229
 #>  Parameter values: 0.0282 0.00574 -0.0127 -0.0375 -0.0192
 #> 
@@ -615,6 +635,7 @@ calibrate(par=c(1,2,3,NA,5), fn=sphereN,
 ### Parameters as lists
 
 ``` r
+
 calibrate(par=list(par1=c(1,2,3), par2=NA, par3=5), fn=sphereN,
           lower=rep(-100, 5), upper=rep(100, 5),
           phases=c(1,2,-3,2,1), replicates=c(1,5), control=list(maxit=1000))
@@ -622,13 +643,13 @@ calibrate(par=list(par1=c(1,2,3), par2=NA, par3=5), fn=sphereN,
 #> 
 #> - Phase 1: 2 out of 5 parameters are currently active.
 #>  Using optimization method 'AHR-ES'.
-#>  Phase 1 finished (0.97s)
+#>  Phase 1 finished (1.32s)
 #>  Function value: 13.1182
 #>  Parameter values: 0.0558 0.181
 #> 
 #> - Phase 2: 4 out of 5 parameters are currently active.
 #>  Using optimization method 'AHR-ES'.
-#>  Phase 2 finished (2.28s)
+#>  Phase 2 finished (3.22s)
 #>  Function value: 8.96767
 #>  Parameter values: -0.0167 0.164 -0.14 0.0335
 #> 
@@ -659,6 +680,7 @@ setup is NOT automatic, and must be done by the user previous to
 executed the optimization, as described in the following example:
 
 ``` r
+
 library(parallel)
 ncores = detectCores() - 1 # number of cores to be used
 cl = makeCluster(ncores)

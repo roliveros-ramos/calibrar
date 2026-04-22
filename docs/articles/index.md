@@ -31,6 +31,5 @@ including deterministic and ODE-based models.
 
 Examples tailored to specific modelling platforms.
 
-- [Setting up an OSMOSE model calibration on high-performance computing
-  (HPC) systems using the calibrar
-  package](https://roliveros-ramos.github.io/calibrar/articles/v12-setting_up_an_osmose_calibration.md):
+- [Preparing and running OSMOSE calibrations with
+  calibrar](https://roliveros-ramos.github.io/calibrar/articles/v12-setting_up_an_osmose_calibration.md):

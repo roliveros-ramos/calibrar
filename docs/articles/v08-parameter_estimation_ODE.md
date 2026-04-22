@@ -30,6 +30,7 @@ function with `T=100` as an additional argument to specify the time
 horizon.
 
 ``` r
+
 library(calibrar)
 set.seed(880820)
 path = NULL # NULL to use the current directory
@@ -41,6 +42,7 @@ LV = calibrar_demo(path=path, model='PredatorPrey', T=100)
     ## Loaded observed data for variables: 'prey', 'predator'.
 
 ``` r
+
 setup = calibration_setup(file = LV$setup)
 observed = calibration_data(setup=setup, path=LV$path)
 ```
@@ -50,6 +52,7 @@ observed = calibration_data(setup=setup, path=LV$path)
     ## Loaded observed data for variables: 'prey', 'predator'.
 
 ``` r
+
 run_model = calibrar:::.PredatorPreyModel
 coef(LV)
 ```
@@ -80,6 +83,7 @@ The `run_model` will simulate the data, by solving the ODE system
 defined by the Lotka-Volterra model:
 
 ``` r
+
 run_model = function(par, T) {
   if(!requireNamespace("deSolve", quietly = TRUE)) 
     stop("You need to install the 'deSolve' package.")
@@ -127,6 +131,7 @@ data is expected to be read from the files in the `file` column, files
 that were created when calling the demo.
 
 ``` r
+
 # objective functions
 obj = calibration_objFn(model=run_model, setup=setup, observed=observed, T=LV$T, aggregate=TRUE)
 ```
@@ -134,48 +139,52 @@ obj = calibration_objFn(model=run_model, setup=setup, observed=observed, T=LV$T,
 Now we can fit the model using several optimization methods:
 
 ``` r
+
 lbfgsb1 = calibrate(par=LV$guess, fn=obj, method='L-BFGS-B', lower=LV$lower, upper=LV$upper, phases=LV$phase)
 ```
 
     ## Using optimization method 'L-BFGS-B'.
 
-    ## Elapsed time: 2.63s
+    ## Elapsed time: 3.34s
     ## Function value: 5.60587e-07
     ## Parameter values: 0.5 0.2 100 0.1 0.1
     ## 
     ## Status: CONVERGENCE: REL_REDUCTION_OF_F <= FACTR*EPSMCH
 
 ``` r
+
 lbfgsb2 = calibrate(par=LV$guess, fn=obj, method="Rvmmin", lower=LV$lower, upper=LV$upper, phases=LV$phase)
 ```
 
     ## Using optimization method 'Rvmmin'.
 
-    ## Elapsed time: 2.86s
+    ## Elapsed time: 3.79s
     ## Function value: 5.60575e-07
     ## Parameter values: 0.5 0.2 100 0.1 0.1
     ## 
     ## Status: Rvmminb appears to have converged
 
 ``` r
+
 ahr = calibrate(par=LV$guess, fn=obj, method='AHR-ES', lower=LV$lower, upper=LV$upper, phases=LV$phase)
 ```
 
     ## Using optimization method 'AHR-ES'.
 
-    ## Elapsed time: 2m 42.5s
+    ## Elapsed time: 3m 57.7s
     ## Function value: 5.60575e-07
     ## Parameter values: 0.5 0.2 100 0.1 0.1
     ## 
     ## Status: Stopping criteria reached in 4909 generations.
 
 ``` r
+
 nm = calibrate(par=LV$guess, fn=obj, method="Nelder-Mead", phases=LV$phase)
 ```
 
     ## Using optimization method 'Nelder-Mead'.
 
-    ## Elapsed time: 40.22s
+    ## Elapsed time: 58.98s
     ## Function value: 1.41517
     ## Parameter values: 0.45 0.275 66.2 0.0788 0.183
     ## 
@@ -184,15 +193,16 @@ nm = calibrate(par=LV$guess, fn=obj, method="Nelder-Mead", phases=LV$phase)
 And compare them:
 
 ``` r
+
 summary(LV, lbfgsb1, lbfgsb2, ahr, nm, show_par = 1:5)
 ```
 
     ##              method elapsed    value    fn gr    r     l     K  alpha gamma
     ## LV             data      NA 4.96e-07    NA NA 0.50 0.200 100.0 0.1000 0.100
-    ## lbfgsb1    L-BFGS-B    2.63 5.61e-07    74 74 0.50 0.200 100.0 0.1000 0.100
-    ## lbfgsb2      Rvmmin    2.87 5.61e-07   132 83 0.50 0.200 100.0 0.1000 0.100
-    ## ahr          AHR-ES  162.49 5.61e-07 39272  0 0.50 0.200 100.0 0.1000 0.100
-    ## nm      Nelder-Mead   40.23 1.42e+00   502 NA 0.45 0.275  66.2 0.0788 0.183
+    ## lbfgsb1    L-BFGS-B    3.34 5.61e-07    74 74 0.50 0.200 100.0 0.1000 0.100
+    ## lbfgsb2      Rvmmin    3.79 5.61e-07   132 83 0.50 0.200 100.0 0.1000 0.100
+    ## ahr          AHR-ES  237.66 5.61e-07 39272  0 0.50 0.200 100.0 0.1000 0.100
+    ## nm      Nelder-Mead   58.98 1.42e+00   502 NA 0.45 0.275  66.2 0.0788 0.183
 
 When a function is created with the
 [`calibration_objFn()`](https://roliveros-ramos.github.io/calibrar/reference/calibration_objFn.md)
@@ -201,6 +211,7 @@ that can be used to simulate the model with the estimated set of
 parameters.
 
 ``` r
+
 lbfgsb1.pred = predict(lbfgsb1)
 lbfgsb2.pred = predict(lbfgsb2)
 ahr.pred     = predict(ahr)
@@ -210,6 +221,7 @@ nm.pred      = predict(nm)
 and plot the results.
 
 ``` r
+
 methods = c("data", "L-BFGS-B", "AHR-ES", "Nelder-Mead")
 par(mfrow=c(1,2), mar=c(4,4,1,1),
     oma=c(1,1,1,1))
@@ -258,6 +270,7 @@ function with `T=100` as an additional argument to specify the time
 horizon.
 
 ``` r
+
 path = NULL # NULL to use the current directory
 SIR = calibrar_demo(path=path, model='SIR', T=100) 
 ```
@@ -267,6 +280,7 @@ SIR = calibrar_demo(path=path, model='SIR', T=100)
     ## Loaded observed data for variables: 'susceptible', 'infected', 'recovered'.
 
 ``` r
+
 setup = calibration_setup(file = SIR$setup)
 observed = calibration_data(setup=setup, path=SIR$path)
 ```
@@ -276,6 +290,7 @@ observed = calibration_data(setup=setup, path=SIR$path)
     ## Loaded observed data for variables: 'susceptible', 'infected', 'recovered'.
 
 ``` r
+
 run_model = calibrar:::.SIRModel
 ```
 
@@ -284,6 +299,7 @@ of parameters `par`, that solves the EDO system and return a list with
 the simulated variables (S, I, R):
 
 ``` r
+
 run_model = function(par, T) {
   if(!requireNamespace("deSolve", quietly = TRUE))
     stop("You need to install the 'deSolve' package.")
@@ -322,6 +338,7 @@ created with the demo:
 | recovered | lnorm2 | TRUE | 1 | TRUE | data/recovered.csv | recovered | 2 | NA |
 
 ``` r
+
 obj = calibration_objFn(model=run_model, setup=setup, observed=observed, T=SIR$T, aggregate=TRUE)
 ```
 
@@ -329,60 +346,65 @@ Now, we can try several optimization algorithms to estimate the
 parameters of the model:
 
 ``` r
+
 lbfgsb3 = calibrate(par=SIR$guess, fn=obj, method='LBFGSB3', lower=SIR$lower, upper=SIR$upper, phases=SIR$phase)
 ```
 
     ## Using optimization method 'LBFGSB3'.
 
-    ## Elapsed time: 1.25s
+    ## Elapsed time: 1.67s
     ## Function value: 7.57138e-13
     ## Parameter values: 0.4 0.2
     ## 
     ## Status: CONVERGENCE: Parameters differences below xtol
 
 ``` r
+
 lbfgsb2 = calibrate(par=SIR$guess, fn=obj, method='Rvmmin', lower=SIR$lower, upper=SIR$upper, phases=SIR$phase)
 ```
 
     ## Using optimization method 'Rvmmin'.
 
-    ## Elapsed time: 0.30s
+    ## Elapsed time: 0.53s
     ## Function value: 7.56969e-13
     ## Parameter values: 0.4 0.2
     ## 
     ## Status: Rvmminb appears to have converged
 
 ``` r
+
 ahr = calibrate(par=SIR$guess, fn=obj, method='AHR-ES', lower=SIR$lower, upper=SIR$upper, phases=SIR$phase)
 ```
 
     ## Using optimization method 'AHR-ES'.
 
-    ## Elapsed time: 23.67s
+    ## Elapsed time: 39.64s
     ## Function value: 9.62938e-22
     ## Parameter values: 0.4 0.2
     ## 
     ## Status: Stopping criteria reached in 1031 generations.
 
 ``` r
+
 cg = calibrate(par=SIR$guess, fn=obj, method='Rcgmin', phases=SIR$phase)
 ```
 
     ## Using optimization method 'Rcgmin'.
 
-    ## Elapsed time: 2m 0.0s
+    ## Elapsed time: 2m 58.9s
     ## Function value: 1.42228e-14
     ## Parameter values: 0.4 0.2
     ## 
     ## Status: Rcgmin seems to have converged
 
 ``` r
+
 nm = calibrate(par=SIR$guess, fn=obj, method='Nelder-Mead', phases=SIR$phase)
 ```
 
     ## Using optimization method 'Nelder-Mead'.
 
-    ## Elapsed time: 0.25s
+    ## Elapsed time: 0.38s
     ## Function value: 2.5122e-05
     ## Parameter values: 0.4 0.2
     ## 
@@ -391,16 +413,17 @@ nm = calibrate(par=SIR$guess, fn=obj, method='Nelder-Mead', phases=SIR$phase)
 and compare them:
 
 ``` r
+
 summary(SIR, lbfgsb2, lbfgsb3, ahr, cg, nm, show_par = 1:2)
 ```
 
     ##              method elapsed    value   fn gr beta gamma
     ## SIR            data      NA 4.45e-28   NA NA  0.4   0.2
-    ## lbfgsb2      Rvmmin   0.300 7.57e-13   24 16  0.4   0.2
-    ## lbfgsb3     LBFGSB3   1.252 7.57e-13   24 24  0.4   0.2
-    ## ahr          AHR-ES  23.667 9.63e-22 6186  0  0.4   0.2
-    ## cg           Rcgmin 120.006 1.42e-14   69 26  0.4   0.2
-    ## nm      Nelder-Mead   0.255 2.51e-05   73 NA  0.4   0.2
+    ## lbfgsb2      Rvmmin   0.534 7.57e-13   24 16  0.4   0.2
+    ## lbfgsb3     LBFGSB3   1.666 7.57e-13   24 24  0.4   0.2
+    ## ahr          AHR-ES  39.643 9.63e-22 6186  0  0.4   0.2
+    ## cg           Rcgmin 178.868 1.42e-14   69 26  0.4   0.2
+    ## nm      Nelder-Mead   0.381 2.51e-05   73 NA  0.4   0.2
 
 In this example, the algorithms ‘Rvmmin’, ‘AHR-ES’, ‘Rcgmin’ and
 ‘Nelder-Mead’ are able to estimate the original parameters, but the

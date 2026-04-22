@@ -31,6 +31,7 @@ See <https://roliveros-ramos.github.io/calibrar/> for more details.
 ### Installation
 
 ``` r
+
 # The easiest way to get calibrar is to install it from CRAN:
 install.packages("calibrar")
 
@@ -48,6 +49,7 @@ For a quick introduction, check the worked the examples available from
 the package:
 
 ``` r
+
 library(calibrar)
 vignette("calibrar")
 ```

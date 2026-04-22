@@ -6,8 +6,8 @@ Functions for general purpose optimization, with support for parallel
 computation of derivatives.
 
 - [`optim2()`](https://roliveros-ramos.github.io/calibrar/reference/optim2.md)
-  : General-purpose optimization with parallel numerical gradient
-  computation
+  : Unified optimisation interface with structured parameters and
+  parallel numerical gradients
 - [`optimh()`](https://roliveros-ramos.github.io/calibrar/reference/optimh.md)
   : General-purpose optimization using heuristic algorithms
 - [`calibrate()`](https://roliveros-ramos.github.io/calibrar/reference/calibrate.md)
@@ -40,7 +40,7 @@ R function running the model.
 
 - [`objFn()`](https://roliveros-ramos.github.io/calibrar/reference/objFn.md)
   [`fitness()`](https://roliveros-ramos.github.io/calibrar/reference/objFn.md)
-  : Calcuted error measure between observed and simulated data
+  : Objective function between observed and simulated data
 
 - [`calibrar_demo()`](https://roliveros-ramos.github.io/calibrar/reference/calibrar_demo.md)
   : Demos for the calibrar package
