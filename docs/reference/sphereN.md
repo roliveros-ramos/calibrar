@@ -1,7 +1,9 @@
-# Sphere function with random noise
+# Noisy sphere test function
 
-This function calculates the Euclidian distance from a point to the
-origin after a random displacement of its position.
+Evaluate a stochastic variant of the sphere test function often used in
+optimisation examples. The deterministic sphere function is the sum of
+the squared coordinates; here, Gaussian noise is added to each
+coordinate before the squared distance is computed.
 
 ## Usage
 
@@ -13,30 +15,40 @@ sphereN(x, sd = 0.1, aggregate = TRUE)
 
 - x:
 
-  The coordinates of the point
+  Numeric vector of coordinates.
 
 - sd:
 
-  The standard deviation of the noise to be added to the position of
-  `x`, a normal distribution with mean zero is used.
+  Standard deviation of the Gaussian noise added independently to each
+  coordinate.
 
 - aggregate:
 
-  If `aggregate` is `TRUE` the distance is returned, otherwise the size
-  of the projection of the distance among each axis.
+  Logical. If `TRUE`, return the summed squared distance. If `FALSE`,
+  return the contribution of each coordinate separately.
 
 ## Value
 
-The distance from the point `x` to the origin after a random
-displacement.
+A numeric scalar if `aggregate = TRUE`, or a numeric vector of squared
+contributions if `aggregate = FALSE`.
 
-## Author
+## Details
 
-Ricardo Oliveros–Ramos
+This function is mainly useful for examples, testing, and illustrating
+how `calibrar` behaves with stochastic objective functions.
+
+## See also
+
+[`calibrate()`](https://roliveros-ramos.github.io/calibrar/reference/calibrate.md),
+[`optim2()`](https://roliveros-ramos.github.io/calibrar/reference/optim2.md),
+[`ahres()`](https://roliveros-ramos.github.io/calibrar/reference/ahres.md)
 
 ## Examples
 
 ``` r
-sphereN(rep(0, 10))
-#> [1] 0.03885167
+set.seed(1)
+sphereN(rep(0, 5))
+#> [1] 0.03777941
+sphereN(rep(0, 5), aggregate = FALSE)
+#> [1] 0.0067316837 0.0023758708 0.0054512337 0.0033152416 0.0009326207
 ```

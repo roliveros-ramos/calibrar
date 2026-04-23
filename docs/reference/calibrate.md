@@ -241,19 +241,19 @@ Ricardo Oliveros-Ramos
 ``` r
 calibrate(par=rep(NA, 5), fn=sphereN)
 #> Using optimization method 'Rvmmin'.
-#> Elapsed time: 0.00s
-#> Function value: 0.0258772
-#> Parameter values: -1e-04 -1.24e-06 -4.34e-05 3.22e-05 4.01e-05
+#> Elapsed time: 0.03s
+#> Function value: 0.00788443
+#> Parameter values: -2.07e-05 4.13e-05 -3.51e-05 1.2e-05 -0.000113
 #> 
 #> Status: Rvmminu appears to have converged
 #> Optimization using 'Rvmmin' algorithm.
-#> Function value: 0.02587717 
+#> Function value: 0.007884428 
 #> Status: Rvmminu appears to have converged 
 #> Parameters:
-#> [1] -9.996345e-05 -1.240568e-06 -4.341452e-05  3.218151e-05  4.013083e-05
+#> [1] -2.073386e-05  4.131103e-05 -3.509991e-05  1.201032e-05 -1.129210e-04
 #> Computation:
 #> function gradient 
-#>       54        2 
+#>      510       15 
 if (FALSE) { # \dontrun{
 calibrate(par=rep(NA, 5), fn=sphereN, replicates=3)
 calibrate(par=rep(0.5, 5), fn=sphereN, replicates=3, lower=-5, upper=5)

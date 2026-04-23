@@ -1,157 +1,149 @@
-# Demos for the calibrar package
+# Create small demonstration calibration projects
 
-Creates demo files able to be processed for a full calibration using the
-calibrar package
+Create self-contained example projects that can be used to learn the
+`calibrar` workflow, test installation, or prototype calibration code.
+Each demo writes a small set of files to disk and returns the
+information needed to read the setup table, load the observed data,
+define the model interface, and run a calibration.
 
 ## Usage
 
 ``` r
 calibrar_demo(path = NULL, model = NULL, ...)
+
+# S3 method for class 'calibrar.demo'
+print(x, ...)
 ```
 
 ## Arguments
 
 - path:
 
-  Path to create the demo files
+  Directory where the demo project should be created. If `NULL`, the
+  current working directory is used.
 
 - model:
 
-  Model to be used in the demo files, see details.
+  Name of the demo model to generate. Supported values currently include
+  `"PoissonMixedModel"`, `"PredatorPrey"`, `"SIR"`, and
+  `"IBMLotkaVolterra"`.
 
 - ...:
 
-  Additional parameters to be used in the construction of the demo
-  files.
+  Further arguments passed to
+  [`print()`](https://rdrr.io/r/base/print.html).
+
+- x:
+
+  A `calibrar.demo` object returned by `calibrar_demo()`.
 
 ## Value
 
-A list with the following elements:
-
-- path:
-
-  Path were the files were saved
-
-- par:
-
-  Real value of the parameters used in the demo
-
-- setup:
-
-  Path to the calibration setup file
-
-- guess:
-
-  Values to be provided as initial guess to the calibrate function
-
-- lower:
-
-  Values to be provided as lower bounds to the calibrate function
-
-- upper:
-
-  Values to be provided as upper bounds to the calibrate function
-
-- phase:
-
-  Values to be provided as phases to the calibrate function
-
-- constants:
-
-  Constants used in the demo, any other variable not listed here.
-
-- value:
-
-  NA, set for compatibility with summary methods.
-
-- time:
-
-  NA, set for compatibility with summary methods.
-
-- counts:
-
-  NA, set for compatibility with summary methods.
+An object of class `calibrar.demo`, which also inherits from
+[`calibrar.results()`](https://roliveros-ramos.github.io/calibrar/reference/calibrar.results.md).
+The returned list contains the demo project path, the true parameter
+values used to generate the synthetic data, the path to the calibration
+setup file, suggested starting values and bounds, phase information,
+model-specific constants, and a precomputed objective value at the true
+parameter set.
 
 ## Details
 
-Current implemented models are:
+The generated project is meant to be a compact, runnable example of the
+`calibrar` workflow rather than a realistic scientific application. The
+returned object typically contains enough information to proceed through
+the standard helper functions:
 
-- PoissonMixedModel:
+- [`calibration_setup()`](https://roliveros-ramos.github.io/calibrar/reference/calibration_setup.md)
+  to read the setup table,
 
-  Poisson Autoregressive Mixed model for the dynamics of a population in
-  different sites: \$\$log(\mu\_{i, t+1}) = log(\mu\_{i, t}) + \alpha +
-  \beta X\_{i, t} + \gamma_t\$\$ where \\\mu\_{i, t}\\ is the size of
-  the population in site \\i\\ at year \\t\\, \\X\_{i, t}\\ is the value
-  of an environmental variable in site \\i\\ at year \\t\\. The
-  parameters to estimate were \\\alpha\\, \\\beta\\, and \\\gamma_t\\,
-  the random effects for each year, \\\gamma_t \sim N(0,\sigma^2)\\, and
-  the initial population at each site \\\mu\_{i, 0}\\. We assumed that
-  the observations \\N\_{i,t}\\ follow a Poisson distribution with mean
-  \\\mu\_{i, t}\\.
+- [`calibration_data()`](https://roliveros-ramos.github.io/calibrar/reference/calibration_data.md)
+  to load the observed data,
 
-- PredatorPrey:
+- [`calibration_objFn()`](https://roliveros-ramos.github.io/calibrar/reference/calibration_objFn.md)
+  to build the objective function, and
 
-  Lotka Volterra Predator-Prey model. The model is defined by a system
-  of ordinary differential equations for the abundance of prey \$N\$ and
-  predator \$P\$: \$\$\frac{dN}{dt} = rN(1-N/K)-\alpha NP\$\$
-  \$\$\frac{dP}{dt} = -lP + \gamma\alpha NP\$\$ The parameters to
-  estimate are the prey’s growth rate \\r\\, the predator’s mortality
-  rate \\l\\, the carrying capacity of the prey \\K\\ and \\\alpha\\ and
-  \\\gamma\\ for the predation interaction. Uses `deSolve` package for
-  numerical solution of the ODE system.
+- [`calibrate()`](https://roliveros-ramos.github.io/calibrar/reference/calibrate.md)
+  or
+  [`optim2()`](https://roliveros-ramos.github.io/calibrar/reference/optim2.md)
+  to run the optimisation.
 
-- SIR:
+The exact files created depend on `model`, but they usually include a
+calibration settings table, one or more observation files, and any
+required forcing or master data files.
 
-  Susceptible-Infected-Recovered epidemiological model. The model is
-  defined by a system of ordinary differential equations for the number
-  of susceptible \$S\$, infected \$I\$ and recovered \$R\$ individuals:
-  \$\$\frac{dS}{dt} = -\beta S I/N\$\$ \$\$\frac{dI}{dt} = \beta S I/N
-  -\gamma I\$\$ \$\$\frac{dR}{dt} = \gamma I\$\$ The parameters to
-  estimate are the average number of contacts per person per time
-  \\\beta\\ and the instant probability of an infectious individual
-  recovering \\\gamma\\. Uses `deSolve` package for numerical solution
-  of the ODE system.
+The currently available demos are:
 
-- IBMLotkaVolterra:
+- `"PoissonMixedModel"`:
 
-  Stochastic Individual Based Model for Lotka-Volterra model. Uses `ibm`
-  package for the simulation.
+  A Poisson autoregressive mixed model for the dynamics of a population
+  observed at several sites over time.
 
-## References
+- `"PredatorPrey"`:
 
-Oliveros-Ramos and Shin (2014)
+  A deterministic Lotka–Volterra predator–prey system solved
+  numerically.
 
-## Author
+- `"SIR"`:
 
-Ricardo Oliveros–Ramos
+  A simple susceptible–infected–recovered epidemic model solved
+  numerically.
+
+- `"IBMLotkaVolterra"`:
+
+  A stochastic individual-based predator–prey example.
+
+## See also
+
+[`calibration_setup()`](https://roliveros-ramos.github.io/calibrar/reference/calibration_setup.md),
+[`calibration_data()`](https://roliveros-ramos.github.io/calibrar/reference/calibration_data.md),
+[`calibration_objFn()`](https://roliveros-ramos.github.io/calibrar/reference/calibration_objFn.md),
+[`calibrate()`](https://roliveros-ramos.github.io/calibrar/reference/calibrate.md),
+[`summary.calibrar.results()`](https://roliveros-ramos.github.io/calibrar/reference/calibrar.results.md),
+[`print.calibrar.results()`](https://roliveros-ramos.github.io/calibrar/reference/calibrar.results.md)
 
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
+tmp = tempdir()
+demo = calibrar_demo(path = tmp, model = "PoissonMixedModel", T = 8, L = 3)
+#> Creating observed data list for calibration...
+#> Loaded observed data for variables: 'site_1', 'site_2', 'site_3'.
+print(demo)
+#> Calibration demo using model 'PoissonMixedModel'.
+#> Target value: -6988.968 
+#> Parameters:
+#>        alpha         beta       gamma1       gamma2       gamma3       gamma4 
+#>  0.400000000 -0.400000000 -0.011421355  0.100721594  0.217153872 -0.138190768 
+#>       gamma5       gamma6       gamma7           sd      mu_ini1      mu_ini2 
+#> -0.256919871  0.009345234 -0.047141311  0.200000000  4.330733340  4.624972813 
+#>      mu_ini3 
+#>  4.204692619 
+#> Lower bounds:
+#>   alpha    beta  gamma1  gamma2  gamma3  gamma4  gamma5  gamma6  gamma7      sd 
+#>     0.0    -0.5    -1.0    -1.0    -1.0    -1.0    -1.0    -1.0    -1.0     0.0 
+#> mu_ini1 mu_ini2 mu_ini3 
+#>     3.7     3.7     3.7 
+#> Upper bounds:
+#>   alpha    beta  gamma1  gamma2  gamma3  gamma4  gamma5  gamma6  gamma7      sd 
+#>     1.0     0.5     1.0     1.0     1.0     1.0     1.0     1.0     1.0     1.0 
+#> mu_ini1 mu_ini2 mu_ini3 
+#>     5.0     5.0     5.0 
+#> Phases:
+#>   alpha    beta  gamma1  gamma2  gamma3  gamma4  gamma5  gamma6  gamma7      sd 
+#>       1       1       1       1       1       1       1       1       1      NA 
+#> mu_ini1 mu_ini2 mu_ini3 
+#>      NA      NA      NA 
+#> Guess (starting point):
+#>   alpha    beta  gamma1  gamma2  gamma3  gamma4  gamma5  gamma6  gamma7      sd 
+#>   0.200   0.100   0.000   0.000   0.000   0.000   0.000   0.000   0.000   0.200 
+#> mu_ini1 mu_ini2 mu_ini3 
+#>   4.431   4.554   4.357 
+#> 
+#> Files location: C:\Users\ricar\AppData\Local\Temp\RtmpMT8afP/PoissonDemo
 
-summary(ahr)
-set.seed(880820)
-path = NULL # NULL to use the current directory
-# create the demonstration files
-demo = calibrar_demo(path=path, model="PredatorPrey", T=100) 
-# get calibration information
-calibration_settings = calibration_setup(file = demo$setup)
-# get observed data
-observed = calibration_data(setup = calibration_settings, path=demo$path)
-# Defining 'run_model' function
-run_model = calibrar:::.PredatorPreyModel
-# real parameters
-cat("Real parameters used to simulate data\n")
-print(unlist(demo$par)) # parameters are in a list
-# objective functions
-obj  = calibration_objFn(model=run_model, setup=calibration_settings, observed=observed, T=demo$T)
-obj2 = calibration_objFn(model=run_model, setup=calibration_settings, observed=observed, 
-T=demo$T, aggregate=TRUE)
-cat("Starting calibration...\n")
-cat("Running optimization algorithms\n", "\t")
-cat("Running optim AHR-ES\n")
-ahr = calibrate(par=demo$guess, fn=obj, lower=demo$lower, upper=demo$upper, phases=demo$phase)
-summary(ahr)
-} # } 
+setup = calibration_setup(demo$setup)
+observed = calibration_data(setup, path = demo$path)
+#> Creating observed data list for calibration...
+#> Loaded observed data for variables: 'site_1', 'site_2', 'site_3'.
 ```

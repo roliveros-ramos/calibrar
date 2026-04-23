@@ -1,8 +1,10 @@
-# Adaptative Hierarchical Recombination Evolutionary Strategy (AHR-ES) for derivative-free and black-box optimization
+# Adaptive Hierarchical Recombination Evolutionary Strategy
 
-This function performs the optimization of a function using the
-Adaptative Hierarchical Recombination Evolutionary Strategy (AHR-ES,
-Oliveros & Shin, 2015).
+`ahres()` runs the AHR-ES optimiser directly through a dedicated
+interface. It is primarily intended for bounded, derivative-free
+optimisation of expensive or black-box objective functions, including
+calibration problems in which the objective may be noisy or obtained
+from an external model.
 
 ## Usage
 
@@ -37,10 +39,7 @@ ahres(
 
 - gr:
 
-  A function computing the gradient of `fn`. If `NULL`, a numerical
-  approximation is used. Alternatively, a character string can specify
-  the numerical gradient scheme: `"central"`, `"forward"` (default),
-  `"backward"`, or `"richardson"`.
+  Function computing the gradient of `fn`. Ignored by `ahres()`.
 
 - ...:
 
@@ -81,40 +80,87 @@ ahres(
 
 ## Value
 
-A list with components:
+An object of class `"ahres.results"`, typically with components:
 
 - par:
 
-  The best set of parameters found.
+  Best parameter values found, returned on the original scale.
 
 - value:
 
-  The value of `fn` corresponding to `par`.
+  Objective value at `par`, returned on the original objective scale.
 
 - counts:
 
-  A two-element integer vector giving the number of calls to `fn` and
-  `gr` respectively. This excludes those calls needed to compute the
-  Hessian, if requested, and any calls to `fn` to compute a
-  finite-difference approximation to the gradient.
+  Number of function and gradient evaluations.
 
 - convergence:
 
-  An integer code. `0` indicates successful completion.
+  Convergence code (`0` usually indicates a regular stop, `1` that the
+  maximum number of generations/evaluations was reached).
 
 - message:
 
-  A character string giving any additional information returned by the
-  optimizer, or `NULL`.
+  A short message describing the stopping condition.
 
-- hessian:
+- generations:
 
-  Only if argument `hessian` is `TRUE`. A symmetric matrix giving an
-  estimate of the Hessian at the solution found. Note that this is the
-  Hessian of the unconstrained problem even if the box constraints are
-  active.
+  Number of generations performed.
+
+- partial:
+
+  Optional vector of objective components when the objective function
+  returns more than one value.
+
+- trace:
+
+  Optional tracing information when tracing is enabled.
+
+- active:
+
+  Information about active parameters used during optimisation.
+
+## Details
+
+`ahres()` accepts the same broad interface as the other optimisation
+entry points in **calibrar**, but is specialised to the `"AHR-ES"`
+algorithm. Parameters may be supplied as a vector or list. Internally,
+list-structured parameters are flattened for optimisation and then
+restored before the result is returned.
+
+The function supports box constraints through `lower` and `upper`, and
+parameter masking through `active`, so only selected parameters are
+evolved while the others are held fixed at their supplied starting
+values.
+
+If `control$parscale` and/or `control$fnscale` are supplied,
+optimisation is performed on the corresponding scaled parameter space
+and objective scale, and results are transformed back before being
+returned.
+
+`gr` is accepted only for interface compatibility and is ignored by this
+method. In the current implementation, `control$maxit` or
+`control$maxgen` must be supplied; otherwise the optimisation stops with
+an error.
+
+For scalar objectives, the default settings are usually sufficient. For
+vector-valued objectives, advanced users may also need to provide
+suitable `control` entries such as `weights`, `nvar`, and `aggFn`,
+depending on how the objective has been constructed.
+
+## Parallel execution
+
+AHR-ES parallelism is controlled through entries inside `control`,
+notably `control$parallel` and `control$ncores`. The top-level
+`parallel` argument is currently retained for interface consistency but
+is not used directly inside `ahres()`.
 
 ## See also
+
+[`optimh()`](https://roliveros-ramos.github.io/calibrar/reference/optimh.md),
+[`optim2()`](https://roliveros-ramos.github.io/calibrar/reference/optim2.md),
+[`calibrate()`](https://roliveros-ramos.github.io/calibrar/reference/calibrate.md),
+[`summary.ahres.results()`](https://roliveros-ramos.github.io/calibrar/reference/ahres.results.md)
 
 Other optimisers:
 [`calibrate()`](https://roliveros-ramos.github.io/calibrar/reference/calibrate.md),
@@ -128,5 +174,13 @@ Ricardo Oliveros-Ramos
 ## Examples
 
 ``` r
-if (FALSE) ahres(par=rep(1, 5), fn=sphereN) # \dontrun{}
+if (FALSE) { # \dontrun{
+ahres(
+  par = rep(0.5, 5),
+  fn = sphereN,
+  lower = -5,
+  upper = 5,
+  control = list(maxit = 200)
+)
+} # }
 ```

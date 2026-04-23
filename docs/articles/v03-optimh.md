@@ -26,7 +26,6 @@ TODO
 ## Reproducibility
 
 ``` r
-
 sessionInfo()
 #> R version 4.5.3 (2026-03-11 ucrt)
 #> Platform: x86_64-w64-mingw32/x64
@@ -59,9 +58,9 @@ sessionInfo()
 #> [19] numDeriv_2016.8-1.1 yaml_2.3.12         foreach_1.5.2      
 #> [22] lifecycle_1.0.5     stringr_1.6.0       compiler_4.5.3     
 #> [25] codetools_0.2-20    fs_2.0.1            Rcpp_1.1.1         
-#> [28] htmlwidgets_1.6.4   systemfonts_1.3.2   digest_0.6.39      
-#> [31] nloptr_2.2.1        optimx_2025-4.9     R6_2.6.1           
-#> [34] magrittr_2.0.4      bslib_0.10.0        tools_4.5.3        
-#> [37] iterators_1.0.14    pkgdown_2.2.0       cachem_1.1.0       
-#> [40] desc_1.4.3
+#> [28] htmlwidgets_1.6.4   rstudioapi_0.18.0   systemfonts_1.3.2  
+#> [31] digest_0.6.39       nloptr_2.2.1        optimx_2025-4.9    
+#> [34] R6_2.6.1            magrittr_2.0.4      bslib_0.10.0       
+#> [37] tools_4.5.3         iterators_1.0.14    pkgdown_2.2.0.9000 
+#> [40] cachem_1.1.0        desc_1.4.3
 ```

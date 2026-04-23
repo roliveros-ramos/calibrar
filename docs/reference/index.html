@@ -77,7 +77,7 @@
           <code><a href="optimh.html">optimh()</a></code>
 
         </dt>
-        <dd>General-purpose optimization using heuristic algorithms</dd>
+        <dd>General-purpose optimisation with heuristic and derivative-free methods</dd>
 
         <dt>
 
@@ -91,14 +91,14 @@
           <code><a href="ahres.html">ahres()</a></code>
 
         </dt>
-        <dd>Adaptative Hierarchical Recombination Evolutionary Strategy (AHR-ES) for derivative-free and black-box optimization</dd>
+        <dd>Adaptive Hierarchical Recombination Evolutionary Strategy</dd>
 
         <dt>
 
           <code><a href="gradient.html">gradient()</a></code>
 
         </dt>
-        <dd>Numerical computation of the gradient, with parallel capabilities</dd>
+        <dd>Numerical gradient approximation</dd>
 
         <dt>
 
@@ -121,21 +121,21 @@
           <code><a href="calibration_data.html">calibration_data()</a></code>
 
         </dt>
-        <dd>Get observed data for the calibration of a model</dd>
+        <dd>Read observed data defined in a calibration setup table</dd>
 
         <dt>
 
           <code><a href="calibration_objFn.html">calibration_objFn()</a></code>
 
         </dt>
-        <dd>Create an objective function to be used with optimization routines</dd>
+        <dd>Create a calibration objective function from a model, setup table, and data</dd>
 
         <dt>
 
           <code><a href="calibration_setup.html">calibration_setup()</a></code>
 
         </dt>
-        <dd>Get information to run a calibration using the <code>calibrar</code> package.</dd>
+        <dd>Read and validate a calibration setup table</dd>
 
         <dt>
 
@@ -146,10 +146,10 @@
 
         <dt>
 
-          <code><a href="calibrar_demo.html">calibrar_demo()</a></code>
+          <code><a href="calibrar_demo.html">calibrar_demo()</a></code> <code><a href="calibrar_demo.html">print(<i>&lt;calibrar.demo&gt;</i>)</a></code>
 
         </dt>
-        <dd>Demos for the calibrar package</dd>
+        <dd>Create small demonstration calibration projects</dd>
       </dl></div><div class="section level2">
       <h2 id="parameter-modelling">Parameter modelling<a class="anchor" aria-label="anchor" href="#parameter-modelling"></a></h2>
 
@@ -165,14 +165,14 @@
           <code><a href="gaussian_kernel.html">gaussian_kernel()</a></code>
 
         </dt>
-        <dd>Calculate a discretization of the 2D Gaussian Kernel</dd>
+        <dd>Discretise a bivariate Gaussian kernel on a grid</dd>
 
         <dt>
 
-          <code><a href="spline_par.html">spline_par()</a></code>
+          <code><a href="spline_par.html">spline_par()</a></code> <code><a href="spline_par.html">plot(<i>&lt;spline.par&gt;</i>)</a></code>
 
         </dt>
-        <dd>Predict time-varying parameters using splines.</dd>
+        <dd>Interpolate time-varying parameters with a spline</dd>
       </dl></div><div class="section level2">
       <h2 id="test-optimization-functions">Test optimization functions<a class="anchor" aria-label="anchor" href="#test-optimization-functions"></a></h2>
 
@@ -188,7 +188,7 @@
           <code><a href="sphereN.html">sphereN()</a></code>
 
         </dt>
-        <dd>Sphere function with random noise</dd>
+        <dd>Noisy sphere test function</dd>
       </dl></div><div class="section level2">
       <h2 id="auxiliar-functions">Auxiliar functions<a class="anchor" aria-label="anchor" href="#auxiliar-functions"></a></h2>
 
@@ -204,14 +204,14 @@
           <code><a href="dot-get_command_argument.html">.get_command_argument()</a></code>
 
         </dt>
-        <dd>Get an specific argument from the command line</dd>
+        <dd>Extract a named command-line argument</dd>
 
         <dt>
 
           <code><a href="dot-read_configuration.html">.read_configuration()</a></code>
 
         </dt>
-        <dd>Read a configuration file.</dd>
+        <dd>Read a simple key-value configuration file</dd>
       </dl></div><div class="section level2">
       <h2 id="defunct-functions">Defunct functions<a class="anchor" aria-label="anchor" href="#defunct-functions"></a></h2>
 
@@ -228,6 +228,29 @@
 
         </dt>
         <dd>Defunct functions in package <span class="pkg">calibrar</span>.</dd>
+      </dl></div><div class="section level2">
+      <h2 id="result-objects">Result objects<a class="anchor" aria-label="anchor" href="#result-objects"></a></h2>
+
+
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="calibrar.results.html">print(<i>&lt;calibrar.results&gt;</i>)</a></code> <code><a href="calibrar.results.html">coef(<i>&lt;calibrar.results&gt;</i>)</a></code> <code><a href="calibrar.results.html">predict(<i>&lt;calibrar.results&gt;</i>)</a></code> <code><a href="calibrar.results.html">plot(<i>&lt;calibrar.results&gt;</i>)</a></code> <code><a href="calibrar.results.html">summary(<i>&lt;calibrar.results&gt;</i>)</a></code> <code><a href="calibrar.results.html">print(<i>&lt;summary.calibrar.results&gt;</i>)</a></code> <code><a href="calibrar.results.html">dim(<i>&lt;calibrar.results&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Calibration result objects</dd>
+
+        <dt>
+
+          <code><a href="ahres.results.html">print(<i>&lt;ahres.results&gt;</i>)</a></code> <code><a href="ahres.results.html">coef(<i>&lt;ahres.results&gt;</i>)</a></code> <code><a href="ahres.results.html">plot(<i>&lt;ahres.results&gt;</i>)</a></code> <code><a href="ahres.results.html">summary(<i>&lt;ahres.results&gt;</i>)</a></code> <code><a href="ahres.results.html">print(<i>&lt;summary.ahres.results&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Evolutionary-strategy result objects</dd>
       </dl></div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>

@@ -19,7 +19,6 @@ function with a simple and fast model. Let’s start by creating some
 parameters for the linear model.
 
 ``` r
-
 library(calibrar)
 N = 7 # number of variables in the linear model
 T = 100 # number of observations
@@ -43,7 +42,6 @@ real
 Now, let’s create a function so simulate the linear model.
 
 ``` r
-
 # function to simulate the linear model
 linear = function(x, par) {
   stopifnot(length(x)==length(par$slope))
@@ -55,7 +53,6 @@ linear = function(x, par) {
 And, finally, the simulated data for the exercise:
 
 ``` r
-
 # simulated data 
 y = apply(x, 1, linear, par=real)
 ```
@@ -64,7 +61,6 @@ Of course, the solution can be found using the
 [`lm()`](https://rdrr.io/r/stats/lm.html) function:
 
 ``` r
-
 mod = lm(y ~ x)
 mod
 #> 
@@ -82,7 +78,6 @@ Now, in order to proceed to find the solution by an explicit numerical
 optimization, we need to define the objective function to be minimized:
 
 ``` r
-
 # objective function (residual squares sum)
 obj = function(par, x, y) {
   y_sim = apply(x, 1, linear, par=par)
@@ -94,7 +89,6 @@ obj = function(par, x, y) {
 So now we can proceed with the optimization:
 
 ``` r
-
 # initial guess for optimization
 start = list(intercept=0, slope=rep(0, N))
 bfgs = calibrate(par=start, fn=obj, x=x, y=y)
@@ -118,7 +112,6 @@ Now, let’s specify `lower` and `upper` bounds for the algorithms that
 require them:
 
 ``` r
-
 lower = relist(rep(-10, N+1), skeleton=start)
 upper = relist(rep(+10, N+1), skeleton=start)
 ```
@@ -126,7 +119,6 @@ upper = relist(rep(+10, N+1), skeleton=start)
 And repeat the exercise with several optimization algorithms:
 
 ``` r
-
 set.seed(880820) # for reproducibility
 cg = calibrate(par=start, fn=obj, x=x, y=y, method='CG')
 #> Using optimization method 'CG'.
@@ -161,7 +153,6 @@ hjn = calibrate(par=start, fn=obj, x=x, y=y, method='hjn', lower=lower, upper=up
 And compare the results:
 
 ``` r
-
 summary(ahres, hjn, nm, bfgs, cg, par.only=TRUE)
 #>       method intercept slope1 slope2 slope3 slope4 slope5 slope6 slope7
 #> ahres AHR-ES      3.14      1      2      3      4      5      6      7
@@ -192,7 +183,6 @@ We will define some values for all the parameters so we can perform an
 optimization an try to recover them from the simulated data:
 
 ``` r
-
 set.seed(880820)
 T = 50
 real = list(r=0.5, K=1000, B0=600)
@@ -204,7 +194,6 @@ will be needed. The requirement for this function is to have as first
 argument the parameter vector (or list) `par`:
 
 ``` r
-
 run_model = function(par, T, catch) {
   B = numeric(T+1)
   times = seq(0, T)
@@ -225,12 +214,10 @@ And now we can use the `run_model()` function and the assumed parameters
 to simulate the model:
 
 ``` r
-
 observed = run_model(par=real, T=T, catch=catch)
 ```
 
 ``` r
-
 par(mfrow=c(2,1), mar=c(3,3,1,1), oma=c(1,1,1,1))
 plot(observed$biomass, type="l", lwd=2, ylab="biomass", xlab="", las=1, ylim=c(0, 1.2*max(observed$biomass)))
 mtext("BIOMASS", 3, adj=0.01, line = 0, font=2)
@@ -245,7 +232,6 @@ In order to carry out the optimization, we need the objective function
 to be defined, in this case, using a simple residual squares sum:
 
 ``` r
-
 objfn = function(par, T, catch, observed) {
   simulated = run_model(par=par, T=T, catch=catch)
   value = sum((observed$biomass-simulated$biomass)^2, na.rm=TRUE)
@@ -256,7 +242,6 @@ objfn = function(par, T, catch, observed) {
 Finally, we need to define a starting point for the search,
 
 ``` r
-
 start = list(r=0.1, K=1.5*max(observed$biomass), B0=observed$biomass[1])
 ```
 
@@ -264,7 +249,6 @@ and we are ready to try to estimate the parameters using several
 algorithms:
 
 ``` r
-
 set.seed(880820) # for reproducibility
 opt0 = calibrate(par=start, fn = objfn, method='LBFGSB3', T=T, catch=catch, observed=observed)
 #> Using optimization method 'LBFGSB3'.
@@ -321,7 +305,6 @@ The function [`summary()`](https://rdrr.io/r/base/summary.html) can be
 used to compare all the optimization results:
 
 ``` r
-
 summary(opt0, opt1, opt2, opt3, opt4, opt5, opt6)
 #>           method elapsed    value    fn  gr     r    K  B0
 #> opt0     LBFGSB3  0.1107 1.51e+05    18  18 0.402 1181 600
@@ -337,7 +320,6 @@ For a better comparison, we can simulate the results for all the
 parameters found:
 
 ``` r
-
 sim0 = run_model(par=coef(opt0), T=T, catch=catch)
 sim1 = run_model(par=coef(opt1), T=T, catch=catch)
 sim2 = run_model(par=coef(opt2), T=T, catch=catch)
@@ -350,7 +332,6 @@ And plot some of the best results obtained (L-BFGS-B 3.0, CG and
 AHR-ES):
 
 ``` r
-
 par(mar=c(3,4,1,1))
 plot(observed$biomass, type="n", ylab="BIOMASS", xlab="", las=1, ylim=c(0, 1.2*max(observed$biomass)))
 lines(sim0$biomass, col=1, lwd=2)
@@ -373,10 +354,9 @@ default. This can be modified here (and for several other methods) by
 changing the `maxit` control argument:
 
 ``` r
-
 optx = calibrate(par=start, fn = objfn, method='LBFGSB3', T=T, catch=catch, observed=observed, control=list(maxit=20000))
 #> Using optimization method 'LBFGSB3'.
-#> Elapsed time: 0.01s
+#> Elapsed time: 0.03s
 #> Function value: 150998
 #> Parameter values: 0.402 1.18e+03 600
 #> 
@@ -398,7 +378,6 @@ parameters (the initial biomass) and trying a two phases parameter
 estimation:
 
 ``` r
-
 calibrate(par=start, fn = objfn, method='Rvmmin', T=T, catch=catch, observed=observed, phases = c(1,1,2))
 #> Parameter estimation in two phases.
 #> 
@@ -450,7 +429,6 @@ with the additional arguments `L=5` (five sites) and `T=100` (one
 hundred years):
 
 ``` r
-
 path = NULL # NULL to use the current directory
 ARPM = calibrar_demo(path=path, model="PoissonMixedModel", L=5, T=100) 
 #> Creating observed data list for calibration...
@@ -472,7 +450,6 @@ from a parameter set and define the objective function using the
 function:
 
 ``` r
-
 run_model = function(par, forcing) {
   output = calibrar:::.PoissonMixedModel(par=par, forcing=forcing)
   output = c(output, list(gammas=par$gamma)) # adding gamma parameters for penalties
@@ -481,7 +458,6 @@ run_model = function(par, forcing) {
 ```
 
 ``` r
-
 obj = calibration_objFn(model=run_model, setup=setup, observed=observed, forcing=forcing, aggregate=TRUE)
 ```
 
@@ -489,7 +465,6 @@ With these we can proceed to the parameter estimation. Here, we will
 compare the performance of three BFGS type algorithms:
 
 ``` r
-
 # real parameters
 coef(ARPM)
 #> $alpha
@@ -528,7 +503,6 @@ coef(ARPM)
 ```
 
 ``` r
-
 lbfgsb1 = calibrate(par=ARPM$guess, fn=obj, method='L-BFGS-B', lower=ARPM$lower, upper=ARPM$upper, phases=ARPM$phase, control=control)
 #> Using optimization method 'L-BFGS-B'.
 #> Elapsed time: 1m 20.1s
@@ -553,7 +527,6 @@ lbfgsb3 = calibrate(par=ARPM$guess, fn=obj, method='LBFGSB3', lower=ARPM$lower, 
 ```
 
 ``` r
-
 summary(ARPM, lbfgsb1, lbfgsb2, lbfgsb3, show_par = 1:3)
 #>           method elapsed   value   fn   gr alpha   beta  gamma1
 #> ARPM        data      NA -186178   NA   NA 0.400 -0.400 -0.1253
@@ -567,7 +540,6 @@ which was also the faster (12.2s). Now, we can try to carry out the
 parameter estimation in two phases:
 
 ``` r
-
 phases = ARPM$phase
 phases$gamma[] = 2
 ```
@@ -575,7 +547,6 @@ phases$gamma[] = 2
 And re-do every optimization:
 
 ``` r
-
 lbfgsb1p = calibrate(par=ARPM$guess, fn=obj, method='L-BFGS-B', lower=ARPM$lower, upper=ARPM$upper, phases=phases, control=control)
 #> Parameter estimation in two phases.
 #> 
@@ -629,7 +600,6 @@ lbfgsb3p = calibrate(par=ARPM$guess, fn=obj, method='LBFGSB3', lower=ARPM$lower,
 ```
 
 ``` r
-
 summary(ARPM, lbfgsb1, lbfgsb1p, lbfgsb2, lbfgsb2p, lbfgsb3, lbfgsb3p, show_par = 1:3)
 #>            method elapsed   value   fn   gr alpha   beta  gamma1
 #> ARPM         data      NA -186178   NA   NA 0.400 -0.400 -0.1253
@@ -649,7 +619,6 @@ each phase. In principle, some algorithms may be faster or find a better
 initial starting point for the final search.
 
 ``` r
-
 mix1 = calibrate(par=ARPM$guess, fn=obj, method=c('hjn', 'Rvmmin'), lower=ARPM$lower, upper=ARPM$upper, phases=phases, control=control)
 #> Parameter estimation in two phases.
 #> 
@@ -701,7 +670,6 @@ mix3 = calibrate(par=ARPM$guess, fn=obj, method=c('CG', 'Rvmmin'), lower=ARPM$lo
 ```
 
 ``` r
-
 summary(ARPM, lbfgsb2, lbfgsb2p, mix1, mix2, mix3, show_par = 1:3)
 #>          method elapsed   value   fn  gr alpha   beta  gamma1
 #> ARPM       data      NA -186178   NA  NA 0.400 -0.400 -0.1253

@@ -226,7 +226,6 @@ A typical first call to
 looks like this:
 
 ``` r
-
 calibration_path = osmose_calibration_setup(
   input = config_file,
   osmose = path_to_jar_file,
@@ -464,7 +463,6 @@ is used to finalise the workspace and connect it to the real data
 location.
 
 ``` r
-
 calibration_path = osmose_calibration_setup(
   input = config_file,
   osmose = path_to_jar_file,
@@ -749,7 +747,6 @@ is provided in the appendix describing `run_model.R`.
 The function is called through a signature of the form:
 
 ``` r
-
 run_model(par, conf, osmose, is_a_test=FALSE, version="4.3.3",
                      options="-Xmx3g -Xms1g", ...)
 ```
@@ -782,7 +779,6 @@ targets and any penalty-related components returned by the workflow.
 A minimal schematic representation looks like this:
 
 ``` r
-
 run_model = function(par, conf, osmose, ...) {
   ## 1. reconstruct simulator-level parameters from calibration parameters
   sim_par = reconstruct_osmose_parameters(par, conf)
@@ -853,7 +849,6 @@ tested formally. In the OSMOSE workflow, this is done with
 [`osmose_calibration_test()`](https://rdrr.io/pkg/osmose/man/osmose_calibration_test.html).
 
 ``` r
-
 osmose_calibration_test(path = calibration_path)
 ```
 
@@ -1091,7 +1086,6 @@ Once a run has produced results, the OSMOSE helper workflow provides a
 way to read them back into an object suited to inspection.
 
 ``` r
-
 calibration = osmose_calibration_check(input=config_file, name="my_calibration")
 ```
 
@@ -1199,7 +1193,6 @@ with the prepared objects. In other words, the script translates a
 calibration directory on disk into the standard `calibrar` call pattern:
 
 ``` r
-
 calibrate(
   par = ...,
   fn = ...,
@@ -1219,7 +1212,6 @@ command-line arguments, loads the required packages, and detects the
 execution environment.
 
 ``` r
-
 if(!exists(".args", mode = "character")) .args = commandArgs(trailingOnly=TRUE)
 
 library("calibrar")
@@ -1260,7 +1252,6 @@ executable resources needed by the model, and prepares the run
 directory.
 
 ``` r
-
 control  = .read_configuration(control_file)
 osmose   = ".osmose.jar"
 obs_file = "observed.rds"
@@ -1299,7 +1290,6 @@ that were prepared earlier by
 [`osmose_calibration_setup()`](https://rdrr.io/pkg/osmose/man/osmose_calibration_setup.html).
 
 ``` r
-
 conf = read_osmose(input = "master/osmose-calibration.osm")
 model = get_par(conf, "output.file.prefix")
 osm_ncpu = get_par(conf, "simulation.ncpu")
@@ -1345,7 +1335,6 @@ Once the calibration objects have been reconstructed, the script turns
 them into the scalar objective function that the optimiser can minimise.
 
 ``` r
-
 osmose = file.path("..", osmose)
 
 objfn = calibration_objFn(
@@ -1387,7 +1376,6 @@ Before launching the optimisation, the script adjusts some control
 values so that they are consistent with the prepared workspace.
 
 ``` r
-
 if(!is.null(control$master)) {
   if(control$master!="master") {
     stop(...)
@@ -1428,7 +1416,6 @@ parallelism into the number of workers that `calibrar` should actually
 use.
 
 ``` r
-
 eff_cores = floor((ncores - 1)/nht/osm_ncpu)
 control$ncores = eff_cores
 ```
@@ -1454,7 +1441,6 @@ Once the effective worker count is known, the script builds the parallel
 backend used by `calibrar`.
 
 ``` r
-
 if(isTRUE(parallel)) {
 
   if(!isTRUE(MPI)) {
@@ -1501,7 +1487,6 @@ After all the preparation steps, the script finally delegates the
 optimisation itself to `calibrar`.
 
 ``` r
-
 opt = try(calibrate(
   par = par_guess,
   fn = objfn,
@@ -1536,7 +1521,6 @@ into the generic inputs expected by the optimiser.
 The script ends with minimal failure handling and cluster cleanup.
 
 ``` r
-
 if(inherits(opt, "try-error")) 
   message("Error while running the calibration.")
 
@@ -1630,7 +1614,6 @@ parameter subsets that will later be used to define random-effect-like
 penalty components.
 
 ``` r
-
   .t0 = Sys.time() # timing
   nspp = get_species(conf, type="focal", code=TRUE)
   nfsh = get_fisheries(conf, code=TRUE)
@@ -1660,7 +1643,6 @@ trajectories from calibrated deviates, and rebuilds fishery selectivity
 terms that are represented more compactly during estimation.
 
 ``` r
-
   # recover parameters modelled by groups
   random = NULL
   nms = get_par(conf, "calibration.*.bygroup$", unlist=TRUE)
@@ -1722,7 +1704,6 @@ estimation and one designed for simulation.
 The script then exposes an explicit user-editable block.
 
 ``` r
-
   ### BEGIN USER ADDED
 
   ### END USER ADDED
@@ -1742,7 +1723,6 @@ Once the parameter object has been fully reconstructed, the wrapper
 converts it into a runnable OSMOSE input file.
 
 ``` r
-
   # remove all osmose.user parameters and clean-up
   par = get_par(par, "osmose.user", invert = TRUE, as.is=TRUE)
   par = get_par(par, linear=TRUE, as.is = TRUE) # write parameters in linear scale.
@@ -1768,7 +1748,6 @@ The next stage is the actual execution of OSMOSE and the extraction of
 the calibration variables.
 
 ``` r
-
   # run osmose!
   t0 = t1 = 0 # init times
   if(!isTRUE(is_a_test)) {
@@ -1803,7 +1782,6 @@ The script also includes a simple retry mechanism and a controlled
 failure path.
 
 ``` r
-
   if(is.null(cal_output)) {
     # sometimes, you get a 'no-write' error. Restarting the calibration usually fix the problem.
     # several things can be the issue. Most times, you won't see the error again. 

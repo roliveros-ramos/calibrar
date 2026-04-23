@@ -17,7 +17,7 @@ parameter masking), constrained optimization (bounding box restrictions)
 and automatic parallel computation of numerical gradients. Some common
 maximum likelihood estimation methods and automated construction of the
 objective function from simulated model outputs is provided. See
-\<https://roliveros-ramos.github.io/calibrar/\> for more details.
+<https://roliveros-ramos.github.io/calibrar/> for more details.
 
 ## References
 
@@ -35,7 +35,7 @@ Useful links:
 ## Author
 
 Ricardo Oliveros-Ramos Maintainer: Ricardo Oliveros-Ramos
-\<ricardo.oliveros@gmail.com\>
+<ricardo.oliveros@gmail.com>
 
 ## Examples
 

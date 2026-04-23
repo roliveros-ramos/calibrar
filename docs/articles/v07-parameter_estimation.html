@@ -88,7 +88,7 @@
                         <h4 data-toc-skip class="author">Ricardo
 Oliveros-Ramos</h4>
             
-            <h4 data-toc-skip class="date">2026-04-22</h4>
+            <h4 data-toc-skip class="date">2026-04-23</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/roliveros-ramos/calibrar/blob/HEAD/vignettes/articles/v07-parameter_estimation.Rmd" class="external-link"><code>vignettes/articles/v07-parameter_estimation.Rmd</code></a></small>
       <div class="d-none name"><code>v07-parameter_estimation.Rmd</code></div>
@@ -391,7 +391,7 @@ changing the <code>maxit</code> control argument:</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">optx</span> <span class="op">=</span> <span class="fu"><a href="../reference/calibrate.html">calibrate</a></span><span class="op">(</span>par<span class="op">=</span><span class="va">start</span>, fn <span class="op">=</span> <span class="va">objfn</span>, method<span class="op">=</span><span class="st">'LBFGSB3'</span>, T<span class="op">=</span><span class="cn">T</span>, catch<span class="op">=</span><span class="va">catch</span>, observed<span class="op">=</span><span class="va">observed</span>, control<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>maxit<span class="op">=</span><span class="fl">20000</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Using optimization method 'LBFGSB3'.</span></span>
-<span><span class="co">#&gt; Elapsed time: 0.01s</span></span>
+<span><span class="co">#&gt; Elapsed time: 0.03s</span></span>
 <span><span class="co">#&gt; Function value: 150998</span></span>
 <span><span class="co">#&gt; Parameter values: 0.402 1.18e+03 600</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -700,7 +700,7 @@ for more details.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.9000.</p>
 </div>
 
     </footer>

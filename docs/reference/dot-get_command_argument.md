@@ -1,6 +1,9 @@
-# Get an specific argument from the command line
+# Extract a named command-line argument
 
-Get an specific argument from the command line
+Parse command-line arguments and return the value associated with a
+named option. This helper is primarily intended for scripting workflows
+that call R from the shell and pass arguments such as
+`--config=file.txt`.
 
 ## Usage
 
@@ -18,29 +21,48 @@ Get an specific argument from the command line
 
 - x:
 
-  The command line arguments, from `x = commandArgs()`
+  Character vector of command-line arguments, typically obtained from
+  [`commandArgs()`](https://rdrr.io/r/base/commandArgs.html).
 
 - argument:
 
-  The name of the argument.
+  Name of the argument to retrieve, without the prefix.
 
 - prefix:
 
-  The prefix to any argument of interest, the default is "–"
+  Prefix used for arguments of interest. The default is `"--"`.
 
 - default:
 
-  Default value to return is argument is missing, default to FALSE.
+  Value returned when the argument is not found. The default is `FALSE`.
 
 - verbose:
 
-  Boolean, if TRUE, shows a warning when the parameter is not found.
+  Logical. If `TRUE`, a warning is issued when the requested argument is
+  not found.
 
 ## Value
 
-The value of the argument, assumed to be followed after '=' or, TRUE if
-nothing but the argument was found. If the argument is not found, FALSE
-is returned.
+The parsed argument value. If the argument is present without an
+explicit `=value` part, `TRUE` is returned. If the argument is absent,
+`default` is returned. Parsed values are passed through an internal type
+guesser, so logical and numeric values may be returned with their
+corresponding R types.
+
+## Details
+
+The function looks for entries matching either `prefix + argument` or
+`prefix + argument = value`. For example, with `prefix = "--"` and
+`argument = "config"`, both `--config` and `--config=file.txt` are
+recognised.
+
+This function is exported because it can be useful in external packages
+or scripts that build command-line interfaces around `calibrar`
+workflows.
+
+## See also
+
+[`.read_configuration()`](https://roliveros-ramos.github.io/calibrar/reference/dot-read_configuration.md)
 
 ## Examples
 
@@ -49,7 +71,7 @@ is returned.
 #> [1] FALSE
 .get_command_argument(commandArgs(), "RStudio")
 #> [1] FALSE
-.get_command_argument(commandArgs(), "RStudio", prefix="")
+.get_command_argument(commandArgs(), "RStudio", prefix = "")
 #> [1] FALSE
 .get_command_argument(commandArgs(), "vanilla")
 #> [1] FALSE

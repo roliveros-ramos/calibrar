@@ -1,6 +1,10 @@
-# General-purpose optimization using heuristic algorithms
+# General-purpose optimisation with heuristic and derivative-free methods
 
-General-purpose optimization using heuristic algorithms
+`optimh()` provides a unified interface to the heuristic and
+derivative-free optimisation methods available through **calibrar**. It
+is intended for objective functions that are expensive, noisy,
+non-smooth, stochastic, or otherwise difficult to handle with standard
+gradient-based optimisers.
 
 ## Usage
 
@@ -37,8 +41,12 @@ optimh(
 
 - gr:
 
-  Function to compute the gradient of `fn`. Ignored by most methods,
-  added for consistency with other optimization functions.
+  Function computing the gradient of `fn`. It is included for API
+  consistency with
+  [`optim2()`](https://roliveros-ramos.github.io/calibrar/reference/optim2.md)
+  and
+  [`calibrate()`](https://roliveros-ramos.github.io/calibrar/reference/calibrate.md),
+  but is ignored by most methods available through `optimh()`.
 
 - ...:
 
@@ -46,9 +54,10 @@ optimh(
 
 - method:
 
-  Optimisation method(s) to be used. Can be a single method name or a
-  vector of method names (e.g., one per phase). If `NULL`, a default is
-  chosen based on `replicates` (see Details).
+  Optimisation method to use. Available choices are `"AHR-ES"`,
+  `"Nelder-Mead"`, `"SANN"`, `"hjn"`, `"bobyqa"`, `"CMA-ES"`, `"genSA"`,
+  `"DE"`, `"soma"`, `"genoud"`, `"PSO"`, `"hybridPSO"`, `"mads"`,
+  `"hjk"`, `"hjkb"`, `"nmk"`, and `"nmkb"`.
 
 - lower:
 
@@ -85,40 +94,74 @@ optimh(
 
 ## Value
 
-A list with components:
+A list in the same general format as
+[`optim2()`](https://roliveros-ramos.github.io/calibrar/reference/optim2.md),
+typically including:
 
 - par:
 
-  The best set of parameters found.
+  The best parameter values found.
 
 - value:
 
-  The value of `fn` corresponding to `par`.
+  The value of `fn` at `par`.
 
 - counts:
 
-  A two-element integer vector giving the number of calls to `fn` and
-  `gr` respectively. This excludes those calls needed to compute the
-  Hessian, if requested, and any calls to `fn` to compute a
-  finite-difference approximation to the gradient.
+  Number of function and gradient evaluations reported by the underlying
+  solver, when available.
 
 - convergence:
 
-  An integer code. `0` indicates successful completion.
+  Convergence code returned by the underlying solver.
 
 - message:
 
-  A character string giving any additional information returned by the
-  optimizer, or `NULL`.
+  Additional information returned by the optimiser, if any.
 
 - hessian:
 
-  Only if argument `hessian` is `TRUE`. A symmetric matrix giving an
-  estimate of the Hessian at the solution found. Note that this is the
-  Hessian of the unconstrained problem even if the box constraints are
-  active.
+  A Hessian estimate when supported and requested; otherwise usually
+  `NULL`.
+
+## Details
+
+`optimh()` uses the same interface conventions as
+[`optim2()`](https://roliveros-ramos.github.io/calibrar/reference/optim2.md)
+and
+[`calibrate()`](https://roliveros-ramos.github.io/calibrar/reference/calibrate.md):
+parameters may be supplied as a vector or list, box constraints can be
+enforced through `lower` and `upper`, and subsets of parameters can be
+held fixed through `active`.
+
+The available methods include both genuinely heuristic/global algorithms
+(for example `"AHR-ES"`, `"CMA-ES"`, `"DE"`, `"genSA"`, `"PSO"`) and a
+few derivative-free local searches (for example `"Nelder-Mead"`,
+`"bobyqa"`, `"hjn"`, `"nmk"`). The function name should therefore be
+read broadly: it is the package entry point for optimisation methods
+that are typically useful when classical smooth, gradient-based
+optimisation is not the best fit.
+
+Analytic gradients are accepted for interface consistency, but many
+methods implemented through `optimh()` ignore `gr`. Likewise, not all
+methods return Hessian information even when `hessian = TRUE` is
+requested.
+
+## Choosing a method
+
+Heuristic and evolutionary methods are often useful for rugged,
+multi-modal, or stochastic objective functions. Derivative-free local
+methods may be a better first choice when the objective is deterministic
+but gradients are unavailable or unreliable. Method choice should still
+reflect the structure of the problem: locality versus global
+exploration, box constraints, stochasticity, and computational cost.
 
 ## See also
+
+[`optim2()`](https://roliveros-ramos.github.io/calibrar/reference/optim2.md),
+[`calibrate()`](https://roliveros-ramos.github.io/calibrar/reference/calibrate.md),
+[`ahres()`](https://roliveros-ramos.github.io/calibrar/reference/ahres.md),
+[`gradient()`](https://roliveros-ramos.github.io/calibrar/reference/gradient.md)
 
 Other optimisers:
 [`ahres()`](https://roliveros-ramos.github.io/calibrar/reference/ahres.md),
@@ -132,21 +175,14 @@ Ricardo Oliveros-Ramos
 ## Examples
 
 ``` r
-optim2(par=rep(NA, 5), fn=sphereN)
-#> $par
-#> [1] -0.003724125 -0.005021691  0.001150144  0.090722235  0.015722235
-#> 
-#> $value
-#> [1] 0.00527852
-#> 
-#> $counts
-#> function gradient 
-#>      504       NA 
-#> 
-#> $convergence
-#> [1] 1
-#> 
-#> $message
-#> NULL
-#> 
+if (FALSE) { # \dontrun{
+optimh(
+  par = rep(0.5, 5),
+  fn = sphereN,
+  lower = -5,
+  upper = 5,
+  method = "AHR-ES",
+  control = list(maxit = 200)
+)
+} # }
 ```

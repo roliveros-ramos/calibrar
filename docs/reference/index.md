@@ -9,15 +9,15 @@ computation of derivatives.
   : Unified optimisation interface with structured parameters and
   parallel numerical gradients
 - [`optimh()`](https://roliveros-ramos.github.io/calibrar/reference/optimh.md)
-  : General-purpose optimization using heuristic algorithms
+  : General-purpose optimisation with heuristic and derivative-free
+  methods
 - [`calibrate()`](https://roliveros-ramos.github.io/calibrar/reference/calibrate.md)
   : Sequential parameter estimation for the calibration of complex
   models
 - [`ahres()`](https://roliveros-ramos.github.io/calibrar/reference/ahres.md)
-  : Adaptative Hierarchical Recombination Evolutionary Strategy (AHR-ES)
-  for derivative-free and black-box optimization
+  : Adaptive Hierarchical Recombination Evolutionary Strategy
 - [`gradient()`](https://roliveros-ramos.github.io/calibrar/reference/gradient.md)
-  : Numerical computation of the gradient, with parallel capabilities
+  : Numerical gradient approximation
 - [`calibrar-package`](https://roliveros-ramos.github.io/calibrar/reference/calibrar-package.md)
   [`calibrar`](https://roliveros-ramos.github.io/calibrar/reference/calibrar-package.md)
   : Automated Calibration for Complex Models
@@ -28,43 +28,40 @@ Functions to easily setup a new calibration for a complex model, from an
 R function running the model.
 
 - [`calibration_data()`](https://roliveros-ramos.github.io/calibrar/reference/calibration_data.md)
-  : Get observed data for the calibration of a model
-
+  : Read observed data defined in a calibration setup table
 - [`calibration_objFn()`](https://roliveros-ramos.github.io/calibrar/reference/calibration_objFn.md)
-  : Create an objective function to be used with optimization routines
-
+  : Create a calibration objective function from a model, setup table,
+  and data
 - [`calibration_setup()`](https://roliveros-ramos.github.io/calibrar/reference/calibration_setup.md)
-  :
-
-  Get information to run a calibration using the `calibrar` package.
-
+  : Read and validate a calibration setup table
 - [`objFn()`](https://roliveros-ramos.github.io/calibrar/reference/objFn.md)
   [`fitness()`](https://roliveros-ramos.github.io/calibrar/reference/objFn.md)
   : Objective function between observed and simulated data
-
 - [`calibrar_demo()`](https://roliveros-ramos.github.io/calibrar/reference/calibrar_demo.md)
-  : Demos for the calibrar package
+  [`print(`*`<calibrar.demo>`*`)`](https://roliveros-ramos.github.io/calibrar/reference/calibrar_demo.md)
+  : Create small demonstration calibration projects
 
 ## Parameter modelling
 
 Functions to easily parametrize a model.
 
 - [`gaussian_kernel()`](https://roliveros-ramos.github.io/calibrar/reference/gaussian_kernel.md)
-  : Calculate a discretization of the 2D Gaussian Kernel
+  : Discretise a bivariate Gaussian kernel on a grid
 - [`spline_par()`](https://roliveros-ramos.github.io/calibrar/reference/spline_par.md)
-  : Predict time-varying parameters using splines.
+  [`plot(`*`<spline.par>`*`)`](https://roliveros-ramos.github.io/calibrar/reference/spline_par.md)
+  : Interpolate time-varying parameters with a spline
 
 ## Test optimization functions
 
 - [`sphereN()`](https://roliveros-ramos.github.io/calibrar/reference/sphereN.md)
-  : Sphere function with random noise
+  : Noisy sphere test function
 
 ## Auxiliar functions
 
 - [`.get_command_argument()`](https://roliveros-ramos.github.io/calibrar/reference/dot-get_command_argument.md)
-  : Get an specific argument from the command line
+  : Extract a named command-line argument
 - [`.read_configuration()`](https://roliveros-ramos.github.io/calibrar/reference/dot-read_configuration.md)
-  : Read a configuration file.
+  : Read a simple key-value configuration file
 
 ## Defunct functions
 
@@ -74,3 +71,20 @@ Functions to easily parametrize a model.
   :
 
   Defunct functions in package calibrar.
+
+## Result objects
+
+- [`print(`*`<calibrar.results>`*`)`](https://roliveros-ramos.github.io/calibrar/reference/calibrar.results.md)
+  [`coef(`*`<calibrar.results>`*`)`](https://roliveros-ramos.github.io/calibrar/reference/calibrar.results.md)
+  [`predict(`*`<calibrar.results>`*`)`](https://roliveros-ramos.github.io/calibrar/reference/calibrar.results.md)
+  [`plot(`*`<calibrar.results>`*`)`](https://roliveros-ramos.github.io/calibrar/reference/calibrar.results.md)
+  [`summary(`*`<calibrar.results>`*`)`](https://roliveros-ramos.github.io/calibrar/reference/calibrar.results.md)
+  [`print(`*`<summary.calibrar.results>`*`)`](https://roliveros-ramos.github.io/calibrar/reference/calibrar.results.md)
+  [`dim(`*`<calibrar.results>`*`)`](https://roliveros-ramos.github.io/calibrar/reference/calibrar.results.md)
+  : Calibration result objects
+- [`print(`*`<ahres.results>`*`)`](https://roliveros-ramos.github.io/calibrar/reference/ahres.results.md)
+  [`coef(`*`<ahres.results>`*`)`](https://roliveros-ramos.github.io/calibrar/reference/ahres.results.md)
+  [`plot(`*`<ahres.results>`*`)`](https://roliveros-ramos.github.io/calibrar/reference/ahres.results.md)
+  [`summary(`*`<ahres.results>`*`)`](https://roliveros-ramos.github.io/calibrar/reference/ahres.results.md)
+  [`print(`*`<summary.ahres.results>`*`)`](https://roliveros-ramos.github.io/calibrar/reference/ahres.results.md)
+  : Evolutionary-strategy result objects

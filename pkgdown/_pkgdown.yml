@@ -111,4 +111,8 @@ reference:
   - getObservedData
   - getCalibrationInfo
   - createObjectiveFunction
-
+- title: Result objects
+- contents:
+  - calibrar.results
+  - ahres.results
+  

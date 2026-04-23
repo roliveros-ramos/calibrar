@@ -30,7 +30,6 @@ function with `T=100` as an additional argument to specify the time
 horizon.
 
 ``` r
-
 library(calibrar)
 set.seed(880820)
 path = NULL # NULL to use the current directory
@@ -42,7 +41,6 @@ LV = calibrar_demo(path=path, model='PredatorPrey', T=100)
     ## Loaded observed data for variables: 'prey', 'predator'.
 
 ``` r
-
 setup = calibration_setup(file = LV$setup)
 observed = calibration_data(setup=setup, path=LV$path)
 ```
@@ -52,7 +50,6 @@ observed = calibration_data(setup=setup, path=LV$path)
     ## Loaded observed data for variables: 'prey', 'predator'.
 
 ``` r
-
 run_model = calibrar:::.PredatorPreyModel
 coef(LV)
 ```
@@ -83,7 +80,6 @@ The `run_model` will simulate the data, by solving the ODE system
 defined by the Lotka-Volterra model:
 
 ``` r
-
 run_model = function(par, T) {
   if(!requireNamespace("deSolve", quietly = TRUE)) 
     stop("You need to install the 'deSolve' package.")
@@ -131,7 +127,6 @@ data is expected to be read from the files in the `file` column, files
 that were created when calling the demo.
 
 ``` r
-
 # objective functions
 obj = calibration_objFn(model=run_model, setup=setup, observed=observed, T=LV$T, aggregate=TRUE)
 ```
@@ -139,7 +134,6 @@ obj = calibration_objFn(model=run_model, setup=setup, observed=observed, T=LV$T,
 Now we can fit the model using several optimization methods:
 
 ``` r
-
 lbfgsb1 = calibrate(par=LV$guess, fn=obj, method='L-BFGS-B', lower=LV$lower, upper=LV$upper, phases=LV$phase)
 ```
 
@@ -152,7 +146,6 @@ lbfgsb1 = calibrate(par=LV$guess, fn=obj, method='L-BFGS-B', lower=LV$lower, upp
     ## Status: CONVERGENCE: REL_REDUCTION_OF_F <= FACTR*EPSMCH
 
 ``` r
-
 lbfgsb2 = calibrate(par=LV$guess, fn=obj, method="Rvmmin", lower=LV$lower, upper=LV$upper, phases=LV$phase)
 ```
 
@@ -165,7 +158,6 @@ lbfgsb2 = calibrate(par=LV$guess, fn=obj, method="Rvmmin", lower=LV$lower, upper
     ## Status: Rvmminb appears to have converged
 
 ``` r
-
 ahr = calibrate(par=LV$guess, fn=obj, method='AHR-ES', lower=LV$lower, upper=LV$upper, phases=LV$phase)
 ```
 
@@ -178,7 +170,6 @@ ahr = calibrate(par=LV$guess, fn=obj, method='AHR-ES', lower=LV$lower, upper=LV$
     ## Status: Stopping criteria reached in 4909 generations.
 
 ``` r
-
 nm = calibrate(par=LV$guess, fn=obj, method="Nelder-Mead", phases=LV$phase)
 ```
 
@@ -193,7 +184,6 @@ nm = calibrate(par=LV$guess, fn=obj, method="Nelder-Mead", phases=LV$phase)
 And compare them:
 
 ``` r
-
 summary(LV, lbfgsb1, lbfgsb2, ahr, nm, show_par = 1:5)
 ```
 
@@ -211,7 +201,6 @@ that can be used to simulate the model with the estimated set of
 parameters.
 
 ``` r
-
 lbfgsb1.pred = predict(lbfgsb1)
 lbfgsb2.pred = predict(lbfgsb2)
 ahr.pred     = predict(ahr)
@@ -221,7 +210,6 @@ nm.pred      = predict(nm)
 and plot the results.
 
 ``` r
-
 methods = c("data", "L-BFGS-B", "AHR-ES", "Nelder-Mead")
 par(mfrow=c(1,2), mar=c(4,4,1,1),
     oma=c(1,1,1,1))
@@ -270,7 +258,6 @@ function with `T=100` as an additional argument to specify the time
 horizon.
 
 ``` r
-
 path = NULL # NULL to use the current directory
 SIR = calibrar_demo(path=path, model='SIR', T=100) 
 ```
@@ -280,7 +267,6 @@ SIR = calibrar_demo(path=path, model='SIR', T=100)
     ## Loaded observed data for variables: 'susceptible', 'infected', 'recovered'.
 
 ``` r
-
 setup = calibration_setup(file = SIR$setup)
 observed = calibration_data(setup=setup, path=SIR$path)
 ```
@@ -290,7 +276,6 @@ observed = calibration_data(setup=setup, path=SIR$path)
     ## Loaded observed data for variables: 'susceptible', 'infected', 'recovered'.
 
 ``` r
-
 run_model = calibrar:::.SIRModel
 ```
 
@@ -299,7 +284,6 @@ of parameters `par`, that solves the EDO system and return a list with
 the simulated variables (S, I, R):
 
 ``` r
-
 run_model = function(par, T) {
   if(!requireNamespace("deSolve", quietly = TRUE))
     stop("You need to install the 'deSolve' package.")
@@ -338,7 +322,6 @@ created with the demo:
 | recovered | lnorm2 | TRUE | 1 | TRUE | data/recovered.csv | recovered | 2 | NA |
 
 ``` r
-
 obj = calibration_objFn(model=run_model, setup=setup, observed=observed, T=SIR$T, aggregate=TRUE)
 ```
 
@@ -346,7 +329,6 @@ Now, we can try several optimization algorithms to estimate the
 parameters of the model:
 
 ``` r
-
 lbfgsb3 = calibrate(par=SIR$guess, fn=obj, method='LBFGSB3', lower=SIR$lower, upper=SIR$upper, phases=SIR$phase)
 ```
 
@@ -359,7 +341,6 @@ lbfgsb3 = calibrate(par=SIR$guess, fn=obj, method='LBFGSB3', lower=SIR$lower, up
     ## Status: CONVERGENCE: Parameters differences below xtol
 
 ``` r
-
 lbfgsb2 = calibrate(par=SIR$guess, fn=obj, method='Rvmmin', lower=SIR$lower, upper=SIR$upper, phases=SIR$phase)
 ```
 
@@ -372,7 +353,6 @@ lbfgsb2 = calibrate(par=SIR$guess, fn=obj, method='Rvmmin', lower=SIR$lower, upp
     ## Status: Rvmminb appears to have converged
 
 ``` r
-
 ahr = calibrate(par=SIR$guess, fn=obj, method='AHR-ES', lower=SIR$lower, upper=SIR$upper, phases=SIR$phase)
 ```
 
@@ -385,7 +365,6 @@ ahr = calibrate(par=SIR$guess, fn=obj, method='AHR-ES', lower=SIR$lower, upper=S
     ## Status: Stopping criteria reached in 1031 generations.
 
 ``` r
-
 cg = calibrate(par=SIR$guess, fn=obj, method='Rcgmin', phases=SIR$phase)
 ```
 
@@ -398,7 +377,6 @@ cg = calibrate(par=SIR$guess, fn=obj, method='Rcgmin', phases=SIR$phase)
     ## Status: Rcgmin seems to have converged
 
 ``` r
-
 nm = calibrate(par=SIR$guess, fn=obj, method='Nelder-Mead', phases=SIR$phase)
 ```
 
@@ -413,7 +391,6 @@ nm = calibrate(par=SIR$guess, fn=obj, method='Nelder-Mead', phases=SIR$phase)
 and compare them:
 
 ``` r
-
 summary(SIR, lbfgsb2, lbfgsb3, ahr, cg, nm, show_par = 1:2)
 ```
 
