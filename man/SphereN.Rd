@@ -2,33 +2,39 @@
 % Please edit documentation in R/calibrar-test_functions.R
 \name{sphereN}
 \alias{sphereN}
-\title{Sphere function with random noise}
+\title{Noisy sphere test function}
 \usage{
 sphereN(x, sd = 0.1, aggregate = TRUE)
 }
 \arguments{
-\item{x}{The coordinates of the point}
+\item{x}{Numeric vector of coordinates.}
 
-\item{sd}{The standard deviation of the noise
-to be added to the position of \code{x}, a normal distribution with mean
-zero is used.}
+\item{sd}{Standard deviation of the Gaussian noise added independently to
+each coordinate.}
 
-\item{aggregate}{If \code{aggregate} is \code{TRUE} the distance is returned, 
-otherwise the size of the projection of the distance among each axis.}
+\item{aggregate}{Logical. If \code{TRUE}, return the summed squared distance. If
+\code{FALSE}, return the contribution of each coordinate separately.}
 }
 \value{
-The distance from the point \code{x} to the origin after a random
-displacement.
+A numeric scalar if \code{aggregate = TRUE}, or a numeric vector of squared
+contributions if \code{aggregate = FALSE}.
 }
 \description{
-This function calculates the Euclidian distance from a point to the origin
-after a random displacement of its position.
+Evaluate a stochastic variant of the sphere test function often used in
+optimisation examples. The deterministic sphere function is the sum of the
+squared coordinates; here, Gaussian noise is added to each coordinate before
+the squared distance is computed.
+}
+\details{
+This function is mainly useful for examples, testing, and illustrating how
+\code{calibrar} behaves with stochastic objective functions.
 }
 \examples{
-sphereN(rep(0, 10))
+set.seed(1)
+sphereN(rep(0, 5))
+sphereN(rep(0, 5), aggregate = FALSE)
+
 }
-\author{
-Ricardo Oliveros--Ramos
+\seealso{
+\code{\link[=calibrate]{calibrate()}}, \code{\link[=optim2]{optim2()}}, \code{\link[=ahres]{ahres()}}
 }
-\keyword{random}
-\keyword{stochastic}

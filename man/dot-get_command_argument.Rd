@@ -2,7 +2,7 @@
 % Please edit documentation in R/calibrar-auxiliar.R
 \name{.get_command_argument}
 \alias{.get_command_argument}
-\title{Get an specific argument from the command line}
+\title{Extract a named command-line argument}
 \usage{
 .get_command_argument(
   x,
@@ -13,27 +13,47 @@
 )
 }
 \arguments{
-\item{x}{The command line arguments, from \code{x = commandArgs()}}
+\item{x}{Character vector of command-line arguments, typically obtained from
+\code{commandArgs()}.}
 
-\item{argument}{The name of the argument.}
+\item{argument}{Name of the argument to retrieve, without the prefix.}
 
-\item{prefix}{The prefix to any argument of interest, the default is "--"}
+\item{prefix}{Prefix used for arguments of interest. The default is \code{"--"}.}
 
-\item{default}{Default value to return is argument is missing, default to FALSE.}
+\item{default}{Value returned when the argument is not found. The default is
+\code{FALSE}.}
 
-\item{verbose}{Boolean, if TRUE, shows a warning when the parameter is not found.}
+\item{verbose}{Logical. If \code{TRUE}, a warning is issued when the requested
+argument is not found.}
 }
 \value{
-The value of the argument, assumed to be followed after '=' or, TRUE if nothing but the argument was found. 
-If the argument is not found, FALSE is returned.
+The parsed argument value. If the argument is present without an explicit
+\verb{=value} part, \code{TRUE} is returned. If the argument is absent, \code{default} is
+returned. Parsed values are passed through an internal type guesser, so
+logical and numeric values may be returned with their corresponding R types.
 }
 \description{
-Get an specific argument from the command line
+Parse command-line arguments and return the value associated with a named
+option. This helper is primarily intended for scripting workflows that call
+R from the shell and pass arguments such as \code{--config=file.txt}.
+}
+\details{
+The function looks for entries matching either \code{prefix + argument} or
+\code{prefix + argument = value}. For example, with \code{prefix = "--"} and
+\code{argument = "config"}, both \code{--config} and \code{--config=file.txt} are
+recognised.
+
+This function is exported because it can be useful in external packages or
+scripts that build command-line interfaces around \code{calibrar} workflows.
 }
 \examples{
 .get_command_argument(commandArgs(), "interactive")
 .get_command_argument(commandArgs(), "RStudio")
-.get_command_argument(commandArgs(), "RStudio", prefix="")
+.get_command_argument(commandArgs(), "RStudio", prefix = "")
 .get_command_argument(commandArgs(), "vanilla")
 .get_command_argument("--control.file=baz.txt", "control.file")
+
+}
+\seealso{
+\code{\link[=.read_configuration]{.read_configuration()}}
 }

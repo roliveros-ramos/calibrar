@@ -4,23 +4,23 @@
 \alias{getObservedData-defunct}
 \title{Get observed data for the calibration of a model}
 \arguments{
-\item{info}{A data.frame with the information about the calibration, 
-normally created with the \code{\link{getCalibrationInfo}} function. 
+\item{info}{A data.frame with the information about the calibration,
+normally created with the \code{\link{getCalibrationInfo}} function.
 See details.}
 
 \item{path}{Path to the directory to look up for the data.}
 
 \item{data.folder}{folder in the path containing the data.}
 
-\item{\dots}{Additional arguments to \code{read.csv} function 
+\item{\dots}{Additional arguments to \code{read.csv} function
 to read the data files.}
 }
 \value{
-A list with the observed data needed for a calibration, to be used 
+A list with the observed data needed for a calibration, to be used
 in combination with the \code{\link{createObjectiveFunction}}.
 }
 \description{
-Create a list with the observed data with the 
+Create a list with the observed data with the
 information provided by its main argument.
 }
 \seealso{

@@ -2,35 +2,99 @@
 % Please edit documentation in R/calibrar-main.R
 \name{calibration_data}
 \alias{calibration_data}
-\title{Get observed data for the calibration of a model}
+\title{Read observed data defined in a calibration setup table}
 \usage{
 calibration_data(setup, path = ".", file = NULL, verbose = TRUE, ...)
 }
 \arguments{
-\item{setup}{A data.frame with the information about the calibration, 
-normally created with the \code{\link{calibration_setup}} function. 
-See details.}
+\item{setup}{A calibration setup table, usually created with
+\code{\link[=calibration_setup]{calibration_setup()}}.}
 
-\item{path}{Path to the directory to look up for the data. Paths in setup are considered relatives to this path.}
+\item{path}{Base directory used to resolve relative paths from \code{setup$file}.
+Each file is looked up with \code{\link[base:file.path]{base::file.path()}} using \code{path} and the value
+stored in the corresponding \code{file} row.}
 
-\item{file}{Optional file to save the created object (as an 'rds' file.)}
+\item{file}{Optional path to save the resulting \code{observed} object with
+\code{\link[base:readRDS]{base::saveRDS()}}. This is useful when observed data are expensive to read
+repeatedly.}
 
-\item{verbose}{If TRUE, detailed messages of the process are printed.}
+\item{verbose}{Logical. If \code{TRUE}, print progress messages describing which
+variables were loaded.}
 
-\item{\dots}{Additional arguments to \code{read.csv} function 
-to read the data files.}
+\item{...}{Additional arguments passed to \code{\link[utils:read.table]{utils::read.csv()}} when reading
+text files.}
 }
 \value{
-A list with the observed data needed for a calibration, to be used 
-in combination with the \code{\link{calibration_objFn}}.
+A named list with one element per row of \code{setup}. Element names are
+taken from \code{setup$variable}.
+
+Depending on the corresponding setup row, each element is typically one of:
+\itemize{
+\item a numeric vector, when \code{varid} selects a single column from a text
+file;
+\item a numeric matrix, when a full table is read from a text file;
+\item an arbitrary R object read from an \code{.rds} file;
+\item \code{NA}, when \code{use_data = FALSE} or \code{calibrate = FALSE}.
+}
 }
 \description{
-Create a list with the observed data with the 
-information provided by its main argument.
+Build the \code{observed} object used by \code{\link[=calibration_objFn]{calibration_objFn()}} from a setup table
+created with \code{\link[=calibration_setup]{calibration_setup()}}. Each active row in the setup table points
+to a file containing observed data, and this function reads those files into a
+named list whose elements correspond to the calibration variables.
+}
+\details{
+Rows with \code{use_data = FALSE} are kept in the output as \code{NA}. This makes it
+possible to include penalty-only components in the same calibration workflow:
+such rows still participate in \code{\link[=calibration_objFn]{calibration_objFn()}} provided the model
+returns a simulated component with the same name.
+
+Only rows satisfying both \code{setup$calibrate} and \code{setup$use_data} are actually
+read from disk. All other rows are represented as \code{NA} in the returned list.
+
+File reading currently depends on file type:
+
+\describe{
+\item{text files (\code{.csv}, \code{.txt})}{Read with \code{\link[utils:read.table]{utils::read.csv()}}. If
+\code{varid} is supplied, that column is extracted and returned as a numeric
+vector. Otherwise the full table is converted to a numeric matrix after
+dropping the first \code{col_skip} columns, when applicable.}
+
+\item{R objects (\code{.rds})}{Read with \code{\link[base:readRDS]{base::readRDS()}} and returned as-is.}
+
+\item{netCDF (\code{.nc})}{Not currently supported by the implementation.}
+}
+
+The interpretation of \code{varid}, \code{col_skip}, and \code{nrows} is controlled by the
+corresponding columns in \code{setup}, after defaults have been filled by
+\code{\link[=calibration_setup]{calibration_setup()}}.
+}
+\section{Expected alignment with model outputs}{
+
+The names of the returned list are used later by \code{\link[=calibration_objFn]{calibration_objFn()}} to
+match observed and simulated quantities. For each active calibration row,
+\code{setup$variable} must therefore match the name of the corresponding element in
+the list returned by the model function.
+}
+
+\section{Saving and reusing observed data}{
+
+When \code{file} is supplied, the created list is also saved as an \code{.rds} file.
+This can be helpful in iterative calibration workflows where the setup table
+is stable but reading the original data files repeatedly is inconvenient.
+}
+
+\examples{
+\dontrun{
+demo = calibrar_demo(model = "PredatorPrey")
+setup = calibration_setup(file = demo$setup)
+observed = calibration_data(setup = setup, path = demo$path)
+
+names(observed)
+str(observed)
+}
+
 }
 \seealso{
-\code{\link{calibration_objFn}}, \code{\link{calibration_setup}}.
-}
-\author{
-Ricardo Oliveros-Ramos
+\code{\link[=calibration_setup]{calibration_setup()}}, \code{\link[=calibration_objFn]{calibration_objFn()}}, \code{\link[=objFn]{objFn()}}
 }

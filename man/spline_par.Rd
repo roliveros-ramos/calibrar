@@ -2,24 +2,55 @@
 % Please edit documentation in R/calibrar-splines.R
 \name{spline_par}
 \alias{spline_par}
-\title{Predict time-varying parameters using splines.}
+\alias{plot.spline.par}
+\title{Interpolate time-varying parameters with a spline}
 \usage{
 spline_par(par, n, knots = NULL, periodic = FALSE, period = NULL)
+
+\method{plot}{spline.par}(x, ...)
 }
 \arguments{
-\item{par}{Values at knots}
+\item{par}{Numeric vector of parameter values at the knots.}
 
-\item{n}{Number of points. Time (independent variable) is assumed to be between 0 and n with length(par) equidistant points (including 0 and n).}
+\item{n}{Number of output time points.}
 
-\item{knots}{Position of knots. Default, is length(x) equidistant points between 0 and 1. Always are re-scaled to 0 to 1.}
+\item{knots}{Optional numeric vector giving the knot positions associated
+with \code{par}. If \code{NULL}, equally spaced knots are used.}
 
-\item{periodic}{boolean, is the spline periodic?}
+\item{periodic}{Logical. Should the spline be treated as periodic?}
 
-\item{period}{If periodic is TRUE, it specify the time period.}
+\item{period}{Optional period of the cycle when \code{periodic = TRUE} and custom
+\code{knots} are supplied.}
+
+\item{x}{A \code{spline.par} object returned by \code{\link[=spline_par]{spline_par()}}.}
+
+\item{...}{Further graphical arguments passed to \code{\link[graphics:plot.default]{graphics::plot()}}.}
 }
 \value{
-A list with the interpolates values as 'x' and 'time'.
+An object of class \code{spline.par}: a list containing the interpolated values
+(\code{x}), the corresponding time points (\code{time}), the knot locations, the knot
+values, and auxiliary information used by the plotting method.
 }
 \description{
-Predict time-varying parameters using splines.
+Build a smooth time series from values specified at spline knots. This is
+useful when a model parameter is allowed to vary through time but is
+represented by a smaller set of control values to be estimated.
+}
+\details{
+The function rescales knot positions internally to the unit interval before
+building the spline. If \code{periodic = TRUE}, the series is extended so that the
+interpolation wraps around smoothly at the boundaries.
+
+The returned object is designed to be plotted with \code{plot()} and to provide
+both the discrete interpolated values used in a model and a smoother curve
+for visual inspection.
+}
+\examples{
+sp = spline_par(par = c(0.2, 0.8, 0.4, 0.6), n = 12)
+head(sp$x)
+plot(sp)
+
+}
+\seealso{
+\code{\link[stats:splinefun]{stats::splinefun()}}
 }

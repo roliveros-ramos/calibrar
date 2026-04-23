@@ -2,7 +2,7 @@
 % Please edit documentation in R/calibrar-main.R
 \name{optimh}
 \alias{optimh}
-\title{General-purpose optimization using heuristic algorithms}
+\title{General-purpose optimisation with heuristic and derivative-free methods}
 \usage{
 optimh(
   par,
@@ -27,14 +27,16 @@ parameters to be estimated (i.e., the dimension of the problem).}
 (or list, depending on the wrapper) as first argument and return either a scalar value
 (single-objective) or a numeric vector (multi-objective).}
 
-\item{gr}{Function to compute the gradient of \code{fn}. Ignored by most methods, 
-added for consistency with other optimization functions.}
+\item{gr}{Function computing the gradient of \code{fn}. It is included for API
+consistency with \code{\link[=optim2]{optim2()}} and \code{\link[=calibrate]{calibrate()}}, but is ignored by most
+methods available through \code{optimh()}.}
 
 \item{...}{Additional arguments passed to \code{fn} and \code{gr}.}
 
-\item{method}{Optimisation method(s) to be used. Can be a single method name or a
-vector of method names (e.g., one per phase). If \code{NULL}, a default is chosen based
-on \code{replicates} (see Details).}
+\item{method}{Optimisation method to use. Available choices are
+\code{"AHR-ES"}, \code{"Nelder-Mead"}, \code{"SANN"}, \code{"hjn"}, \code{"bobyqa"}, \code{"CMA-ES"},
+\code{"genSA"}, \code{"DE"}, \code{"soma"}, \code{"genoud"}, \code{"PSO"}, \code{"hybridPSO"}, \code{"mads"},
+\code{"hjk"}, \code{"hjkb"}, \code{"nmk"}, and \code{"nmkb"}.}
 
 \item{lower}{Lower bounds for parameters. One value or a vector of the same length as
 \code{par}. \code{NA} is treated as \code{-Inf}. Default is unconstrained.}
@@ -57,29 +59,67 @@ Currently not implemented.}
 and/or numerical gradients) using up to \code{control$ncores} cores.}
 }
 \value{
-A list with components:
+A list in the same general format as \code{\link[=optim2]{optim2()}}, typically including:
 \describe{
-\item{par}{The best set of parameters found.}
-\item{value}{The value of \code{fn} corresponding to \code{par}.}
-\item{counts}{A two-element integer vector giving the number of calls to \code{fn} and
-\code{gr} respectively. This excludes those calls needed to compute the Hessian, if
-requested, and any calls to \code{fn} to compute a finite-difference approximation to the
-gradient.}
-\item{convergence}{An integer code. \code{0} indicates successful completion.}
-\item{message}{A character string giving any additional information returned by the
-optimizer, or \code{NULL}.}
-\item{hessian}{Only if argument \code{hessian} is \code{TRUE}. A symmetric matrix giving an
-estimate of the Hessian at the solution found. Note that this is the Hessian of the
-unconstrained problem even if the box constraints are active.}
+\item{par}{The best parameter values found.}
+\item{value}{The value of \code{fn} at \code{par}.}
+\item{counts}{Number of function and gradient evaluations reported by the
+underlying solver, when available.}
+\item{convergence}{Convergence code returned by the underlying solver.}
+\item{message}{Additional information returned by the optimiser, if any.}
+\item{hessian}{A Hessian estimate when supported and requested; otherwise
+usually \code{NULL}.}
 }
 }
 \description{
-General-purpose optimization using heuristic algorithms
+\code{optimh()} provides a unified interface to the heuristic and derivative-free
+optimisation methods available through \strong{calibrar}. It is intended for
+objective functions that are expensive, noisy, non-smooth, stochastic, or
+otherwise difficult to handle with standard gradient-based optimisers.
 }
+\details{
+\code{optimh()} uses the same interface conventions as \code{\link[=optim2]{optim2()}} and
+\code{\link[=calibrate]{calibrate()}}: parameters may be supplied as a vector or list, box
+constraints can be enforced through \code{lower} and \code{upper}, and subsets of
+parameters can be held fixed through \code{active}.
+
+The available methods include both genuinely heuristic/global algorithms
+(for example \code{"AHR-ES"}, \code{"CMA-ES"}, \code{"DE"}, \code{"genSA"}, \code{"PSO"}) and a few
+derivative-free local searches (for example \code{"Nelder-Mead"}, \code{"bobyqa"},
+\code{"hjn"}, \code{"nmk"}). The function name should therefore be read broadly: it is
+the package entry point for optimisation methods that are typically useful
+when classical smooth, gradient-based optimisation is not the best fit.
+
+Analytic gradients are accepted for interface consistency, but many methods
+implemented through \code{optimh()} ignore \code{gr}. Likewise, not all methods return
+Hessian information even when \code{hessian = TRUE} is requested.
+}
+\section{Choosing a method}{
+
+Heuristic and evolutionary methods are often useful for rugged,
+multi-modal, or stochastic objective functions. Derivative-free local
+methods may be a better first choice when the objective is deterministic but
+gradients are unavailable or unreliable. Method choice should still reflect
+the structure of the problem: locality versus global exploration, box
+constraints, stochasticity, and computational cost.
+}
+
 \examples{
-optim2(par=rep(NA, 5), fn=sphereN)
+\dontrun{
+optimh(
+  par = rep(0.5, 5),
+  fn = sphereN,
+  lower = -5,
+  upper = 5,
+  method = "AHR-ES",
+  control = list(maxit = 200)
+)
+}
+
 }
 \seealso{
+\code{\link[=optim2]{optim2()}}, \code{\link[=calibrate]{calibrate()}}, \code{\link[=ahres]{ahres()}}, \code{\link[=gradient]{gradient()}}
+
 Other optimisers: 
 \code{\link{ahres}()},
 \code{\link{calibrate}()},

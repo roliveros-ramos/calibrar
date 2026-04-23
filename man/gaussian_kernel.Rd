@@ -2,26 +2,53 @@
 % Please edit documentation in R/calibrar-splines.R
 \name{gaussian_kernel}
 \alias{gaussian_kernel}
-\title{Calculate a discretization of the 2D Gaussian Kernel}
+\title{Discretise a bivariate Gaussian kernel on a grid}
 \usage{
 gaussian_kernel(par, lower, upper, n = 10, checkSymmetry = TRUE, ...)
 }
 \arguments{
-\item{par}{A list, including the mean and covariance matrix.}
+\item{par}{A list containing at least \code{mean} and \code{sigma}, where \code{mean} is a
+numeric vector of length two and \code{sigma} is a \verb{2 x 2} covariance matrix.}
 
-\item{lower}{A vector, indicating the lower bound for the calculation.}
+\item{lower}{Numeric vector of length two giving the lower bounds of the
+grid.}
 
-\item{upper}{A vector, indicating the upper bound for the calculation.}
+\item{upper}{Numeric vector of length two giving the upper bounds of the
+grid.}
 
-\item{n}{The number of cells for each dimension, can be one or two numbers.}
+\item{n}{Number of grid cells per dimension. This can be a scalar or a
+length-two numeric vector.}
 
-\item{checkSymmetry}{TRUE by default, checks if the covariance matrix is symmetric.}
+\item{checkSymmetry}{Logical. Passed to \code{\link[mvtnorm:Mvnorm]{mvtnorm::dmvnorm()}} when checking
+the covariance matrix.}
 
-\item{...}{Additional arguments, currently not used.}
+\item{...}{Further arguments reserved for future extensions.}
 }
 \value{
-A list, with 'x', 'y' and 'z' components.
+A list with components \code{x}, \code{y}, and \code{z}, suitable for contour or image
+plotting. \code{x} and \code{y} contain the grid coordinates, and \code{z} contains the
+corresponding matrix of Gaussian density values.
 }
 \description{
-Calculate a discretization of the 2D Gaussian Kernel
+Evaluate a two-dimensional Gaussian density on a regular grid defined by
+lower and upper bounds in each dimension.
+}
+\details{
+This helper is convenient when a smooth bivariate dispersal or movement
+kernel needs to be represented on a finite grid. The function uses
+\code{\link[mvtnorm:Mvnorm]{mvtnorm::dmvnorm()}} internally and returns the density values without
+normalising them to sum to one over the discretised domain.
+}
+\examples{
+ker = gaussian_kernel(
+  par = list(mean = c(0, 0), sigma = diag(2)),
+  lower = c(-2, -2),
+  upper = c(2, 2),
+  n = c(10, 10)
+)
+str(ker)
+
+}
+\seealso{
+\code{\link[mvtnorm:Mvnorm]{mvtnorm::dmvnorm()}}
 }

@@ -2,29 +2,122 @@
 % Please edit documentation in R/calibrar-main.R
 \name{calibration_setup}
 \alias{calibration_setup}
-\title{Get information to run a calibration using the \code{calibrar} package.}
+\title{Read and validate a calibration setup table}
 \usage{
 calibration_setup(file, control = list(), ...)
 }
 \arguments{
-\item{file}{The file with the calibration information, see details.}
+\item{file}{Path to the calibration setup file, typically a \code{.csv} file.}
 
-\item{control}{Control arguments for generating the setup. See details.}
+\item{control}{Named list of defaults used when optional columns are missing
+from the setup table. Currently recognised entries are:
+\describe{
+\item{\code{col_skip}}{Default number of leading columns to discard when a
+text file is read as a full table by \code{\link[=calibration_data]{calibration_data()}}. Defaults to
+\code{2}.}
+\item{\code{nrows}}{Default number of rows to read from each data file.
+Defaults to \code{NA}, which is interpreted downstream as “read all rows”.}
+}}
 
-\item{\dots}{Additional arguments to \code{read.csv} function.}
+\item{...}{Additional arguments passed to \code{\link[utils:read.table]{utils::read.csv()}} when reading
+\code{file}.}
 }
 \value{
-A data.frame with the information for the calibration of a 
-model, to be used with the \code{\link{calibration_objFn}} 
-and \code{\link{calibration_data}}.
+A \code{data.frame} describing the calibration targets. The returned table
+is suitable for direct use in \code{\link[=calibration_data]{calibration_data()}} and
+\code{\link[=calibration_objFn]{calibration_objFn()}}. Standard columns are coerced to the expected types
+and missing optional columns are added where needed.
 }
 \description{
-A wrapper for \code{read.csv} checking column names and data types 
-for the table with the calibration information.
+Read a calibration settings table from a text file and coerce it to the
+structure expected by \code{\link[=calibration_data]{calibration_data()}} and \code{\link[=calibration_objFn]{calibration_objFn()}}. The
+setup table defines which model outputs are compared with observations, which
+objective function is used for each output, whether a row contributes to the
+calibration, and how each component is weighted in the final objective.
+}
+\details{
+The function is a validated wrapper around \code{\link[utils:read.table]{utils::read.csv()}}. It checks
+required column names, coerces standard column types, fills a few optional
+columns from \code{control}, and derives \code{weight} from \code{cv} when needed.
+
+The setup table may contain the following columns:
+
+\describe{
+\item{\code{variable}}{Name of the calibration component. This name must match
+the corresponding element returned by the model function supplied to
+\code{\link[=calibration_objFn]{calibration_objFn()}}.}
+
+\item{\code{type}}{Name of the objective function used for that component.
+In current workflows this is usually the name of a function accepted by
+\code{\link[=objFn]{objFn()}}, such as \code{"norm2"}, \code{"lnorm2"}, \code{"pois"}, \code{"multinom"},
+\code{"normp"}, or \code{"penalty"}.}
+
+\item{\code{calibrate}}{Logical flag indicating whether the component is active
+in the calibration. Only rows with \code{calibrate = TRUE} are included in the
+objective function returned by \code{\link[=calibration_objFn]{calibration_objFn()}}.}
+
+\item{\code{weight}}{Positive weight used when partial objective values are
+aggregated. If \code{weight} is missing, or contains \code{NA}, it is derived from
+\code{cv} as \code{1 / (2 * cv^2)} for the corresponding rows.}
+
+\item{\code{cv}}{Coefficient of variation used to derive \code{weight} when an
+explicit weight is not supplied. At least one of \code{weight} or \code{cv} must be
+available in the table.}
+
+\item{\code{use_data}}{Logical flag indicating whether an observed dataset must
+be read for that row. This is typically \code{FALSE} for pure penalties such as
+\code{"normp"}, where the objective depends only on simulated values.}
+
+\item{\code{file}}{Path to the observed data file for that component. Paths are
+interpreted relative to the \code{path} argument of \code{\link[=calibration_data]{calibration_data()}}. This
+column is still required when \code{use_data = FALSE}, although the file will not
+be read in that case.}
+
+\item{\code{varid}}{Optional identifier used by \code{\link[=calibration_data]{calibration_data()}} when
+extracting a single column from a text file. If omitted, a full numeric
+table is read instead.}
+
+\item{\code{col_skip}}{Optional number of leading columns to discard when a text
+file is read as a full table. Missing values are replaced by
+\code{control$col_skip}.}
+
+\item{\code{nrows}}{Optional number of rows to read from each observed-data
+file. Missing values are replaced by \code{control$nrows}.}
+}
+
+Required columns are \code{variable}, \code{type}, \code{calibrate}, \code{use_data}, and
+\code{file}. In addition, at least one of \code{weight} or \code{cv} must be supplied.
+}
+\section{Weight handling}{
+
+Aggregation weights are stored in the returned table regardless of whether the
+objective is later used in vector or scalar form.
+
+If the table does not contain a \code{weight} column, weights are computed from
+\code{cv} as \code{1 / (2 * cv^2)}. If \code{weight} exists but contains missing values,
+those entries are filled using the same formula. All final weights must be
+strictly positive.
+}
+
+\section{Relationship with the rest of the workflow}{
+
+A typical file-based calibration workflow is:
+\enumerate{
+\item read the setup table with \code{calibration_setup()};
+\item load observed data with \code{\link[=calibration_data]{calibration_data()}};
+\item build the objective function with \code{\link[=calibration_objFn]{calibration_objFn()}};
+\item pass the resulting function to \code{\link[=calibrate]{calibrate()}} or another optimiser.
+}
+}
+
+\examples{
+\dontrun{
+demo = calibrar_demo(model = "PredatorPrey")
+setup = calibration_setup(file = demo$setup)
+setup
+}
+
 }
 \seealso{
-\code{\link{calibration_objFn}}, \code{\link{calibration_data}}.
-}
-\author{
-Ricardo Oliveros-Ramos
+\code{\link[=calibration_data]{calibration_data()}}, \code{\link[=calibration_objFn]{calibration_objFn()}}, \code{\link[=calibrate]{calibrate()}}, \code{\link[=objFn]{objFn()}}
 }

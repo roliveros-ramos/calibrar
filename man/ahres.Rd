@@ -2,8 +2,7 @@
 % Please edit documentation in R/calibrar-main.R
 \name{ahres}
 \alias{ahres}
-\title{Adaptative Hierarchical Recombination Evolutionary Strategy (AHR-ES) for 
-derivative-free and black-box optimization}
+\title{Adaptive Hierarchical Recombination Evolutionary Strategy}
 \usage{
 ahres(
   par,
@@ -26,10 +25,7 @@ parameters to be estimated (i.e., the dimension of the problem).}
 (or list, depending on the wrapper) as first argument and return either a scalar value
 (single-objective) or a numeric vector (multi-objective).}
 
-\item{gr}{A function computing the gradient of \code{fn}. If \code{NULL}, a numerical
-approximation is used. Alternatively, a character string can specify the numerical
-gradient scheme: \code{"central"}, \code{"forward"} (default), \code{"backward"}, or
-\code{"richardson"}.}
+\item{gr}{Function computing the gradient of \code{fn}. Ignored by \code{ahres()}.}
 
 \item{...}{Additional arguments passed to \code{fn} and \code{gr}.}
 
@@ -54,30 +50,74 @@ Currently not implemented.}
 and/or numerical gradients) using up to \code{control$ncores} cores.}
 }
 \value{
-A list with components:
+An object of class \code{"ahres.results"}, typically with components:
 \describe{
-\item{par}{The best set of parameters found.}
-\item{value}{The value of \code{fn} corresponding to \code{par}.}
-\item{counts}{A two-element integer vector giving the number of calls to \code{fn} and
-\code{gr} respectively. This excludes those calls needed to compute the Hessian, if
-requested, and any calls to \code{fn} to compute a finite-difference approximation to the
-gradient.}
-\item{convergence}{An integer code. \code{0} indicates successful completion.}
-\item{message}{A character string giving any additional information returned by the
-optimizer, or \code{NULL}.}
-\item{hessian}{Only if argument \code{hessian} is \code{TRUE}. A symmetric matrix giving an
-estimate of the Hessian at the solution found. Note that this is the Hessian of the
-unconstrained problem even if the box constraints are active.}
+\item{par}{Best parameter values found, returned on the original scale.}
+\item{value}{Objective value at \code{par}, returned on the original objective scale.}
+\item{counts}{Number of function and gradient evaluations.}
+\item{convergence}{Convergence code (\code{0} usually indicates a regular stop,
+\code{1} that the maximum number of generations/evaluations was reached).}
+\item{message}{A short message describing the stopping condition.}
+\item{generations}{Number of generations performed.}
+\item{partial}{Optional vector of objective components when the objective
+function returns more than one value.}
+\item{trace}{Optional tracing information when tracing is enabled.}
+\item{active}{Information about active parameters used during optimisation.}
 }
 }
 \description{
-This function performs the optimization of a function using 
-the Adaptative Hierarchical Recombination Evolutionary Strategy (AHR-ES, Oliveros & Shin, 2015).
+\code{ahres()} runs the AHR-ES optimiser directly through a dedicated interface.
+It is primarily intended for bounded, derivative-free optimisation of
+expensive or black-box objective functions, including calibration problems in
+which the objective may be noisy or obtained from an external model.
 }
+\details{
+\code{ahres()} accepts the same broad interface as the other optimisation entry
+points in \strong{calibrar}, but is specialised to the \code{"AHR-ES"} algorithm.
+Parameters may be supplied as a vector or list. Internally, list-structured
+parameters are flattened for optimisation and then restored before the result
+is returned.
+
+The function supports box constraints through \code{lower} and \code{upper}, and
+parameter masking through \code{active}, so only selected parameters are evolved
+while the others are held fixed at their supplied starting values.
+
+If \code{control$parscale} and/or \code{control$fnscale} are supplied, optimisation is
+performed on the corresponding scaled parameter space and objective scale,
+and results are transformed back before being returned.
+
+\code{gr} is accepted only for interface compatibility and is ignored by this
+method. In the current implementation, \code{control$maxit} or \code{control$maxgen}
+must be supplied; otherwise the optimisation stops with an error.
+
+For scalar objectives, the default settings are usually sufficient. For
+vector-valued objectives, advanced users may also need to provide suitable
+\code{control} entries such as \code{weights}, \code{nvar}, and \code{aggFn}, depending on how
+the objective has been constructed.
+}
+\section{Parallel execution}{
+
+AHR-ES parallelism is controlled through entries inside \code{control}, notably
+\code{control$parallel} and \code{control$ncores}. The top-level \code{parallel} argument is
+currently retained for interface consistency but is not used directly inside
+\code{ahres()}.
+}
+
 \examples{
-\dontrun{ahres(par=rep(1, 5), fn=sphereN)}
+\dontrun{
+ahres(
+  par = rep(0.5, 5),
+  fn = sphereN,
+  lower = -5,
+  upper = 5,
+  control = list(maxit = 200)
+)
+}
+
 }
 \seealso{
+\code{\link[=optimh]{optimh()}}, \code{\link[=optim2]{optim2()}}, \code{\link[=calibrate]{calibrate()}}, \code{\link[=summary.ahres.results]{summary.ahres.results()}}
+
 Other optimisers: 
 \code{\link{calibrate}()},
 \code{\link{optim2}()},

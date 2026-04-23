@@ -2,30 +2,69 @@
 % Please edit documentation in R/calibrar-gradient.R
 \name{gradient}
 \alias{gradient}
-\title{Numerical computation of the gradient, with parallel capabilities}
+\alias{gradient.default}
+\title{Numerical gradient approximation}
 \usage{
 gradient(fn, x, method, control, parallel, ...)
+
+\method{gradient}{default}(fn, x, method = NULL, control = list(), parallel = FALSE, ...)
 }
 \arguments{
-\item{fn}{The function to calculate the gradient.}
+\item{fn}{Function whose gradient is to be approximated.}
 
-\item{x}{The value to compute the gradient at.}
+\item{x}{Numeric vector giving the point at which the gradient is evaluated.}
 
-\item{method}{The method used. Currently implemented: central, backward, forward and Richardson. See details.}
+\item{method}{Numerical differentiation scheme. If \code{NULL}, the default method
+used by \code{gradient.default()} is \code{"forward"}.}
 
-\item{control}{A list of control arguments.}
+\item{control}{A list of control arguments governing step-size construction
+and, for Richardson extrapolation, the extrapolation sequence.}
 
-\item{parallel}{Boolean, should numerical derivatives be calculated in parallel?}
+\item{parallel}{Logical. Should the function evaluations needed for the
+numerical derivative be carried out in parallel via \code{foreach}?}
 
-\item{...}{Additional arguments to be passed to \code{fn}.}
+\item{...}{Additional arguments passed to \code{fn}.}
 }
 \value{
-The gradient of \code{fn} at \code{x}.
+A numeric vector of the same length as \code{x} containing the estimated
+gradient of \code{fn} at \code{x}.
 }
 \description{
-This function calculates the gradient of a function, numerically, including the possibility
-of doing it in parallel.
+\code{gradient()} computes a numerical approximation to the gradient of a scalar
+objective function at a given parameter vector. It provides several
+finite-difference schemes and can distribute the underlying function
+evaluations across a registered \code{foreach} backend when \code{parallel = TRUE}.
+}
+\details{
+The currently implemented methods are:
+\itemize{
+\item \code{"forward"} (default): one-sided forward finite differences.
+\item \code{"backward"}: one-sided backward finite differences.
+\item \code{"central"}: central finite differences.
+\item \code{"richardson"}: central differences with Richardson extrapolation.
+}
+
+Step sizes are controlled through \code{control}. Common entries are:
+\itemize{
+\item \code{step_method}: how the initial step size is computed. Implemented values
+are \code{"simple"}, \code{"optextras"}, and \code{"start"}.
+\item \code{eps}: base perturbation size.
+\item \code{zero.tol}: threshold used to decide when a parameter value is treated as
+effectively zero for step-size construction.
+\item \code{d}: starting fraction of \code{x} used by \code{step_method = "start"}.
+\item \code{r} and \code{v}: Richardson iteration depth and reduction factor for
+\code{method = "richardson"}.
+}
+
+When \code{parallel = TRUE}, a suitable \code{foreach} backend must already be
+registered by the user. This function does not itself create or manage a
+parallel backend.
 }
 \examples{
-gradient(fn=function(x) sum(x^3), x=0)
+gradient(fn = function(x) sum(x^3), x = c(1, 2), method = "forward")
+gradient(fn = function(x) sum(x^3), x = c(1, 2), method = "central")
+
+}
+\seealso{
+\code{\link[=optim2]{optim2()}}, \code{\link[=optimh]{optimh()}}, \code{\link[=calibrate]{calibrate()}}
 }

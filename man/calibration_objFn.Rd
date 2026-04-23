@@ -2,41 +2,143 @@
 % Please edit documentation in R/calibrar-main.R
 \name{calibration_objFn}
 \alias{calibration_objFn}
-\title{Create an objective function to be used with optimization routines}
+\title{Create a calibration objective function from a model, setup table, and data}
 \usage{
 calibration_objFn(model, setup, observed, aggFn = NULL, aggregate = FALSE, ...)
 }
 \arguments{
-\item{model}{Function to run the model and produce a list of outputs.}
+\item{model}{Function that runs the model for a candidate parameter set. Its
+first argument must be \code{par}. The function must return a named list of
+simulated outputs whose names match \code{setup$variable} for all active
+calibration rows.}
 
-\item{setup}{A data.frame with the information about the calibration, 
-normally created with the \code{\link{calibration_setup}} function. 
-See details.}
+\item{setup}{A calibration setup table, usually created with
+\code{\link[=calibration_setup]{calibration_setup()}}.}
 
-\item{observed}{A list of the observed variables created with the 
-function \code{\link{calibration_data}}}
+\item{observed}{Observed data as returned by \code{\link[=calibration_data]{calibration_data()}}. This is
+typically a named list whose elements correspond to \code{setup$variable}.}
 
-\item{aggFn}{A function to aggregate \code{fn} to a scalar value if the
-returned value is a vector. Some optimization algorithm can explote the
-additional information provided by a vectorial output from \code{fn}}
+\item{aggFn}{Function used to aggregate partial objective values when
+\code{aggregate = TRUE}. The default is an internal weighted sum. The function
+must accept arguments \code{x} (partial objective values) and \code{w} (weights).}
 
-\item{aggregate}{boolean, if TRUE, a scalar value is returned using the 
-\code{aggFn}.}
+\item{aggregate}{Logical. If \code{FALSE} (the default), the returned function
+produces one objective value per active calibration row. If \code{TRUE}, those
+partial values are combined into a single scalar using \code{aggFn} and the
+weights stored in \code{setup}.}
 
-\item{\dots}{More arguments passed to the \code{model} function.}
+\item{...}{Additional arguments passed to \code{model} each time the returned
+objective function is evaluated.}
 }
 \value{
-A function, integrating the simulation of the model and the 
-comparison with observed data.
+A function of \code{par} suitable for optimisation.
+
+When evaluated, the returned function:
+\enumerate{
+\item runs \code{model(par, ...)};
+\item extracts the simulated outputs;
+\item compares them with \code{observed} according to \code{setup$type};
+\item returns either a named numeric vector of partial objective values
+or a single aggregated numeric value.
+}
+
+The returned function has class \code{"objFn"} and carries metadata attributes
+used internally by \code{\link[=calibrate]{calibrate()}}, including the number of objective
+components, their weights, and the names of the active variables.
 }
 \description{
-Create a new function, to be used as the objective function in the 
-calibration, given a function to run the model within R, observed data 
-and information about the comparison with data.
+Build an objective function that runs a model, compares its outputs with the
+observed data prepared by \code{\link[=calibration_data]{calibration_data()}}, and returns either a vector of
+partial objective values or a single aggregated objective value.
+}
+\details{
+This is the main bridge between a model-specific simulation function and the
+optimisation tools in \code{calibrar}. The resulting function can be passed
+directly to \code{\link[=calibrate]{calibrate()}} and related optimisers.
+
+For each row where \code{setup$calibrate} is \code{TRUE}, the function looks for a
+variable named \code{setup$variable} in both \code{observed} and the list returned by
+\code{model}. The comparison itself is delegated to the objective function named in
+\code{setup$type}, using the same convention as \code{\link[=objFn]{objFn()}}.
+
+This means that the structure of the objects returned by \code{model} must already
+be compatible with the corresponding objective function. For example:
+
+\itemize{
+\item pointwise criteria such as \code{"norm2"}, \code{"lnorm2"}, or \code{"pois"}
+usually expect vectors, matrices, or arrays with shapes matching the
+observed data;
+\item \code{"multinom"} expects matrix inputs;
+\item penalty terms such as \code{"normp"} may ignore \code{observed}, but still
+require the model output to contain the corresponding named element.
+}
+
+If \code{model} returns \code{NULL}, the generated objective function returns \code{NULL}
+after emitting a diagnostic message.
+}
+\section{Aggregated versus vector objectives}{
+
+With \code{aggregate = FALSE}, the returned objective is multi-component: it
+produces one value per active calibration row. This can be useful for methods
+that exploit vector-valued objectives.
+
+With \code{aggregate = TRUE}, the returned objective is scalar and can be used with
+optimisers that require a single value. Aggregation is performed with
+\code{aggFn(x = partial_values, w = setup$weight[setup$calibrate])}.
+}
+
+\section{Expected model interface}{
+
+In typical use, the model function has the form:
+
+\verb{function(par, ...) -> named list}
+
+where \code{par} may be a numeric vector or a list, depending on how the
+optimisation is configured. The returned list should expose one element per
+calibration target, with names that match \code{setup$variable} exactly.
+}
+
+\section{Workflow}{
+
+The usual sequence is:
+\enumerate{
+\item define a model-running function;
+\item read the setup table with \code{\link[=calibration_setup]{calibration_setup()}};
+\item read observed data with \code{\link[=calibration_data]{calibration_data()}};
+\item create the objective function with \code{calibration_objFn()};
+\item call \code{\link[=calibrate]{calibrate()}} with the resulting function.
+}
+}
+
+\examples{
+\dontrun{
+demo = calibrar_demo(model = "PredatorPrey")
+setup = calibration_setup(file = demo$setup)
+observed = calibration_data(setup = setup, path = demo$path)
+
+run_model = calibrar:::.PredatorPreyModel
+
+obj_vec = calibration_objFn(
+  model = run_model,
+  setup = setup,
+  observed = observed,
+  T = demo$T,
+  aggregate = FALSE
+)
+
+obj_scalar = calibration_objFn(
+  model = run_model,
+  setup = setup,
+  observed = observed,
+  T = demo$T,
+  aggregate = TRUE
+)
+
+obj_vec(demo$guess)
+obj_scalar(demo$guess)
+}
+
 }
 \seealso{
-\code{\link{calibration_data}}, \code{\link{calibration_setup}}.
-}
-\author{
-Ricardo Oliveros-Ramos
+\code{\link[=calibration_setup]{calibration_setup()}}, \code{\link[=calibration_data]{calibration_data()}}, \code{\link[=calibrate]{calibrate()}}, \code{\link[=objFn]{objFn()}}
 }

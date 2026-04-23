@@ -13,12 +13,12 @@
 \item{\dots}{Additional arguments to \code{read.csv} function.}
 }
 \value{
-A data.frame with the information for the calibration of a 
-model, to be used with the \code{\link{createObjectiveFunction}} 
+A data.frame with the information for the calibration of a
+model, to be used with the \code{\link{createObjectiveFunction}}
 and \code{\link{getObservedData}}.
 }
 \description{
-A wrapper for \code{read.csv} checking column names and data types 
+A wrapper for \code{read.csv} checking column names and data types
 for the table with the calibration information.
 }
 \seealso{

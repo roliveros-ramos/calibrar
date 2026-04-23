@@ -2,101 +2,79 @@
 % Please edit documentation in R/calibrar-auxiliar.R
 \name{calibrar_demo}
 \alias{calibrar_demo}
-\title{Demos for the calibrar package}
+\alias{print.calibrar.demo}
+\title{Create small demonstration calibration projects}
 \usage{
 calibrar_demo(path = NULL, model = NULL, ...)
+
+\method{print}{calibrar.demo}(x, ...)
 }
 \arguments{
-\item{path}{Path to create the demo files}
+\item{path}{Directory where the demo project should be created. If \code{NULL},
+the current working directory is used.}
 
-\item{model}{Model to be used in the demo files, see details.}
+\item{model}{Name of the demo model to generate. Supported values currently
+include \code{"PoissonMixedModel"}, \code{"PredatorPrey"}, \code{"SIR"}, and
+\code{"IBMLotkaVolterra"}.}
 
-\item{\dots}{Additional parameters to be used in the construction of
-the demo files.}
+\item{...}{Further arguments passed to \code{\link[=print]{print()}}.}
+
+\item{x}{A \code{calibrar.demo} object returned by \code{\link[=calibrar_demo]{calibrar_demo()}}.}
 }
 \value{
-A list with the following elements:
-\item{path}{Path were the files were saved}
-\item{par}{Real value of the parameters used in the demo} 
-\item{setup}{Path to the calibration setup file} 
-\item{guess}{Values to be provided as initial guess to the calibrate function} 
-\item{lower}{Values to be provided as lower bounds to the calibrate function} 
-\item{upper}{Values to be provided as upper bounds to the calibrate function} 
-\item{phase}{Values to be provided as phases to the calibrate function} 
-\item{constants}{Constants used in the demo, any other variable not listed here.} 
-\item{value}{NA, set for compatibility with summary methods.} 
-\item{time}{NA, set for compatibility with summary methods.} 
-\item{counts}{NA, set for compatibility with summary methods.}
+An object of class \code{calibrar.demo}, which also inherits from
+\code{\link[=calibrar.results]{calibrar.results()}}. The returned list contains the demo project path,
+the true parameter values used to generate the synthetic data, the path to
+the calibration setup file, suggested starting values and bounds, phase
+information, model-specific constants, and a precomputed objective value at
+the true parameter set.
 }
 \description{
-Creates demo files able to be processed for a full calibration using
-the calibrar package
+Create self-contained example projects that can be used to learn the
+\code{calibrar} workflow, test installation, or prototype calibration code.
+Each demo writes a small set of files to disk and returns the information
+needed to read the setup table, load the observed data, define the model
+interface, and run a calibration.
 }
 \details{
-Current implemented models are:
+The generated project is meant to be a compact, runnable example of the
+\code{calibrar} workflow rather than a realistic scientific application. The
+returned object typically contains enough information to proceed through the
+standard helper functions:
+\itemize{
+\item \code{\link[=calibration_setup]{calibration_setup()}} to read the setup table,
+\item \code{\link[=calibration_data]{calibration_data()}} to load the observed data,
+\item \code{\link[=calibration_objFn]{calibration_objFn()}} to build the objective function, and
+\item \code{\link[=calibrate]{calibrate()}} or \code{\link[=optim2]{optim2()}} to run the optimisation.
+}
+
+The exact files created depend on \code{model}, but they usually include a
+calibration settings table, one or more observation files, and any required
+forcing or master data files.
+
+The currently available demos are:
+
 \describe{
-\item{PoissonMixedModel}{Poisson Autoregressive Mixed model for the dynamics 
-of a population in different sites:
-\deqn{log(\mu_{i, t+1}) = log(\mu_{i, t}) + \alpha + \beta X_{i, t} + \gamma_t}
-where \eqn{\mu_{i, t}} is the size of the population in site \eqn{i} at year \eqn{t}, 
-\eqn{X_{i, t}} is the value of an environmental variable in site \eqn{i} at year \eqn{t}. 
-The parameters to estimate were \eqn{\alpha}, \eqn{\beta}, and \eqn{\gamma_t}, the 
-random effects for each year, \eqn{\gamma_t \sim N(0,\sigma^2)}, and the initial 
-population at each site \eqn{\mu_{i, 0}}. We assumed that the observations 
-\eqn{N_{i,t}} follow a Poisson distribution with mean \eqn{\mu_{i, t}}.}
-\item{PredatorPrey}{Lotka Volterra Predator-Prey model. The model is defined 
-by a system of ordinary differential equations for the abundance of prey $N$ and predator $P$:
-\deqn{\frac{dN}{dt} = rN(1-N/K)-\alpha NP}
-\deqn{\frac{dP}{dt} = -lP + \gamma\alpha NP}
-The parameters to estimate are the prey’s growth rate \eqn{r}, the predator’s 
-mortality rate \eqn{l}, the carrying capacity of the prey \eqn{K} and \eqn{\alpha} 
-and \eqn{\gamma} for the predation interaction. Uses \code{deSolve} package 
-for numerical solution of the ODE system.}
-\item{SIR}{Susceptible-Infected-Recovered epidemiological model. 
-The model is defined by a system of ordinary differential equations for the 
-number of susceptible $S$, infected $I$ and recovered $R$ individuals:
-\deqn{\frac{dS}{dt} = -\beta S I/N}
-\deqn{\frac{dI}{dt} = \beta S I/N -\gamma I}
-\deqn{\frac{dR}{dt} = \gamma I}
-The parameters to estimate are the  average number of contacts per person per 
-time \eqn{\beta} and the instant probability of an infectious individual 
-recovering \eqn{\gamma}. Uses \code{deSolve} package for numerical solution of the ODE system.}
-\item{IBMLotkaVolterra}{Stochastic Individual Based Model for Lotka-Volterra model. Uses \code{ibm} package for the simulation.}
+\item{\code{"PoissonMixedModel"}}{A Poisson autoregressive mixed model for the
+dynamics of a population observed at several sites over time.}
+\item{\code{"PredatorPrey"}}{A deterministic Lotka--Volterra predator--prey
+system solved numerically.}
+\item{\code{"SIR"}}{A simple susceptible--infected--recovered epidemic model
+solved numerically.}
+\item{\code{"IBMLotkaVolterra"}}{A stochastic individual-based predator--prey
+example.}
 }
 }
 \examples{
-\dontrun{
+tmp = tempdir()
+demo = calibrar_demo(path = tmp, model = "PoissonMixedModel", T = 8, L = 3)
+print(demo)
 
-summary(ahr)
-set.seed(880820)
-path = NULL # NULL to use the current directory
-# create the demonstration files
-demo = calibrar_demo(path=path, model="PredatorPrey", T=100) 
-# get calibration information
-calibration_settings = calibration_setup(file = demo$setup)
-# get observed data
-observed = calibration_data(setup = calibration_settings, path=demo$path)
-# Defining 'run_model' function
-run_model = calibrar:::.PredatorPreyModel
-# real parameters
-cat("Real parameters used to simulate data\n")
-print(unlist(demo$par)) # parameters are in a list
-# objective functions
-obj  = calibration_objFn(model=run_model, setup=calibration_settings, observed=observed, T=demo$T)
-obj2 = calibration_objFn(model=run_model, setup=calibration_settings, observed=observed, 
-T=demo$T, aggregate=TRUE)
-cat("Starting calibration...\n")
-cat("Running optimization algorithms\n", "\t")
-cat("Running optim AHR-ES\n")
-ahr = calibrate(par=demo$guess, fn=obj, lower=demo$lower, upper=demo$upper, phases=demo$phase)
-summary(ahr)
-} 
+setup = calibration_setup(demo$setup)
+observed = calibration_data(setup, path = demo$path)
+
 }
-\references{
-Oliveros-Ramos and Shin (2014)
+\seealso{
+\code{\link[=calibration_setup]{calibration_setup()}}, \code{\link[=calibration_data]{calibration_data()}}, \code{\link[=calibration_objFn]{calibration_objFn()}},
+\code{\link[=calibrate]{calibrate()}}, \code{\link[=summary.calibrar.results]{summary.calibrar.results()}}, \code{\link[=print.calibrar.results]{print.calibrar.results()}}
 }
-\author{
-Ricardo Oliveros--Ramos
-}
-\keyword{calibration}
-\keyword{demo}

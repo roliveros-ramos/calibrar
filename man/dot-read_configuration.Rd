@@ -2,7 +2,7 @@
 % Please edit documentation in R/calibrar-auxiliar.R
 \name{.read_configuration}
 \alias{.read_configuration}
-\title{Read a configuration file.}
+\title{Read a simple key-value configuration file}
 \usage{
 .read_configuration(
   file,
@@ -13,19 +13,56 @@
 )
 }
 \arguments{
-\item{file}{File to read the configuration}
+\item{file}{Path to the configuration file.}
 
-\item{recursive}{Should 'conf.key' keys be read as additional configuration files? Default is TRUE.}
+\item{recursive}{Logical. If \code{TRUE}, keys matching \code{conf.key} are treated as
+references to additional configuration files and are read recursively.}
 
-\item{keep.names}{Should names be kept as they are? By default, are converted to lower case.}
+\item{keep.names}{Logical. If \code{TRUE}, keys are kept as written. If \code{FALSE},
+they are converted to lower case.}
 
-\item{conf.key}{String indicating the leading key to find an additional configuration file.}
+\item{conf.key}{Optional pattern identifying keys that should be interpreted
+as additional configuration files.}
 
-\item{...}{Additional arguments, not currently in use.}
+\item{...}{Reserved for future extensions.}
+}
+\value{
+A named list containing the parsed configuration values. Scalars are returned
+as length-one vectors where appropriate, and simple values are converted with
+\code{type.convert()}. If \code{file} does not exist, \code{NULL} is returned with a
+warning.
 }
 \description{
-File is expected to have lines of the form 'key SEP value' where key is the
-name of the parameter, SEP a separator (can be '=' ',', ';') and value the value
-of the parameter itself. The SEP for each line is determined and parameters values are
-returned as a list.
+Read a plain-text configuration file in which each non-empty, non-comment
+line defines a key and one or more values separated by a recognised
+delimiter. Parsed values are returned as a named list.
+}
+\details{
+The reader accepts simple lines of the form \verb{key separator value}, where the
+separator may vary across lines. The current parser guesses the separator
+among common choices such as \code{=}, \verb{;}, \verb{,}, \code{:}, and tab.
+
+Lines beginning with punctuation after trimming are ignored, and trailing
+comments are removed. When \code{conf.key} is supplied, matching entries are
+treated as file references. Their paths are resolved relative to the parent
+configuration file, and the referenced files can be merged recursively.
+
+This helper is intentionally lightweight. It is useful for small calibration
+or script configuration files, but it is not intended to replace richer
+configuration formats such as YAML.
+}
+\examples{
+tf = tempfile(fileext = ".txt")
+writeLines(c(
+  "ncores = 4",
+  "verbose = TRUE",
+  "method = AHR-ES"
+), tf)
+
+cfg = .read_configuration(tf)
+str(cfg)
+
+}
+\seealso{
+\code{\link[=.get_command_argument]{.get_command_argument()}}
 }
