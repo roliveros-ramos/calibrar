@@ -1,87 +1,71 @@
 
-# calibrarDemo ------------------------------------------------------------
+# calibrar_demo()
 
-#' @title Demos for the calibrar package
-#' @description Creates demo files able to be processed for a full calibration using
-#' the calibrar package
-#' 
-#' @param path Path to create the demo files 
-#' @param model Model to be used in the demo files, see details.
-#' @param \dots Additional parameters to be used in the construction of
-#' the demo files.
-#' @return A list with the following elements:
-#' \item{path}{Path were the files were saved}
-#' \item{par}{Real value of the parameters used in the demo} 
-#' \item{setup}{Path to the calibration setup file} 
-#' \item{guess}{Values to be provided as initial guess to the calibrate function} 
-#' \item{lower}{Values to be provided as lower bounds to the calibrate function} 
-#' \item{upper}{Values to be provided as upper bounds to the calibrate function} 
-#' \item{phase}{Values to be provided as phases to the calibrate function} 
-#' \item{constants}{Constants used in the demo, any other variable not listed here.} 
-#' \item{value}{NA, set for compatibility with summary methods.} 
-#' \item{time}{NA, set for compatibility with summary methods.} 
-#' \item{counts}{NA, set for compatibility with summary methods.} 
-#' @details Current implemented models are:
+#' Create small demonstration calibration projects
+#'
+#' Create self-contained example projects that can be used to learn the
+#' `calibrar` workflow, test installation, or prototype calibration code.
+#' Each demo writes a small set of files to disk and returns the information
+#' needed to read the setup table, load the observed data, define the model
+#' interface, and run a calibration.
+#'
+#' @param path Directory where the demo project should be created. If `NULL`,
+#'   the current working directory is used.
+#' @param model Name of the demo model to generate. Supported values currently
+#'   include `"PoissonMixedModel"`, `"PredatorPrey"`, `"SIR"`, and
+#'   `"IBMLotkaVolterra"`.
+#' @param ... Additional model-specific arguments passed to the corresponding
+#'   demo generator, for example the simulation length or the true parameter
+#'   values used to generate the synthetic observations.
+#'
+#' @return An object of class `calibrar.demo`, which also inherits from
+#'   [calibrar.results()]. The returned list contains the demo project path,
+#'   the true parameter values used to generate the synthetic data, the path to
+#'   the calibration setup file, suggested starting values and bounds, phase
+#'   information, model-specific constants, and a precomputed objective value at
+#'   the true parameter set.
+#'
+#' @details
+#' The generated project is meant to be a compact, runnable example of the
+#' `calibrar` workflow rather than a realistic scientific application. The
+#' returned object typically contains enough information to proceed through the
+#' standard helper functions:
+#'
+#' - [calibration_setup()] to read the setup table,
+#' - [calibration_data()] to load the observed data,
+#' - [calibration_objFn()] to build the objective function, and
+#' - [calibrate()] or [optim2()] to run the optimisation.
+#'
+#' The exact files created depend on `model`, but they usually include a
+#' calibration settings table, one or more observation files, and any required
+#' forcing or master data files.
+#'
+#' The currently available demos are:
+#'
 #' \describe{
-#' \item{PoissonMixedModel}{Poisson Autoregressive Mixed model for the dynamics 
-#' of a population in different sites:
-#' \deqn{log(\mu_{i, t+1}) = log(\mu_{i, t}) + \alpha + \beta X_{i, t} + \gamma_t}
-#' where \eqn{\mu_{i, t}} is the size of the population in site \eqn{i} at year \eqn{t}, 
-#' \eqn{X_{i, t}} is the value of an environmental variable in site \eqn{i} at year \eqn{t}. 
-#' The parameters to estimate were \eqn{\alpha}, \eqn{\beta}, and \eqn{\gamma_t}, the 
-#' random effects for each year, \eqn{\gamma_t \sim N(0,\sigma^2)}, and the initial 
-#' population at each site \eqn{\mu_{i, 0}}. We assumed that the observations 
-#' \eqn{N_{i,t}} follow a Poisson distribution with mean \eqn{\mu_{i, t}}.}
-#' \item{PredatorPrey}{Lotka Volterra Predator-Prey model. The model is defined 
-#' by a system of ordinary differential equations for the abundance of prey $N$ and predator $P$:
-#' \deqn{\frac{dN}{dt} = rN(1-N/K)-\alpha NP}
-#' \deqn{\frac{dP}{dt} = -lP + \gamma\alpha NP}
-#' The parameters to estimate are the prey’s growth rate \eqn{r}, the predator’s 
-#' mortality rate \eqn{l}, the carrying capacity of the prey \eqn{K} and \eqn{\alpha} 
-#' and \eqn{\gamma} for the predation interaction. Uses \code{deSolve} package 
-#' for numerical solution of the ODE system.}
-#' \item{SIR}{Susceptible-Infected-Recovered epidemiological model. 
-#' The model is defined by a system of ordinary differential equations for the 
-#' number of susceptible $S$, infected $I$ and recovered $R$ individuals:
-#' \deqn{\frac{dS}{dt} = -\beta S I/N}
-#' \deqn{\frac{dI}{dt} = \beta S I/N -\gamma I}
-#' \deqn{\frac{dR}{dt} = \gamma I}
-#' The parameters to estimate are the  average number of contacts per person per 
-#' time \eqn{\beta} and the instant probability of an infectious individual 
-#' recovering \eqn{\gamma}. Uses \code{deSolve} package for numerical solution of the ODE system.}
-#' \item{IBMLotkaVolterra}{Stochastic Individual Based Model for Lotka-Volterra model. Uses \code{ibm} package for the simulation.}
+#'   \item{`"PoissonMixedModel"`}{A Poisson autoregressive mixed model for the
+#'   dynamics of a population observed at several sites over time.}
+#'   \item{`"PredatorPrey"`}{A deterministic Lotka--Volterra predator--prey
+#'   system solved numerically.}
+#'   \item{`"SIR"`}{A simple susceptible--infected--recovered epidemic model
+#'   solved numerically.}
+#'   \item{`"IBMLotkaVolterra"`}{A stochastic individual-based predator--prey
+#'   example.}
 #' }
-#' @author Ricardo Oliveros--Ramos
-#' @references Oliveros-Ramos and Shin (2014)
-#' @keywords demo calibration 
+#'
+#' @seealso
+#' [calibration_setup()], [calibration_data()], [calibration_objFn()],
+#' [calibrate()], [summary.calibrar.results()], [print.calibrar.results()]
+#'
 #' @examples
-#' \dontrun{
-#' 
-#' summary(ahr)
-#' set.seed(880820)
-#' path = NULL # NULL to use the current directory
-#' # create the demonstration files
-#' demo = calibrar_demo(path=path, model="PredatorPrey", T=100) 
-#' # get calibration information
-#' calibration_settings = calibration_setup(file = demo$setup)
-#' # get observed data
-#' observed = calibration_data(setup = calibration_settings, path=demo$path)
-#' # Defining 'run_model' function
-#' run_model = calibrar:::.PredatorPreyModel
-#' # real parameters
-#' cat("Real parameters used to simulate data\n")
-#' print(unlist(demo$par)) # parameters are in a list
-#' # objective functions
-#' obj  = calibration_objFn(model=run_model, setup=calibration_settings, observed=observed, T=demo$T)
-#' obj2 = calibration_objFn(model=run_model, setup=calibration_settings, observed=observed, 
-#' T=demo$T, aggregate=TRUE)
-#' cat("Starting calibration...\n")
-#' cat("Running optimization algorithms\n", "\t")
-#' cat("Running optim AHR-ES\n")
-#' ahr = calibrate(par=demo$guess, fn=obj, lower=demo$lower, upper=demo$upper, phases=demo$phase)
-#' summary(ahr)
-#' } 
-#' @export 
+#' tmp = tempdir()
+#' demo = calibrar_demo(path = tmp, model = "PoissonMixedModel", T = 8, L = 3)
+#' print(demo)
+#'
+#' setup = calibration_setup(demo$setup)
+#' observed = calibration_data(setup, path = demo$path)
+#'
+#' @export
 calibrar_demo = function(path=NULL, model=NULL, ...) {
   
   if(is.null(path)) path = getwd()
@@ -107,6 +91,9 @@ calibrar_demo = function(path=NULL, model=NULL, ...) {
   
 }
 
+#' @rdname calibrar_demo
+#' @param x A `calibrar.demo` object returned by [calibrar_demo()].
+#' @param ... Further arguments passed to [print()].
 #' @export
 #' @method print calibrar.demo
 print.calibrar.demo = function(x, ...) {
@@ -135,24 +122,49 @@ print.calibrar.demo = function(x, ...) {
 
 # Some other useful stuff -------------------------------------------------
 
-#' Get an specific argument from the command line
+# .get_command_argument()
+
+#' Extract a named command-line argument
 #'
-#' @param x The command line arguments, from \code{x = commandArgs()}
-#' @param argument The name of the argument.
-#' @param prefix The prefix to any argument of interest, the default is "--"
-#' @param default Default value to return is argument is missing, default to FALSE.
-#' @param verbose Boolean, if TRUE, shows a warning when the parameter is not found.
-#' 
-#' @return  The value of the argument, assumed to be followed after '=' or, TRUE if nothing but the argument was found. 
-#' If the argument is not found, FALSE is returned.
-#' @export
+#' Parse command-line arguments and return the value associated with a named
+#' option. This helper is primarily intended for scripting workflows that call
+#' R from the shell and pass arguments such as `--config=file.txt`.
 #'
-#' @examples 
+#' @param x Character vector of command-line arguments, typically obtained from
+#'   `commandArgs()`.
+#' @param argument Name of the argument to retrieve, without the prefix.
+#' @param prefix Prefix used for arguments of interest. The default is `"--"`.
+#' @param default Value returned when the argument is not found. The default is
+#'   `FALSE`.
+#' @param verbose Logical. If `TRUE`, a warning is issued when the requested
+#'   argument is not found.
+#'
+#' @return
+#' The parsed argument value. If the argument is present without an explicit
+#' `=value` part, `TRUE` is returned. If the argument is absent, `default` is
+#' returned. Parsed values are passed through an internal type guesser, so
+#' logical and numeric values may be returned with their corresponding R types.
+#'
+#' @details
+#' The function looks for entries matching either `prefix + argument` or
+#' `prefix + argument = value`. For example, with `prefix = "--"` and
+#' `argument = "config"`, both `--config` and `--config=file.txt` are
+#' recognised.
+#'
+#' This function is exported because it can be useful in external packages or
+#' scripts that build command-line interfaces around `calibrar` workflows.
+#'
+#' @seealso
+#' [.read_configuration()]
+#'
+#' @examples
 #' .get_command_argument(commandArgs(), "interactive")
 #' .get_command_argument(commandArgs(), "RStudio")
-#' .get_command_argument(commandArgs(), "RStudio", prefix="")
+#' .get_command_argument(commandArgs(), "RStudio", prefix = "")
 #' .get_command_argument(commandArgs(), "vanilla")
 #' .get_command_argument("--control.file=baz.txt", "control.file")
+#'
+#' @export
 .get_command_argument = function(x, argument, prefix="--", default=FALSE, verbose=FALSE) {
   
   xdefault = if(is.null(default)) "NULL" else as.character(default)
@@ -187,19 +199,56 @@ print.calibrar.demo = function(x, ...) {
   return(ctl)
 }
 
-#' Read a configuration file.
-#' 
-#' File is expected to have lines of the form 'key SEP value' where key is the
-#' name of the parameter, SEP a separator (can be '=' ',', ';') and value the value
-#' of the parameter itself. The SEP for each line is determined and parameters values are
-#' returned as a list. 
-#' 
-#' @param file File to read the configuration
+# .read_configuration()
+
+#' Read a simple key-value configuration file
 #'
-#' @param recursive Should 'conf.key' keys be read as additional configuration files? Default is TRUE.
-#' @param keep.names Should names be kept as they are? By default, are converted to lower case.
-#' @param conf.key String indicating the leading key to find an additional configuration file.
-#' @param ... Additional arguments, not currently in use.
+#' Read a plain-text configuration file in which each non-empty, non-comment
+#' line defines a key and one or more values separated by a recognised
+#' delimiter. Parsed values are returned as a named list.
+#'
+#' @param file Path to the configuration file.
+#' @param recursive Logical. If `TRUE`, keys matching `conf.key` are treated as
+#'   references to additional configuration files and are read recursively.
+#' @param keep.names Logical. If `TRUE`, keys are kept as written. If `FALSE`,
+#'   they are converted to lower case.
+#' @param conf.key Optional pattern identifying keys that should be interpreted
+#'   as additional configuration files.
+#' @param ... Reserved for future extensions.
+#'
+#' @return
+#' A named list containing the parsed configuration values. Scalars are returned
+#' as length-one vectors where appropriate, and simple values are converted with
+#' `type.convert()`. If `file` does not exist, `NULL` is returned with a
+#' warning.
+#'
+#' @details
+#' The reader accepts simple lines of the form `key separator value`, where the
+#' separator may vary across lines. The current parser guesses the separator
+#' among common choices such as `=`, `;`, `,`, `:`, and tab.
+#'
+#' Lines beginning with punctuation after trimming are ignored, and trailing
+#' comments are removed. When `conf.key` is supplied, matching entries are
+#' treated as file references. Their paths are resolved relative to the parent
+#' configuration file, and the referenced files can be merged recursively.
+#'
+#' This helper is intentionally lightweight. It is useful for small calibration
+#' or script configuration files, but it is not intended to replace richer
+#' configuration formats such as YAML.
+#'
+#' @seealso
+#' [.get_command_argument()]
+#'
+#' @examples
+#' tf = tempfile(fileext = ".txt")
+#' writeLines(c(
+#'   "ncores = 4",
+#'   "verbose = TRUE",
+#'   "method = AHR-ES"
+#' ), tf)
+#'
+#' cfg = .read_configuration(tf)
+#' str(cfg)
 #'
 #' @export
 .read_configuration = function(file, recursive=TRUE, keep.names = TRUE, conf.key=NULL, ...) {

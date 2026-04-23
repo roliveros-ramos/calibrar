@@ -1,12 +1,41 @@
-#' Predict time-varying parameters using splines.
+# spline_par()
+
+#' Interpolate time-varying parameters with a spline
 #'
-#' @param par Values at knots
-#' @param n Number of points. Time (independent variable) is assumed to be between 0 and n with length(par) equidistant points (including 0 and n).
-#' @param knots Position of knots. Default, is length(x) equidistant points between 0 and 1. Always are re-scaled to 0 to 1.
-#' @param periodic boolean, is the spline periodic?
-#' @param period If periodic is TRUE, it specify the time period.
+#' Build a smooth time series from values specified at spline knots. This is
+#' useful when a model parameter is allowed to vary through time but is
+#' represented by a smaller set of control values to be estimated.
 #'
-#' @return A list with the interpolates values as 'x' and 'time'.
+#' @param par Numeric vector of parameter values at the knots.
+#' @param n Number of output time points.
+#' @param knots Optional numeric vector giving the knot positions associated
+#'   with `par`. If `NULL`, equally spaced knots are used.
+#' @param periodic Logical. Should the spline be treated as periodic?
+#' @param period Optional period of the cycle when `periodic = TRUE` and custom
+#'   `knots` are supplied.
+#'
+#' @return
+#' An object of class `spline.par`: a list containing the interpolated values
+#' (`x`), the corresponding time points (`time`), the knot locations, the knot
+#' values, and auxiliary information used by the plotting method.
+#'
+#' @details
+#' The function rescales knot positions internally to the unit interval before
+#' building the spline. If `periodic = TRUE`, the series is extended so that the
+#' interpolation wraps around smoothly at the boundaries.
+#'
+#' The returned object is designed to be plotted with `plot()` and to provide
+#' both the discrete interpolated values used in a model and a smoother curve
+#' for visual inspection.
+#'
+#' @seealso
+#' [stats::splinefun()]
+#'
+#' @examples
+#' sp = spline_par(par = c(0.2, 0.8, 0.4, 0.6), n = 12)
+#' head(sp$x)
+#' plot(sp)
+#'
 #' @export
 spline_par = function(par, n, knots=NULL, periodic=FALSE, period=NULL) {
 
@@ -57,6 +86,9 @@ spline_par = function(par, n, knots=NULL, periodic=FALSE, period=NULL) {
   
 }
 
+#' @rdname spline_par
+#' @param x A `spline.par` object returned by [spline_par()].
+#' @param ... Further graphical arguments passed to [graphics::plot()].
 #' @export
 plot.spline.par = function(x, ...) {
   
@@ -73,16 +105,48 @@ plot.spline.par = function(x, ...) {
 
 # Gaussian dispersion -----------------------------------------------------
 
-#' Calculate a discretization of the 2D Gaussian Kernel
+# gaussian_kernel()
+
+#' Discretise a bivariate Gaussian kernel on a grid
 #'
-#' @param par A list, including the mean and covariance matrix.
-#' @param lower A vector, indicating the lower bound for the calculation.
-#' @param upper A vector, indicating the upper bound for the calculation.
-#' @param n The number of cells for each dimension, can be one or two numbers.
-#' @param checkSymmetry TRUE by default, checks if the covariance matrix is symmetric. 
-#' @param ... Additional arguments, currently not used.
+#' Evaluate a two-dimensional Gaussian density on a regular grid defined by
+#' lower and upper bounds in each dimension.
 #'
-#' @return A list, with 'x', 'y' and 'z' components.
+#' @param par A list containing at least `mean` and `sigma`, where `mean` is a
+#'   numeric vector of length two and `sigma` is a `2 x 2` covariance matrix.
+#' @param lower Numeric vector of length two giving the lower bounds of the
+#'   grid.
+#' @param upper Numeric vector of length two giving the upper bounds of the
+#'   grid.
+#' @param n Number of grid cells per dimension. This can be a scalar or a
+#'   length-two numeric vector.
+#' @param checkSymmetry Logical. Passed to [mvtnorm::dmvnorm()] when checking
+#'   the covariance matrix.
+#' @param ... Further arguments reserved for future extensions.
+#'
+#' @return
+#' A list with components `x`, `y`, and `z`, suitable for contour or image
+#' plotting. `x` and `y` contain the grid coordinates, and `z` contains the
+#' corresponding matrix of Gaussian density values.
+#'
+#' @details
+#' This helper is convenient when a smooth bivariate dispersal or movement
+#' kernel needs to be represented on a finite grid. The function uses
+#' [mvtnorm::dmvnorm()] internally and returns the density values without
+#' normalising them to sum to one over the discretised domain.
+#'
+#' @seealso
+#' [mvtnorm::dmvnorm()]
+#'
+#' @examples
+#' ker = gaussian_kernel(
+#'   par = list(mean = c(0, 0), sigma = diag(2)),
+#'   lower = c(-2, -2),
+#'   upper = c(2, 2),
+#'   n = c(10, 10)
+#' )
+#' str(ker)
+#'
 #' @export
 gaussian_kernel = function(par, lower, upper, n=10, checkSymmetry=TRUE, ...) {
   mean  = par$mean

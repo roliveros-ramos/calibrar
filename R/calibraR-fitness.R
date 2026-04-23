@@ -205,6 +205,9 @@
 #' }
 #' objFn(obs = c(1, 2, NA), sim = c(1.1, 1.7, 3), FUN = my_obj)
 #'
+#' `fitness()` is provided as an exported alias of `objFn()`. Both names refer
+#' to the same underlying function, but `objFn()` is the preferred name in the
+#' current user-facing documentation.
 #' @seealso
 #' \code{match.fun}
 #'
@@ -215,15 +218,9 @@ objFn = function(obs, sim, FUN, ...) {
   return(output)
 }
 
-#' @export
-objFn = function(obs, sim, FUN, ...) {
-  FUN = match.fun(FUN)
-  output = FUN(obs=obs, sim=sim, ...)
-  return(output)
-}
 
 #' @export
-#' @rdname objFn 
+#' @rdname objFn
 fitness = objFn
 
 # Penalties ---------------------------------------------------------------

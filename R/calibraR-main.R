@@ -512,15 +512,76 @@ optim2 = function(par, fn, gr = NULL, ...,
 
 # optimh ------------------------------------------------------------------
 
-#' General-purpose optimization using heuristic algorithms
+#' General-purpose optimisation with heuristic and derivative-free methods
 #'
-#' @param gr Function to compute the gradient of \code{fn}. Ignored by most methods, 
-#' added for consistency with other optimization functions.
-#' @examples 
-#' optim2(par=rep(NA, 5), fn=sphereN)
+#' `optimh()` provides a unified interface to the heuristic and derivative-free
+#' optimisation methods available through **calibrar**. It is intended for
+#' objective functions that are expensive, noisy, non-smooth, stochastic, or
+#' otherwise difficult to handle with standard gradient-based optimisers.
+#'
+#' @details
+#' `optimh()` uses the same interface conventions as [optim2()] and
+#' [calibrate()]: parameters may be supplied as a vector or list, box
+#' constraints can be enforced through `lower` and `upper`, and subsets of
+#' parameters can be held fixed through `active`.
+#'
+#' The available methods include both genuinely heuristic/global algorithms
+#' (for example `"AHR-ES"`, `"CMA-ES"`, `"DE"`, `"genSA"`, `"PSO"`) and a few
+#' derivative-free local searches (for example `"Nelder-Mead"`, `"bobyqa"`,
+#' `"hjn"`, `"nmk"`). The function name should therefore be read broadly: it is
+#' the package entry point for optimisation methods that are typically useful
+#' when classical smooth, gradient-based optimisation is not the best fit.
+#'
+#' Analytic gradients are accepted for interface consistency, but many methods
+#' implemented through `optimh()` ignore `gr`. Likewise, not all methods return
+#' Hessian information even when `hessian = TRUE` is requested.
+#'
+#' @section Choosing a method:
+#' Heuristic and evolutionary methods are often useful for rugged,
+#' multi-modal, or stochastic objective functions. Derivative-free local
+#' methods may be a better first choice when the objective is deterministic but
+#' gradients are unavailable or unreliable. Method choice should still reflect
+#' the structure of the problem: locality versus global exploration, box
+#' constraints, stochasticity, and computational cost.
+#'
+#' @param gr Function computing the gradient of `fn`. It is included for API
+#' consistency with [optim2()] and [calibrate()], but is ignored by most
+#' methods available through `optimh()`.
+#' @param method Optimisation method to use. Available choices are
+#' `"AHR-ES"`, `"Nelder-Mead"`, `"SANN"`, `"hjn"`, `"bobyqa"`, `"CMA-ES"`,
+#' `"genSA"`, `"DE"`, `"soma"`, `"genoud"`, `"PSO"`, `"hybridPSO"`, `"mads"`,
+#' `"hjk"`, `"hjkb"`, `"nmk"`, and `"nmkb"`.
+#'
+#' @return
+#' A list in the same general format as [optim2()], typically including:
+#' \describe{
+#' \item{par}{The best parameter values found.}
+#' \item{value}{The value of `fn` at `par`.}
+#' \item{counts}{Number of function and gradient evaluations reported by the
+#' underlying solver, when available.}
+#' \item{convergence}{Convergence code returned by the underlying solver.}
+#' \item{message}{Additional information returned by the optimiser, if any.}
+#' \item{hessian}{A Hessian estimate when supported and requested; otherwise
+#' usually `NULL`.}
+#' }
+#'
+#' @seealso [optim2()], [calibrate()], [ahres()], [gradient()]
+#'
+#' @examples
+#' \dontrun{
+#' optimh(
+#'   par = rep(0.5, 5),
+#'   fn = sphereN,
+#'   lower = -5,
+#'   upper = 5,
+#'   method = "AHR-ES",
+#'   control = list(maxit = 200)
+#' )
+#' }
+#'
 #' @inheritParams optim2
-#' @inherit optim2 return author
-#' @family optimisers 
+#' @author Ricardo Oliveros-Ramos
+#' @family optimisers
 #' @export
 optimh = function(par, fn, gr = NULL, ...,  
                   method = c("AHR-ES", "Nelder-Mead", "SANN", "hjn", "bobyqa",
@@ -538,21 +599,79 @@ optimh = function(par, fn, gr = NULL, ...,
   
 }
 
-# AHR-ES ------------------------------------------------------------------
+# ahres -------------------------------------------------------------------
 
-#' @title Adaptative Hierarchical Recombination Evolutionary Strategy (AHR-ES) for 
-#' derivative-free and black-box optimization 
-#' @description This function performs the optimization of a function using 
-#' the Adaptative Hierarchical Recombination Evolutionary Strategy (AHR-ES, Oliveros & Shin, 2015). 
+#' Adaptive Hierarchical Recombination Evolutionary Strategy
 #'
-#' @author Ricardo Oliveros-Ramos
+#' `ahres()` runs the AHR-ES optimiser directly through a dedicated interface.
+#' It is primarily intended for bounded, derivative-free optimisation of
+#' expensive or black-box objective functions, including calibration problems in
+#' which the objective may be noisy or obtained from an external model.
+#'
+#' @details
+#' `ahres()` accepts the same broad interface as the other optimisation entry
+#' points in **calibrar**, but is specialised to the `"AHR-ES"` algorithm.
+#' Parameters may be supplied as a vector or list. Internally, list-structured
+#' parameters are flattened for optimisation and then restored before the result
+#' is returned.
+#'
+#' The function supports box constraints through `lower` and `upper`, and
+#' parameter masking through `active`, so only selected parameters are evolved
+#' while the others are held fixed at their supplied starting values.
+#'
+#' If `control$parscale` and/or `control$fnscale` are supplied, optimisation is
+#' performed on the corresponding scaled parameter space and objective scale,
+#' and results are transformed back before being returned.
+#'
+#' `gr` is accepted only for interface compatibility and is ignored by this
+#' method. In the current implementation, `control$maxit` or `control$maxgen`
+#' must be supplied; otherwise the optimisation stops with an error.
+#'
+#' For scalar objectives, the default settings are usually sufficient. For
+#' vector-valued objectives, advanced users may also need to provide suitable
+#' `control` entries such as `weights`, `nvar`, and `aggFn`, depending on how
+#' the objective has been constructed.
+#'
+#' @section Parallel execution:
+#' AHR-ES parallelism is controlled through entries inside `control`, notably
+#' `control$parallel` and `control$ncores`. The top-level `parallel` argument is
+#' currently retained for interface consistency but is not used directly inside
+#' `ahres()`.
+#'
+#' @param gr Function computing the gradient of `fn`. Ignored by `ahres()`.
+#'
+#' @return
+#' An object of class `"ahres.results"`, typically with components:
+#' \describe{
+#' \item{par}{Best parameter values found, returned on the original scale.}
+#' \item{value}{Objective value at `par`, returned on the original objective scale.}
+#' \item{counts}{Number of function and gradient evaluations.}
+#' \item{convergence}{Convergence code (`0` usually indicates a regular stop,
+#' `1` that the maximum number of generations/evaluations was reached).}
+#' \item{message}{A short message describing the stopping condition.}
+#' \item{generations}{Number of generations performed.}
+#' \item{partial}{Optional vector of objective components when the objective
+#' function returns more than one value.}
+#' \item{trace}{Optional tracing information when tracing is enabled.}
+#' \item{active}{Information about active parameters used during optimisation.}
+#' }
+#'
+#' @seealso [optimh()], [optim2()], [calibrate()], [summary.ahres.results()]
+#'
 #' @examples
-#' \dontrun{ahres(par=rep(1, 5), fn=sphereN)}
-#' @inheritParams calibrate
+#' \dontrun{
+#' ahres(
+#'   par = rep(0.5, 5),
+#'   fn = sphereN,
+#'   lower = -5,
+#'   upper = 5,
+#'   control = list(maxit = 200)
+#' )
+#' }
+#'
 #' @inheritParams optim2
-#' @inherit optim2 return
 #' @author Ricardo Oliveros-Ramos
-#' @family optimisers 
+#' @family optimisers
 #' @export
 ahres = function(par, fn, gr = NULL, ..., lower = -Inf, upper = +Inf, active = NULL, 
                  control = list(), hessian = FALSE, parallel=FALSE) {
@@ -618,7 +737,7 @@ ahres = function(par, fn, gr = NULL, ..., lower = -Inf, upper = +Inf, active = N
   output$value = output$value*fnscale
   
   output = c(output, active=list(par=isActive, flag=activeFlag))
-  class(output) = c("ahres.result", class(output))
+  class(output) = c("ahres.results", class(output))
   
   return(output) 
   
@@ -627,19 +746,113 @@ ahres = function(par, fn, gr = NULL, ..., lower = -Inf, upper = +Inf, active = N
 
 # calibration_setup -------------------------------------------------------
 
-#' Get information to run a calibration using the \code{calibrar} package.
-#' 
-#' A wrapper for \code{read.csv} checking column names and data types 
-#' for the table with the calibration information.
-#' 
-#' @param file The file with the calibration information, see details.
-#' @param control Control arguments for generating the setup. See details.
-#' @param \dots Additional arguments to \code{read.csv} function.
-#' @return A data.frame with the information for the calibration of a 
-#' model, to be used with the \code{\link{calibration_objFn}} 
-#' and \code{\link{calibration_data}}.
-#' @author Ricardo Oliveros-Ramos
-#' @seealso \code{\link{calibration_objFn}}, \code{\link{calibration_data}}.
+#' Read and validate a calibration setup table
+#'
+#' Read a calibration settings table from a text file and coerce it to the
+#' structure expected by [calibration_data()] and [calibration_objFn()]. The
+#' setup table defines which model outputs are compared with observations, which
+#' objective function is used for each output, whether a row contributes to the
+#' calibration, and how each component is weighted in the final objective.
+#'
+#' The function is a validated wrapper around [utils::read.csv()]. It checks
+#' required column names, coerces standard column types, fills a few optional
+#' columns from `control`, and derives `weight` from `cv` when needed.
+#'
+#' @param file Path to the calibration setup file, typically a `.csv` file.
+#'
+#' @param control Named list of defaults used when optional columns are missing
+#'   from the setup table. Currently recognised entries are:
+#'   \describe{
+#'     \item{`col_skip`}{Default number of leading columns to discard when a
+#'     text file is read as a full table by [calibration_data()]. Defaults to
+#'     `2`.}
+#'     \item{`nrows`}{Default number of rows to read from each data file.
+#'     Defaults to `NA`, which is interpreted downstream as “read all rows”.}
+#'   }
+#'
+#' @param ... Additional arguments passed to [utils::read.csv()] when reading
+#'   `file`.
+#'
+#' @return A `data.frame` describing the calibration targets. The returned table
+#'   is suitable for direct use in [calibration_data()] and
+#'   [calibration_objFn()]. Standard columns are coerced to the expected types
+#'   and missing optional columns are added where needed.
+#'
+#' @details
+#' The setup table may contain the following columns:
+#'
+#' \describe{
+#'   \item{`variable`}{Name of the calibration component. This name must match
+#'   the corresponding element returned by the model function supplied to
+#'   [calibration_objFn()].}
+#'
+#'   \item{`type`}{Name of the objective function used for that component.
+#'   In current workflows this is usually the name of a function accepted by
+#'   [objFn()], such as `"norm2"`, `"lnorm2"`, `"pois"`, `"multinom"`,
+#'   `"normp"`, or `"penalty"`.}
+#'
+#'   \item{`calibrate`}{Logical flag indicating whether the component is active
+#'   in the calibration. Only rows with `calibrate = TRUE` are included in the
+#'   objective function returned by [calibration_objFn()].}
+#'
+#'   \item{`weight`}{Positive weight used when partial objective values are
+#'   aggregated. If `weight` is missing, or contains `NA`, it is derived from
+#'   `cv` as `1 / (2 * cv^2)` for the corresponding rows.}
+#'
+#'   \item{`cv`}{Coefficient of variation used to derive `weight` when an
+#'   explicit weight is not supplied. At least one of `weight` or `cv` must be
+#'   available in the table.}
+#'
+#'   \item{`use_data`}{Logical flag indicating whether an observed dataset must
+#'   be read for that row. This is typically `FALSE` for pure penalties such as
+#'   `"normp"`, where the objective depends only on simulated values.}
+#'
+#'   \item{`file`}{Path to the observed data file for that component. Paths are
+#'   interpreted relative to the `path` argument of [calibration_data()]. This
+#'   column is still required when `use_data = FALSE`, although the file will not
+#'   be read in that case.}
+#'
+#'   \item{`varid`}{Optional identifier used by [calibration_data()] when
+#'   extracting a single column from a text file. If omitted, a full numeric
+#'   table is read instead.}
+#'
+#'   \item{`col_skip`}{Optional number of leading columns to discard when a text
+#'   file is read as a full table. Missing values are replaced by
+#'   `control$col_skip`.}
+#'
+#'   \item{`nrows`}{Optional number of rows to read from each observed-data
+#'   file. Missing values are replaced by `control$nrows`.}
+#' }
+#'
+#' Required columns are `variable`, `type`, `calibrate`, `use_data`, and
+#' `file`. In addition, at least one of `weight` or `cv` must be supplied.
+#'
+#' @section Weight handling:
+#' Aggregation weights are stored in the returned table regardless of whether the
+#' objective is later used in vector or scalar form.
+#'
+#' If the table does not contain a `weight` column, weights are computed from
+#' `cv` as `1 / (2 * cv^2)`. If `weight` exists but contains missing values,
+#' those entries are filled using the same formula. All final weights must be
+#' strictly positive.
+#'
+#' @section Relationship with the rest of the workflow:
+#' A typical file-based calibration workflow is:
+#' \enumerate{
+#'   \item read the setup table with `calibration_setup()`;
+#'   \item load observed data with [calibration_data()];
+#'   \item build the objective function with [calibration_objFn()];
+#'   \item pass the resulting function to [calibrate()] or another optimiser.
+#' }
+#'
+#' @examples
+#' \dontrun{
+#' demo = calibrar_demo(model = "PredatorPrey")
+#' setup = calibration_setup(file = demo$setup)
+#' setup
+#' }
+#'
+#' @seealso [calibration_data()], [calibration_objFn()], [calibrate()], [objFn()]
 #' @export
 calibration_setup = function(file, control=list(), ...) {
   
@@ -707,23 +920,90 @@ calibration_setup = function(file, control=list(), ...) {
 
 # calibration_data --------------------------------------------------------
 
-#' @title Get observed data for the calibration of a model 
-#' 
-#' @description Create a list with the observed data with the 
-#' information provided by its main argument. 
-#' 
-#' @param setup A data.frame with the information about the calibration, 
-#' normally created with the \code{\link{calibration_setup}} function. 
-#' See details.
-#' @param path Path to the directory to look up for the data. Paths in setup are considered relatives to this path.
-#' @param file Optional file to save the created object (as an 'rds' file.)
-#' @param verbose If TRUE, detailed messages of the process are printed.
-#' @param \dots Additional arguments to \code{read.csv} function 
-#' to read the data files.
-#' @return A list with the observed data needed for a calibration, to be used 
-#' in combination with the \code{\link{calibration_objFn}}.
-#' @author Ricardo Oliveros-Ramos
-#' @seealso \code{\link{calibration_objFn}}, \code{\link{calibration_setup}}.
+#' Read observed data defined in a calibration setup table
+#'
+#' Build the `observed` object used by [calibration_objFn()] from a setup table
+#' created with [calibration_setup()]. Each active row in the setup table points
+#' to a file containing observed data, and this function reads those files into a
+#' named list whose elements correspond to the calibration variables.
+#'
+#' Rows with `use_data = FALSE` are kept in the output as `NA`. This makes it
+#' possible to include penalty-only components in the same calibration workflow:
+#' such rows still participate in [calibration_objFn()] provided the model
+#' returns a simulated component with the same name.
+#'
+#' @param setup A calibration setup table, usually created with
+#'   [calibration_setup()].
+#'
+#' @param path Base directory used to resolve relative paths from `setup$file`.
+#'   Each file is looked up with [base::file.path()] using `path` and the value
+#'   stored in the corresponding `file` row.
+#'
+#' @param file Optional path to save the resulting `observed` object with
+#'   [base::saveRDS()]. This is useful when observed data are expensive to read
+#'   repeatedly.
+#'
+#' @param verbose Logical. If `TRUE`, print progress messages describing which
+#'   variables were loaded.
+#'
+#' @param ... Additional arguments passed to [utils::read.csv()] when reading
+#'   text files.
+#'
+#' @return A named list with one element per row of `setup`. Element names are
+#'   taken from `setup$variable`.
+#'
+#'   Depending on the corresponding setup row, each element is typically one of:
+#'   \itemize{
+#'     \item a numeric vector, when `varid` selects a single column from a text
+#'     file;
+#'     \item a numeric matrix, when a full table is read from a text file;
+#'     \item an arbitrary R object read from an `.rds` file;
+#'     \item `NA`, when `use_data = FALSE` or `calibrate = FALSE`.
+#'   }
+#'
+#' @details
+#' Only rows satisfying both `setup$calibrate` and `setup$use_data` are actually
+#' read from disk. All other rows are represented as `NA` in the returned list.
+#'
+#' File reading currently depends on file type:
+#'
+#' \describe{
+#'   \item{text files (`.csv`, `.txt`)}{Read with [utils::read.csv()]. If
+#'   `varid` is supplied, that column is extracted and returned as a numeric
+#'   vector. Otherwise the full table is converted to a numeric matrix after
+#'   dropping the first `col_skip` columns, when applicable.}
+#'
+#'   \item{R objects (`.rds`)}{Read with [base::readRDS()] and returned as-is.}
+#'
+#'   \item{netCDF (`.nc`)}{Not currently supported by the implementation.}
+#' }
+#'
+#' The interpretation of `varid`, `col_skip`, and `nrows` is controlled by the
+#' corresponding columns in `setup`, after defaults have been filled by
+#' [calibration_setup()].
+#'
+#' @section Expected alignment with model outputs:
+#' The names of the returned list are used later by [calibration_objFn()] to
+#' match observed and simulated quantities. For each active calibration row,
+#' `setup$variable` must therefore match the name of the corresponding element in
+#' the list returned by the model function.
+#'
+#' @section Saving and reusing observed data:
+#' When `file` is supplied, the created list is also saved as an `.rds` file.
+#' This can be helpful in iterative calibration workflows where the setup table
+#' is stable but reading the original data files repeatedly is inconvenient.
+#'
+#' @examples
+#' \dontrun{
+#' demo = calibrar_demo(model = "PredatorPrey")
+#' setup = calibration_setup(file = demo$setup)
+#' observed = calibration_data(setup = setup, path = demo$path)
+#'
+#' names(observed)
+#' str(observed)
+#' }
+#'
+#' @seealso [calibration_setup()], [calibration_objFn()], [objFn()]
 #' @export
 calibration_data = function(setup, path=".", file=NULL, verbose=TRUE, ...) {
   
@@ -766,28 +1046,132 @@ calibration_data = function(setup, path=".", file=NULL, verbose=TRUE, ...) {
 
 # calibration_objFn -------------------------------------------------------
 
-#' Create an objective function to be used with optimization routines
-#' 
-#' Create a new function, to be used as the objective function in the 
-#' calibration, given a function to run the model within R, observed data 
-#' and information about the comparison with data.
-#' 
-#' @param model Function to run the model and produce a list of outputs.
-#' @param setup A data.frame with the information about the calibration, 
-#' normally created with the \code{\link{calibration_setup}} function. 
-#' See details.
-#' @param observed A list of the observed variables created with the 
-#' function \code{\link{calibration_data}}
-#' @param aggFn A function to aggregate \code{fn} to a scalar value if the
-#' returned value is a vector. Some optimization algorithm can explote the
-#' additional information provided by a vectorial output from \code{fn}
-#' @param aggregate boolean, if TRUE, a scalar value is returned using the 
-#' \code{aggFn}.
-#' @param \dots More arguments passed to the \code{model} function.
-#' @return A function, integrating the simulation of the model and the 
-#' comparison with observed data. 
-#' @author Ricardo Oliveros-Ramos
-#' @seealso \code{\link{calibration_data}}, \code{\link{calibration_setup}}.
+#' Create a calibration objective function from a model, setup table, and data
+#'
+#' Build an objective function that runs a model, compares its outputs with the
+#' observed data prepared by [calibration_data()], and returns either a vector of
+#' partial objective values or a single aggregated objective value.
+#'
+#' This is the main bridge between a model-specific simulation function and the
+#' optimisation tools in `calibrar`. The resulting function can be passed
+#' directly to [calibrate()] and related optimisers.
+#'
+#' @param model Function that runs the model for a candidate parameter set. Its
+#'   first argument must be `par`. The function must return a named list of
+#'   simulated outputs whose names match `setup$variable` for all active
+#'   calibration rows.
+#'
+#' @param setup A calibration setup table, usually created with
+#'   [calibration_setup()].
+#'
+#' @param observed Observed data as returned by [calibration_data()]. This is
+#'   typically a named list whose elements correspond to `setup$variable`.
+#'
+#' @param aggFn Function used to aggregate partial objective values when
+#'   `aggregate = TRUE`. The default is an internal weighted sum. The function
+#'   must accept arguments `x` (partial objective values) and `w` (weights).
+#'
+#' @param aggregate Logical. If `FALSE` (the default), the returned function
+#'   produces one objective value per active calibration row. If `TRUE`, those
+#'   partial values are combined into a single scalar using `aggFn` and the
+#'   weights stored in `setup`.
+#'
+#' @param ... Additional arguments passed to `model` each time the returned
+#'   objective function is evaluated.
+#'
+#' @return A function of `par` suitable for optimisation.
+#'
+#'   When evaluated, the returned function:
+#'   \enumerate{
+#'     \item runs `model(par, ...)`;
+#'     \item extracts the simulated outputs;
+#'     \item compares them with `observed` according to `setup$type`;
+#'     \item returns either a named numeric vector of partial objective values
+#'     or a single aggregated numeric value.
+#'   }
+#'
+#'   The returned function has class `"objFn"` and carries metadata attributes
+#'   used internally by [calibrate()], including the number of objective
+#'   components, their weights, and the names of the active variables.
+#'
+#' @details
+#' For each row where `setup$calibrate` is `TRUE`, the function looks for a
+#' variable named `setup$variable` in both `observed` and the list returned by
+#' `model`. The comparison itself is delegated to the objective function named in
+#' `setup$type`, using the same convention as [objFn()].
+#'
+#' This means that the structure of the objects returned by `model` must already
+#' be compatible with the corresponding objective function. For example:
+#'
+#' \itemize{
+#'   \item pointwise criteria such as `"norm2"`, `"lnorm2"`, or `"pois"`
+#'   usually expect vectors, matrices, or arrays with shapes matching the
+#'   observed data;
+#'   \item `"multinom"` expects matrix inputs;
+#'   \item penalty terms such as `"normp"` may ignore `observed`, but still
+#'   require the model output to contain the corresponding named element.
+#' }
+#'
+#' If `model` returns `NULL`, the generated objective function returns `NULL`
+#' after emitting a diagnostic message.
+#'
+#' @section Aggregated versus vector objectives:
+#' With `aggregate = FALSE`, the returned objective is multi-component: it
+#' produces one value per active calibration row. This can be useful for methods
+#' that exploit vector-valued objectives.
+#'
+#' With `aggregate = TRUE`, the returned objective is scalar and can be used with
+#' optimisers that require a single value. Aggregation is performed with
+#' `aggFn(x = partial_values, w = setup$weight[setup$calibrate])`.
+#'
+#' @section Expected model interface:
+#' In typical use, the model function has the form:
+#'
+#' `function(par, ...) -> named list`
+#'
+#' where `par` may be a numeric vector or a list, depending on how the
+#' optimisation is configured. The returned list should expose one element per
+#' calibration target, with names that match `setup$variable` exactly.
+#'
+#' @section Workflow:
+#' The usual sequence is:
+#' \enumerate{
+#'   \item define a model-running function;
+#'   \item read the setup table with [calibration_setup()];
+#'   \item read observed data with [calibration_data()];
+#'   \item create the objective function with `calibration_objFn()`;
+#'   \item call [calibrate()] with the resulting function.
+#' }
+#'
+#' @examples
+#' \dontrun{
+#' demo = calibrar_demo(model = "PredatorPrey")
+#' setup = calibration_setup(file = demo$setup)
+#' observed = calibration_data(setup = setup, path = demo$path)
+#'
+#' run_model = calibrar:::.PredatorPreyModel
+#'
+#' obj_vec = calibration_objFn(
+#'   model = run_model,
+#'   setup = setup,
+#'   observed = observed,
+#'   T = demo$T,
+#'   aggregate = FALSE
+#' )
+#'
+#' obj_scalar = calibration_objFn(
+#'   model = run_model,
+#'   setup = setup,
+#'   observed = observed,
+#'   T = demo$T,
+#'   aggregate = TRUE
+#' )
+#'
+#' obj_vec(demo$guess)
+#' obj_scalar(demo$guess)
+#' }
+#'
+#' @seealso [calibration_setup()], [calibration_data()], [calibrate()], [objFn()]
 #' @export
 calibration_objFn = function(model, setup, observed, aggFn=NULL, aggregate=FALSE, ...) {
 

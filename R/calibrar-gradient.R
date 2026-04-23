@@ -1,23 +1,60 @@
-#' Numerical computation of the gradient, with parallel capabilities
-#' 
-#' This function calculates the gradient of a function, numerically, including the possibility
-#' of doing it in parallel.
+# gradient ----------------------------------------------------------------
+
+#' Numerical gradient approximation
 #'
-#' @param fn The function to calculate the gradient.
-#' @param x The value to compute the gradient at.
-#' @param method The method used. Currently implemented: central, backward, forward and Richardson. See details.
-#' @param control A list of control arguments. 
-#' @param parallel Boolean, should numerical derivatives be calculated in parallel?
-#' @param ... Additional arguments to be passed to \code{fn}.
+#' `gradient()` computes a numerical approximation to the gradient of a scalar
+#' objective function at a given parameter vector. It provides several
+#' finite-difference schemes and can distribute the underlying function
+#' evaluations across a registered `foreach` backend when `parallel = TRUE`.
 #'
-#' @return The gradient of \code{fn} at \code{x}.
+#' @details
+#' The currently implemented methods are:
+#'
+#' - `"forward"` (default): one-sided forward finite differences.
+#' - `"backward"`: one-sided backward finite differences.
+#' - `"central"`: central finite differences.
+#' - `"richardson"`: central differences with Richardson extrapolation.
+#'
+#' Step sizes are controlled through `control`. Common entries are:
+#'
+#' - `step_method`: how the initial step size is computed. Implemented values
+#'   are `"simple"`, `"optextras"`, and `"start"`.
+#' - `eps`: base perturbation size.
+#' - `zero.tol`: threshold used to decide when a parameter value is treated as
+#'   effectively zero for step-size construction.
+#' - `d`: starting fraction of `x` used by `step_method = "start"`.
+#' - `r` and `v`: Richardson iteration depth and reduction factor for
+#'   `method = "richardson"`.
+#'
+#' When `parallel = TRUE`, a suitable `foreach` backend must already be
+#' registered by the user. This function does not itself create or manage a
+#' parallel backend.
+#'
+#' @param fn Function whose gradient is to be approximated.
+#' @param x Numeric vector giving the point at which the gradient is evaluated.
+#' @param method Numerical differentiation scheme. If `NULL`, the default method
+#' used by `gradient.default()` is `"forward"`.
+#' @param control A list of control arguments governing step-size construction
+#' and, for Richardson extrapolation, the extrapolation sequence.
+#' @param parallel Logical. Should the function evaluations needed for the
+#' numerical derivative be carried out in parallel via `foreach`?
+#' @param ... Additional arguments passed to `fn`.
+#'
+#' @return A numeric vector of the same length as `x` containing the estimated
+#' gradient of `fn` at `x`.
+#'
+#' @seealso [optim2()], [optimh()], [calibrate()]
+#'
+#' @examples
+#' gradient(fn = function(x) sum(x^3), x = c(1, 2), method = "forward")
+#' gradient(fn = function(x) sum(x^3), x = c(1, 2), method = "central")
+#'
 #' @export
-#'
-#' @examples gradient(fn=function(x) sum(x^3), x=0)
 gradient = function(fn, x, method, control, parallel, ...) {
   UseMethod("gradient")
 }
 
+#' @rdname gradient
 #' @export
 gradient.default = function(fn, x, method=NULL, control=list(), parallel=FALSE, ...) {
 

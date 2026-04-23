@@ -1,6 +1,69 @@
+# -----------------------------------------------------------------------------
+# Draft roxygen documentation for result objects and S3 methods in calibrar
+# Suggested target file: R/calibrar-class.R
+# -----------------------------------------------------------------------------
 
-# Methods for calibrar.results class ---------------------------------------
+#' Calibration result objects
+#'
+#' @description
+#' Objects of class `calibrar.results` are returned by [calibrate()]. They store
+#' the final parameter values together with the objective value, convergence
+#' information, the set of calibrated parameters, and tracing information from
+#' the calibration run.
+#'
+#' @details
+#' A `calibrar.results` object represents the final output of a complete
+#' calibration workflow, potentially including multiple calibration phases.
+#'
+#' The most useful accessors are:
+#'
+#' - [print()] for a compact console summary;
+#' - [summary()] for a more explicit summary, including selected parameters;
+#' - [coef()] to extract the fitted parameter values;
+#' - [predict()] to evaluate the fitted parameter set with the underlying model
+#'   function when this is available; and
+#' - [dim()] to report the number of parameters in the fitted solution.
+#'
+#' The [predict()] method is currently only available when the objective
+#' function was built with [calibration_objFn()], because it relies on metadata
+#' attached to that function.
+#'
+#' @docType class
+#' @name calibrar.results
+#' @rdname calibrar.results
+#' @format A list, usually with the following components:
+#' \describe{
+#'   \item{par}{Best parameter values found, returned with the same structure as
+#'   the input `par` supplied to [calibrate()].}
+#'   \item{value}{Objective-function value at `par`.}
+#'   \item{counts}{Named integer vector giving the number of function and
+#'   gradient evaluations recorded for the last calibration phase.}
+#'   \item{convergence}{Integer convergence code returned by the optimiser used
+#'   in the final phase.}
+#'   \item{message}{Character string with additional information returned by the
+#'   optimiser.}
+#'   \item{method}{Name of the optimisation method used in the calibration.}
+#'   \item{fn}{Objective function used for the calibration.}
+#'   \item{active}{Logical vector indicating which parameters were active
+#'   (estimated) in the full calibration problem.}
+#'   \item{elapsed}{Elapsed time for the complete calibration run.}
+#'   \item{trace}{A list containing tracing information from the last phase and
+#'   additional run-level metadata. Depending on the control settings and the
+#'   optimiser used, this may include per-phase outputs, generation traces,
+#'   partial objective values, and other diagnostic information.}
+#' }
+#'
+#' @seealso [calibrate()], [calibration_objFn()], [summary()], [coef()],
+#'   [predict()]
+#' @keywords classes
+NULL
 
+#' @rdname calibrar.results
+#' @title Methods for `calibrar.results` objects
+#' @param x A `calibrar.results` object, or a `summary.calibrar.results` object
+#'   for `print.summary.calibrar.results()`.
+#' @param object A `calibrar.results` object.
+#' @param ... Additional arguments passed to the underlying method.
 #' @export
 print.calibrar.results = function(x, ...) {
   
@@ -19,11 +82,29 @@ print.calibrar.results = function(x, ...) {
   return(invisible(NULL))
 }
 
+#' @rdname calibrar.results
+#' @description
+#' `coef()` returns the fitted parameter values stored in a
+#' `calibrar.results` object.
+#' @return `coef.calibrar.results()` returns the fitted parameter values, with
+#'   the same structure as the `par` component of the object.
 #' @export
 coef.calibrar.results = function(object, ...) {
   return(object$par)
 }
 
+#' @rdname calibrar.results
+#' @param replicates Number of replicate evaluations of the fitted parameter set
+#'   to perform. If `replicates = 1`, the underlying model function is evaluated
+#'   once. If `replicates > 1`, repeated evaluations are combined by taking the
+#'   mean across replicates for each returned output.
+#' @param na.rm Logical. Passed to the internal averaging step used when
+#'   `replicates > 1`.
+#' @return
+#' `predict.calibrar.results()` returns the model outputs produced by the fitted
+#' parameter set. When `replicates > 1`, it returns the mean output across
+#' replicates and stores the full replicate-level outputs in the `.replicates`
+#' component of the returned object.
 #' @export
 predict.calibrar.results = function(object, replicates=1, 
                                     na.rm=FALSE, ...) {
@@ -53,17 +134,32 @@ predict.calibrar.results = function(object, replicates=1,
 }
 
 
+#' @rdname calibrar.results
+#' @description
+#' `plot()` is currently a placeholder method for `calibrar.results` objects.
+#' No graphical summary is produced at present.
+#' @return `plot.calibrar.results()` returns `NULL`, invisibly.
 #' @export
 plot.calibrar.results = function(x, ...) {
   return(invisible(NULL))
 }
 
-#' @title Summary for calibration results object
-#' @param object Object of class calibrar.results
-#' @param ... More objects of class calibrar.results as needed for comparisons.
-#' @param show_par Vector of names of positions of the parameters to show in the summary. 
-#' @param par.only Show only parameters in the summary, used when more than one optimization results are summarized.
-#' @keywords internal
+#' @rdname calibrar.results
+#' @param show_par Optional character vector of parameter names or integer vector
+#'   of positions indicating which parameters should be shown in the summary.
+#'   By default, all fitted parameters are shown.
+#' @param par.only Logical. If `TRUE`, return only the method name and selected
+#'   parameter values. This is mainly useful when summarising several
+#'   `calibrar.results` objects side by side.
+#' @return
+#' `summary.calibrar.results()` returns either:
+#' 
+#' - an object of class `summary.calibrar.results` when called on a single
+#'   object; or
+#' - a `data.frame` with one row per result object when several
+#'   `calibrar.results` objects are supplied through `...`.
+#'
+#' The print method formats these summaries for console display.
 #' @export
 summary.calibrar.results = function(object, ..., show_par=NULL, par.only=FALSE) {
   oNames = as.character(match.call())[-1]
@@ -77,7 +173,7 @@ summary.calibrar.results = function(object, ..., show_par=NULL, par.only=FALSE) 
     class(out) = c("summary.calibrar.results", class(out))
     return(out)
   }
-  object$nphases = length(object$phases)
+  object$nphases = length(object$trace$phases)
   object$nactive = sum(object$active)
   object$npar = length(unlist(object$par))
   object$show_pars = show_par
@@ -109,6 +205,9 @@ summary.calibrar.results = function(object, ..., show_par=NULL, par.only=FALSE) 
   return(out)
 }
 
+#' @rdname calibrar.results
+#' @param digits Number of significant digits to use when printing summary
+#'   tables or parameter values.
 #' @export
 print.summary.calibrar.results = function(x, digits=3, ...) {
   if(is.data.frame(x)) {
@@ -142,39 +241,112 @@ print.summary.calibrar.results = function(x, digits=3, ...) {
   return(invisible())
 }
 
-# Methods for ahres.result class ----------------------------------------
-
+#' @rdname calibrar.results
+#' @description
+#' `dim()` returns the number of fitted parameters after unlisting the parameter
+#' structure stored in the result object.
+#' @return `dim.calibrar.results()` returns a single integer.
 #' @export
-print.ahres.result = function(x, short=FALSE, ...) {
+dim.calibrar.results = function(x) {
+  length(unlist(x$par))
+}
+
+
+#' Evolutionary-strategy result objects
+#'
+#' @description
+#' Objects of class `ahres.results` are returned by [ahres()]. They store the
+#' fitted parameters and the main diagnostics produced by the AHR-ES optimiser.
+#'
+#' @details
+#' These objects are specific to the AHR-ES optimisation workflow. They contain
+#' the final parameter vector, the aggregated objective value, convergence and
+#' iteration information, and, when relevant, partial objective values and
+#' tracing information.
+#'
+#' The main accessors are [print()], [summary()], and [coef()]. A `plot()`
+#' method is currently exported as a placeholder but does not yet produce a
+#' graphical summary.
+#'
+#' @docType class
+#' @name ahres.results
+#' @rdname ahres.results
+#' @format A list, usually with the following components:
+#' \describe{
+#'   \item{par}{Best parameter values found by the AHR-ES algorithm.}
+#'   \item{value}{Aggregated objective-function value at `par`.}
+#'   \item{counts}{Named integer vector giving the number of function and
+#'   gradient evaluations recorded by the optimiser.}
+#'   \item{convergence}{Integer convergence code. `0` indicates that the
+#'   stopping criterion was reached before the generation limit; `1` indicates
+#'   that the maximum number of generations or function evaluations was reached.}
+#'   \item{message}{Character string describing the stopping condition.}
+#'   \item{generations}{Number of generations completed.}
+#'   \item{partial}{Optional vector of partial objective-function values,
+#'   present when the objective function returns multiple components.}
+#'   \item{trace}{Optional tracing information collected during the run.}
+#'   \item{active}{Information on which parameters were active in the
+#'   optimisation, as stored by [ahres()].}
+#' }
+#'
+#' @seealso [ahres()], [summary()], [coef()]
+#' @keywords classes
+NULL
+
+#' @rdname ahres.results
+#' @title Methods for `ahres.results` objects
+#' @param x An `ahres.results` object, or a `summary.ahres.results` object for
+#'   `print.summary.ahres.results()`.
+#' @param object An `ahres.results` object.
+#' @param ... Additional arguments passed to the underlying method.
+#' @param short Logical. If `TRUE`, print a compact summary without listing the
+#'   full parameter vector.
+#' @export
+print.ahres.results = function(x, short=FALSE, ...) {
   
   cat("\nFunction value:", x$value, "\n")
   if(!isTRUE(short)) {
     cat(sprintf("Parameters (%d out of %d parameters are currently active).\n",
-                length(x$active.par), length(x$par)))
+                sum(x$active$isActive), length(x$par)))
     print(x=x$par, ...)    
-    if(!isTRUE(x$active.flag)) cat("* Parameters not calibrated.\n")
+    if(!isTRUE(x$active$activeFlag)) cat("* Parameters not calibrated.\n")
   }
   
 }
 
+#' @rdname ahres.results
+#' @description
+#' `coef()` returns the fitted parameter values stored in an `ahres.results`
+#' object.
+#' @return `coef.ahres.results()` returns the fitted parameter vector.
 #' @export
-coef.ahres.result = function(object, ...) {
+coef.ahres.results = function(object, ...) {
   return(object$par)
 }
 
+#' @rdname ahres.results
+#' @description
+#' `plot()` is currently a placeholder method for `ahres.results` objects.
+#' No graphical summary is produced at present.
+#' @return `plot.ahres.results()` returns `NULL`, invisibly.
 #' @export
-plot.ahres.result = function(x, ...) {
+plot.ahres.results = function(x, ...) {
   return(invisible(NULL))
 }
 
+#' @rdname ahres.results
+#' @return
+#' `summary.ahres.results()` returns an object of class
+#' `summary.ahres.results`.
 #' @export
-summary.ahres.result = function(object, ...) {
-  class(object) = "summary.ahres.result"
+summary.ahres.results = function(object, ...) {
+  class(object) = "summary.ahres.results"
   return(object)
 }
 
+#' @rdname ahres.results
 #' @export 
-print.summary.ahres.result = function(x, ...) {
+print.summary.ahres.results = function(x, ...) {
   cat("\nFunction value:", x$value, "\n")
   cat("Parameters:\n")
   print(x=x$par, ...)
@@ -186,9 +358,4 @@ print.summary.ahres.result = function(x, ...) {
   cat("Counts:\n")
   print(x$counts)
   
-}
-
-#' @export
-dim.calibrar.results = function(x) {
-  length(unlist(x$par))
 }

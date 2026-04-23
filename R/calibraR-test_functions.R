@@ -9,23 +9,37 @@ summary.calibrar.function = function(object, ...) {
   return(invisible())
 }
 
-#' Sphere function with random noise 
-#' 
-#' This function calculates the Euclidian distance from a point to the origin
-#' after a random displacement of its position. 
-#' 
-#' @param x The coordinates of the point
-#' @param sd The standard deviation of the noise
-#' to be added to the position of \code{x}, a normal distribution with mean
-#' zero is used.
-#' @param aggregate If \code{aggregate} is \code{TRUE} the distance is returned, 
-#' otherwise the size of the projection of the distance among each axis.
-#' @return The distance from the point \code{x} to the origin after a random
-#' displacement.
-#' @author Ricardo Oliveros--Ramos
-#' @keywords stochastic random
-#' @examples sphereN(rep(0, 10))
-#' @aliases sphereN
+# sphereN()
+
+#' Noisy sphere test function
+#'
+#' Evaluate a stochastic variant of the sphere test function often used in
+#' optimisation examples. The deterministic sphere function is the sum of the
+#' squared coordinates; here, Gaussian noise is added to each coordinate before
+#' the squared distance is computed.
+#'
+#' @param x Numeric vector of coordinates.
+#' @param sd Standard deviation of the Gaussian noise added independently to
+#'   each coordinate.
+#' @param aggregate Logical. If `TRUE`, return the summed squared distance. If
+#'   `FALSE`, return the contribution of each coordinate separately.
+#'
+#' @return
+#' A numeric scalar if `aggregate = TRUE`, or a numeric vector of squared
+#' contributions if `aggregate = FALSE`.
+#'
+#' @details
+#' This function is mainly useful for examples, testing, and illustrating how
+#' `calibrar` behaves with stochastic objective functions.
+#'
+#' @seealso
+#' [calibrate()], [optim2()], [ahres()]
+#'
+#' @examples
+#' set.seed(1)
+#' sphereN(rep(0, 5))
+#' sphereN(rep(0, 5), aggregate = FALSE)
+#'
 #' @export
 sphereN = function(x, sd=0.1, aggregate=TRUE) {
   # f(0,...,0) = 0
