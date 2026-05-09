@@ -76,14 +76,3 @@ vignette("calibrar")
 For a more detailed explanation of the package philosophy, you can read
 the article [calibrar: an R package for fitting complex ecological
 models](https://doi.org/10.1111/2041-210X.14452).
-
-### Contributions
-
-If you find any bug, have questions about the documentation or requests
-for enhancements, please [open an
-issue](https://github.com/roliveros-ramos/calibrar/issues).
-
-Contributions are accepted as pull requests. Please note that the
-calibrar package is released with a [Contributor Code of
-Conduct](https://www.contributor-covenant.org/version/2/1/code_of_conduct/).
-By contributing to this project, you agree to abide by its terms.

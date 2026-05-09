@@ -26,3 +26,5 @@ vignettes/.*_cache/
 ^Meta$
 ^vignettes/articles$
 ^vignettes/internal$
+^\.positai$
+^\.claude$
