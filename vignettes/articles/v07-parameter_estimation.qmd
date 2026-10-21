@@ -1,15 +1,19 @@
 ---
 title: "Using the `calibrate()` function for parameter estimation"
 author: "Ricardo Oliveros-Ramos"
-date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
+date: today
+format:
+  html:
+    toc: true
+    number-sections: true
 vignette: >
   %\VignetteIndexEntry{Using the `calibrate()` function for parameter estimation}
-  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEngine{quarto::html}
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r setup, include = FALSE}
+```{r}
+#| include: false
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"

@@ -1,0 +1,78 @@
+---
+title: "Sequential calibration with calibrate()"
+author: "Ricardo Oliveros-Ramos"
+date: today
+format:
+  html:
+    toc: true
+    number-sections: true
+vignette: >
+  %\VignetteIndexEntry{Sequential calibration with calibrate()}
+  %\VignetteEngine{quarto::html}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+library(calibrar, quietly = TRUE)
+```
+
+This vignette introduces \code{v06-sequential-calibration} and provides a structured starting point for documenting the relevant functions and workflows.
+
+<!--
+Suggested approach:
+- Keep examples short and runnable.
+- Prefer `calibrar::optim2()`/`calibrar::optimh()` calls over extensive supporting code.
+- Where timings are shown, report the machine/cores and use `system.time()` or `bench` with small runs.
+-->
+
+## Overview
+<!--
+- What `calibrate()` provides beyond a single optimisation call.
+- Key idea: multi-phase calibration via progressive unmasking.
+-->
+
+TODO
+
+## Why sequential calibration?
+<!--
+- Motivation: identifiability, stability, expensive objectives, staged fitting.
+- Typical patterns: fit subsets first, then refine jointly.
+-->
+
+TODO
+
+## Defining phases and masks
+<!--
+- How to specify which parameters are active per phase.
+- Guidance for ordering phases and choosing initial values.
+-->
+
+TODO
+
+## Choosing methods per phase
+<!--
+- Local methods early vs later; optional refinement.
+- Handling bounds and scaling consistently across phases.
+-->
+
+TODO
+
+## Replicates and stochastic models (preview)
+<!--
+- Briefly introduce `replicates` and how it changes objective evaluation.
+- Point to the dedicated stochastic-model vignette.
+-->
+
+TODO
+
+## Worked workflow template
+<!--
+- Provide a minimal reusable scaffold users can adapt.
+- Emphasise logging, checkpoints, and reproducibility.
+-->
+
+TODO

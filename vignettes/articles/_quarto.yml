@@ -1,0 +1,8 @@
+# Minimal Quarto project config for pkgdown articles in vignettes/articles
+project:
+  type: default
+  render:
+    - "*.qmd"
+  preview:
+    browser: false
+    watch-inputs: false

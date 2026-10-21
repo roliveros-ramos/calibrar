@@ -1,0 +1,301 @@
+---
+title: "Preparing a calibration workflow with calibrar"
+author: "Ricardo Oliveros-Ramos"
+date: today
+lang: en-GB
+bibliography: calibrar.bib
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+execute:
+  eval: true
+  echo: true
+  warning: false
+  message: false
+---
+
+## Introduction
+
+This vignette introduces the main objects that define a calibration workflow in `calibrar`, before moving to the more model-specific workflows developed in later vignettes. It is meant as a bridge between the earlier demonstration examples and the more operational workflows presented later for OSMOSE and Atlantis.
+
+The focus here is not on a new model, but on a new level of organisation. Earlier vignettes showed how a model can be calibrated in `calibrar`. Here, the goal is to make the calibration itself more explicit. Rather than relying only on convenient demo objects prepared in advance, we make the structure of the calibration visible and discuss the helper functions that turn that structure into a working objective function.
+
+To keep the model side familiar, this vignette reuses the Poisson mixed-model example introduced earlier. That choice is deliberate. It allows us to concentrate on the new concepts without having to introduce a new biological or statistical model at the same time. It also provides a more informative calibration structure than the simpler predator--prey example, because it naturally involves several fitted outputs and an additional penalty term.
+
+A useful feature of this example is that the model still runs fully in memory within R. The workflow is therefore rich enough to introduce the objective-function layer clearly, while remaining simple enough that the parameter layer can still be handled directly in R. In other words, this vignette introduces the key concepts without yet requiring a more elaborate file structure for the parameters.
+
+The central ideas of this vignette are fourfold. First, `calibration_settings.csv` defines the objective-function layer: which simulated quantities are compared to which targets, how they are compared, and how they are combined. Second, `calibration_setup()`, `calibration_data()`, and `calibration_objFn()` form the bridge between that setup and a working objective function. Third, the distinction between `calibrate` and `use_data` becomes explicit, which is especially useful when penalty terms are part of the objective function. Fourth, even though the parameter layer is kept in memory here, the same objects could later be stored on disk, read into the R session, and passed to `calibrate()` in exactly the same way.
+
+::: {.callout-note}
+## Scope of this vignette
+This vignette is introductory by design. It explains the structure of a calibration workflow and the role of the main setup objects. It does not yet aim to provide a fully engineered model-specific workflow. That fuller operational layer is better illustrated in later vignettes.
+:::
+
+## Reusing the Poisson Autoregressive model example in a more explicit workflow
+
+The model used here is the Poisson autoregressive mixed model introduced earlier in the [parameter estimation](v07-parameter_estimation.html) vignette. In that model, abundance evolves across several sites through time as a function of its previous state, an environmental covariate, and year-specific random effects. Observations are then represented as Poisson counts around the modelled mean process.
+
+For the purposes of this vignette, however, the model itself is not the main subject. What matters here is that the model returns several simulated quantities that can be confronted with observations, and that the calibration may also include a penalty term based on an internal component of the parameterisation. This makes it a good didactic example for introducing the calibration structure.
+
+This choice also makes this vignette a natural continuation of the more general  examples presented in the [parameter estimation](v07-parameter_estimation.html) vignette, especially the autoregressive Poisson example developed there. The difference is that we now stop looking only at the optimisation call itself and instead make the calibration workflow explicit.
+
+In particular, the Poisson example allows us to introduce an important feature of `calibrar`: not every row of the calibration setup needs to correspond to a standard observed-data series. Some rows represent data-driven comparisons, while others can represent penalties or diagnostic components. This makes the settings table more than a simple list of files. It is the formal description of the calibration objective.
+
+We begin by creating a small version of the Poisson mixed-model example with `calibrar_demo()`. The goal is not to create a realistic large problem, but to obtain a compact and reproducible workspace in which the calibration structure can be inspected clearly.
+
+```{r}
+library(calibrar)
+library(knitr)
+
+set.seed(880820)
+
+demo_path = file.path(tempdir(), "calibrar_poisson_intro")
+dir.create(demo_path, recursive = TRUE, showWarnings = FALSE)
+
+ARPM = calibrar_demo(
+  path = demo_path,
+  model = "PoissonMixedModel",
+  L = 3,
+  T = 30
+)
+```
+
+At this point, the demo has created a small workspace containing the objective-function information and the observed data needed by the example.
+
+## Core components of the calibration workflow
+
+### Reading the objective-function layer
+
+The first explicit layer of the workflow is the calibration setup. This is the part that tells `calibrar` how the simulated outputs should be interpreted in the calibration.
+
+```{r}
+setup = calibration_setup(file = ARPM$setup)
+observed = calibration_data(setup = setup, path = ARPM$path)
+
+forcing = as.matrix(
+  utils::read.csv(
+    file.path(ARPM$path, "master", "environment.csv"),
+    row.names = 1,
+    check.names = FALSE
+  )
+)
+```
+
+The `setup` object comes from `calibration_setup()`. Conceptually, it is a checked version of the calibration table. The `observed` object comes from `calibration_data()`, which reads the observed targets required by that setup. In this example, we also read an additional forcing object, because the model needs environmental conditions at each site and time step.
+
+To begin with, it is useful to inspect the setup directly.
+
+```{r}
+#| eval: false
+setup
+```
+```{r}
+#| echo: false
+kable(setup, caption = "Contents of `calibration_settings.csv` after reading it with `calibration_setup()`.")
+```
+
+This table is the core of the objective-function layer. Each row corresponds to one component of the objective function. The `variable` column identifies one output returned by the model wrapper. The `type` column specifies how observed and simulated values are compared. The `weight` column determines how strongly that component contributes to the aggregated objective function.
+
+Two columns deserve special attention here.
+
+The `calibrate` field indicates whether the row contributes to the calibration criterion. It answers the question of whether the row is active in the objective function used for parameter estimation.
+
+The `use_data` field indicates whether observed data should actually be read for that row. It answers a different question: whether the component relies on an external observed dataset.
+
+This distinction is important because the Poisson example includes a penalty term. A penalty row may still contribute to the objective function and therefore have `calibrate = TRUE`, while not corresponding to any observed dataset and therefore requiring `use_data = FALSE`.
+
+This is one of the main reasons for using the Poisson example in this vignette. It makes clear that `calibration_settings.csv` is not merely a map of observed data files. It is a more general description of the components that define the calibration objective.
+
+### The parameter layer
+
+In later workflows, it can be useful to store parameter information explicitly on disk, for example in files such as `parguess.csv`, `parmin.csv`, `parmax.csv`, and `parphase.csv`. Those files would then be read into the R session and passed to `calibrate()`.
+
+Here, however, the model is still simple enough that the parameter layer can be kept entirely in memory. This is an advantage for an introductory vignette. It allows us to introduce the calibration structure without over-complicating the example with a larger file hierarchy.
+
+The demo object already provides the four parameter objects we need:
+
+```{r}
+#| eval: false
+ARPM$guess
+ARPM$lower
+ARPM$upper
+ARPM$phase
+```
+
+These four objects play the same conceptual roles that disk-based parameter files would play in a more operational workflow.
+
+The first one, `ARPM$guess`, contains the starting values passed to `calibrate()`. These are the values from which the optimisation begins. They are not target values and they are not assumed to be correct; they are simply the initial point from which the search starts.
+
+```{r}
+ARPM$guess
+```
+
+The second one, `ARPM$lower`, contains the lower bounds for the parameters. These values define the lower edge of the admissible search space for a box-constrained calibration.
+
+```{r}
+ARPM$lower
+```
+
+The third one, `ARPM$upper`, contains the upper bounds. Together with the lower bounds, these values specify the full range within which the optimiser is allowed to search.
+
+```{r}
+ARPM$upper
+```
+
+The fourth one, `ARPM$phase`, defines the sequential activation of the parameters. A parameter becomes active only from its assigned POSTIVE phase onward. Negative phases or `NA` mark inactive parameters. This is useful when the calibration is organised progressively rather than estimating all parameters at once.
+
+```{r}
+ARPM$phase
+```
+
+In this example, all four objects are returned directly by `calibrar_demo()` and remain in memory. In a disk-based workflow, the same information could be stored externally and then read into R before calling `calibrate()`. The conceptual role of the objects would be unchanged. Only their source would differ.
+
+For example, a later workflow could do something like:
+
+```{r eval=FALSE}
+par_table = read.csv("calibration-parameters.csv")
+par = par_table$parguess
+lower = par_table$parmin
+upper = par_table$parmax
+phases = par_table$parphase
+```
+
+The important point is that `calibrate()` ultimately receives ordinary R objects. Whether they were created directly in code or read from disk is a workflow choice rather than a conceptual difference.
+
+### Defining the model wrapper
+
+The next step is to define the model wrapper, `run_model()`. This function is central to the black-box design of `calibrar`. Its job is to receive a parameter object, run the model, and return the simulated outputs that may later be confronted with the observed targets.
+
+In this example, the wrapper remains very simple because the model itself already exists inside the package demo machinery. We only add one extra element to the output: the yearly random effects, returned explicitly as `gammas`, so they can be used in the objective-function layer.
+
+```{r}
+run_model = function(par, forcing) {
+  output = calibrar:::.PoissonMixedModel(par = par, forcing = forcing)
+
+  output = c(output, list(gammas = par$gamma))
+
+  return(output)
+}
+```
+
+This is a useful step to inspect immediately:
+
+```{r}
+sim0 = run_model(ARPM$guess, forcing = forcing)
+names(sim0)
+```
+
+This inspection matters because it shows how the wrapper and the setup object must agree. The names returned by `run_model()` are what the objective-function layer will refer to. The setup therefore describes how to interpret this returned list, not the internal details of the model code.
+
+### Building the objective function
+
+With the model wrapper, the setup, and the observed data in hand, we can now create the objective function.
+
+This is the role of `calibration_objFn()`. It combines three ingredients:
+
+- the model wrapper, which knows how to run the model;
+- the setup object, which knows how the outputs should be interpreted;
+- the observed-data object, which provides the targets when they are needed.
+
+It is useful to construct the objective function in two forms. First, with `aggregate = FALSE`, we can inspect the separate components. Second, with `aggregate = TRUE`, we obtain the scalar objective function to be passed to `calibrate()`.
+
+```{r}
+obj_components = calibration_objFn(
+  model = run_model,
+  setup = setup,
+  observed = observed,
+  forcing = forcing,
+  aggregate = FALSE
+)
+
+obj = calibration_objFn(
+  model = run_model,
+  setup = setup,
+  observed = observed,
+  forcing = forcing,
+  aggregate = TRUE
+)
+```
+
+At the starting point, the component-wise view helps make the structure of the objective function visible:
+
+```{r}
+components_start = obj_components(ARPM$guess)
+components_start
+```
+
+The aggregated objective-function value is then simply:
+
+```{r}
+value_start = obj(ARPM$guess)
+value_start
+```
+
+This is a key moment in the vignette. Up to this point, we have been assembling ingredients. Here, those ingredients become a proper optimisation target.
+
+### Running a calibration and inspecting the result
+
+Once the objective function has been created, the calibration step itself becomes comparatively straightforward. We pass the starting values, bounds, phases, and objective function to `calibrate()`.
+
+```{r}
+fit = calibrate(
+  par = ARPM$guess,
+  fn = obj,
+  lower = ARPM$lower,
+  upper = ARPM$upper,
+  phases = ARPM$phase,
+  method = "L-BFGS-B",
+  control = list(maxit = 500)
+)
+```
+
+Even in this compact example, the separation of roles is now clear. The call to `calibrate()` does not itself define the calibration problem. It only solves the problem that has already been made explicit by the setup, the observed-data object, the parameter layer, and the model wrapper.
+
+At this stage, the main goal is not to perform a deep interpretation of the fitted values, but to verify that the workflow behaves as expected.
+
+```{r}
+summary(fit)
+coef(fit)
+```
+
+It is also useful to compare the objective-function value before and after calibration:
+
+```{r}
+par_fit = coef(fit)
+value_fit = obj(par_fit)
+
+value_start
+value_fit
+```
+
+And, if needed, we can compare the partial components as well:
+
+```{r}
+components_fit = obj_components(par_fit)
+components_fit
+```
+
+This component-wise view can be informative when teaching the workflow, because it makes it clear that the final objective value is built from several weighted pieces rather than from a single monolithic comparison.
+
+## Conclusion
+
+### What this example has introduced
+
+At this point, the full logic of the workflow has been shown once, end to end.
+
+The first explicit layer is the objective-function layer, read from the calibration settings and formalised by `calibration_setup()`. The second is the observed-data layer, read by `calibration_data()` according to the needs declared in the setup. The third is the model wrapper, which translates a parameter object into a named list of simulated outputs. The fourth is the parameter layer, which in this vignette remains in memory through the objects returned by `calibrar_demo()`. Finally, `calibration_objFn()` combines the model wrapper, the setup, and the observed data into a proper objective function for `calibrate()`.
+
+The example also introduced an important conceptual distinction: a row may contribute to the calibration criterion without reading observed data. This is the role of penalty-type components and the main reason why `use_data` and `calibrate` should be understood separately.
+
+### Where to go next
+
+Once these ideas are clear, the reader is in a much better position to approach the more model-specific vignettes.
+
+The later [OSMOSE](v12-setting_up_an_osmose_calibration.html) and [Atlantis](v13-using_calibrar_for_atlantis_calibration.html) workflows do not replace the structure introduced here. They build on it. What changes is not the underlying logic of `calibrar`, but the amount of preparation required around the model, the number of targets involved, and the practical organisation of runs and files.
+
+In those more operational workflows, the parameter layer may well be stored explicitly on disk and then read into R before calling `calibrate()`. This vignette has deliberately postponed that extra organisational step so that the core ideas can be introduced in a simpler setting first.
+
+As additional model-specific vignettes are added in the future, they may each highlight different lessons. The role of this vignette is therefore intentionally modest: it provides the common conceptual base and invites the reader to continue towards more specialised applications.
+
