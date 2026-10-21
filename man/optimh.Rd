@@ -120,10 +120,10 @@ optimh(
 \seealso{
 \code{\link[=optim2]{optim2()}}, \code{\link[=calibrate]{calibrate()}}, \code{\link[=ahres]{ahres()}}, \code{\link[=gradient]{gradient()}}
 
-Other optimisers: 
-\code{\link{ahres}()},
-\code{\link{calibrate}()},
-\code{\link{optim2}()}
+Other optimisers:
+\code{\link[=ahres]{ahres()}},
+\code{\link[=calibrate]{calibrate()}},
+\code{\link[=optim2]{optim2()}}
 }
 \author{
 Ricardo Oliveros-Ramos

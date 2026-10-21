@@ -118,10 +118,10 @@ ahres(
 \seealso{
 \code{\link[=optimh]{optimh()}}, \code{\link[=optim2]{optim2()}}, \code{\link[=calibrate]{calibrate()}}, \code{\link[=summary.ahres.results]{summary.ahres.results()}}
 
-Other optimisers: 
-\code{\link{calibrate}()},
-\code{\link{optim2}()},
-\code{\link{optimh}()}
+Other optimisers:
+\code{\link[=calibrate]{calibrate()}},
+\code{\link[=optim2]{optim2()}},
+\code{\link[=optimh]{optimh()}}
 }
 \author{
 Ricardo Oliveros-Ramos

@@ -19,7 +19,7 @@ grid.}
 \item{n}{Number of grid cells per dimension. This can be a scalar or a
 length-two numeric vector.}
 
-\item{checkSymmetry}{Logical. Passed to \code{\link[mvtnorm:Mvnorm]{mvtnorm::dmvnorm()}} when checking
+\item{checkSymmetry}{Logical. Passed to \code{\link[mvtnorm:dmvnorm]{mvtnorm::dmvnorm()}} when checking
 the covariance matrix.}
 
 \item{...}{Further arguments reserved for future extensions.}
@@ -36,7 +36,7 @@ lower and upper bounds in each dimension.
 \details{
 This helper is convenient when a smooth bivariate dispersal or movement
 kernel needs to be represented on a finite grid. The function uses
-\code{\link[mvtnorm:Mvnorm]{mvtnorm::dmvnorm()}} internally and returns the density values without
+\code{\link[mvtnorm:dmvnorm]{mvtnorm::dmvnorm()}} internally and returns the density values without
 normalising them to sum to one over the discretised domain.
 }
 \examples{
@@ -50,5 +50,5 @@ str(ker)
 
 }
 \seealso{
-\code{\link[mvtnorm:Mvnorm]{mvtnorm::dmvnorm()}}
+\code{\link[mvtnorm:dmvnorm]{mvtnorm::dmvnorm()}}
 }

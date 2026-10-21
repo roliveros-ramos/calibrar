@@ -24,7 +24,7 @@ with \code{par}. If \code{NULL}, equally spaced knots are used.}
 
 \item{x}{A \code{spline.par} object returned by \code{\link[=spline_par]{spline_par()}}.}
 
-\item{...}{Further graphical arguments passed to \code{\link[graphics:plot.default]{graphics::plot()}}.}
+\item{...}{Further graphical arguments passed to \code{\link[graphics:plot]{graphics::plot()}}.}
 }
 \value{
 An object of class \code{spline.par}: a list containing the interpolated values

@@ -122,10 +122,10 @@ optim2(par=rep(NA, 5), fn=sphereN)
 \seealso{
 \code{\link[stats]{optim}}, \code{\link[stats]{nlm}}, \code{\link[stats]{nlminb}}
 
-Other optimisers: 
-\code{\link{ahres}()},
-\code{\link{calibrate}()},
-\code{\link{optimh}()}
+Other optimisers:
+\code{\link[=ahres]{ahres()}},
+\code{\link[=calibrate]{calibrate()}},
+\code{\link[=optimh]{optimh()}}
 }
 \author{
 Ricardo Oliveros-Ramos

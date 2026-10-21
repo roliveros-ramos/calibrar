@@ -15,13 +15,13 @@ Each file is looked up with \code{\link[base:file.path]{base::file.path()}} usin
 stored in the corresponding \code{file} row.}
 
 \item{file}{Optional path to save the resulting \code{observed} object with
-\code{\link[base:readRDS]{base::saveRDS()}}. This is useful when observed data are expensive to read
+\code{\link[base:saveRDS]{base::saveRDS()}}. This is useful when observed data are expensive to read
 repeatedly.}
 
 \item{verbose}{Logical. If \code{TRUE}, print progress messages describing which
 variables were loaded.}
 
-\item{...}{Additional arguments passed to \code{\link[utils:read.table]{utils::read.csv()}} when reading
+\item{...}{Additional arguments passed to \code{\link[utils:read.csv]{utils::read.csv()}} when reading
 text files.}
 }
 \value{
@@ -55,7 +55,7 @@ read from disk. All other rows are represented as \code{NA} in the returned list
 File reading currently depends on file type:
 
 \describe{
-\item{text files (\code{.csv}, \code{.txt})}{Read with \code{\link[utils:read.table]{utils::read.csv()}}. If
+\item{text files (\code{.csv}, \code{.txt})}{Read with \code{\link[utils:read.csv]{utils::read.csv()}}. If
 \code{varid} is supplied, that column is extracted and returned as a numeric
 vector. Otherwise the full table is converted to a numeric matrix after
 dropping the first \code{col_skip} columns, when applicable.}

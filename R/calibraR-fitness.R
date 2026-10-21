@@ -171,6 +171,12 @@
 #'   \item returns a length-one numeric scalar to be minimised;
 #'   \item defines its own parameter checks and missing-value policy.
 #' }
+#' 
+#' @note
+#' `fitness()` is provided as an exported alias of `objFn()`. Both names refer
+#' to the same underlying function, but `objFn()` is the preferred name in the
+#' current user-facing documentation.
+
 #'
 #' @examples
 #' ## Basic squared-error objective
@@ -205,9 +211,6 @@
 #' }
 #' objFn(obs = c(1, 2, NA), sim = c(1.1, 1.7, 3), FUN = my_obj)
 #'
-#' `fitness()` is provided as an exported alias of `objFn()`. Both names refer
-#' to the same underlying function, but `objFn()` is the preferred name in the
-#' current user-facing documentation.
 #' @seealso
 #' \code{match.fun}
 #'

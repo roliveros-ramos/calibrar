@@ -172,10 +172,10 @@ calibrate(par=rep(0.5, 5), fn=sphereN, replicates=c(1,1,4), lower=-5, upper=5, p
 \code{\link{calibration_setup}}, \code{\link{calibration_data}},
 \code{\link{calibration_objFn}}
 
-Other optimisers: 
-\code{\link{ahres}()},
-\code{\link{optim2}()},
-\code{\link{optimh}()}
+Other optimisers:
+\code{\link[=ahres]{ahres()}},
+\code{\link[=optim2]{optim2()}},
+\code{\link[=optimh]{optimh()}}
 }
 \author{
 Ricardo Oliveros-Ramos

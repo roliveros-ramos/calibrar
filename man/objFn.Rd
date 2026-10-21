@@ -43,6 +43,11 @@ dispatcher: it resolves \code{FUN} via \code{\link[=match.fun]{match.fun()}} and
 The returned value is intended to be \strong{minimised} by an optimiser: lower
 values indicate a better match between \code{sim} and \code{obs} (or a lower penalty).
 }
+\note{
+\code{fitness()} is provided as an exported alias of \code{objFn()}. Both names refer
+to the same underlying function, but \code{objFn()} is the preferred name in the
+current user-facing documentation.
+}
 \section{Conventions and expectations}{
 
 \itemize{
@@ -226,9 +231,6 @@ my_obj <- function(obs, sim, ...) {
 }
 objFn(obs = c(1, 2, NA), sim = c(1.1, 1.7, 3), FUN = my_obj)
 
-`fitness()` is provided as an exported alias of `objFn()`. Both names refer
-to the same underlying function, but `objFn()` is the preferred name in the
-current user-facing documentation.
 }
 \seealso{
 \code{match.fun}

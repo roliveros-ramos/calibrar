@@ -19,7 +19,7 @@ text file is read as a full table by \code{\link[=calibration_data]{calibration_
 Defaults to \code{NA}, which is interpreted downstream as “read all rows”.}
 }}
 
-\item{...}{Additional arguments passed to \code{\link[utils:read.table]{utils::read.csv()}} when reading
+\item{...}{Additional arguments passed to \code{\link[utils:read.csv]{utils::read.csv()}} when reading
 \code{file}.}
 }
 \value{
@@ -36,7 +36,7 @@ objective function is used for each output, whether a row contributes to the
 calibration, and how each component is weighted in the final objective.
 }
 \details{
-The function is a validated wrapper around \code{\link[utils:read.table]{utils::read.csv()}}. It checks
+The function is a validated wrapper around \code{\link[utils:read.csv]{utils::read.csv()}}. It checks
 required column names, coerces standard column types, fills a few optional
 columns from \code{control}, and derives \code{weight} from \code{cv} when needed.
 
